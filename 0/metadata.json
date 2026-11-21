@@ -38,7 +38,7 @@
     "subagent_tokens_complete": true
   },
   "redaction": {
-    "replacements": 927,
+    "replacements": 931,
     "layers": {
       "betterleaks": 28,
       "connection_string": 0,
@@ -48,12 +48,12 @@
       "entropy": 154,
       "goredact": 2,
       "key_context": 0,
-      "pii": 692,
+      "pii": 696,
       "provider_token": 0,
       "shell_stdin": 0
     },
     "pii": {
-      "EMAIL": 614,
+      "EMAIL": 618,
       "IP": 24,
       "PHONE": 54
     }
