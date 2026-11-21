@@ -35,6 +35,17 @@ The product idea is not fixed yet. Check the README and recent commits for the c
 
 Prefer working, deployed and demoable over complete. Go deep on one problem.
 
+## Team workflow
+
+Who is doing what lives in `PROGRESS.md` at the repo root. Humans and agents follow the same steps.
+
+- **Before starting:** `git pull --rebase`, read `PROGRESS.md`, add or update your line under **Now** (`- <name>: <task>`), then commit and push that change right away so others see it
+- **Don't take work someone else is on.** If your task touches files another person's **Now** line covers, talk to them first
+- **While working:** small commits, one topic each; `git pull --rebase` before every `git push`; push at least every hour
+- **When done:** move your line to **Done** with the date, note any decision under **Decisions** and any blocker under **Blockers**, then push
+- **Conflicts in `PROGRESS.md`:** keep both sides; edit only your own line
+- Agents: do the above on behalf of the person you work for, using their name
+
 ## Entire (session tracking)
 
 Entire records agent sessions as checkpoints and links them to commits.
