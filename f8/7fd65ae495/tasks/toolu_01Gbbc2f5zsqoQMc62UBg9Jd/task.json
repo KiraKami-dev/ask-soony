@@ -1,0 +1,14 @@
+{
+  "tool_use_id": "toolu_01Gbbc2f5zsqoQMc62UBg9Jd",
+  "agent_id": "a1f0cfc7ccc0e4eb0",
+  "task_description": "Check delivery note scans vs GR",
+  "token_usage": {
+    "input_tokens": 12,
+    "cache_creation_tokens": 257150,
+    "cache_read_tokens": 550896,
+    "output_tokens": 22141,
+    "api_call_count": 6
+  },
+  "started_at": "2026-11-21T14:58:42.57899+01:00",
+  "completed_at": "2026-11-21T15:00:18.435116+01:00"
+}

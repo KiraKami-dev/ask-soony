@@ -1,0 +1,14 @@
+{
+  "tool_use_id": "toolu_011ESQKKyUvgSnTzbGaZxBd8",
+  "agent_id": "a7eda76cb91cf3ecc",
+  "task_description": "Analyse Soony portal data",
+  "token_usage": {
+    "input_tokens": 82,
+    "cache_creation_tokens": 210542,
+    "cache_read_tokens": 4446138,
+    "output_tokens": 35469,
+    "api_call_count": 37
+  },
+  "started_at": "2026-11-21T14:52:05.565794+01:00",
+  "completed_at": "2026-11-21T15:01:54.068596+01:00"
+}
