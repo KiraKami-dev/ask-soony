@@ -14,7 +14,6 @@ flowchart LR
 - Lucas: arrival forecast: rules for ETA + road leg, silence detection, news/notice risks, alternatives — see plan.md §5
 - Jonas: watcher (in progress) + criticality agent (call / email / notify) + ElevenLabs calls and supplier emails — see plan.md §5
 
-- Farhan (00:35): wiring portal changes into verifier/predictor/decision routing and moving verification under `src/ask_soony`; next: focused tests and handoff to UI/action integration
 
 ## Next
 - Sat 21:00 target (overdue): shared shapes in `src/ask_soony/schema.py`, sender addresses registered, office hours booked
@@ -22,6 +21,7 @@ flowchart LR
 - Sun 07:00: UI on real findings; Sun 10:00 freeze + deploy; Sun 11:00 video + deck; **Sun 12:00 submit**
 
 ## Done
+- 2026-11-22: Verifier, predictor and dispatch moved under `src/ask_soony`; watcher routes changes through them and regenerates approval-gated decision cards
 - 2026-11-21: Product direction fixed and work split (plan.md)
 - 2026-11-21: Read all portal files; findings in local `data/UNDERSTANDING.md` (gitignored, ask Akshat)
 - 2026-11-21: Entire session tracking and Brain shared memory set up (see AGENTS.md)
