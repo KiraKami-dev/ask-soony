@@ -1,0 +1,17 @@
+# Secrets (portal token, API keys)
+.env
+.env.*
+!.env.example
+
+# Portal data: fetch it through the API, never commit it
+data/
+
+# Personal agent settings (shared ones in .claude/settings.json are committed)
+.claude/settings.local.json
+
+# Tooling
+.DS_Store
+__pycache__/
+.venv/
+node_modules/
+dist/
