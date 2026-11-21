@@ -50,7 +50,16 @@ def main(argv: list[str] | None = None) -> int:
     p_f.add_argument("--all", action="store_true", help="Include resolved findings")
     p_f.add_argument("--json", action="store_true")
     sub.add_parser("status", help="Versions, pending analyses and open findings")
+    p_srv = sub.add_parser("serve", help="Serve the decision inbox UI and its API")
+    p_srv.add_argument("--host", default="127.0.0.1")
+    p_srv.add_argument("--port", type=int, default=8000)
     args = parser.parse_args(argv)
+
+    if args.cmd == "serve":
+        import uvicorn
+
+        uvicorn.run("ask_soony.api:app", host=args.host, port=args.port)
+        return 0
 
     settings = Settings.from_env()
     store = Store(settings.data_dir)
