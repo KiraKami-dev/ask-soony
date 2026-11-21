@@ -1,0 +1,5 @@
+but make predicotor an organized package like verifier, with no overengineering
+
+---
+
+maybe dispatch could also work like a package such as predictor or verifier?
