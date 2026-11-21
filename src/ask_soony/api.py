@@ -20,9 +20,11 @@ from pydantic import BaseModel
 
 from ask_soony import cardtools, feed, push, replies, voice
 from ask_soony.basic_auth import BasicAuth
+from ask_soony.network import build_network
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "web" / "fixtures" / "sample_state.json"
+NETWORK_FIXTURE = ROOT / "web" / "fixtures" / "sample_network.json"
 FIXTURES = [FIXTURE, ROOT / "web" / "fixtures" / "sample_forecast_cards.json"]
 DIST = ROOT / "web" / "dist"
 
@@ -164,6 +166,18 @@ def get_feed():
     if not events:
         events = _read(FIXTURE, {}).get("feed", [])
     return sorted(events, key=lambda e: e.get("at", ""), reverse=True)
+
+
+@app.get("/api/network")
+def get_network():
+    root = Path(os.environ.get("ASK_PORTAL_DIR") or ROOT / "data" / "soony-data")
+    net = build_network(root)
+    source = "portal"
+    if net is None:
+        net, source = _read(NETWORK_FIXTURE, {}), "fixture"
+    net["source"] = source
+    net["stale_hours"] = float(os.environ.get("ASK_STALE_HOURS") or 24)
+    return net
 
 
 class Mode(BaseModel):

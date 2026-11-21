@@ -55,6 +55,16 @@ export interface EditionRow {
   at_risk: number;
 }
 
+export interface PartRow {
+  part: string;
+  description?: string;
+  editions: string[];
+  needed: number;
+  usable: number;
+  gap: number;
+  runs_dry: string | null;
+}
+
 export interface State {
   source: string;
   mode: "ask" | "autonomous";
@@ -62,7 +72,7 @@ export interface State {
   hours_left?: number;
   packing_ends?: string;
   editions: EditionRow[];
-  parts: unknown[];
+  parts: PartRow[];
   cards: Card[];
 }
 
@@ -71,4 +81,57 @@ export interface FeedEvent {
   actor: string;
   text: string;
   ref?: string;
+}
+
+export interface NetNode {
+  id: string;
+  kind: "site" | "supplier" | "port";
+  name: string;
+  lat: number;
+  lon: number;
+  country?: string;
+  mode?: string;
+}
+
+export interface NetRoute {
+  id: string;
+  origin: string;
+  destination: string;
+  mode: string;
+  transit_days: number | null;
+  via: string[];
+  path: string[];
+}
+
+export interface NetShipment {
+  id: string;
+  supplier: string;
+  mode: string;
+  route: string;
+  path: string[];
+  etd: string | null;
+  eta: string | null;
+  transit_days: number | null;
+  status: string;
+  updated_at: string | null;
+  parts: string[];
+  po_numbers: string[];
+  note: string;
+}
+
+export interface NetProduct {
+  id: string;
+  name: string;
+  day_one: number | null;
+  parts: { part: string; qty_per: number | null; description: string; category: string }[];
+}
+
+export interface Network {
+  source: string;
+  stale_hours: number;
+  nodes: NetNode[];
+  routes: NetRoute[];
+  shipments: NetShipment[];
+  part_suppliers: Record<string, { supplier: string; share: number | null }[]>;
+  products: NetProduct[];
 }

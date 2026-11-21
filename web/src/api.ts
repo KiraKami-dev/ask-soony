@@ -1,4 +1,4 @@
-import type { ActionKind, FeedEvent, State } from "./types";
+import type { ActionKind, FeedEvent, Network, State } from "./types";
 
 async function json<T>(res: Response): Promise<T> {
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
@@ -7,6 +7,7 @@ async function json<T>(res: Response): Promise<T> {
 
 export const getState = () => fetch("/api/state").then((r) => json<State>(r));
 export const getFeed = () => fetch("/api/feed").then((r) => json<FeedEvent[]>(r));
+export const getNetwork = () => fetch("/api/network").then((r) => json<Network>(r));
 
 const post = (url: string, body: unknown) =>
   fetch(url, {
