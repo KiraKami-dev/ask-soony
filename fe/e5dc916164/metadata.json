@@ -3,7 +3,7 @@
   "checkpoint_id": "fee5dc916164",
   "strategy": "manual-commit",
   "branch": "integration/verifier",
-  "checkpoints_count": 1,
+  "checkpoints_count": 8,
   "files_touched": [
     "verifier/image_recognizer/README.md",
     "verifier/image_recognizer/__main__.py"
@@ -15,34 +15,48 @@
       "compact_transcript": "/fe/e5dc916164/0/transcript.jsonl",
       "content_hash": "/fe/e5dc916164/0/content_hash.txt",
       "prompt": "/fe/e5dc916164/0/prompt.txt"
+    },
+    {
+      "metadata": "/fe/e5dc916164/1/metadata.json",
+      "transcript": "/fe/e5dc916164/1/full.jsonl",
+      "compact_transcript": "/fe/e5dc916164/1/transcript.jsonl",
+      "content_hash": "/fe/e5dc916164/1/content_hash.txt",
+      "prompt": "/fe/e5dc916164/1/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 65925,
-    "cache_creation_tokens": 0,
-    "cache_read_tokens": 556544,
-    "output_tokens": 4254,
-    "api_call_count": 14
+    "input_tokens": 66007,
+    "cache_creation_tokens": 42905,
+    "cache_read_tokens": 7974552,
+    "output_tokens": 22618,
+    "api_call_count": 46,
+    "subagent_tokens": {
+      "input_tokens": 6,
+      "cache_creation_tokens": 18903,
+      "cache_read_tokens": 9416,
+      "output_tokens": 1617,
+      "api_call_count": 3
+    }
   },
   "redaction": {
-    "replacements": 9,
+    "replacements": 64,
     "layers": {
       "betterleaks": 0,
       "connection_string": 0,
       "credential_key": 0,
-      "credential_value": 3,
+      "credential_value": 17,
       "credentialed_uri": 0,
-      "entropy": 2,
+      "entropy": 29,
       "goredact": 0,
       "key_context": 0,
-      "pii": 4,
+      "pii": 18,
       "provider_token": 0,
       "shell_stdin": 0
     },
     "pii": {
-      "EMAIL": 4,
+      "EMAIL": 16,
       "IP": 0,
-      "PHONE": 0
+      "PHONE": 2
     }
   }
 }
