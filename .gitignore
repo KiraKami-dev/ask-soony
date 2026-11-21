@@ -21,3 +21,6 @@ dist/
 
 # Local copy of portal data (confidential)
 soony-data/
+
+# Playwright MCP scratch
+.playwright-mcp/

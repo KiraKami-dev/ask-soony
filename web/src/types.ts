@@ -31,6 +31,9 @@ export interface Card {
   act_by: string | null;
   runs_dry: string | null;
   blocked_only: boolean;
+  module?: string;
+  source_file?: string;
+  action_status?: { status: "sent" | "replied"; at: string; reply?: string };
   stage?: "before_arrival" | "after_dock";
   human_decision?: { action: ActionKind; note?: string | null; ts: string };
 }
@@ -58,7 +61,8 @@ export interface State {
 }
 
 export interface FeedEvent {
-  ts: string;
-  agent: string;
+  at: string;
+  actor: string;
   text: string;
+  ref?: string;
 }

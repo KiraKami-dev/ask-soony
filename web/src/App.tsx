@@ -83,6 +83,11 @@ function CardRow({
         {card.stage === "before_arrival" && (
           <span className="rounded bg-accent/10 px-1.5 py-0.5 font-semibold text-accent">EARLY WARNING</span>
         )}
+        {card.action_status && (
+          <span className="rounded bg-ok/10 px-1.5 py-0.5 font-semibold text-ok">
+            {card.action_status.status === "replied" ? "REPLIED" : "SENT"}
+          </span>
+        )}
         <span>{card.edition}</span>
         {left && <span>Act within {left}</span>}
       </div>
@@ -240,8 +245,8 @@ export default function App() {
             {(feed ?? []).map((ev, i) => (
               <li key={i} className="rounded-lg border border-slate-200 bg-white p-3 text-sm">
                 <div className="flex justify-between text-xs text-slate-500">
-                  <span className="font-medium text-slate-700">{ev.agent}</span>
-                  <span>{new Date(ev.ts).toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" })}</span>
+                  <span className="font-medium text-slate-700">{ev.actor}</span>
+                  <span>{new Date(ev.at).toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" })}</span>
                 </div>
                 {ev.text}
               </li>
