@@ -1,0 +1,50 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "5be034229a1d",
+  "strategy": "manual-commit",
+  "branch": "feat/predictor",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "src/ask_soony/cli.py",
+    "src/ask_soony/config.py",
+    "src/ask_soony/impact.py",
+    "tests/test_impact.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/5b/e034229a1d/0/metadata.json",
+      "transcript": "/5b/e034229a1d/0/full.jsonl",
+      "compact_transcript": "/5b/e034229a1d/0/transcript.jsonl",
+      "content_hash": "/5b/e034229a1d/0/content_hash.txt",
+      "prompt": "/5b/e034229a1d/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 42,
+    "cache_creation_tokens": 68879,
+    "cache_read_tokens": 1522143,
+    "output_tokens": 11598,
+    "api_call_count": 20
+  },
+  "redaction": {
+    "replacements": 35,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 14,
+      "credentialed_uri": 0,
+      "entropy": 7,
+      "goredact": 0,
+      "key_context": 0,
+      "pii": 14,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 12,
+      "IP": 0,
+      "PHONE": 2
+    }
+  }
+}

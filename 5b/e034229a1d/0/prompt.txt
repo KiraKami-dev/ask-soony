@@ -1,0 +1,5 @@
+As part of this repostory i want you to implement a system which is an agent that reads the events (news, supplies notification, weather, ...) and identify what supplier, prodcut part, product will be afected and how. Keep it functional, organized, avoid over-engineering. The required credentials are in .env.
+
+---
+
+can you commit it and push in another branch named "feat/predictor"
