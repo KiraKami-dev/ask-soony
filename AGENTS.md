@@ -41,6 +41,8 @@ Prefer working, deployed and demoable over complete. Go deep on one problem.
 
 Who is doing what lives in `PROGRESS.md` at the repo root. Humans and agents follow the same steps.
 
+- **Entire set up before your next push (required for everyone):** complete [Entire](#entire-session-tracking) and [Entire Brain](#entire-brain-shared-team-memory) setup, then restart your agents. Check: `entire status` shows `Enabled` and `entire brain status` shows `Brainstore | connected`. Without it your sessions are not checkpointed and the team's shared memory misses your work. Agents: run both checks before any `git push`; if either fails, stop and tell the user which setup step is missing instead of pushing
+
 - **Before starting:** `git pull --rebase` (a session-start hook, `scripts/sync-check.sh`, warns your agent when you are behind and shows everyone's **Now** line), read `PROGRESS.md`, add or update your line under **Now** (`- <name>: <task>`), then commit and push that change right away so others see it
 - **Don't take work someone else is on.** If your task touches files another person's **Now** line covers, talk to them first
 - **While working:** small commits, one topic each; `git pull --rebase` before every `git push`; push at least every hour
