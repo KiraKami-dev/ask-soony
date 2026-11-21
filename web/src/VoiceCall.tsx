@@ -86,6 +86,27 @@ export default function VoiceCall({
           }));
           dc.send(JSON.stringify({ type: "response.create" }));
           decided = true;
+        } else if (msg.type === "response.function_call_arguments.done") {
+          // Other tools run on the server; relay the result back to the model.
+          const args = JSON.parse(msg.arguments || "{}");
+          add({ who: "system", text: `Running ${msg.name}…` });
+          fetch(`/api/cards/${encodeURIComponent(card.id)}/tool`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: msg.name, arguments: args }),
+          })
+            .then((r) => r.json())
+            .catch((e) => ({ ok: false, error: String(e) }))
+            .then((out) => {
+              if (msg.name === "send_supplier_email" && out.ok) add({ who: "system", text: `Email sent to ${out.sent_to}` });
+              if (msg.name === "escalate" && out.ok) add({ who: "system", text: "Escalated" });
+              if (out.ok && msg.name !== "get_card_details") decided = true;
+              dc.send(JSON.stringify({
+                type: "conversation.item.create",
+                item: { type: "function_call_output", call_id: msg.call_id, output: JSON.stringify(out) },
+              }));
+              dc.send(JSON.stringify({ type: "response.create" }));
+            });
         } else if (msg.type === "response.done" && decided) {
           setTimeout(hangUp, 4000); // let the goodbye play out
         } else if (msg.type === "error") {

@@ -13,6 +13,7 @@ import os
 import httpx
 from fastapi import APIRouter, HTTPException
 
+from ask_soony import cardtools
 from ask_soony.config import load_dotenv
 
 router = APIRouter()
@@ -60,6 +61,12 @@ def instructions(card: dict) -> str:
         "Answer questions only with the facts above; if you do not know, say so. Then ask for a "
         "decision: approve the recommended action, escalate to the next person, or reject. "
         "When they decide, call record_decision, confirm in one sentence and say goodbye.\n\n"
+        "Tools: use get_card_details when asked about sources, costs or what would be sent. If the "
+        "person approves and the card has a drafted supplier message, read out recipient and gist, "
+        "ask 'Shall I send it now?' and only after a clear yes call send_supplier_email with "
+        "confirmed true; then tell them it was sent. "
+        "Use escalate when they want the next person to decide. "
+        "Use record_decision for approve or reject without sending anything.\n\n"
         "The person may be in a noisy room. Only respond to what they say to you about this card. "
         "Ignore background conversations, other languages and fragments; if unsure, ask: 'Sorry, "
         "was that for me?' Never record a decision from background speech."
@@ -97,7 +104,7 @@ def voice_session(card_id: str):
                 },
             },
         },
-        "tools": [DECISION_TOOL],
+        "tools": [DECISION_TOOL, *cardtools.TOOLS],
         "tool_choice": "auto",
     }
     resp = httpx.post(
