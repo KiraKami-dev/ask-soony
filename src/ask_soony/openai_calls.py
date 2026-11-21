@@ -192,6 +192,28 @@ def verify_webhook(headers, body: bytes, secret: str, tolerance: int = 300) -> b
     return any(hmac.compare_digest(expected, part.split(",", 1)[-1]) for part in sig.split())
 
 
+def turn_detection() -> dict:
+    """
+    How the model decides that the caller spoke. `server` (default) ignores sound below a volume
+    threshold, which filters quieter background voices; `semantic` judges by meaning instead.
+    """
+    if os.environ.get("OPENAI_TURN_DETECTION", "server") == "semantic":
+        return {
+            "type": "semantic_vad",
+            "eagerness": "low",
+            "create_response": True,
+            "interrupt_response": False,
+        }
+    return {
+        "type": "server_vad",
+        "threshold": float(os.environ.get("OPENAI_VAD_THRESHOLD", "0.8")),
+        "prefix_padding_ms": 300,
+        "silence_duration_ms": 700,
+        "create_response": True,
+        "interrupt_response": False,
+    }
+
+
 def handle_incoming(event: dict, data_dir: Path) -> None:
     """Accept the call for its alert and follow it on the sideband (runs in a background thread)."""
     data = event.get("data", {})
@@ -222,12 +244,7 @@ def handle_incoming(event: dict, data_dir: Path) -> None:
                     # Phone lines and stages are noisy: judge turns by meaning, filter noise and
                     # let the assistant finish its sentence instead of cancelling on every sound.
                     "noise_reduction": {"type": "near_field"},
-                    "turn_detection": {
-                        "type": "semantic_vad",
-                        "eagerness": "low",
-                        "create_response": True,
-                        "interrupt_response": False,
-                    },
+                    "turn_detection": turn_detection(),
                 },
             },
             "tools": [DECISION_TOOL],
