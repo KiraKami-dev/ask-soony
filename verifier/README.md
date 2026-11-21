@@ -50,7 +50,7 @@ PO line → confirmation → shipping document → shipment → delivery note �
 
 ### Normalise before linking
 
-- **Legacy PO export:** SAP field names (`EBELN` = PO, `EBELP` = line, `LIFNR` = supplier, `MATNR` = material), `;` separator, decimal commas, `MM/DD/YYYY` dates. Line `00010` probably means line 1 (to verify).
+- **Legacy PO export:** SAP field names (`EBELN` = PO, `EBELP` = line, `LIFNR` = supplier, `MATNR` = material), `;` separator, decimal commas, `MM/DD/YYYY` dates. Line `00010` is line 1 and `00510` is line 51 (confirmed: all legacy receipts link).
 - **Supplier:** numeric id, `SUP-` id, folder name and display name all map to one id.
 - **Part:** supplier part numbers map to `CMP-` ids.
 - **Cancellations:** negative quantities.
@@ -105,6 +105,25 @@ Start with the source that would know, then apply three checks:
 | Which version is valid? | **Marketing** | Sleeve rev. B or rev. C? |
 
 Contact suppliers only about contradictions that matter. They stop replying when spammed.
+
+## Linker: status and usage
+
+Code in `linker/`. M1 is done: spreadsheets, master data and supplier profiles are linked. Documents are classified, but not linked yet (M2).
+
+```bash
+uv run python -m verifier.linker build             # link everything, save to data/store/verifier.db, print summary
+uv run python -m verifier.linker trace 4500318768  # one order's chain, with its issues
+uv run python -m verifier.linker issues --rule shipment_to_tracker
+uv run pytest verifier                             # tests on a made-up mini portal
+```
+
+- **discover.py:** classifies files by their columns (CSV, XLSX, JSON) or filename pattern (documents). Unmatched files are reported as `unknown`.
+- **normalize.py:** cleans up supplier ids, PO lines, lists, numbers and dates.
+- **adapters/:** turn each file kind into records.
+- **rules.py:** link rules (exact joins plus "must have a partner") and structural checks.
+- **graph.py:** build, save, trace.
+
+**Unchanged design choices:** everything is rebuilt on each run, pandas does the work in memory, and SQLite only stores the result.
 
 ## Building blocks
 
