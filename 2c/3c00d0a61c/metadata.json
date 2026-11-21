@@ -1,0 +1,62 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "2c3c00d0a61c",
+  "strategy": "manual-commit",
+  "branch": "akshat/dashboard",
+  "checkpoints_count": 7,
+  "files_touched": [
+    "web/package-lock.json",
+    "web/package.json",
+    "web/public/earth-dark.jpg",
+    "web/src/GlobeView.tsx",
+    "web/src/api.ts",
+    "web/src/model.ts",
+    "web/src/types.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/2c/3c00d0a61c/0/metadata.json",
+      "transcript": "/2c/3c00d0a61c/0/full.jsonl",
+      "compact_transcript": "/2c/3c00d0a61c/0/transcript.jsonl",
+      "content_hash": "/2c/3c00d0a61c/0/content_hash.txt",
+      "prompt": "/2c/3c00d0a61c/0/prompt.txt",
+      "assets_manifest": "/2c/3c00d0a61c/0/assets/manifest.json"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 26,
+    "cache_creation_tokens": 192319,
+    "cache_read_tokens": 1723784,
+    "output_tokens": 6766,
+    "api_call_count": 10,
+    "subagent_tokens": {
+      "input_tokens": 82,
+      "cache_creation_tokens": 357163,
+      "cache_read_tokens": 5177386,
+      "output_tokens": 49943,
+      "api_call_count": 36
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 2524,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 2,
+      "credentialed_uri": 0,
+      "entropy": 2520,
+      "goredact": 0,
+      "key_context": 0,
+      "pii": 2,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 2,
+      "IP": 0,
+      "PHONE": 0
+    }
+  }
+}
