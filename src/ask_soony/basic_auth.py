@@ -12,6 +12,10 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
+# Static PWA files hold no data; browsers (notably iOS) fetch the manifest without credentials,
+# and without it the page is not installable and cannot ask for notification permission.
+PUBLIC_PATHS = {"/manifest.webmanifest", "/sw.js", "/icon-192.png", "/icon-512.png"}
+
 
 class BasicAuth(BaseHTTPMiddleware):
     def __init__(self, app):
@@ -19,7 +23,7 @@ class BasicAuth(BaseHTTPMiddleware):
         self.password = os.environ.get("ASK_DASHBOARD_PASSWORD", "")
 
     async def dispatch(self, request: Request, call_next):
-        if not self.password:
+        if not self.password or request.url.path in PUBLIC_PATHS:
             return await call_next(request)
         header = request.headers.get("authorization", "")
         if header.startswith("Basic "):
