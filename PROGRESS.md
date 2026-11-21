@@ -9,7 +9,7 @@ flowchart LR
 ```
 
 ## Now
-- Akshat (00:27): UI spec agreed (plan.md §5); next: building decision inbox + supply map, then wiring modules
+- Akshat (01:05): decision inbox + supply map UI and API built (`uv run ask-soony serve`, seed with `scripts/seed_demo_state.py`); next: wire real module output, deploy
 - Farhan: verification: claim extraction from documents + three-way match (PO ↔ confirmation ↔ receipt) — see plan.md §5
 - Lucas: arrival forecast: rules for ETA + road leg, silence detection, news/notice risks, alternatives — see plan.md §5
 - Jonas: watcher (in progress) + criticality agent (call / email / notify) + ElevenLabs calls and supplier emails — see plan.md §5
