@@ -1,0 +1,22 @@
+{
+  "tool_use_id": "toolu_01KaMT8S7MFCcz9tYZnDdhJA",
+  "agent_id": "ad459cfcd05908eb2",
+  "subagent_type": "web-fetch",
+  "task_description": "Research OpenAI realtime webhook availability",
+  "files": [
+    "pyproject.toml",
+    "src/ask_soony/dashboard.py",
+    "src/ask_soony/escalation.py",
+    "tests/test_alerts.py",
+    "uv.lock"
+  ],
+  "token_usage": {
+    "input_tokens": 6,
+    "cache_creation_tokens": 46337,
+    "cache_read_tokens": 35205,
+    "output_tokens": 5622,
+    "api_call_count": 3
+  },
+  "started_at": "2026-11-21T23:20:35.509607+01:00",
+  "completed_at": "2026-11-21T23:20:35.510036+01:00"
+}

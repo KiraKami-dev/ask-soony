@@ -1,0 +1,208 @@
+The voice is not really natural though. What did you use? And we want voice input / natural conversation
+
+---
+
+How long would credits be valid?
+
+---
+
+Just check this first
+
+---
+
+Is there any other alternative with student or free credits to work with?
+
+---
+
+ok, I upgraded... now try again
+
+---
+
+ok, I upgraded... now try again getting either gpt live, gpt realtime or eleven labs in
+
+---
+
+Why an US number?
+
+---
+
+kyc is done
+
+---
+
+You said you'll buy a German one. How much money have you spent?
+
+---
+
+yeah, tell me where to put my id, then change it
+
+---
+
+done
+
+---
+
+how much does the call from us cost per minute?
+
+---
+
+any other cheaper option?
+
+---
+
+<task-notification>
+<task-id>b2lojy6zy</task-id>
+<tool-use-id>toolu_01D5oyzQJYqPj8PezpKbarGb</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/b2lojy6zy.output</output-file>
+<status>completed</status>
+<summary>Background command "Wait for voice call end, show transcript" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+tried it via the website. still "
+
+<pasted_content id="1dc7">
+Oops! Something went wrong.
+{"errors":[{"code":"400","detail":"Regulation not found","status":"400","title":"Regulation not found"}],"status":404}
+More info
+Trace Id: 12694d32dde4fe044fed7c8afff37be2
+Request Sid: RQda810ea5000e0830133628a205450d3a
+Operation Name: Checklist
+Error Class: DOWNSTREAM.NOT_FOUND
+Error Class Domain: DOWNSTREAM
+</pasted_content id="1dc7">
+
+"
+
+---
+
+any other cheaper phone number?
+
+---
+
+ok, can we do a pwa or the us one (or is there anything else that does not need cmplicance)?
+
+---
+
+Is it on elevenlabs?
+
+---
+
+yeah, use some gpt one (or claude maybe). yeah, claude
+
+---
+
+yeah, use some gpt one (or claude maybe). or allow both
+
+---
+
+why not gpt-realtime?
+
+---
+
+We'll use the realtime as they also sponser. don't they have twilio or some native phone support
+
+---
+
+why not option 1?
+
+---
+
+"2. The decision tool: in the newer "GPT-Live" API, OpenAI hasn't documented how our own tools (like record_decision) are called in this mode. For the older Realtime API used in option 2, the tool flow is well known." why not gpt-realtime but gpt-live?
+
+---
+
+"  - GPT-Realtime only works with option 2: Twilio calls your phone and hands the call to OpenAI as an "incoming" call, which we accept." how much delay is this?
+
+---
+
+ok, can you append the keys you need to .env to I just need to insert values?
+
+---
+
+done
+
+---
+
+where to create a webhook?
+
+---
+
+There are only these two event types somehow [Image #14]
+
+---
+
+nope, it is not
+
+---
+
+"Then SIP isn't enabled for this OpenAI project. You can't turn it on yourself; at most the OpenAI booth could. The code I just wrote isn't wasted: it works as soon as the event shows up. There are still two ways to a GPT voice on the phone:" what does this mean?
+
+---
+
+why can't one just enable it by hand?
+
+---
+
+then research it with a subagent or so?
+
+---
+
+should be done now
+
+---
+
+<task-notification>
+<task-id>bnaddudzf</task-id>
+<tool-use-id>toolu_01CrU6VsBQ3JyfPDNbGsewwr</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/bnaddudzf.output</output-file>
+<status>completed</status>
+<summary>Background command "Wait for call end, check SIP leg and decision" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+Ok also tried getting a belgium number but need belgium address. can you call again? I was on do not disturb
+
+---
+
+<task-notification>
+<task-id>bavulvwyi</task-id>
+<tool-use-id>toolu_014sNYcsDqtNHDb4G8nmLvv9</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/bavulvwyi.output</output-file>
+<status>completed</status>
+<summary>Background command "Follow call, SIP leg, decision and errors" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+the getting connected announcement is not great. and somehow after a few seconds it got stuck
+
+---
+
+<task-notification>
+<task-id>bkytq3ur7</task-id>
+<tool-use-id>toolu_01NUPQWvmC3WRPRuMUVGvKnA</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/bkytq3ur7.output</output-file>
+<status>completed</status>
+<summary>Background command "Follow call and print conversation log" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+i couldn't hear anything now
+
+---
+
+the background noise is still too much in here
+
+---
+
+<task-notification>
+<task-id>bmmj8ev2h</task-id>
+<tool-use-id>toolu_01WcU2Bt8abKeAbbMHuPrLKR</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/bmmj8ev2h.output</output-file>
+<status>completed</status>
+<summary>Background command "Follow call and print conversation log" completed (exit code 0)</summary>
+</task-notification>
