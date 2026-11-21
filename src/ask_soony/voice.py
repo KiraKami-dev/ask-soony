@@ -52,6 +52,7 @@ def instructions(card: dict) -> str:
         f"System says: {card.get('system_says', '')}",
         f"Documents say: {card.get('paper_says', '')}",
         f"Options:\n{options}",
+        f"Supplier reply so far: {(card.get('action_status') or {}).get('reply') or 'none yet'}",
     ]
     return (
         "You are the procurement assistant of the dashboard, talking to a buyer about one decision "

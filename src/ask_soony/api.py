@@ -18,7 +18,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from ask_soony import cardtools, feed, push, voice
+from ask_soony import cardtools, feed, push, replies, voice
 from ask_soony.basic_auth import BasicAuth
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -31,6 +31,8 @@ app = FastAPI(title="ask-soony dashboard")
 app.include_router(voice.router)
 app.include_router(push.router)
 app.include_router(cardtools.router)
+app.include_router(replies.router)
+replies.start_background()
 app.add_middleware(BasicAuth)
 
 

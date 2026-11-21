@@ -33,7 +33,13 @@ export interface Card {
   blocked_only: boolean;
   module?: string;
   source_file?: string;
-  action_status?: { status: "sent" | "replied"; at: string; reply?: string };
+  action_status?: {
+    status: "sent" | "replied";
+    at: string;
+    reply?: string;
+    reply_from?: string;
+    reply_text?: string;
+  };
   stage?: "before_arrival" | "after_dock";
   human_decision?: { action: ActionKind; note?: string | null; ts: string };
 }

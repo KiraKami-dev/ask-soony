@@ -143,7 +143,9 @@ def run_tool(card_id: str, call: ToolCall):
             "evidence": (card.get("evidence") or [])[:6],
             "options": card.get("options") or [],
             "messages": messages,
-            "status": card.get("action_status"),
+            "status": {
+                k: v for k, v in (card.get("action_status") or {}).items() if k != "reply_text"
+            },
         }
 
     if call.name == "send_supplier_email":

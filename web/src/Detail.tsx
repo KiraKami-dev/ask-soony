@@ -91,6 +91,20 @@ export default function Detail({
         </div>
       )}
 
+      {card.action_status?.status === "replied" && card.action_status.reply && (
+        <div className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm">
+          <div className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+            Reply from {card.action_status.reply_from?.split("<")[0].replace(/"/g, "").trim() || "supplier"}
+          </div>
+          <p className="mt-1">{card.action_status.reply}</p>
+          {card.action_status.reply_text && (
+            <details className="mt-2">
+              <summary className="cursor-pointer text-xs text-slate-500">Original email</summary>
+              <pre className="mt-1 whitespace-pre-wrap break-words font-sans text-xs text-slate-600">{card.action_status.reply_text}</pre>
+            </details>
+          )}
+        </div>
+      )}
       <VoiceCall key={card.id} card={card} onAction={onAction} />
 
       <div>
