@@ -1,0 +1,56 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "06bd4e802598",
+  "session_id": "01a20066-860b-79c3-86da-2051c674e871",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-21T23:41:57.060576Z",
+  "branch": "integration/verifier",
+  "checkpoints_count": 5,
+  "files_touched": [
+    "PROGRESS.md"
+  ],
+  "agent": "Codex",
+  "model": "gpt-5.6-terra",
+  "turn_id": "413de982ff52",
+  "checkpoint_transcript_start": 497,
+  "transcript_lines_at_start": 497,
+  "compact_transcript_start": 89,
+  "token_usage": {
+    "input_tokens": 6526,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 642048,
+    "output_tokens": 905,
+    "api_call_count": 4
+  },
+  "session_token_usage": {
+    "input_tokens": 191938,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 6241792,
+    "output_tokens": 20740,
+    "api_call_count": 62
+  },
+  "redaction": {
+    "replacements": 15,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 3,
+      "credentialed_uri": 0,
+      "entropy": 8,
+      "goredact": 0,
+      "key_context": 0,
+      "pii": 4,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 4,
+      "IP": 0,
+      "PHONE": 0
+    }
+  },
+  "session_metrics": {
+    "turn_count": 6
+  }
+}
