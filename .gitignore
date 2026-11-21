@@ -21,3 +21,6 @@ dist/
 
 # Local copy of portal data (confidential)
 soony-data/
+
+# Lio challenge documents (kept locally, not shared through the repo)
+challenge_docs/
