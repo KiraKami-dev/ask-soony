@@ -131,6 +131,25 @@ uv run pytest verifier                             # tests on a made-up mini por
 
 **Unchanged design choices:** everything is rebuilt on each run, pandas does the work in memory, and SQLite only stores the result.
 
+## Price it and act: `impact/` and `act/`
+
+```bash
+uv run python -m verifier.impact   # parts: needed, book stock, usable, gap; copies at risk per edition
+uv run python -m verifier.act      # decision cards → data/store/decision_cards.html (+ .json)
+```
+
+- **impact/shortfall.py** works out copies at risk:
+  - **Demand still to pack:** day-one demand (`products.csv`) minus packed copies (the newest `stock_update`), times the parts per copy (`bom.csv`).
+  - **Usable stock:** the newest book stock minus live linker issues with a stock effect: booked but not delivered, failed inspection, wrong part booked, old revision.
+  - **Not counted:** parts a supplier says it fits into another part, such as the magnets.
+  - **Ways to close a gap:** inbound waiting at the port, supplier offers, and arrivals after launch (shown, but they don't help).
+- **impact/timing.py** works out when each part runs out:
+  - **Packing windows** come from the launch plan's `Shifts` sheet. **Now** is the time of the newest stock figures, not the machine clock.
+  - **Run-out time** = usable stock ÷ (packing rate × parts per copy), walked through the shifts.
+  - **Act-by time** = run-out time minus the lead time. The lead time is read from the document, e.g. "loaded within 4 h" plus "about 9 hours driving" gives 13 h.
+- **Each edition shows two numbers:** copies at risk **now**, and **if you act in time** (collect, order, concede).
+- **act/cards.py** makes one decision card per cause, with copies at risk, *system says* vs *paper says*, the options, the decision needed, and ready emails routed by the table above. Supplier addresses come from the profiles. Nothing is sent automatically: a person clicks *Email* (mailto) or *Copy text*. **For an email agent:** `data/store/decision_cards.json` lists every card with its messages (`to_email`, `subject`, `body`) and `act_by`. The sender address must be registered in the portal.
+
 ## Building blocks
 
 - **Claim store:** one shared table of claims, recording what, value, source, issuer and time. Every step reads from it and writes to it.
