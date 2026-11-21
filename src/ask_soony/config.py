@@ -20,7 +20,9 @@ def load_dotenv(path: Path = Path(".env")) -> None:
             continue
         key, value = line.split("=", 1)
         value = value.strip().strip('"').strip("'")
-        os.environ.setdefault(key.strip(), value)
+        # Empty template lines must not shadow credentials the SDKs find elsewhere.
+        if value:
+            os.environ.setdefault(key.strip(), value)
 
 
 def _env(name: str, default: str = "") -> str:

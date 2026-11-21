@@ -12,16 +12,29 @@ Work in progress. The product direction is being decided; this README will descr
 
 ## Getting started
 
-1. Clone the repo
-2. Create a `.env` in the repo root with the team token from the portal's Settings:
+1. Clone the repo and install [uv](https://docs.astral.sh/uv/), then `uv sync --group dev`
+2. Create your `.env` from the template: `cp .env.example .env`. It is gitignored; never commit it or paste keys in chat.
+3. Put the keys into `.env`:
 
-   ```bash
-   SOONY_PORTAL_TOKEN=your-team-token
-   ```
+   | Variable | Where to get it | Needed for |
+   |---|---|---|
+   | `SOONY_PORTAL_TOKEN` | Portal → Settings → API token | Everything (download, poll, watch) |
+   | `ANTHROPIC_API_KEY` | [Claude Console](https://console.anthropic.com/) → API keys | `analyze` and `watch` with the default Claude backend |
+   | `ASK_LLM_PROVIDER` + `ASK_LLM_API_KEY` | OpenAI key, or empty for a local llama.cpp server | Only if you use another backend (see below) |
 
-3. Set up Entire so your agent sessions are tracked: see [AGENTS.md](AGENTS.md#entire-session-tracking)
+   `SOONY_PORTAL_URL` is already filled in by the template.
+4. Set up Entire so your agent sessions are tracked: see [AGENTS.md](AGENTS.md#entire-session-tracking)
 
-Run instructions follow once the stack is in place.
+### Download the portal data once
+
+Needs only `SOONY_PORTAL_TOKEN`, no LLM key:
+
+```bash
+uv run ask-soony download              # all current files into data/portal/, under their portal paths
+uv run ask-soony download some/folder  # or into another folder
+```
+
+Run it again any time to bring the folder up to date: only new or changed files are fetched (the first run uses `archive.zip`). Files removed from the portal stay in the folder. Every version also lands in the version store (`data/store/`, see below). All of `data/` is gitignored: the data is confidential.
 
 ## Data watcher (`src/ask_soony`)
 
@@ -35,8 +48,7 @@ A fixed loop polls the portal, keeps every file version and lets an LLM agent an
 The first poll stores the current state as a baseline without analysing it; only later changes are analysed. `analyze --path <prefix>` queues existing files on purpose.
 
 ```bash
-uv sync --group dev
-cp .env.example .env            # fill in SOONY_PORTAL_TOKEN and the LLM settings
+uv run ask-soony download       # one-off: fetch everything into data/portal/ (no LLM needed)
 uv run ask-soony poll           # one poll; the first one stores the baseline
 uv run ask-soony analyze --path suppliers/SUP-0028_Karton_Nowak/notices/   # analyse chosen files
 uv run ask-soony watch          # poll, analyse and notify every ASK_INTERVAL_SECONDS

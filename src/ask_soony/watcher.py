@@ -8,6 +8,7 @@ import io
 import sys
 import time
 import zipfile
+from pathlib import Path
 
 from ask_soony.agent import Analyst
 from ask_soony.notify import Event, Fanout
@@ -39,6 +40,22 @@ def _fill_from_archive(store: Store, portal: PortalClient, wanted: set[str]) -> 
             digest = hashlib.sha256(data).hexdigest()
             if digest in wanted:
                 store.put_blob(digest, data)
+
+
+def mirror(store: Store, dest: Path) -> int:
+    """Write every current portal file to dest under its portal path. Returns the file count."""
+    root = dest.resolve()
+    count = 0
+    for path, version in store.current().items():
+        target = (root / path).resolve()
+        if not target.is_relative_to(root):  # never write outside dest, whatever the portal sends
+            raise ValueError(f"refusing unsafe portal path {path!r}")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        data = store.read_blob(version.sha256)
+        if not target.exists() or target.read_bytes() != data:
+            target.write_bytes(data)
+        count += 1
+    return count
 
 
 def describe_poll(result: PollResult) -> Event | None:

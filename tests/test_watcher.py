@@ -11,7 +11,7 @@ from ask_soony.llm import RunResult
 from ask_soony.notify import DiscordNotifier, Event, Fanout
 from ask_soony.portal import PortalClient
 from ask_soony.store import Store
-from ask_soony.watcher import analyze_pending, describe_poll, poll
+from ask_soony.watcher import analyze_pending, describe_poll, mirror, poll
 
 BASE = "https://portal.example.com"
 
@@ -162,3 +162,26 @@ def test_discord_notifier_posts_embed():
         Event("finding", "Title", "Body", "high")
     )
     assert sent[0]["embeds"][0]["title"] == "Title"
+
+
+def test_mirror_writes_files_under_their_portal_paths(tmp_path):
+    portal = FakePortal({"acme/orders.csv": b"po,qty\n1001,500\n", "acme/sub/notice.txt": b"hi"})
+    store = Store(tmp_path / "store")
+    poll(store, portal.client())
+
+    assert mirror(store, tmp_path / "out") == 2
+    assert (tmp_path / "out/acme/sub/notice.txt").read_bytes() == b"hi"
+
+
+def test_mirror_refuses_paths_outside_the_target(tmp_path):
+    portal = FakePortal({"../escape.txt": b"x"})
+    store = Store(tmp_path / "store")
+    store.put_blob(sha(b"x"), b"x")  # already stored, so the poll does not download it
+    poll(store, portal.client())
+    try:
+        mirror(store, tmp_path / "out")
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("expected ValueError")
+    assert not (tmp_path / "escape.txt").exists()

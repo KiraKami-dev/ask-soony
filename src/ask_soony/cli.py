@@ -1,8 +1,9 @@
-"""Command line: ask-soony poll | analyze | watch | findings | status."""
+"""Command line: ask-soony download | poll | analyze | watch | findings | status."""
 
 import argparse
 import json
 import sys
+from pathlib import Path
 
 from ask_soony.agent import Analyst
 from ask_soony.config import Settings
@@ -10,7 +11,7 @@ from ask_soony.llm import make_backend
 from ask_soony.notify import build_notifiers
 from ask_soony.portal import PortalClient
 from ask_soony.store import Store
-from ask_soony.watcher import analyze_pending, describe_poll, poll, watch
+from ask_soony.watcher import analyze_pending, describe_poll, mirror, poll, watch
 
 
 def _analyst(settings: Settings, store: Store) -> Analyst | None:
@@ -29,6 +30,10 @@ def _analyst(settings: Settings, store: Store) -> Analyst | None:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="ask-soony", description=__doc__)
     sub = parser.add_subparsers(dest="cmd", required=True)
+    p_dl = sub.add_parser(
+        "download", help="One-off: fetch the portal and write all files under their paths"
+    )
+    p_dl.add_argument("dest", nargs="?", default="data/portal", help="Target folder")
     p_poll = sub.add_parser("poll", help="Poll once: store new versions, report changes")
     p_poll.add_argument(
         "--analyze-baseline", action="store_true", help="Queue the first snapshot for analysis too"
@@ -51,6 +56,12 @@ def main(argv: list[str] | None = None) -> int:
     store = Store(settings.data_dir)
     notify = build_notifiers(settings.notifiers, settings.discord_webhook_url, settings.webhook_url)
 
+    if args.cmd == "download":
+        result = poll(store, PortalClient(settings.portal_url, settings.portal_token))
+        n = mirror(store, Path(args.dest))
+        changes = describe_poll(result)
+        print(f"{n} files in {args.dest}" + (f" ({changes.title})" if changes else ""))
+        return 0
     if args.cmd == "poll":
         result = poll(
             store, PortalClient(settings.portal_url, settings.portal_token), args.analyze_baseline
