@@ -16,12 +16,25 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
+from verifier.linker.normalize import parse_count
 from verifier.linker.records import HUB_KINDS
 
 Predicate = Callable[[dict], bool]
 
 # live: the record still affects something open; due: its nearest relevant date
-ISSUE_COLUMNS = ["rule", "type", "record_id", "related", "detail", "context", "live", "due"]
+# material_id + units: book stock of that part that the evidence says is not really usable
+ISSUE_COLUMNS = [
+    "rule",
+    "type",
+    "record_id",
+    "related",
+    "detail",
+    "context",
+    "material_id",
+    "units",
+    "live",
+    "due",
+]
 LINK_COLUMNS = ["src", "dst", "rule", "method", "key"]
 
 
@@ -159,6 +172,7 @@ RULES: list[Rule] = [
         for kind in ("confirmation", "shipping_doc", "delivery_note_scan", "inspection_report")
     ],
     Rule("doc_line_to_reading", "doc_line", "reading", (("doc_path", "doc_path"),)),
+    Rule("plan_inbound_to_shipment", "plan_inbound", "shipment", (("reference", "reference"),)),
     Rule(
         "doc_line_to_po_line",
         "doc_line",
@@ -188,7 +202,9 @@ def _context(record: dict, keys: tuple[str, ...]) -> str | None:
     return ", ".join(shown) or None
 
 
-def _issue(rule, type_, record_id, detail, related=None, context=None) -> dict:
+def _issue(
+    rule, type_, record_id, detail, related=None, context=None, material_id=None, units=None
+) -> dict:
     return {
         "rule": rule,
         "type": type_,
@@ -196,6 +212,8 @@ def _issue(rule, type_, record_id, detail, related=None, context=None) -> dict:
         "related": related,
         "detail": detail,
         "context": context,
+        "material_id": material_id,
+        "units": units,
     }
 
 
@@ -411,6 +429,15 @@ def check_open_line_received(records: pd.DataFrame, links: pd.DataFrame) -> list
     return issues
 
 
+_UNITS = re.compile(r"(\d[\d.,\s]*)\s*(?:pcs|pc|pieces|units|szt|件)\b", re.I)
+
+
+def _units_in(text: str) -> float | None:
+    """A piece count written in free text: '4,000 pcs', '4.000 szt'."""
+    match = _UNITS.search(text or "")
+    return parse_count(match.group(1).strip()) if match else None
+
+
 def check_receipt_remark_names_other_part(records: pd.DataFrame, links: pd.DataFrame) -> list[dict]:
     """
     A receipt's remark names a part other than the one it was booked as: the booked quantity
@@ -433,6 +460,8 @@ def check_receipt_remark_names_other_part(records: pd.DataFrame, links: pd.DataF
                     "Receipt remark names another part: booked quantity may include it",
                     context=f"booked {r['attrs'].get('qty_received') or 0:,.0f} as "
                     f'{r["material_id"]}; remark names {", ".join(others)}: "{remark}"',
+                    material_id=r["material_id"],
+                    units=_units_in(remark),  # e.g. '(4,000 pcs)'; None if the remark has none
                 )
             )
     return issues
@@ -721,6 +750,8 @@ def check_delivery_notes_against_receipts(records: pd.DataFrame, links: pd.DataF
                         "Booked quantity differs from the delivery note",
                         doc_id,
                         context,
+                        material_id=part,
+                        units=max(sap - quantity, 0),  # booked but never delivered
                     )
                 )
     return issues
@@ -790,6 +821,111 @@ def check_shipped_against_ordered(records: pd.DataFrame, links: pd.DataFrame) ->
     return issues
 
 
+def doc_name(doc: dict) -> str:
+    return (doc.get("doc_path") or "").rsplit("/", 1)[-1]
+
+
+def check_old_revision_in_stock(records: pd.DataFrame, links: pd.DataFrame) -> list[dict]:
+    """
+    A change notice says the old revision of a part must not be packed. A supplier's
+    confirmation says its PO was made to that old revision, and that PO's receipt is still a
+    batch in stock: that stock can't be used.
+    """
+    lookup, issues = _Readings(records, links), []
+    changes = [
+        r
+        for r in lookup.by_id.values()
+        if r["kind"] == "bom_change"
+        and (r["attrs"].get("use_up_old_rev") or "").upper() == "N"
+        and r["attrs"].get("rev_old")
+    ]
+    if not changes:
+        return []
+    stock = {r["batch"]: r for r in lookup.by_id.values() if r["kind"] == "stock_batch"}
+    receipts_by_po: dict[tuple, list[dict]] = {}
+    for r in lookup.by_id.values():
+        if r["kind"] == "goods_receipt" and r["po_number"]:
+            receipts_by_po.setdefault((r["po_number"], r["material_id"]), []).append(r)
+    for change in changes:
+        part, old = change["material_id"], change["attrs"]["rev_old"]
+        says_old = re.compile(rf"\brev(?:ision|\.)?\s*{re.escape(old)}\b", re.I)
+        for reading_id, doc_id in lookup.doc_of.items():
+            doc = lookup.by_id[doc_id]
+            if doc["kind"] not in ("confirmation", "shipping_doc"):
+                continue
+            statements = lookup.by_id[reading_id]["attrs"].get("statements") or []
+            if not any(says_old.search(s.get("text_en") or "") for s in statements):
+                continue
+            for receipt in receipts_by_po.get((doc["po_number"], part), []):
+                batch = stock.get(receipt["gr_number"])
+                if batch is None or (batch["attrs"].get("quantity") or 0) <= 0:
+                    continue
+                quantity = batch["attrs"]["quantity"]
+                issues.append(
+                    _issue(
+                        "old_revision_in_stock",
+                        "conflict",
+                        batch["record_id"],
+                        "Stock is an old revision that must not be packed",
+                        change["record_id"],
+                        f"{quantity:,.0f} of {part} rev {old} (per {doc_name(doc)}); "
+                        f"{change['key']}: {change['attrs'].get('reason')}",
+                        part,
+                        quantity,
+                    )
+                )
+    # One issue per batch, even if several documents say the same
+    seen, unique = set(), []
+    for issue in issues:
+        if issue["record_id"] not in seen:
+            seen.add(issue["record_id"])
+            unique.append(issue)
+    return unique
+
+
+def check_plan_inbound_against_paper(records: pd.DataFrame, links: pd.DataFrame) -> list[dict]:
+    """
+    The launch plan expects an inbound quantity by a date; the supplier's shipping document for
+    the same air waybill or container says less, or later.
+    """
+    lookup, issues = _Readings(records, links), []
+    docs_by_ref: dict[str, list[dict]] = {}
+    for reading_id, doc_id in lookup.doc_of.items():
+        doc = lookup.by_id[doc_id]
+        if doc["kind"] == "shipping_doc" and doc["reference"]:
+            docs_by_ref.setdefault(doc["reference"], []).append(lookup.by_id[reading_id])
+    for plan in (r for r in lookup.by_id.values() if r["kind"] == "plan_inbound"):
+        for reading in docs_by_ref.get(plan["reference"], []):
+            for line in lookup.lines_of.get(reading["record_id"], []):
+                if line["material_id"] != plan["material_id"]:
+                    continue
+                shipped = line["attrs"]["final"].get("quantity_shipped")
+                expected = [
+                    v["raw"] for v in line["attrs"]["values"] if v["field"] == "date_expected"
+                ]
+                planned = plan["attrs"].get("quantity") or 0
+                if shipped is None or shipped >= planned - 0.5:
+                    continue
+                context = (
+                    f"{plan['material_id']} via {plan['reference']}: plan {planned:,.0f} by "
+                    f"{plan['attrs'].get('eta')}, supplier shipped {shipped:,.0f}"
+                    + (f"; balance expected {expected[-1]}" if expected else "")
+                )
+                issues.append(
+                    _issue(
+                        "plan_vs_paper",
+                        "conflict",
+                        plan["record_id"],
+                        "Launch plan expects more than the supplier shipped",
+                        reading["record_id"],
+                        context,
+                        plan["material_id"],
+                        planned - shipped,
+                    )
+                )
+    return issues
+
+
 FAILED = {"fail", "rejected"}
 
 
@@ -825,6 +961,8 @@ def check_failed_lots_in_stock(records: pd.DataFrame, links: pd.DataFrame) -> li
                 "Lot failed inspection but counts as usable stock",
                 doc_id,
                 context,
+                material_id=batch["material_id"],
+                units=batch["attrs"]["quantity"],
             )
         )
     return issues
@@ -837,6 +975,8 @@ CHECKS = [
     check_delivery_notes_against_receipts,
     check_shipped_against_ordered,
     check_failed_lots_in_stock,
+    check_plan_inbound_against_paper,
+    check_old_revision_in_stock,
     check_lines_without_confirmation,
     check_link_agreement,
     check_delivery_note_suppliers,
