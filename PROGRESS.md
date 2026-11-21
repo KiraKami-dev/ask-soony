@@ -14,7 +14,7 @@ flowchart LR
 - Lucas: arrival forecast: rules for ETA + road leg, silence detection, news/notice risks, alternatives — see plan.md §5
 - Jonas: watcher (in progress) + criticality agent (call / email / notify) + ElevenLabs calls and supplier emails — see plan.md §5
 
-- Farhan: verifier linker (`verifier/linker/`): links SAP records, shipments and documents, reports gaps and disagreeing versions; next: reader for document contents (M3)
+- Farhan: verifier linker (`verifier/linker/`): links SAP records, shipments and documents, reports gaps and disagreeing versions; image recognizer (`verifier/image_recognizer/`): reads every scan and PDF with Claude via the Agent SDK into claims and a verdict; next: full discovery run, then join to the linker (M3)
 
 ## Next
 - Sat 21:00 target (overdue): shared shapes in `src/ask_soony/schema.py`, sender addresses registered, office hours booked
