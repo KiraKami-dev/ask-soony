@@ -5,7 +5,7 @@ import pytest
 from verifier.linker import build
 from verifier.linker.tests.conftest import write
 
-CONF = "confirmation:OA123"
+CONF = "confirmation:OA123_9100000001"
 ADVICE = "shipping_doc:Shipping_advice_020-1_9100000002"
 
 
@@ -88,7 +88,7 @@ def test_shipping_doc_without_shipment_is_an_orphan(graph):
 
 def test_document_for_unknown_po_is_an_orphan(portal):
     write(portal, "suppliers/SUP-0007_Acme_Parts/order_confirmations/OA77_9199999999.pdf", "pdf")
-    assert "confirmation:OA77" in issues_of(build(portal), "confirmation_to_po_line")
+    assert "confirmation:OA77_9199999999" in issues_of(build(portal), "confirmation_to_po_line")
 
 
 def test_confirmation_from_the_wrong_supplier_folder_is_a_conflict(portal):
@@ -99,4 +99,4 @@ def test_confirmation_from_the_wrong_supplier_folder_is_a_conflict(portal):
     )
     write(portal, "suppliers/SUP-0009_Gamma/order_confirmations/OA55_9100000002.pdf", "pdf")
     issues = build(portal).issues
-    assert "confirmation:OA55" in set(issues[issues.rule == "link_agreement"].record_id)
+    assert "confirmation:OA55_9100000002" in set(issues[issues.rule == "link_agreement"].record_id)

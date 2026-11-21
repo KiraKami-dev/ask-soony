@@ -25,7 +25,7 @@ def confirmation(source, ctx) -> list[dict]:
     return [
         make_record(
             "confirmation",
-            f"OA{meta['conf']}",
+            f"OA{meta['conf']}_{meta['po_number']}",  # the number alone may repeat across POs
             source,
             {"file": _file(source)},
             supplier_id=_supplier_from_path(source, ctx),
