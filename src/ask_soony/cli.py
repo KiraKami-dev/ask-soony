@@ -1,8 +1,7 @@
-"""Command line: ask-soony run | serve | drop | download | poll | analyze | watch | findings."""
+"""Command line: ask-soony download | poll | analyze | watch | findings | status."""
 
 import argparse
 import json
-import os
 import sys
 from pathlib import Path
 
@@ -51,33 +50,7 @@ def main(argv: list[str] | None = None) -> int:
     p_f.add_argument("--all", action="store_true", help="Include resolved findings")
     p_f.add_argument("--json", action="store_true")
     sub.add_parser("status", help="Versions, pending analyses and open findings")
-    p_srv = sub.add_parser("serve", help="Serve the decision inbox UI and its API")
-    p_srv.add_argument("--host", default="127.0.0.1")
-    p_srv.add_argument("--port", type=int, default=8000)
-    p_run = sub.add_parser("run", help="Serve the UI and run the watcher + pipeline loop")
-    p_run.add_argument("--host", default=os.environ.get("HOST", "127.0.0.1"))
-    p_run.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8000")))
-    p_run.add_argument("--interval", type=int, help="Seconds between polls")
-    p_drop = sub.add_parser("drop", help="Rehearsal: announce one portal file as a new drop")
-    p_drop.add_argument("path", help="Portal path, e.g. suppliers/<id>/notices/x.pdf")
-    p_drop.add_argument("--from", dest="source", type=Path, help="Copy this local file in first")
     args = parser.parse_args(argv)
-
-    if args.cmd == "serve":
-        import uvicorn
-
-        uvicorn.run("ask_soony.api:app", host=args.host, port=args.port)
-        return 0
-    if args.cmd == "run":
-        from ask_soony.runner import serve_with_loop
-
-        serve_with_loop(args.host, args.port, args.interval or Settings.from_env().interval_seconds)
-        return 0
-    if args.cmd == "drop":
-        from ask_soony.runner import drop
-
-        print(json.dumps(drop(args.path, args.source), indent=2))
-        return 0
 
     settings = Settings.from_env()
     store = Store(settings.data_dir)

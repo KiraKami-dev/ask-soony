@@ -36,24 +36,6 @@ uv run ask-soony download some/folder  # or into another folder
 
 Run it again any time to bring the folder up to date: only new or changed files are fetched (the first run uses `archive.zip`). Files removed from the portal stay in the folder. Every version also lands in the version store (`data/store/`, see below). All of `data/` is gitignored: the data is confidential.
 
-## Platform: decision inbox (`ask-soony run`)
-
-One service: FastAPI serves the built UI (`web/dist`) and a JSON API over `data/state/`, and a background thread runs the watcher loop: poll the portal, mirror new files, record each new or changed file as a drop, and route the changed paths through the installed modules (`ask_soony.dispatch.refresh`: verifier and predictor). Missing modules or a failing step never stop the UI.
-
-```bash
-cd web && npm ci && npm run build && cd ..   # build the UI once
-uv run ask-soony run --port 8000             # UI + API + watcher loop (needs SOONY_PORTAL_TOKEN to poll)
-uv run ask-soony serve --port 8000           # UI + API only, over the files already on disk
-uv run ask-soony drop suppliers/<id>/notices/x.pdf [--from local.pdf]   # rehearse a live drop
-uv run python scripts/seed_demo_state.py [--calm | --drop]   # dev only: placeholder state from the portal files
-```
-
-The UI reads the verifier's `data/store/decision_cards.json`, the predictor's `data/state/impacts.json` and the shared shapes in `data/state/` (findings, impacts, decisions, claims, events). Slack and the time a line stops come from the launch plan's shift table, read at runtime (`src/ask_soony/launch.py`). Clicks write only to `data/state/` (`actions.json`, `decision_status.json`, `trust.json`); nothing is sent from the UI.
-
-### Deploy
-
-`Dockerfile` builds the UI and runs `ask-soony run` on `$PORT`. No portal data is baked in; set `SOONY_PORTAL_TOKEN` (and an LLM key for the predictor) as secrets on the host. For example with Fly.io: `fly launch --no-deploy`, `fly secrets set SOONY_PORTAL_TOKEN=...`, `fly deploy`. Render: new Web Service from this repo, runtime Docker, same env vars.
-
 ## Data watcher (`src/ask_soony`)
 
 A fixed loop polls the portal, keeps every file version and lets an LLM agent analyse each change.

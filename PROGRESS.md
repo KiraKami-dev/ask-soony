@@ -1,5 +1,5 @@
 # ask-soony progress
-_Last updated: 2026-11-22 00:57_
+_Last updated: 2026-11-21 22:45_
 
 One line per person under **Now**, with the time. Update it when your status changes and at least every 2 hours, even with no code to push, then commit and push right away. Full plan and ownership: [`plan.md`](plan.md). Workflow: "Team workflow" in AGENTS.md.
 
@@ -9,7 +9,7 @@ flowchart LR
 ```
 
 ## Now
-- Akshat (00:57): inbox reads verifier cards + predictor impacts, shift-aware strip (CE line stops Sun 12:26), Europe inset, `ask-soony run`/`drop`, Dockerfile; next: merge integration/verifier with Lucas, deploy (needs host account)
+- Akshat (00:59): platform (API, decision inbox, supply map, run loop) moved to branch akshat/platform for review; next: rebase it after Jonas's PR #3 merges
 - Farhan: verification: claim extraction from documents + three-way match (PO ↔ confirmation ↔ receipt) — see plan.md §5
 - Lucas: arrival forecast: rules for ETA + road leg, silence detection, news/notice risks, alternatives — see plan.md §5
 - Jonas: watcher (in progress) + criticality agent (call / email / notify) + ElevenLabs calls and supplier emails — see plan.md §5
