@@ -1,0 +1,100 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "4eb75d1fe86b",
+  "strategy": "manual-commit",
+  "branch": "merge/jonas-alert-agent",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".env.example",
+    ".gitignore",
+    "PROGRESS.md",
+    "README.md",
+    "docs/alert-policy.example.json",
+    "docs/dashboard_contract.md",
+    "docs/supplier-status-format.md",
+    "pyproject.toml",
+    "scripts/dashboard.sh",
+    "src/ask_soony/alerts.py",
+    "src/ask_soony/api.py",
+    "src/ask_soony/background.py",
+    "src/ask_soony/basic_auth.py",
+    "src/ask_soony/calls.py",
+    "src/ask_soony/cardtools.py",
+    "src/ask_soony/changes.py",
+    "src/ask_soony/cli.py",
+    "src/ask_soony/config.py",
+    "src/ask_soony/dashboard.py",
+    "src/ask_soony/escalation.py",
+    "src/ask_soony/feed.py",
+    "src/ask_soony/network.py",
+    "src/ask_soony/openai_calls.py",
+    "src/ask_soony/push.py",
+    "src/ask_soony/replies.py",
+    "src/ask_soony/store.py",
+    "src/ask_soony/voice.py",
+    "src/ask_soony/watcher.py",
+    "tests/test_alerts.py",
+    "tests/test_api.py",
+    "tests/test_calls.py",
+    "tests/test_network.py",
+    "tests/test_watcher.py",
+    "uv.lock",
+    "web/fixtures/sample_network.json",
+    "web/index.html",
+    "web/public/icon-192.png",
+    "web/public/icon-512.png",
+    "web/public/manifest.webmanifest",
+    "web/public/sw.js",
+    "web/src/App.tsx",
+    "web/src/components/DecisionCard.tsx",
+    "web/src/components/Rail.tsx",
+    "web/src/components/VoiceCall.tsx",
+    "web/src/lib/api.ts",
+    "web/src/lib/push.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/4e/b75d1fe86b/0/metadata.json",
+      "transcript": "/4e/b75d1fe86b/0/full.jsonl",
+      "compact_transcript": "/4e/b75d1fe86b/0/transcript.jsonl",
+      "content_hash": "/4e/b75d1fe86b/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 0,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 0,
+    "output_tokens": 0,
+    "api_call_count": 0,
+    "subagent_tokens": {
+      "input_tokens": 74,
+      "cache_creation_tokens": 74522,
+      "cache_read_tokens": 6131931,
+      "output_tokens": 31539,
+      "api_call_count": 37
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 10,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 10,
+      "goredact": 0,
+      "key_context": 0,
+      "pii": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 0,
+      "IP": 0,
+      "PHONE": 0
+    }
+  }
+}
