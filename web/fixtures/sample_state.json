@@ -1,0 +1,54 @@
+{
+  "now": "2030-01-10T09:00:00+00:00",
+  "hours_left": 20,
+  "packing_ends": "2030-01-11T05:00:00+00:00",
+  "editions": [
+    {"product": "WG-1", "name": "Standard Edition", "launch_date": "2030-01-11T06:00:00+00:00",
+     "day_one": 1000, "packed": 600, "packed_as_of": "2030-01-10T06:00:00+00:00",
+     "rate_per_hour": 50, "remaining": 400, "at_risk": 0},
+    {"product": "WG-2", "name": "Deluxe Edition", "launch_date": "2030-01-11T06:00:00+00:00",
+     "day_one": 200, "packed": 120, "packed_as_of": "2030-01-10T06:00:00+00:00",
+     "rate_per_hour": 10, "remaining": 80, "at_risk": 60}
+  ],
+  "parts": [
+    {"part": "P-100", "description": "Widget A", "editions": ["WG-2"], "needed": 80,
+     "book_stock": 900, "book_as_of": "2030-01-10T06:00:00+00:00", "deductions": [],
+     "plan_status": "ok", "supply": [], "per_copy": {"WG-2": 1}, "used_today": 0,
+     "rate_per_hour": 10, "runs_dry": null, "fixes": [], "usable": 20, "gap": 60}
+  ],
+  "cards": [
+    {"id": "card-widget-a", "title": "Widget A: book stock overstated",
+     "edition": "WG-2", "at_risk": 60, "part": "P-100",
+     "system_says": "Receipt shows 900 Widget A in stock",
+     "paper_says": "Delivery note shows 90 received, 900 crossed out",
+     "stage": "after_dock",
+     "evidence": [
+       {"doc_path": "docs/example/delivery_note.pdf", "page": 1,
+        "quote": "90 pcs", "language": "EN", "translation": null},
+       "Purchase order line 10 orders 90 pcs"],
+     "options": [
+       {"action": "Reclaim via finance", "cost": "none", "effect": "stock corrected", "recommended": true},
+       "Order replacement from Acme Parts"],
+     "decision": null,
+     "messages": [{"to_role": "Supplier contact", "to_email": "sales@supplier-one.example.com",
+                   "subject": "Delivery note quantity", "body": "Please confirm the quantity delivered for line 10."}],
+     "at_risk_if_acted": 0, "act_by": "2030-01-10T12:00:00+00:00",
+     "runs_dry": "2030-01-10T20:00:00+00:00", "blocked_only": false},
+    {"id": "card-widget-b", "title": "Widget B: shipment likely split",
+     "edition": "WG-1", "at_risk": 30, "part": "P-200",
+     "system_says": "Shipment status booked, full quantity",
+     "paper_says": "Shipping advice: half flown, half later",
+     "stage": "before_arrival",
+     "evidence": ["Shipping advice dated 2030-01-09"],
+     "options": ["Ask Supplier Two for new dates", "Accept partial"],
+     "decision": null,
+     "messages": [{"to_role": "Supplier contact", "to_email": "ops@supplier-two.example.com",
+                   "subject": "Split shipment", "body": "Can you confirm the arrival date of the second half?"}],
+     "at_risk_if_acted": 0, "act_by": "2030-01-10T15:00:00+00:00",
+     "runs_dry": null, "blocked_only": false}
+  ],
+  "feed": [
+    {"ts": "2030-01-10T08:55:00+00:00", "agent": "reader", "text": "Read delivery_note.pdf (1 page)"},
+    {"ts": "2030-01-10T08:56:00+00:00", "agent": "verifier", "text": "Found 2 mismatches against the ERP export"}
+  ]
+}
