@@ -90,6 +90,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(prog="verifier.linker")
     parser.add_argument("--root", type=Path, default=Path("data/portal"), help="portal data folder")
     parser.add_argument("--db", type=Path, default=Path("data/store/verifier.db"))
+    parser.add_argument(
+        "--readings",
+        type=Path,
+        default=Path("data/store/image_recognizer"),
+        help="image recognizer output; skipped if the folder does not exist",
+    )
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("build")
     trace_cmd = sub.add_parser("trace")
@@ -99,7 +105,7 @@ def main() -> None:
     issues_cmd.add_argument("--live", action="store_true", help="only live issues")
     args = parser.parse_args()
 
-    graph = build(args.root)
+    graph = build(args.root, args.readings)
     if args.command == "build":
         save(graph, args.db)
         _summary(graph)

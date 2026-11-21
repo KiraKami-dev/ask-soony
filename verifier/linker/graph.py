@@ -12,6 +12,7 @@ from pathlib import Path
 import pandas as pd
 
 from verifier.linker.adapters import ADAPTERS, PROFILE_KINDS, Context
+from verifier.linker.adapters.readings import load_readings, map_supplier_part_numbers
 from verifier.linker.discover import Source, discover
 from verifier.linker.normalize import SupplierResolver
 from verifier.linker.records import HUB_KINDS, RECORD_COLUMNS, disambiguate
@@ -54,7 +55,8 @@ def _resolver(profile_records: list[dict]) -> SupplierResolver:
     )
 
 
-def build(root: Path) -> Graph:
+def build(root: Path, readings: Path | None = None) -> Graph:
+    """Link the portal data in `root`; add document readings from `readings` when given."""
     sources = discover(root)
     profiles = [s for s in sources if s.kind in PROFILE_KINDS]
     others = [s for s in sources if s.kind not in PROFILE_KINDS]
@@ -69,6 +71,14 @@ def build(root: Path) -> Graph:
         produced, row = _run(source, ctx)
         all_records += produced
         source_rows.append(row)
+
+    if readings is not None and readings.is_dir():
+        current_sha = {s.path: s.sha256 for s in sources}
+        read_records, read_rows = load_readings(readings, current_sha)
+        known_parts = {r["material_id"] for r in all_records if r["kind"] == "part"}
+        map_supplier_part_numbers(read_records, known_parts)
+        all_records += read_records
+        source_rows += read_rows
 
     # object dtype keeps None as None (pandas would turn it into NaN in string columns)
     records = disambiguate(pd.DataFrame(all_records, columns=RECORD_COLUMNS, dtype=object))
