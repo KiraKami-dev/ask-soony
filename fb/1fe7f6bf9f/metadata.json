@@ -1,0 +1,64 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "fb1fe7f6bf9f",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 3,
+  "files_touched": [
+    ".gitignore",
+    "challenge_docs/Lio Hackathon Challenge Summary.pdf",
+    "challenge_docs/Lio_-_Challenge_Keep_the_Line_Running.pdf",
+    "challenge_docs/Lio_-_Deep_dive_slides.pptx",
+    "challenge_docs/Lio_-_Judging_criteria.pdf",
+    "data_analysis/soony_data_analysis.ipynb",
+    "inconsistencies_soony.md",
+    "inconsistencies_suppliers.md",
+    "questions.md",
+    "requirements.txt",
+    "strategy.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/fb/1fe7f6bf9f/0/metadata.json",
+      "transcript": "/fb/1fe7f6bf9f/0/full.jsonl",
+      "compact_transcript": "/fb/1fe7f6bf9f/0/transcript.jsonl",
+      "content_hash": "/fb/1fe7f6bf9f/0/content_hash.txt",
+      "prompt": "/fb/1fe7f6bf9f/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 26,
+    "cache_creation_tokens": 14464,
+    "cache_read_tokens": 1393016,
+    "output_tokens": 3992,
+    "api_call_count": 10,
+    "subagent_tokens": {
+      "input_tokens": 0,
+      "cache_creation_tokens": 0,
+      "cache_read_tokens": 0,
+      "output_tokens": 0,
+      "api_call_count": 0
+    }
+  },
+  "redaction": {
+    "replacements": 2054,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 2,
+      "credentialed_uri": 0,
+      "entropy": 2054,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 0,
+      "IP": 0,
+      "PHONE": 0
+    }
+  }
+}
