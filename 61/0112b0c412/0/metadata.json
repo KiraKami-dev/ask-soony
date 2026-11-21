@@ -1,0 +1,65 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "610112b0c412",
+  "session_id": "01a20066-860b-79c3-86da-2051c674e871",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-21T23:55:09.003254Z",
+  "branch": "integration/verifier",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "README.md",
+    "pyproject.toml",
+    "src/ask_soony/cli.py",
+    "src/ask_soony/dispatch/__init__.py",
+    "src/ask_soony/dispatch/decisions/HANDOFF.md",
+    "src/ask_soony/dispatch/decisions/__init__.py",
+    "src/ask_soony/dispatch/decisions/__main__.py",
+    "src/ask_soony/verifier/README.md",
+    "src/ask_soony/verifier/impact/tests/test_shortfall.py",
+    "tests/test_dispatch.py"
+  ],
+  "agent": "Codex",
+  "model": "gpt-5.6-terra",
+  "turn_id": "46898158374f",
+  "checkpoint_transcript_start": 634,
+  "transcript_lines_at_start": 634,
+  "compact_transcript_start": 112,
+  "token_usage": {
+    "input_tokens": 39009,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 4373760,
+    "output_tokens": 9210,
+    "api_call_count": 23
+  },
+  "session_token_usage": {
+    "input_tokens": 249131,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 12653312,
+    "output_tokens": 36141,
+    "api_call_count": 97
+  },
+  "redaction": {
+    "replacements": 19,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 7,
+      "credentialed_uri": 0,
+      "entropy": 8,
+      "goredact": 0,
+      "key_context": 0,
+      "pii": 4,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 4,
+      "IP": 0,
+      "PHONE": 0
+    }
+  },
+  "session_metrics": {
+    "turn_count": 8
+  }
+}

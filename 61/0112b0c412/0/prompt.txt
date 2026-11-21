@@ -1,0 +1,5 @@
+the flow is trigger -> verifier and/or predictor -> dispatch, verifier should not generate any card or html both agents output will be interpreted by dispatch to take a decision which return it in a strcutered json
+
+---
+
+you can remove this html/ui part of verifier/dispatch
