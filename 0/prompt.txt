@@ -1,5 +1,0 @@
-ok how now do we simulate a call?
-
----
-
-i don't get asked to allow notifications
