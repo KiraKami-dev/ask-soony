@@ -1,0 +1,53 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "12355f1f9d9e",
+  "strategy": "manual-commit",
+  "branch": "akshat/dashboard",
+  "checkpoints_count": 7,
+  "files_touched": null,
+  "sessions": [
+    {
+      "metadata": "/12/355f1f9d9e/0/metadata.json",
+      "transcript": "/12/355f1f9d9e/0/full.jsonl",
+      "compact_transcript": "/12/355f1f9d9e/0/transcript.jsonl",
+      "content_hash": "/12/355f1f9d9e/0/content_hash.txt",
+      "prompt": "/12/355f1f9d9e/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 46,
+    "cache_creation_tokens": 31653,
+    "cache_read_tokens": 2369849,
+    "output_tokens": 11276,
+    "api_call_count": 17,
+    "subagent_tokens": {
+      "input_tokens": 16,
+      "cache_creation_tokens": 72949,
+      "cache_read_tokens": 463438,
+      "output_tokens": 9659,
+      "api_call_count": 8
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 2505,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 2,
+      "credentialed_uri": 0,
+      "entropy": 2503,
+      "goredact": 0,
+      "key_context": 0,
+      "pii": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 0,
+      "IP": 0,
+      "PHONE": 0
+    }
+  }
+}
