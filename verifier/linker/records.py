@@ -22,6 +22,7 @@ RECORD_COLUMNS = [
     "delivery_note",
     "shipment_id",
     "reference",  # container number or air waybill
+    "doc_path",  # portal path of a document; joins a document to what was read from it
     "as_of",  # when the source says this was true (snapshot, export, update); None if unknown
     "po_numbers",  # list
     "material_ids",  # list

@@ -30,6 +30,7 @@ def confirmation(source, ctx) -> list[dict]:
             {"file": _file(source)},
             supplier_id=_supplier_from_path(source, ctx),
             po_number=meta["po_number"],
+            doc_path=source.path,
         )
     ]
 
@@ -46,6 +47,7 @@ def shipping_document(source, ctx) -> list[dict]:
             {"file": _file(source), "doc_type": source.kind},
             supplier_id=_supplier_from_path(source, ctx),
             po_number=meta["po_number"],
+            doc_path=source.path,
             reference=reference,
         )
     ]
@@ -60,6 +62,7 @@ def delivery_note(source, ctx) -> list[dict]:
             source,
             {"file": _file(source), "scan_date": parse_date(meta["date"], ("%Y%m%d",))},
             delivery_note=meta["delivery_note"],
+            doc_path=source.path,
             as_of=parse_date(meta["date"], ("%Y%m%d",)),
         )
     ]
@@ -74,5 +77,6 @@ def inspection_report(source, ctx) -> list[dict]:
             source,
             {"file": _file(source)},
             batch=meta["batch"],
+            doc_path=source.path,
         )
     ]
