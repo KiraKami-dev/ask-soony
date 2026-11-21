@@ -105,6 +105,47 @@ def to_utc_iso(value) -> str | None:
     return moment.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+_GROUPED_THOUSANDS = re.compile(r"\d{1,3}(?:[.,  ]\d{3})+")
+# Fields that count whole things. Only these get the thousands rule; a price such as
+# '1.520' must stay 1.52.
+COUNT_FIELDS = {
+    "quantity_ordered",
+    "quantity_confirmed",
+    "quantity_shipped",
+    "quantity_delivered",
+    "quantity_received",
+    "quantity_balance",
+    "quantity_rejected",
+    "lot_size",
+    "sample_size",
+    "defective",
+    "accept_number",
+    "reject_number",
+    "packages",
+    "minimum_order_quantity",
+}
+
+
+def count_number(field: str, raw, model_number: float | None) -> float | None:
+    """
+    The number a count means, from the raw text as written.
+
+    A count can't be fractional, so a group of three digits after a dot, comma or space is a
+    thousands group, whatever the document's language: '19.000', '14.600', '8 000', '48,000'.
+    Readers get this wrong on some documents; the raw text is the evidence, so it decides.
+    Other fields keep the reader's number.
+    """
+    if field not in COUNT_FIELDS:
+        return model_number
+    text = clean(raw)
+    if text is None:
+        return model_number
+    match = _GROUPED_THOUSANDS.search(text)
+    if match and match.group(0) == re.search(r"[\d.,  ]+", text).group(0).strip():
+        return float(re.sub(r"\D", "", match.group(0)))
+    return model_number
+
+
 def po_line_state(quantity: float | None, delivered_date: str | None) -> str:
     """
     State of a PO line, derived from facts rather than status codes ('GL', 'delivered', ...),

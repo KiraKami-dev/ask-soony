@@ -111,3 +111,16 @@ def test_to_utc_iso_puts_every_format_in_one_form():
     assert to_utc_iso("2026-11-21T16:12:00Z") == "2026-11-21T16:12:00Z"
     assert to_utc_iso("yesterday") is None
     assert to_utc_iso(None) is None
+
+
+def test_count_number_reads_thousands_from_the_raw_text():
+    from verifier.linker.normalize import count_number
+
+    assert count_number("quantity_delivered", "19.000", 19) == 19000
+    assert count_number("quantity_delivered", "14.600", 14.6) == 14600
+    assert count_number("quantity_delivered", "8 000", 8000) == 8000
+    assert count_number("quantity_ordered", "48,000", 48000) == 48000
+    assert count_number("quantity_delivered", "5.000 PCS", 5) == 5000
+    assert count_number("quantity_delivered", "12", 12) == 12
+    assert count_number("unit_price", "1.520", 1.52) == 1.52  # prices are not counts
+    assert count_number("weight", "1.500 kg", 1.5) == 1.5
