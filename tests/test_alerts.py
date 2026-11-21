@@ -87,8 +87,9 @@ def test_twilio_call_reads_alert_and_points_keypad_to_webhook():
     out = caller.call(
         book_alert, Contact("buyer", "Alex", "buyer", phone="+15550000001"), "https://x.example.com"
     )
-    twiml = sent[0]["Twiml"][0]
     assert "CA123" in out and sent[0]["To"] == ["+15550000001"]
+    assert sent[0]["Url"] == ["https://x.example.com/hooks/twilio/twiml/7?token=secret"]
+    twiml = caller.twiml(book_alert, "https://x.example.com")
     assert "Part short." in twiml and "/hooks/twilio/7?token=secret" in twiml and "<Gather" in twiml
 
 

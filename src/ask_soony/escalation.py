@@ -66,11 +66,14 @@ class TwilioCaller:
         resp = self.http.post(
             f"https://api.twilio.com/2010-04-01/Accounts/{self.sid}/Calls.json",
             auth=(self.sid, self.token),
-            data={
-                "To": contact.phone,
-                "From": self.from_number,
-                "Twiml": self.twiml(alert, public_url),
-            },
+            # With a public URL Twilio fetches the call script from us (trial accounts only accept
+            # Url, not inline Twiml); without one the script goes inline.
+            data={"To": contact.phone, "From": self.from_number}
+            | (
+                {"Url": f"{public_url}/hooks/twilio/twiml/{alert.id}?token={alert.token}"}
+                if public_url
+                else {"Twiml": self.twiml(alert, public_url)}
+            ),
         )
         if resp.status_code >= 300:
             raise RuntimeError(f"Twilio call failed: HTTP {resp.status_code} {resp.text[:200]}")

@@ -97,7 +97,7 @@ Other modules (verification, prediction, the watcher) raise alerts; the alert mo
 - **Escalation policy** (`ASK_ALERT_POLICY`, default `data/alert-policy.json`, gitignored because it holds phone numbers; see `docs/alert-policy.example.json`): contacts, which channels each severity uses, the order of people to try and how many minutes each gets to decide before the next one is notified.
 - **Channels**: dashboard (`/alerts`, with Approve / Escalate / Reject buttons), email (only with `ASK_ALERT_EMAIL=on`), call. Calls go through `ASK_CALL_PROVIDER`:
   - `dry_run` (default): logs what would be said, no credentials, no cost
-  - `twilio`: reads the alert and takes a keypad answer (1 approve, 2 escalate, 3 reject), posted to `/hooks/twilio/<id>`. Needs `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`
+  - `twilio`: reads the alert and takes a keypad answer (1 approve, 2 escalate, 3 reject), posted to `/hooks/twilio/<id>`. Needs `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`. Works on a free Twilio trial: Twilio fetches the call script from `/hooks/twilio/twiml/<id>` (trials accept only a URL, not inline TwiML), uses the shared trial number shown under Voice → Try out Voice, and can only call verified numbers in the signup country
   - `elevenlabs`: a voice agent talks the alert through. Needs `ELEVENLABS_API_KEY`, `ELEVENLABS_AGENT_ID`, `ELEVENLABS_PHONE_NUMBER_ID` (a Twilio number imported into ElevenLabs)
 - **Webhooks** need `ASK_PUBLIC_URL` (the tunnel). They bypass the dashboard password and are authenticated by a secret token per alert.
 

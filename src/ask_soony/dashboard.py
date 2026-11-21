@@ -11,6 +11,7 @@ import email
 import hmac
 import json
 import mimetypes
+import os
 from datetime import datetime
 from email import policy
 from html import escape
@@ -20,7 +21,7 @@ from urllib.parse import parse_qs, quote, urlparse
 from zoneinfo import ZoneInfo
 
 from ask_soony.alerts import AlertBook
-from ask_soony.escalation import KEYPAD
+from ask_soony.escalation import KEYPAD, TwilioCaller
 from ask_soony.store import Store
 
 TZ = ZoneInfo("Europe/Berlin")
@@ -383,6 +384,15 @@ class Dashboard:
                 store = Store(dash.data_dir)
                 book = AlertBook(store)
                 try:
+                    # Call script Twilio fetches when the call connects (token-protected).
+                    if url.path.startswith("/hooks/twilio/twiml/") and url.path[20:].isdigit():
+                        a = book.get(int(url.path[20:]))
+                        token = parse_qs(url.query).get("token", [""])[0]
+                        if not a or not hmac.compare_digest(token, a.token):
+                            return self._send(403, b"forbidden")
+                        public = os.environ.get("ASK_PUBLIC_URL", "").rstrip("/")
+                        twiml = TwilioCaller("", "", "").twiml(a, public).encode()
+                        return self._send(200, twiml, "text/xml")
                     # Phone keypad answer from Twilio: authenticated by the alert's secret token.
                     if url.path.startswith("/hooks/twilio/") and url.path[14:].isdigit():
                         form = parse_qs(self._body().decode())
@@ -396,7 +406,7 @@ class Dashboard:
                                 book.decide(
                                     int(url.path[14:]),
                                     decision,
-                                    by=form.get("To", ["phone"])[0],
+                                    by="phone …" + form.get("To", [""])[0][-2:],
                                     channel="call",
                                     token=token,
                                 )
