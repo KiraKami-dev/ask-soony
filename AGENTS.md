@@ -41,7 +41,7 @@ Prefer working, deployed and demoable over complete. Go deep on one problem.
 
 Who is doing what lives in `PROGRESS.md` at the repo root. Humans and agents follow the same steps.
 
-- **Before starting:** `git pull --rebase`, read `PROGRESS.md`, add or update your line under **Now** (`- <name>: <task>`), then commit and push that change right away so others see it
+- **Before starting:** `git pull --rebase` (a session-start hook, `scripts/sync-check.sh`, warns your agent when you are behind and shows everyone's **Now** line), read `PROGRESS.md`, add or update your line under **Now** (`- <name>: <task>`), then commit and push that change right away so others see it
 - **Don't take work someone else is on.** If your task touches files another person's **Now** line covers, talk to them first
 - **While working:** small commits, one topic each; `git pull --rebase` before every `git push`; push at least every hour
 - **Status, even without code:** when your status changes, and at least every 2 hours, update your **Now** line with the time and what's next (`- <name> (HH:MM): <doing>, next: <next>`), then commit and push it. No code to push is no reason to stay silent
