@@ -1,0 +1,107 @@
+How much will this cost?
+
+---
+
+I have ElvenLabs credits. Taht is fine. More the phone number and credits. And there is no alternative, is there? And we could also use GPT-Live / GPT-Realtime as OpenAI is a sponsor
+
+---
+
+and a whatsapp call or telegram or anything we can demo? Or would you do the Wilio demo and create an us number?
+
+---
+
+Ok, then Twiliio it is. CAn you walk me throguh? / use mcp /api for elevenlabs / twilio as much as possible?
+
+---
+
+done
+
+---
+
+Do I need to upgrade or sth? I can call verified testers for now
+
+---
+
+It always goes to "
+
+<pasted_content id="1dc7">
+
+Twilio One Console
+
+READY FOR THE NEXT LEVEL?
+Upgrade your account to keep building
+You're currently using a trial account. To access the full Twilio platform, upgrade by adding funds to your balance.
+
+Refreshed free units with no 30 day limit
+
+Unlock trials for advanced products
+
+Access the full product catalog
+
+Collaborate with your team
+
+Verify your brand for reliable delivery
+Upgrade account
+</pasted_content id="1dc7">
+
+"
+
+---
+
+1. done
+
+---
+
+It is minimum 20$ for it? Is there any student promo code? 
+
+<pasted_content id="1dc7">
+Use a promo code to get started. You can always add more to your balance after you begin using Twilio.
+
+
+</pasted_content id="1dc7">
+
+---
+
+Is there any other free (student) option?
+
+---
+
+Sure this is not possible without? https://www.twilio.com/docs/usage/trials/try-out-voice
+
+---
+
+Are there any alternatives that allows free calls or have a student program?
+
+---
+
+I still have 180$ azure credits left. How to try voice?
+
+---
+
+"Azure Communication Services (ACS) can do phone calls with text-to-speech and keypad input" and I guess we don't necessarily want transcription but like voice to voice model? or rather not?
+
+---
+
+"pay-as-you-go subscription" I think I have this? how to try it? do they have some api / mcp. So far I have no resource group [Image #10]
+
+---
+
+<pasted_content id="1dc7">
+# Download the helper library from https://www.twilio.com/docs/python/install
+import os
+from twilio.rest import Client
+
+# Find your Account SID and Auth Token at twilio.com/console
+# and set the environment variables. See http://twil.io/secure
+account_sid = os.environ["TWILIO_ACCOUNT_SID"]
+auth_token = REDACTED
+client = Client(account_sid, auth_token)
+
+call = client.calls.create(
+    url="https://webhooks.twilio.com/v1/Voice/Template/voice_speech_recognition",
+    to="+xxxx”x,
+    from_="+4915888623971",
+)
+
+print(call.sid)
+</pasted_content id="1dc7">
