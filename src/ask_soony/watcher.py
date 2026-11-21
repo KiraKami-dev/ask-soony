@@ -11,6 +11,7 @@ import zipfile
 from pathlib import Path
 
 from ask_soony.agent import Analyst
+from ask_soony.changes import summarize
 from ask_soony.notify import Event, Fanout
 from ask_soony.portal import PortalClient
 from ask_soony.store import PollResult, Store, severity_at_least
@@ -27,7 +28,21 @@ def poll(store: Store, portal: PortalClient, analyze_baseline: bool = False) -> 
     for f in listing:
         if not store.has_blob(f.sha256):
             store.put_blob(f.sha256, portal.download(f.path))
-    return store.record_listing(listing, analyze_baseline=analyze_baseline)
+    result = store.record_listing(listing, analyze_baseline=analyze_baseline)
+    summarize_changes(store)
+    return result
+
+
+def summarize_changes(store: Store) -> int:
+    """Compute a 'what changed' summary for every new or changed version that has none yet."""
+    done = 0
+    for version in store.versions_without_change():
+        prev = store.previous_version(version)
+        old = store.read_blob(prev.sha256) if prev else None
+        summary, diff = summarize(version.path, old, store.read_blob(version.sha256))
+        store.put_change(version.id, summary, diff)
+        done += 1
+    return done
 
 
 def _fill_from_archive(store: Store, portal: PortalClient, wanted: set[str]) -> None:

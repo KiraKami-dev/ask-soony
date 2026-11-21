@@ -185,3 +185,14 @@ def test_mirror_refuses_paths_outside_the_target(tmp_path):
     else:
         raise AssertionError("expected ValueError")
     assert not (tmp_path / "escape.txt").exists()
+
+
+def test_change_summary_for_csv_rows_and_renamed_columns():
+    from ask_soony.changes import summarize
+
+    old = b"id,qty,plan\nA,1,10\nB,2,20\n"
+    new = b"id,qty,plan_units,note\nA,1,10,\nB,3,20,\nC,4,30,x\n"
+    summary, diff = summarize("t.csv", old, new)
+    assert "1 rows added" in summary and "1 rows changed" in summary
+    assert "plan → plan_units" in summary
+    assert "B: qty: 2 → 3" in diff
