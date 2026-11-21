@@ -118,12 +118,19 @@ Action    { id, decision_id, channel: call|email|portal,
 - **Done when:** finding #3 and #6 come out of a fresh run, and the magnet drop is classified correctly.
 
 ### Akshat: platform, UI/UX, bringing it together
-- **One screen that answers:** "Will we make Sunday 20:00? What breaks first? What do I do now?"
-  - Top: launch status per edition (copies safe, copies at risk, slack hours).
-  - Middle: findings ranked by copies at risk, each one sentence plus the price.
-  - Detail: both sides of the contradiction with the source document (scan shown, quote highlighted, translated).
-  - Action: the recommended option with one click: **Allow once / Allow always / Edit / Dismiss**.
-  - Live feed: new drops and what the agents did with them.
+- **One screen that answers:** "Will we make Sunday 20:00? What breaks first? What do I do now?" UI spec agreed 2026-11-22:
+  - **User:** Felix (senior buyer). Decisions go to Maren when he escalates, or directly by rule: cost above the buyer limit, can stop a line, or a Collector's exception (read from PP-07 and the launch plan at runtime; each card states its reason). Maren's cards stay visible to Felix ("With Maren · called 21:14").
+  - **Shape:** a decision inbox, not a dashboard. The agents push (call / notification) with a deep link to one card; `/` = Felix's inbox, `/d/<id>` = a single card (also the mobile view). No login.
+  - **Layout:** status strip on top (per edition: status, copies at risk, slack hours, what breaks first, last portal drop); a 2D supply-chain map (~60%, left); a decision rail (~40%, right).
+  - **Map:** d3-geo + world-atlas SVG, static, cropped from the US to Korea, no zoom. Nodes and legs come from the supplier profiles, `ports.csv`, `sites.csv` and `routes.csv` (SGSIN is missing: fall back to a generic sea path). Solid = air, dashed = sea. Colour = status: blue on track, amber at risk, red stops a line, grey pulsing silent. Shipments are placed by estimated position along the route (the GPS data is fake). A badge shows a node's open decisions. Munich is a faint dot. The map and the rail are linked both ways (click a route → filter cards; hover a card → highlight its route).
+  - **Card:** headline with a number → deadline to decide → recommended option with its cost and effect (+1–2 alternatives) → **Approve · Edit · Escalate · Dismiss**; after the first approval of a routine type: "Send routine ETA chasers like this one automatically from now on? You'll still approve anything that costs money." **Allow always · Ask me each time**. The evidence (both sides, scan, translation) and the agent trail open on click. Escalate: the agent writes the brief, Felix adds one line, it goes by call if urgent, otherwise by notification.
+  - **Autonomy:** automatic = reading, matching, forecasting, ranking, internal notifications; after Allow always = routine supplier chasers; always a click = spending money, commitments, the first email of each type. Katrin (dock slot) and suppliers get messages only.
+  - **Calm state:** "On track. Nothing needs you right now." + "Agents read N new files since 06:00 · last check X min ago" + the activity log (includes dismissed false alarms, e.g. the magnets).
+  - **Live:** poll every 5 s; a drop pulses its place on the map → toast "Agent reading…" → the route changes colour → the card slides into its ranked place.
+  - **Look:** light theme only, for the projector: white background, light grey land, saturated route colours, headline ≥20px, numbers ≥28px, no glass or glow.
+  - **Demo order:** calm → Hwaseong 20,000 cards on the 24th (Felix approves the chaser, then Allow always) → art books stop the Collector's cell (auto-routed to Maren, call, approve the Nowak rush; the dock slot request to Katrin goes out automatically).
+  - **Out until after Sun 12:00:** login and roles, dark theme, mobile beyond the single card, charts, SAP write-back, supplier portal, map zoom.
+  - **Stack:** FastAPI (API over `data/state/` + serves the static build) + Vite/React/Tailwind/shadcn, one service on Render or Fly.
 - **Integration:** a small API over `data/state/`, wire all modules into one run loop, keep the demo path working at every merge.
 - **Deploy:** one public URL for the jury.
 - **Pitch and video** with the team: problem (with a quote from Maren or Felix), live demo, business slide.

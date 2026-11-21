@@ -35,3 +35,4 @@ flowchart LR
 - Code calculates, agents read and talk: matching, maths and trust rules are code; reading, judging and writing are agents
 - Arrival forecast is rules, not a trained model: ~25 shipments and 30 h left, and rules are explainable on stage
 - Demo path is art books end to end first: clearest catch, real deadline tonight
+- UI is a decision inbox + 2D supply map, light theme, Felix first with rule-based routing to Maren (2026-11-22): Soony has "ten minutes and forty dashboards", so it shows what needs a human, not every number; spec in plan.md §5
