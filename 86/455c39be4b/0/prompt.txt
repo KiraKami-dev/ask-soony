@@ -1,0 +1,59 @@
+what is the feed note in erp xls file ?
+
+---
+
+where is it coming grom ?
+
+---
+
+there is a feed note in erp spreedsheet
+
+[Image #3]
+
+---
+
+do we have in data somewhere which has feed note ?
+
+---
+
+where is the feed note coming from can you confirm with proof
+
+---
+
+can we email supplier to know if where the product is ? where they reach out to the logistics to give us an update
+
+---
+
+how can we know where the product is ?
+
+---
+
+how does the ERP shipment feed knows ?
+
+---
+
+can the shipment company update the erp system ?
+
+---
+
+can you give a question for head of precurement
+
+---
+
+Ask whether he would prefer having calls made to him in critical situations and decision making
+
+---
+
+make it shorter
+
+---
+
+just ask if its something he would like to have or need to have in order to meet the deadline?
+
+---
+
+can you store the pdfs in folder and make it git ignore
+
+---
+
+can you store the pdfs and pptx in folder and make it git ignore

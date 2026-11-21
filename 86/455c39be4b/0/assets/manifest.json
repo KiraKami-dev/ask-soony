@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "name": "img-a4ea3d0d66fcb460473996e3b2b1e123.jpg",
+      "media_type": "image/jpeg",
+      "size": 182047,
+      "sha256": "c502630ea13f9ed7f7e46a727829fac3957dbba3d6410c0e7562424446456e0c"
+    },
+    {
+      "name": "img-77ac95abed426763c96c8d00c2b5c6b7.png",
+      "media_type": "image/png",
+      "size": 150435,
+      "sha256": "ece890cf3a0368fd40908b07f0b7468679334ef2b775ee2b5dd2f71e1b5195aa"
+    }
+  ]
+}
