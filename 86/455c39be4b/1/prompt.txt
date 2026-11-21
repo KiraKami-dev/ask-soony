@@ -1,0 +1,30 @@
+<task-notification>
+<task-id>a5e5861d3bf603291</task-id>
+<output-file>/private/tmp/claude-501/-Users-akshatkhair-Documents-Projects-ask-soony/49836c6e-df5b-41b4-be68-1d7c0426136f/tasks/a5e5861d3bf603291.output</output-file>
+<status>completed</status>
+<summary>Agent "Scaffold local dashboard skeleton" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>The globe phase is built and pushed to `origin/akshat/dashboard`, in 2 commits (`b846082`, `3cd21a2`). `uv run pytest` passes (21 tests), `npm run build` is clean, and `entire status` and `entire brain status` were both fine before the push. I commented out no checks; commits carry no Claude attribution, and nothing from `data/` was committed.
+
+- **API:** `GET /api/network` reads `ASK_PORTAL_DIR` (default `data/soony-data`) and finds sites, ports, suppliers, routes, shipments and the bill of materials by their columns, not by file paths. It falls back to the fake `web/fixtures/sample_network.json` when the folder is missing or empty. `ASK_STALE_HOURS` sets the stale limit (default 24). The tests use a tiny fake portal, and I also ran it against the real portal data once, which gave 18 nodes, 25 shipments and 3 products.
+- **UI:** dark theme, with a goal bar ("Ship N units by &lt;deadline&gt;", countdown, and a per-edition "covered" bar showing now → if you act). The globe in the centre shows nodes coloured by their worst open card, arcs styled by mode, and moving shipment dots (grey "?" for stale, red for late). The part tiles sit below it, and the cards and feed in the right rail.
+- **Interaction checked:** I clicked a part tile and the globe flew to its supplier, highlighted the route, and filtered the cards. A card click uses the same fly-to code but I did not click it separately. Clicking a node or arc on the globe canvas is untested because I couldn't drive the canvas.
+- **Screenshots:** `.playwright-mcp/globe.png` and `.playwright-mcp/globe-part.png`, both gitignored. They show the fixture data, not the real portal data. I used the Chrome DevTools browser because Playwright was locked by another session. A favicon 404 was the only console error, and I added a blank favicon to `web/index.html` (not re-checked).
+- **Problems:** the bundled `web/public/earth-dark.jpg` texture is very dark, so continents are hard to see. The JS bundle is about 2.3 MB, which only raises a Vite size warning. The "all parts needed at once" banner goes on the edition with the most parts, because nothing in the data marks a manual cell.</result>
+<usage><subagent_tokens>194901</subagent_tokens><tool_uses>19</tool_uses><duration_ms>141131</duration_ms></usage>
+<worktree><worktreePath>/Users/akshatkhair/Documents/Projects/ask-soony/.claude/worktrees/agent-a5e5861d3bf603291</worktreePath><worktreeBranch>worktree-agent-a5e5861d3bf603291</worktreeBranch></worktree>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>b3rdu5p1k</task-id>
+<tool-use-id>toolu_01CSBpoGAhbppB4wCF3cZcbc</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-akshatkhair-Documents-Projects-ask-soony/49836c6e-df5b-41b4-be68-1d7c0426136f/tasks/b3rdu5p1k.output</output-file>
+<status>completed</status>
+<summary>Background command "cd /Users/akshatkhair/Documents/Projects/ask-soony/.claude/worktrees/agent-a5e5861d3bf603291 &amp;&amp; ./scripts/dashboard.sh &gt; /private/tmp/claude-501/-Users-akshatkhair-Documents-Projects-ask-soony/db858fa3-8924-42e5-93e8-7023af8c2574/scratchpad/dashboard.log 2&gt;&amp;1" completed (exit code -1)</summary>
+</task-notification>
+
+---
+
+what is widget abcd? don't push the dashboard until we are done

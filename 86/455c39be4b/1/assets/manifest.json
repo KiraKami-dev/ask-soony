@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "name": "img-f1f8d44ee4db03163979ac9ca7112d04.jpg",
+      "media_type": "image/jpeg",
+      "size": 270354,
+      "sha256": "f6db8ed6a95879804ab762053561e1ce1a7111914d3288488ca013a1a5135fbd"
+    },
+    {
+      "name": "img-d4d27b9ac5d5e0b29bb55fcc52b77228.jpg",
+      "media_type": "image/jpeg",
+      "size": 163114,
+      "sha256": "3a3d9280f6714a8907816ac1171d29e4678de80599d147aa8bfd366db05d94af"
+    },
+    {
+      "name": "img-1fbdc10e8adf1dd82bf81d28d7725c0f.png",
+      "media_type": "image/png",
+      "size": 150713,
+      "sha256": "dd024020bddf29fd2d33fe7c221ac6a106fef9b14c43e71e045570fa0ef6f854"
+    }
+  ]
+}
