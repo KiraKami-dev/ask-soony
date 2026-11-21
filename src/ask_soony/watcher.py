@@ -13,7 +13,7 @@ from pathlib import Path
 from ask_soony.agent import Analyst
 from ask_soony.changes import summarize
 from ask_soony.notify import Event, Fanout
-from ask_soony.portal import PortalClient
+from ask_soony.portal import PortalClient, RemoteFile
 from ask_soony.store import PollResult, Store, severity_at_least
 
 # Above this many missing files, one archive download beats single requests.
@@ -31,6 +31,34 @@ def poll(store: Store, portal: PortalClient, analyze_baseline: bool = False) -> 
     result = store.record_listing(listing, analyze_baseline=analyze_baseline)
     summarize_changes(store)
     return result
+
+
+def import_snapshot(store: Store, source: Path, at: str) -> PollResult:
+    """
+    Record an earlier portal state as the baseline: a portal archive.zip (files under one
+    top-level folder) or a folder with the portal's paths. Only for an empty store.
+    """
+    if not store.is_empty():
+        raise ValueError("import-snapshot only seeds an empty store")
+    files: dict[str, bytes] = {}
+    if source.suffix == ".zip":
+        with zipfile.ZipFile(source) as z:
+            names = [n for n in z.namelist() if not n.endswith("/")]
+            prefix = names[0].split("/")[0] + "/" if names and all("/" in n for n in names) else ""
+            if prefix and not all(n.startswith(prefix) for n in names):
+                prefix = ""
+            for n in names:
+                files[n[len(prefix) :]] = z.read(n)
+    else:
+        for f in sorted(source.rglob("*")):
+            if f.is_file():
+                files[f.relative_to(source).as_posix()] = f.read_bytes()
+    listing = []
+    for path, data in files.items():
+        digest = hashlib.sha256(data).hexdigest()
+        store.put_blob(digest, data)
+        listing.append(RemoteFile(path=path, sha256=digest, size=len(data)))
+    return store.record_listing(listing, at=at)
 
 
 def summarize_changes(store: Store) -> int:

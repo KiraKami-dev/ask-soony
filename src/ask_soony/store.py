@@ -147,15 +147,15 @@ class Store:
         return {r["path"]: _version(r) for r in rows}
 
     def record_listing(
-        self, listing: list[RemoteFile], analyze_baseline: bool = False
+        self, listing: list[RemoteFile], analyze_baseline: bool = False, at: str | None = None
     ) -> PollResult:
         """
         Compare a portal listing with what we know and record new versions.
 
         On the very first poll every file is a baseline version: stored but not queued for
-        analysis unless analyze_baseline is set.
+        analysis unless analyze_baseline is set. `at` backdates the poll (for imported history).
         """
-        at = now_iso()
+        at = at or now_iso()
         baseline = self.is_empty()
         known = self.current()
         cur = self.db.execute(

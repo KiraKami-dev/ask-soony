@@ -45,6 +45,8 @@ A fixed loop polls the portal, keeps every file version and lets an LLM agent an
 3. **Analyse** each new or changed file with an agent. It reads the file (text, or page images for scans and photos), cross-checks other files with tools (`list_files`, `read_file`, `search_files`, `list_open_findings`) and submits a summary plus findings with evidence. Scans get a transcription that later searches can use.
 4. **Notify** through console, macOS notifications, a Discord webhook or a generic JSON webhook.
 
+To start the history from an earlier state, seed an empty store first: `uv run ask-soony import-snapshot data/archive.zip --at 2026-01-01T10:00:00+01:00` (a portal `archive.zip` or a folder with portal paths). Later polls then show every drop since that state.
+
 The first poll stores the current state as a baseline without analysing it; only later changes are analysed. `analyze --path <prefix>` queues existing files on purpose.
 
 ```bash

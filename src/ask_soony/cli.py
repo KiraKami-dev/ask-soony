@@ -11,7 +11,14 @@ from ask_soony.llm import make_backend
 from ask_soony.notify import build_notifiers
 from ask_soony.portal import PortalClient
 from ask_soony.store import Store
-from ask_soony.watcher import analyze_pending, describe_poll, mirror, poll, watch
+from ask_soony.watcher import (
+    analyze_pending,
+    describe_poll,
+    import_snapshot,
+    mirror,
+    poll,
+    watch,
+)
 
 
 def _analyst(settings: Settings, store: Store) -> Analyst | None:
@@ -34,6 +41,13 @@ def main(argv: list[str] | None = None) -> int:
         "download", help="One-off: fetch the portal and write all files under their paths"
     )
     p_dl.add_argument("dest", nargs="?", default="data/portal", help="Target folder")
+    p_imp = sub.add_parser(
+        "import-snapshot", help="Seed an empty store with an earlier state (archive.zip or folder)"
+    )
+    p_imp.add_argument("source", help="archive.zip from the portal, or a folder with portal paths")
+    p_imp.add_argument(
+        "--at", required=True, help="When that state was taken, ISO 8601 with offset"
+    )
     p_poll = sub.add_parser("poll", help="Poll once: store new versions, report changes")
     p_poll.add_argument(
         "--analyze-baseline", action="store_true", help="Queue the first snapshot for analysis too"
@@ -63,6 +77,10 @@ def main(argv: list[str] | None = None) -> int:
     store = Store(settings.data_dir)
     notify = build_notifiers(settings.notifiers, settings.discord_webhook_url, settings.webhook_url)
 
+    if args.cmd == "import-snapshot":
+        result = import_snapshot(store, Path(args.source), args.at)
+        print(f"Baseline of {result.stored} files recorded at {args.at}.", file=sys.stderr)
+        return 0
     if args.cmd == "download":
         result = poll(store, PortalClient(settings.portal_url, settings.portal_token))
         n = mirror(store, Path(args.dest))
