@@ -1,0 +1,128 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M7ZF37WZ37S2VC41DEM8KZ8H",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-21T16:30:20.392075Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "README.md",
+    "src/ask_soony/cli.py",
+    "src/ask_soony/store.py",
+    "src/ask_soony/watcher.py",
+    "tests/test_watcher.py"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "d5f6fd25ece8",
+  "checkpoint_transcript_start": 2863,
+  "transcript_lines_at_start": 2863,
+  "compact_transcript_start": 274,
+  "token_usage": {
+    "input_tokens": 13,
+    "cache_creation_tokens": 10259,
+    "cache_read_tokens": 3531721,
+    "output_tokens": 10461,
+    "api_call_count": 6
+  },
+  "session_token_usage": {
+    "input_tokens": 484,
+    "cache_creation_tokens": 550113,
+    "cache_read_tokens": 76633336,
+    "output_tokens": 220453,
+    "api_call_count": 205,
+    "subagent_tokens": {
+      "input_tokens": 62,
+      "cache_creation_tokens": 166800,
+      "cache_read_tokens": 2842511,
+      "output_tokens": 21849,
+      "api_call_count": 30
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 617,
+    "layers": {
+      "betterleaks": 20,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 23,
+      "credentialed_uri": 0,
+      "entropy": 67,
+      "goredact": 0,
+      "key_context": 0,
+      "pii": 511,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 483,
+      "IP": 24,
+      "PHONE": 4
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 50
+  },
+  "summary": {
+    "intent": "The user noticed that the version tracker showed fewer organizer data drops than the four listed on the organizers' page and wanted to know why a revision was missing.",
+    "outcome": "The assistant found that the version store only began at 15:08, so the 14:04 supplier paperwork drop was folded into the baseline. It added backdated import-snapshot support, rebuilt the store with the original 14:00 archive as baseline and the paperwork drop at 14:37, swapped it in, restarted, and committed with docs.",
+    "learnings": {
+      "repo": [
+        "The version store records history only from when the watcher/service started, so any drop that landed earlier is absorbed into the baseline and never appears as a revision.",
+        "The original 303-file archive is kept in data/raw/, which allows history to be reconstructed from an earlier state.",
+        "The watcher service now polls every 5 minutes, so future organizer drops should be detected within that window.",
+        "record_listing now accepts an optional timestamp, and a new import-snapshot CLI command loads an earlier folder state as the baseline (changes in cli.py, store.py, watcher.py, documented in README.md, tested in tests/test_watcher.py)."
+      ],
+      "code": [],
+      "workflow": [
+        "When rebuilding derived state such as a version store, build it in a new folder and swap it in only after verifying it, so the live store is not damaged by a bad rebuild.",
+        "Compare the tool's output against the source of truth (the organizers' list of drops) to find gaps in detection coverage."
+      ]
+    },
+    "friction": [
+      "No watcher was running between 15:09 and 16:57, so the 15:54 CPO memo drop was detected about an hour late.",
+      "The version store was started at 15:08, after the 14:04 paperwork drop, so that drop was hidden in the baseline and had to be found by hand at 14:37.",
+      "The dashboard showed fewer revisions than the organizers published, which prompted the user to question the detection."
+    ],
+    "open_items": [
+      "The detection time for the paperwork drop is set to 14:37, when it was found, rather than the organizers' 14:04 publication time; the recorded timestamps are approximations.",
+      "Detection times for the 15:54 and 17:14 drops (16:57 and 17:20) reflect when they were found, not when they were published."
+    ]
+  }
+}
