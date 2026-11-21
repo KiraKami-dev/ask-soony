@@ -384,6 +384,30 @@ class Dashboard:
                 store = Store(dash.data_dir)
                 book = AlertBook(store)
                 try:
+                    # OpenAI realtime: incoming SIP call webhook (signature-checked).
+                    if url.path == "/hooks/openai":
+                        from ask_soony.openai_calls import start_incoming, verify_webhook
+
+                        raw = self._body()
+                        if not verify_webhook(
+                            self.headers, raw, os.environ.get("OPENAI_WEBHOOK_SECRET", "")
+                        ):
+                            return self._send(401, b"bad signature")
+                        event = json.loads(raw or b"{}")
+                        if event.get("type") == "realtime.call.incoming":
+                            start_incoming(event, dash.data_dir)
+                        return self._send(200, b"ok")
+                    # Twilio script that hands the answered call over to OpenAI.
+                    if url.path.startswith("/hooks/openai/twiml/") and url.path[20:].isdigit():
+                        from ask_soony.openai_calls import OpenAICaller
+
+                        a = book.get(int(url.path[20:]))
+                        token = parse_qs(url.query).get("token", [""])[0]
+                        if not a or not hmac.compare_digest(token, a.token):
+                            return self._send(403, b"forbidden")
+                        return self._send(
+                            200, OpenAICaller.from_env().twiml(a).encode(), "text/xml"
+                        )
                     # Call script Twilio fetches when the call connects (token-protected).
                     if url.path.startswith("/hooks/twilio/twiml/") and url.path[20:].isdigit():
                         a = book.get(int(url.path[20:]))

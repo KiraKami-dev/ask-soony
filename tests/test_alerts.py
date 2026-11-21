@@ -162,3 +162,29 @@ def test_webhooks_record_decisions_only_with_the_right_token(tmp_path):
     book = AlertBook(Store(tmp_path))
     assert book.get(a1.id).status == "approved"
     assert book.get(a2.id).status == "escalated"
+
+
+def test_openai_webhook_signature_and_handover_script(tmp_path):
+    import hashlib
+    import hmac as hmac_mod
+    import time as time_mod
+
+    from ask_soony.openai_calls import OpenAICaller, verify_webhook
+
+    secret = "whsec_" + base64.b64encode(b"k" * 32).decode()
+    body = b'{"type":"realtime.call.incoming"}'
+    ts = str(int(time_mod.time()))
+    mac = hmac_mod.new(b"k" * 32, f"msg_1.{ts}.".encode() + body, hashlib.sha256).digest()
+    headers = {
+        "webhook-id": "msg_1",
+        "webhook-timestamp": ts,
+        "webhook-signature": "v1," + base64.b64encode(mac).decode(),
+    }
+    assert verify_webhook(headers, body, secret)
+    assert not verify_webhook({**headers, "webhook-signature": "v1,AAAA"}, body, secret)
+
+    book = AlertBook(Store(tmp_path))
+    alert = book.raise_alert(title="T", message="M", severity="critical", policy=policy())
+    twiml = OpenAICaller("AC1", "tok", "+15550009999", "proj_abc").twiml(alert)
+    assert f"sip:proj_abc@sip.api.openai.com;transport=tls?x-alert-id={alert.id}" in twiml
+    assert "<Dial><Sip>" in twiml

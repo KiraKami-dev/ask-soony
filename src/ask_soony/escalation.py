@@ -130,6 +130,10 @@ def make_caller(provider: str) -> Caller:
             env("TWILIO_AUTH_TOKEN", ""),
             env("TWILIO_FROM_NUMBER", ""),
         )
+    if provider == "openai":
+        from ask_soony.openai_calls import OpenAICaller
+
+        return OpenAICaller.from_env()
     if provider == "elevenlabs":
         return ElevenLabsCaller(
             env("ELEVENLABS_API_KEY", ""),
