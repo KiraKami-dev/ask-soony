@@ -10,7 +10,7 @@ The linker connects every record that describes the same order, delivery or lot,
 | **M1.1** | Review fixes: versions of one entity kept side by side with their differences; shipment links marked `po_level`; PO line state derived from facts; issue context; supplier and material agreement check; trace hops | Pune `active` vs `watch`, PackRight `active` vs `at risk` | ✅ done |
 | **M2** | Filename-level document links: confirmations, shipping documents, delivery-note scans, inspection reports | Unconfirmed PO lines (P7, P12, P15), receipts with no scan (S14), inspection ↔ batch (S2 chain) | ✅ done |
 | **M2.1** | Review fixes: issues marked `live`/`closed` with a `due` date and sorted; trace shows other orders without expanding them; confirmation key `OA<conf>_<PO>`; `as_of` on every record; version issues list one-sided fields and `as_of` | 7 open unconfirmed lines (16 delivered ones closed); tracker gaps sorted by ETA; Pune's expired release (`qualification_valid_until 2026-10-30`) | ✅ done |
-| **M3** | Content-level links: confirmation line items, air waybill inside the shipping advice, PackRight part numbers (Annex C) | Line-level PO ↔ confirmation; shipping advice ↔ the right PO line (4500318735: 11,000 vs. 48,000 line) | next |
+| **M3** | Content-level links: confirmation line items, air waybill inside the shipping advice, PackRight part numbers (Annex C) | S1 booked 80,000 vs paper 8,000; 28,000 shipped of 48,000 (plus the 21 Nov note); failed lot 5000413063 in stock; filename vs content key check | ✅ done (from image recognizer readings) |
 | **M4** | Fuzzy fallback (same supplier, part, quantity, date window), marked for review | Links where keys are missing | planned |
 
 `trace <PO>`, originally planned for M4, was built in M1.

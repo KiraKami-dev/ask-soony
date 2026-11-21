@@ -111,7 +111,8 @@ Contact suppliers only about contradictions that matter. They stop replying when
 Code in `linker/`. M1 and M2 are done:
 - **Linked:** spreadsheets, master data, supplier profiles, and documents by their filename keys.
 - **Issue priority:** every issue is marked `live` or `closed` and has a `due` date. Live issues come first, soonest first.
-- **Next:** the documents' contents (M3).
+- **M3, done:** the documents' contents, from the image recognizer's readings (`--readings`, default `data/store/image_recognizer`). Delivery notes vs receipts, shipping documents vs PO lines, failed inspections vs stock, and filename vs content keys.
+- **Next:** an adapter for `stock_update_*.xlsx` (new drop, still `unknown`).
 
 Status: [linker/linker_strategy.md](linker/linker_strategy.md).
 

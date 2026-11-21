@@ -25,6 +25,11 @@
 
 Field names stayed stable: only 13 values used `other` (downtime dates, approval limits).
 
-## Not in the linker yet
+## In the linker (M3)
 
-These results are only in `data/store/image_recognizer/`. Loading them into the linker as claims is the next step (M3: join adapter).
+`uv run python -m verifier.linker build` loads these readings (`adapters/readings.py`) and applies the reader-error fixes on load. Live issues:
+- S1: receipt 5000413065, paper 8,000 (handwritten; printed 80,000 crossed out) vs SAP 80,000, ordered 8,000.
+- P2: PO line 4500318735/2, shipped 28,000 of 48,000, balance 20,000 expected 2026-11-24, and delivery note DN-261120-726 received 28,000.
+- S2: stock batch 5000413063, 5,600 in stock, lot failed (9 of 125 defective, accept 3).
+
+The three "arrived but not booked" notes were booked in SAP at 21:34 (`goods_receipts_update.csv`, a new drop). The linker picked that up on its own, so they no longer show. Receiving booked 20,000 GH6 sleeves for `WZ-261120-732`, although its own remark says one pallet holds CMP-GAM-005 (GH5) sleeves, 4,000 pcs. The new check `remark_names_other_part` flags it: about 16,000 GH6 sleeves, not 20,000.
