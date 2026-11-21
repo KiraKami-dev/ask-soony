@@ -1,0 +1,5 @@
+/flush
+
+---
+
+Somehow the pwa on my phone on reopen only shows white
