@@ -54,9 +54,10 @@ Entire records agent sessions as checkpoints and links them to commits.
    ```
 
    `--local` writes your choices to `.entire/settings.local.json`, so the shared `.entire/settings.json` stays unchanged. Drop `--telemetry=false` if you don't mind anonymous usage stats.
-4. Codex only: open `/hooks` inside Codex and approve the Entire hooks
-5. Verify: `entire status` should show `Enabled`, your agents, `Checkpoints sync to: origin` and `Secret scanners · betterleaks, goredact`
-6. If `entire enable` changed `.claude/settings.json` or `.codex/hooks.json`, check `git diff` before committing; the committed versions already work for everyone
+4. **Restart your agents:** quit every Claude Code or Codex session that was open in this repo and start a new one. Hooks load when a session starts, so sessions that were already running are not tracked
+5. Codex only: in the new session, open `/hooks` and approve the Entire hooks
+6. Verify: `entire status` should show `Enabled`, your agents, `Checkpoints sync to: origin` and `Secret scanners · betterleaks, goredact`
+7. If `entire enable` changed `.claude/settings.json` or `.codex/hooks.json`, check `git diff` before committing; the committed versions already work for everyone
 
 `entire doctor` diagnoses and fixes stuck sessions.
 - Shared redaction settings (PII, betterleaks, goredact) live in `.entire/settings.json`; personal settings go in `.entire/settings.local.json` (gitignored)
