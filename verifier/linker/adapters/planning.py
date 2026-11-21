@@ -245,3 +245,15 @@ def supplier_parts(source, ctx) -> list[dict]:
             )
         )
     return out
+
+
+def sites(source, ctx) -> list[dict]:
+    out = []
+    for row in rows(source.abspath):
+        site = clean(row.get("site_id"))
+        if site:
+            attrs = {
+                key: clean(row.get(key)) for key in ("name", "operator", "type", "country", "city")
+            }
+            out.append(make_record("site", site, source, attrs))
+    return out

@@ -51,6 +51,7 @@ ADAPTERS = {
     "bom": planning.bom,
     "bom_change": planning.bom_change,
     "supplier_parts": planning.supplier_parts,
+    "sites": planning.sites,
 }
 
 # Run first: their records teach the SupplierResolver every name of every supplier.

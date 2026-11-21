@@ -27,6 +27,7 @@ CSV_LAYOUTS: dict[str, frozenset[str]] = {
     "supplier_profile": frozenset({"supplier_id", "name", "legal_name", "qualification_status"}),
     "parts_master": frozenset({"component_id", "description", "abc_class", "drawing_rev"}),
     "products": frozenset({"product_id", "launch_date", "day_one_qty"}),
+    "sites": frozenset({"site_id", "name", "city", "type"}),
     "bom": frozenset({"parent_id", "child_id", "qty_per"}),
     "bom_change": frozenset({"change_id", "parent_id", "child_id", "rev_old", "rev_new"}),
     "supplier_parts": frozenset({"component_id", "share", "unit_price", "primary", "note"}),
