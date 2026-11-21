@@ -108,7 +108,12 @@ Contact suppliers only about contradictions that matter. They stop replying when
 
 ## Linker: status and usage
 
-Code in `linker/`. M1 is done: spreadsheets, master data and supplier profiles are linked. Documents are classified, but not linked yet (M2).
+Code in `linker/`. M1 and M2 are done:
+- **Linked:** spreadsheets, master data, supplier profiles, and documents by their filename keys.
+- **Issue priority:** every issue is marked `live` or `closed` and has a `due` date. Live issues come first, soonest first.
+- **Next:** the documents' contents (M3).
+
+Status: [linker/linker_strategy.md](linker/linker_strategy.md).
 
 ```bash
 uv run python -m verifier.linker build             # link everything, save to data/store/verifier.db, print summary
