@@ -1,0 +1,17 @@
+where did you pushed it for?
+
+---
+
+so now we have the system with both systems that are capable to find inconsistencies in the data and prevent problems and an agent to act?
+
+---
+
+when the system works, when agents are trigerred, what is the act agent output
+
+---
+
+should we triger the verifier when there is any change to the data and triger the predictor when there is any change to the respective folders? then the act act agent gets thier output to decine on an action, which can be only notification, email, call. the actual act will be implemented later?
+
+---
+
+ok do it, also organize verifier, predictor and other parts of the system under src not in root
