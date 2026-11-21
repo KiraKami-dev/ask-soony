@@ -135,7 +135,7 @@ uv run pytest verifier                             # tests on a made-up mini por
 
 ```bash
 uv run python -m ask_soony.verifier.impact   # parts: needed, book stock, usable, gap; copies at risk per edition
-uv run python -m ask_soony.verifier.act      # decision cards → data/store/decision_cards.html (+ .json)
+uv run python -m ask-soony refresh soony/erp/stock_snapshot.csv  # decisions → data/state/dispatch.json
 ```
 
 - **impact/shortfall.py** works out copies at risk:
@@ -148,7 +148,7 @@ uv run python -m ask_soony.verifier.act      # decision cards → data/store/dec
   - **Run-out time** = usable stock ÷ (packing rate × parts per copy), walked through the shifts.
   - **Act-by time** = run-out time minus the lead time. The lead time is read from the document, e.g. "loaded within 4 h" plus "about 9 hours driving" gives 13 h.
 - **Each edition shows two numbers:** copies at risk **now**, and **if you act in time** (collect, order, concede).
-- **act/cards.py** makes one decision card per cause, with copies at risk, *system says* vs *paper says*, the options, the decision needed, and ready emails routed by the table above. Supplier addresses come from the profiles. Nothing is sent automatically: a person clicks *Email* (mailto) or *Copy text*. **For an email agent** (owned by colleagues; see [act/HANDOFF.md](act/HANDOFF.md)): `data/store/decision_cards.json` lists every card with its messages (`to_email`, `subject`, `body`) and `act_by`. The sender address must be registered in the portal.
+- **Dispatch** turns verifier and predictor results into `data/state/dispatch.json`: evidence, options, a pending-approval action, and ready messages. Nothing is sent automatically.
 
 ## Building blocks
 

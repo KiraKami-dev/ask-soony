@@ -81,7 +81,7 @@ def main(argv: list[str] | None = None) -> int:
             paths,
             Path("data/portal"),
             Path("data/store/image_recognizer"),
-            Path("data/store/decision_cards.html"),
+            Path("data/state/dispatch.json"),
             predictor,
         )
         print(f"refreshed verifier={routed.verifier} predictor={routed.predictor}", file=sys.stderr)

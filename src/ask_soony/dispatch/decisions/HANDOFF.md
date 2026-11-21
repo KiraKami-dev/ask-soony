@@ -4,7 +4,7 @@ The verifier finds problems and recommends what to do. Sending the messages is o
 
 ## Input
 
-`uv run python -m ask_soony.verifier.act` writes `data/store/decision_cards.json`. It has one entry per card:
+`uv run ask-soony refresh <changed-path>` writes `data/state/dispatch.json`. It has one entry per decision:
 
 | Field | Meaning |
 |---|---|

@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from ask_soony.verifier.act.people import People, decider, site_lead
+from ask_soony.dispatch.decisions.people import People, decider, site_lead
 
 
 def reading(doc_type, date, *texts, path="doc.pdf"):

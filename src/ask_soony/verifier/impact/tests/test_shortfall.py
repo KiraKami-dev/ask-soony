@@ -5,8 +5,7 @@ import json
 
 import openpyxl
 
-from ask_soony.verifier.act.cards import build_cards
-from ask_soony.verifier.act.render import render
+from ask_soony.dispatch.decisions.cards import build_cards
 from ask_soony.verifier.impact.shortfall import compute
 from ask_soony.verifier.linker import build
 from ask_soony.verifier.linker.tests.conftest import make_portal, write
@@ -126,7 +125,7 @@ def test_failed_lot_is_not_usable_and_puts_copies_at_risk(tmp_path):
     assert result.shared_gaps == [part_a]  # CMP-A is used by both editions
 
 
-def test_cards_route_and_render(tmp_path):
+def test_decisions_route_to_the_correct_approver(tmp_path):
     root = portal_with_plan(tmp_path)
     readings = tmp_path / "readings"
     failed_inspection(root, readings)
@@ -137,8 +136,6 @@ def test_cards_route_and_render(tmp_path):
     assert concession.decision
     # No org chart in this portal: the card names the role to find, not a person
     assert concession.messages[0].to_role == "approver of exceptions (see the approval policy)"
-    page = render(result, cards, "now")
-    assert "Will we make the launch?" in page and "decide on the failed lot" in page
 
 
 def test_cards_carry_deadlines_and_before_after(tmp_path):
@@ -179,4 +176,3 @@ def test_blocked_stock_card_asks_whether_it_was_packed(tmp_path):
     blocked = next(c for c in cards if c.id.startswith("wrong"))
     assert blocked.blocked_only and blocked.at_risk == 0
     assert "do any packed copies already contain this stock?" in blocked.messages[0].body
-    assert "No gap" in render(result, cards, "now")

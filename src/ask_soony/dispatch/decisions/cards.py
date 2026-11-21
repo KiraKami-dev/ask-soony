@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
-from ask_soony.verifier.act.people import People, decider, site_lead
+from ask_soony.dispatch.decisions.people import People, decider, site_lead
 from ask_soony.verifier.impact.shortfall import PartNeed, Shortfall
 from ask_soony.verifier.impact.timing import fmt
 

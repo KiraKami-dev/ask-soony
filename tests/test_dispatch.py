@@ -26,12 +26,13 @@ class PredictorRecorder:
 
     def run(self, events, force):
         self.runs.append((events, force))
+        return events
 
 
 def test_dispatches_erp_and_news_changes_to_their_roles(tmp_path):
     root = make_portal(tmp_path / "portal")
     write(root, "soony/news/port_strike.txt", "Port strike may delay containers.")
-    out = tmp_path / "state" / "decision_cards.html"
+    out = tmp_path / "state" / "dispatch.json"
     predictor = PredictorRecorder()
 
     routed = refresh(
@@ -45,5 +46,12 @@ def test_dispatches_erp_and_news_changes_to_their_roles(tmp_path):
     assert routed.verifier and routed.predictor
     assert predictor.paths == [["soony/erp/stock_snapshot.csv", "soony/news/port_strike.txt"]]
     assert predictor.runs == [([{"changed": "soony/news/port_strike.txt"}], True)]
-    assert out.exists()
-    assert json.loads(out.with_suffix(".json").read_text())
+    payload = json.loads(out.read_text())
+    assert payload["changed_paths"] == [
+        "soony/erp/stock_snapshot.csv",
+        "soony/news/port_strike.txt",
+    ]
+    assert payload["routes"] == {"verifier": True, "predictor": True}
+    assert payload["predictor"] == [{"changed": "soony/news/port_strike.txt"}]
+    assert "cards" not in payload
+    assert "decisions" in payload

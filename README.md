@@ -66,7 +66,7 @@ LLM backends (`ASK_LLM_PROVIDER`): `anthropic` (Claude via the Anthropic SDK, de
 All product code lives in `src/ask_soony/`. The watcher routes every new or changed portal
 file through `verifier` and regenerates approval-gated decision cards. Changes under notices,
 news, logistics, or shipments also run `predictor`. `dispatch` combines the refreshed results
-into the decision-card artifacts; it prepares notifications, emails, or calls for approval but
+into `data/state/dispatch.json`; it prepares notifications, emails, or calls for approval but
 does not send external messages automatically.
 
 ## Data
