@@ -57,6 +57,36 @@ uv run ask-soony status
 uv run pytest
 ```
 
+### Dashboard: what changed, when
+
+Every new or changed file version gets a "what changed" summary without any LLM: CSV files are compared row by row (rows added, removed, changed with old → new values; columns added, removed or renamed), Excel files cell by cell, everything else as a text diff. The dashboard shows each poll with its changes, every file's version history with diffs, the agent's findings and the supplier mail log (`data/outbox/`, `data/inbox/`).
+
+```bash
+uv run ask-soony serve --interval 300   # poll every 5 min + dashboard on http://127.0.0.1:8765
+uv run ask-soony dashboard              # dashboard only
+```
+
+Set `ASK_DASHBOARD_PASSWORD` in `.env` (HTTP basic auth, any user name). The dashboard listens on localhost only and refuses other addresses without a password. To share it, put a tunnel in front, for example a Cloudflare Tunnel with its own config file:
+
+```yaml
+# ~/.cloudflared/ask-soony.yml
+protocol: http2            # QUIC is often blocked on event and campus networks
+tunnel: <tunnel id>
+credentials-file: /path/to/<tunnel id>.json
+ingress:
+  - hostname: ask-soony.example.com   # one level below the zone, so the free certificate covers it
+    service: http://localhost:8765
+  - service: http_status:404
+```
+
+```bash
+cloudflared tunnel create ask-soony
+cloudflared tunnel --config ~/.cloudflared/ask-soony.yml route dns <tunnel id> ask-soony.example.com
+cloudflared tunnel --config ~/.cloudflared/ask-soony.yml run
+```
+
+Pass `--config` to `route dns` too: without it, `cloudflared` takes the tunnel from the default `config.yml` and may attach the hostname to a different tunnel.
+
 LLM backends (`ASK_LLM_PROVIDER`): `anthropic` (Claude via the Anthropic SDK, default `claude-opus-5-5`), `openai` (OpenAI), `llamacpp` (any OpenAI-compatible server, e.g. `llama-server --jinja` with `ASK_LLM_BASE_URL=http://localhost:8080/v1`), `none` (poll and store only). Local models need vision support for scans.
 
 ## Data

@@ -47,6 +47,8 @@ class Settings:
     webhook_url: str = ""
     # Findings at or above this severity are pushed to the notifiers.
     notify_min_severity: str = "high"
+    dashboard_password: str = ""
+    dashboard_port: int = 8765
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -68,4 +70,6 @@ class Settings:
             discord_webhook_url=_env("ASK_DISCORD_WEBHOOK_URL"),
             webhook_url=_env("ASK_WEBHOOK_URL"),
             notify_min_severity=_env("ASK_NOTIFY_MIN_SEVERITY", "high").lower(),
+            dashboard_password=_env("ASK_DASHBOARD_PASSWORD"),
+            dashboard_port=int(_env("ASK_DASHBOARD_PORT", "8765")),
         )

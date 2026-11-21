@@ -1,4 +1,4 @@
-"""Command line: ask-soony download | poll | analyze | watch | findings | status."""
+"""Command line for the portal watcher, its agent and the dashboard."""
 
 import argparse
 import json
@@ -46,6 +46,13 @@ def main(argv: list[str] | None = None) -> int:
         "--interval", type=int, help="Seconds between polls (default ASK_INTERVAL_SECONDS)"
     )
     p_watch.add_argument("--analyze-baseline", action="store_true")
+    p_dash = sub.add_parser("dashboard", help="Serve the read-only web dashboard")
+    p_dash.add_argument("--host", default="127.0.0.1")
+    p_dash.add_argument("--port", type=int)
+    p_serve = sub.add_parser("serve", help="Watch loop and dashboard in one process")
+    p_serve.add_argument("--interval", type=int, help="Seconds between polls")
+    p_serve.add_argument("--host", default="127.0.0.1")
+    p_serve.add_argument("--port", type=int)
     p_f = sub.add_parser("findings", help="Print findings")
     p_f.add_argument("--all", action="store_true", help="Include resolved findings")
     p_f.add_argument("--json", action="store_true")
@@ -91,6 +98,34 @@ def main(argv: list[str] | None = None) -> int:
             args.interval or settings.interval_seconds,
             settings.notify_min_severity,
             args.analyze_baseline,
+        )
+        return 0
+    if args.cmd in {"dashboard", "serve"}:
+        import threading
+
+        from ask_soony.dashboard import Dashboard
+
+        if args.host not in {"127.0.0.1", "localhost"} and not settings.dashboard_password:
+            print(
+                "Refusing to listen beyond localhost without ASK_DASHBOARD_PASSWORD.",
+                file=sys.stderr,
+            )
+            return 1
+        server = Dashboard(settings.data_dir, settings.dashboard_password).serve(
+            args.host, args.port or settings.dashboard_port
+        )
+        print(f"Dashboard on http://{args.host}:{server.server_port}/", file=sys.stderr)
+        if args.cmd == "dashboard":
+            server.serve_forever()
+            return 0
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        watch(
+            store,
+            PortalClient(settings.portal_url, settings.portal_token),
+            _analyst(settings, store),
+            notify,
+            args.interval or settings.interval_seconds,
+            settings.notify_min_severity,
         )
         return 0
     if args.cmd == "findings":
