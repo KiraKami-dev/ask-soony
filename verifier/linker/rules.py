@@ -10,6 +10,7 @@ Link methods say how certain a link is:
 - po_level: only PO number and material match; the line is unknown until a document says so
 """
 
+import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
@@ -151,6 +152,19 @@ RULES: list[Rule] = [
         expect_src=always,
         src_orphan="Inspection report for a batch that was never received",
         context=("file",),
+    ),
+    # --- Readings (M3): what was read inside each document ---
+    *[
+        Rule(f"reading_to_{kind}", "reading", kind, (("doc_path", "doc_path"),))
+        for kind in ("confirmation", "shipping_doc", "delivery_note_scan", "inspection_report")
+    ],
+    Rule("doc_line_to_reading", "doc_line", "reading", (("doc_path", "doc_path"),)),
+    Rule(
+        "doc_line_to_po_line",
+        "doc_line",
+        "po_line",
+        (("po_numbers", "po_number"), ("material_id", "material_id")),
+        method="po_level",  # the paper names the PO and part; which line is decided by checks
     ),
     _part_rule("po_line"),
     _part_rule("goods_receipt"),
@@ -357,19 +371,71 @@ def check_delivery_note_suppliers(records: pd.DataFrame, links: pd.DataFrame) ->
 
 
 def check_open_line_received(records: pd.DataFrame, links: pd.DataFrame) -> list[dict]:
-    received = set(links[links.rule == "receipt_to_po_line"].dst)
-    lines = records[(records.kind == "po_line") & records.record_id.isin(received)]
-    return [
-        _issue(
-            "open_line_received",
-            "conflict",
-            r["record_id"],
-            "Goods were received, but the PO line has no delivery date",
-            context=_context(r, ("status",)),
+    """
+    A PO line with receipts but no delivery date. Received in full: SAP hasn't caught up.
+    Received in part: an open balance, which is normal and reported separately.
+    """
+    by_id = {r["record_id"]: r for r in records.to_dict("records")}
+    received: dict[str, float] = {}
+    for link in links[links.rule == "receipt_to_po_line"].itertuples():
+        received[link.dst] = received.get(link.dst, 0) + (
+            by_id[link.src]["attrs"].get("qty_received") or 0
         )
-        for r in lines.to_dict("records")
-        if r["attrs"].get("state") == "open"
-    ]
+    issues = []
+    for line_id, quantity in received.items():
+        line = by_id[line_id]
+        if line["attrs"].get("state") != "open":
+            continue
+        ordered = line["attrs"].get("quantity") or 0
+        shown = f"received {quantity:,.0f} of {ordered:,.0f}; status={line['attrs'].get('status')}"
+        if quantity + 0.5 >= ordered:
+            issues.append(
+                _issue(
+                    "open_line_received",
+                    "conflict",
+                    line_id,
+                    "Received in full, but the PO line has no delivery date",
+                    context=shown,
+                )
+            )
+        else:
+            issues.append(
+                _issue(
+                    "open_line_received",
+                    "partial",
+                    line_id,
+                    "Received in part: open balance on the PO line",
+                    context=shown,
+                )
+            )
+    return issues
+
+
+def check_receipt_remark_names_other_part(records: pd.DataFrame, links: pd.DataFrame) -> list[dict]:
+    """
+    A receipt's remark names a part other than the one it was booked as: the booked quantity
+    may include the wrong part. Part numbers are matched against the parts master.
+    """
+    parts = sorted(set(records[records.kind == "part"].material_id.dropna()), key=len, reverse=True)
+    if not parts:
+        return []
+    pattern = re.compile(r"(?<![\w-])(" + "|".join(map(re.escape, parts)) + r")(?![\w-])")
+    issues = []
+    for r in records[records.kind == "goods_receipt"].to_dict("records"):
+        remark = r["attrs"].get("remark") or ""
+        others = sorted({p for p in pattern.findall(remark) if p != r["material_id"]})
+        if others:
+            issues.append(
+                _issue(
+                    "remark_names_other_part",
+                    "conflict",
+                    r["record_id"],
+                    "Receipt remark names another part: booked quantity may include it",
+                    context=f"booked {r['attrs'].get('qty_received') or 0:,.0f} as "
+                    f'{r["material_id"]}; remark names {", ".join(others)}: "{remark}"',
+                )
+            )
+    return issues
 
 
 def check_shipment_pos_known(records: pd.DataFrame, links: pd.DataFrame) -> list[dict]:
@@ -488,12 +554,294 @@ def check_lines_without_confirmation(records: pd.DataFrame, links: pd.DataFrame)
     )
 
 
+# --- Readings (M3): the paper against the system ---------------------------------------------
+
+DOCUMENT_KINDS = ("confirmation", "shipping_doc", "delivery_note_scan", "inspection_report")
+READING_RULES = {f"reading_to_{kind}" for kind in DOCUMENT_KINDS}
+
+
+def _fmt(number) -> str:
+    return "?" if number is None else f"{number:,.0f}"
+
+
+class _Readings:
+    """Lookups the reading checks share."""
+
+    def __init__(self, records: pd.DataFrame, links: pd.DataFrame):
+        self.by_id = {r["record_id"]: r for r in records.to_dict("records")}
+        self.doc_of = {lk.src: lk.dst for lk in links[links.rule.isin(READING_RULES)].itertuples()}
+        self.reading_of = {doc: reading for reading, doc in self.doc_of.items()}
+        self.lines_of: dict[str, list[dict]] = {}
+        for lk in links[links.rule == "doc_line_to_reading"].itertuples():
+            self.lines_of.setdefault(lk.dst, []).append(self.by_id[lk.src])
+        self.po_lines_of: dict[str, list[dict]] = {}
+        for lk in links[links.rule == "doc_line_to_po_line"].itertuples():
+            self.po_lines_of.setdefault(lk.src, []).append(self.by_id[lk.dst])
+        self.receipts_of_scan: dict[str, list[dict]] = {}
+        for lk in links[links.rule == "receipt_to_scan"].itertuples():
+            self.receipts_of_scan.setdefault(lk.dst, []).append(self.by_id[lk.src])
+        self.readings = [r for r in self.by_id.values() if r["kind"] == "reading"]
+
+
+def check_readings_match_files(records: pd.DataFrame, links: pd.DataFrame) -> list[dict]:
+    """
+    A reading must be of the file's current version. Readings of files the linker has no
+    document type for (contracts, notices) are kept as records but not flagged.
+    """
+    lookup, issues = _Readings(records, links), []
+    for reading in lookup.readings:
+        attrs = reading["attrs"]
+        if attrs.get("current_sha256") and attrs.get("read_sha256") != attrs.get("current_sha256"):
+            issues.append(
+                _issue(
+                    "reading_file",
+                    "orphan",
+                    reading["record_id"],
+                    "Reading is of an older version of the file: read it again",
+                )
+            )
+    return issues
+
+
+def check_reading_keys(records: pd.DataFrame, links: pd.DataFrame) -> list[dict]:
+    """The key in a document's filename must match the key printed inside it."""
+    lookup, issues = _Readings(records, links), []
+    for reading_id, doc_id in lookup.doc_of.items():
+        reading, doc = lookup.by_id[reading_id], lookup.by_id[doc_id]
+        problems = []
+        if (
+            doc["po_number"]
+            and reading["po_numbers"]
+            and doc["po_number"] not in reading["po_numbers"]
+        ):
+            problems.append(f"PO: filename {doc['po_number']}, document {reading['po_numbers']}")
+        if (
+            doc["delivery_note"]
+            and reading["delivery_note"]
+            and doc["delivery_note"] != reading["delivery_note"]
+        ):
+            filename, inside = doc["delivery_note"], reading["delivery_note"]
+            problems.append(f"delivery note: filename {filename}, document {inside}")
+        if (
+            doc["kind"] == "inspection_report"
+            and reading["batch"]
+            and doc["batch"] != reading["batch"]
+        ):
+            problems.append(f"batch: filename {doc['batch']}, document {reading['batch']}")
+        if problems:
+            issues.append(
+                _issue(
+                    "reading_keys",
+                    "conflict",
+                    doc_id,
+                    "Filename and document contents disagree",
+                    reading_id,
+                    "; ".join(problems),
+                )
+            )
+    return issues
+
+
+def _paper_quantity(line: dict) -> tuple[float | None, str]:
+    """The delivered quantity that stands on a delivery-note line, and how it was written."""
+    final, crossed = line["attrs"]["final"], line["attrs"]["crossed"]
+    for name in ("quantity_delivered", "quantity_shipped", "quantity_received"):
+        if final.get(name) is not None:
+            written = next(
+                v["written"]
+                for v in line["attrs"]["values"]
+                if v["field"] == name and not v["crossed_out"] and v["number"] == final[name]
+            )
+            note = f"{written}"
+            if crossed.get(name) is not None:
+                note += f"; printed {_fmt(crossed[name])} crossed out"
+            return final[name], note
+    return None, ""
+
+
+def check_delivery_notes_against_receipts(records: pd.DataFrame, links: pd.DataFrame) -> list[dict]:
+    """
+    What the delivery note says arrived vs what receiving booked, per part.
+
+    No receipt at all: the goods arrived on paper but are not in the system yet.
+    """
+    lookup, issues = _Readings(records, links), []
+    for reading_id, doc_id in lookup.doc_of.items():
+        if lookup.by_id[doc_id]["kind"] != "delivery_note_scan":
+            continue
+        reading = lookup.by_id[reading_id]
+        paper: dict[str, tuple[float, str]] = {}
+        for line in lookup.lines_of.get(reading_id, []):
+            quantity, note = _paper_quantity(line)
+            if quantity is None or not line["material_id"]:
+                continue
+            total, notes = paper.get(line["material_id"], (0.0, ""))
+            paper[line["material_id"]] = (total + quantity, "; ".join(filter(None, [notes, note])))
+        if not paper:
+            continue
+        receipts = lookup.receipts_of_scan.get(doc_id, [])
+        if not receipts:
+            shown = ", ".join(f"{part} {_fmt(q)}" for part, (q, _) in paper.items())
+            pos = ", ".join(reading["po_numbers"]) or "?"
+            received = reading["attrs"].get("date_received") or "not stamped"
+            flag = (reading["attrs"].get("red_flags") or [""])[0][:120]
+            context = f"{shown}; PO {pos}; received {received}" + (
+                f"; reader: {flag}" if flag else ""
+            )
+            issues.append(
+                _issue(
+                    "delivery_vs_receipt",
+                    "orphan",
+                    reading_id,
+                    "Delivered on paper, but not booked in SAP",
+                    doc_id,
+                    context,
+                )
+            )
+            continue
+        for part, (quantity, note) in paper.items():
+            booked = [r for r in receipts if r["material_id"] == part]
+            if not booked:
+                continue
+            sap = sum(r["attrs"].get("qty_received") or 0 for r in booked)
+            if abs(sap - quantity) > 0.5:
+                ordered = sum(r["attrs"].get("qty_ordered") or 0 for r in booked)
+                context = (
+                    f"{part}: paper {_fmt(quantity)} ({note}), SAP received {_fmt(sap)}, "
+                    f"ordered {_fmt(ordered)}"
+                )
+                remark = booked[0]["attrs"].get("remark")
+                if remark:
+                    context += f"; receiving remark: {remark}"
+                issues.append(
+                    _issue(
+                        "delivery_vs_receipt",
+                        "conflict",
+                        booked[0]["record_id"],
+                        "Booked quantity differs from the delivery note",
+                        doc_id,
+                        context,
+                    )
+                )
+    return issues
+
+
+def check_shipped_against_ordered(records: pd.DataFrame, links: pd.DataFrame) -> list[dict]:
+    """
+    A supplier's shipping document says less was shipped than the PO line holds.
+
+    The line is the PO line whose quantity matches the 'ordered' figure on the paper; without
+    one, the only candidate for that part. Delivery notes for the same PO and part are named.
+    """
+    lookup, issues = _Readings(records, links), []
+    for reading_id, doc_id in lookup.doc_of.items():
+        if lookup.by_id[doc_id]["kind"] != "shipping_doc":
+            continue
+        for line in lookup.lines_of.get(reading_id, []):
+            final = line["attrs"]["final"]
+            shipped = final.get("quantity_shipped")
+            candidates = lookup.po_lines_of.get(line["record_id"], [])
+            if shipped is None or not candidates:
+                continue
+            ordered_paper = final.get("quantity_ordered")
+            matching = [
+                c
+                for c in candidates
+                if ordered_paper is not None
+                and abs((c["attrs"].get("quantity") or 0) - ordered_paper) < 0.5
+            ]
+            chosen = matching or (candidates if len(candidates) == 1 else [])
+            if len(chosen) != 1:
+                continue
+            po_line = chosen[0]
+            ordered = po_line["attrs"].get("quantity") or 0
+            if shipped >= ordered - 0.5:
+                continue
+            expected = [v["raw"] for v in line["attrs"]["values"] if v["field"] == "date_expected"]
+            context = (
+                f"{line['material_id']}: shipped {_fmt(shipped)} of {_fmt(ordered)}"
+                f", balance {_fmt(final.get('quantity_balance', ordered - shipped))}"
+            )
+            if expected:
+                context += f", expected {expected[-1]}"
+            notes = [
+                f"{other['delivery_note'] or other['doc_path'].rsplit('/', 1)[-1]} received "
+                f"{_fmt(_paper_quantity(dl)[0])}"
+                for other in lookup.readings
+                if other["record_id"] != reading_id
+                and lookup.by_id.get(lookup.doc_of.get(other["record_id"], ""), {}).get("kind")
+                == "delivery_note_scan"
+                and po_line["po_number"] in (other["po_numbers"] or [])
+                for dl in lookup.lines_of.get(other["record_id"], [])
+                if dl["material_id"] == line["material_id"] and _paper_quantity(dl)[0] is not None
+            ]
+            if notes:
+                context += "; delivery notes: " + ", ".join(notes)
+            issues.append(
+                _issue(
+                    "shipped_vs_ordered",
+                    "conflict",
+                    po_line["record_id"],
+                    "Supplier shipped less than the PO line",
+                    doc_id,
+                    context,
+                )
+            )
+    return issues
+
+
+FAILED = {"fail", "rejected"}
+
+
+def check_failed_lots_in_stock(records: pd.DataFrame, links: pd.DataFrame) -> list[dict]:
+    """An inspection report says a lot failed, but its batch still counts as usable stock."""
+    lookup, issues = _Readings(records, links), []
+    stock = {r["batch"]: r for r in lookup.by_id.values() if r["kind"] == "stock_batch"}
+    for reading_id, doc_id in lookup.doc_of.items():
+        doc = lookup.by_id[doc_id]
+        if doc["kind"] != "inspection_report":
+            continue
+        failed = [
+            d for d in lookup.by_id[reading_id]["attrs"]["decisions"] if d.get("outcome") in FAILED
+        ]
+        batch = stock.get(doc["batch"])
+        if not failed or batch is None or (batch["attrs"].get("quantity") or 0) <= 0:
+            continue
+        counts = {}
+        for line in lookup.lines_of.get(reading_id, []):
+            counts.update({k: v for k, v in line["attrs"]["final"].items() if v is not None})
+        shown = ", ".join(
+            f"{k}={_fmt(counts[k])}"
+            for k in ("lot_size", "sample_size", "defective", "accept_number")
+            if k in counts
+        )
+        conditions = failed[0].get("conditions") or ""
+        context = f"{_fmt(batch['attrs']['quantity'])} in stock; {shown}; {conditions}".strip("; ")
+        issues.append(
+            _issue(
+                "failed_lot_in_stock",
+                "conflict",
+                batch["record_id"],
+                "Lot failed inspection but counts as usable stock",
+                doc_id,
+                context,
+            )
+        )
+    return issues
+
+
 CHECKS = [
     check_receipts_without_scan,
+    check_readings_match_files,
+    check_reading_keys,
+    check_delivery_notes_against_receipts,
+    check_shipped_against_ordered,
+    check_failed_lots_in_stock,
     check_lines_without_confirmation,
     check_link_agreement,
     check_delivery_note_suppliers,
     check_open_line_received,
+    check_receipt_remark_names_other_part,
     check_shipment_pos_known,
     check_tracker_pos_match,
     check_unresolved_suppliers,

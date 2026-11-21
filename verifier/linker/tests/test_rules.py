@@ -45,8 +45,9 @@ def test_link_methods_are_honest(graph):
     for link in graph.links[graph.links.rule.isin(methods)].itertuples():
         assert link.method == methods[link.rule], link
     for rule in RULES:
-        on_po_only = {s for s, _ in rule.on} <= {"po_number", "po_numbers", "material_ids"}
-        assert (rule.method == "po_level") == (on_po_only and rule.dst == "po_line"), rule.name
+        # A join to a PO line that doesn't use the line number can't be exact
+        without_line = "po_line" not in {d for _, d in rule.on}
+        assert (rule.method == "po_level") == (without_line and rule.dst == "po_line"), rule.name
     coverage = graph.coverage.set_index("rule")
     assert coverage.at["shipment_to_po_line", "method"] == "po_level"
 
