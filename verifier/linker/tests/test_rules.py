@@ -190,7 +190,8 @@ def test_two_versions_that_disagree_keep_both_and_name_the_fields(portal):
     assert (CSV_VERSION, JSON_VERSION) in links_of(graph, "same_entity")
     issue = graph.issues[graph.issues.rule == "versions"].iloc[0]
     assert issue.type == "conflict"
-    assert issue.context == "status: active (profile.csv) vs at risk (profile.json)"
+    assert issue.context.startswith("status: active (profile.csv) vs at risk (profile.json)")
+    assert "as_of: unknown (profile.csv) vs unknown (profile.json)" in issue.context
 
 
 def test_identical_versions_are_a_duplicate_not_a_conflict(portal):

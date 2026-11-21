@@ -244,6 +244,34 @@ def _short(path: str) -> str:
     return path.rsplit("/", 1)[-1]
 
 
+MAX_VALUE_CHARS = 80
+
+
+def _shorten(value) -> str:
+    text = str(value)
+    return text if len(text) <= MAX_VALUE_CHARS else text[: MAX_VALUE_CHARS - 1] + "…"
+
+
+def _version_diff(rows: list[dict]) -> tuple[list[str], list[str]]:
+    """Fields the versions disagree on, and fields only some versions have."""
+    present = [{k for k, v in r["attrs"].items() if v is not None} for r in rows]
+    shared = set.intersection(*present)
+    diffs = []
+    for key in sorted(shared):
+        if len({str(r["attrs"][key]) for r in rows}) > 1:
+            shown = " vs ".join(
+                f"{_shorten(r['attrs'][key])} ({_short(r['source'])})" for r in rows
+            )
+            diffs.append(f"{key}: {shown}")
+    one_sided = []
+    for row, keys in zip(rows, present):
+        only = sorted(keys - shared)
+        if only:
+            fields = ", ".join(f"{k}={_shorten(row['attrs'][k])}" for k in only)
+            one_sided.append(f"only in {_short(row['source'])}: {fields}")
+    return diffs, one_sided
+
+
 def version_links(records: pd.DataFrame) -> tuple[pd.DataFrame, list[dict]]:
     """
     Link every version of the same entity, and report the fields they disagree on.
@@ -264,24 +292,23 @@ def version_links(records: pd.DataFrame) -> tuple[pd.DataFrame, list[dict]]:
                     "key": entity,
                 }
             )
-        diffs = []
-        shared = set.intersection(
-            *(set(k for k, v in r["attrs"].items() if v is not None) for r in rows)
-        )
-        for key in sorted(shared):
-            values = {str(r["attrs"][key]) for r in rows}
-            if len(values) > 1:
-                shown = " vs ".join(f"{r['attrs'][key]} ({_short(r['source'])})" for r in rows)
-                diffs.append(f"{key}: {shown}")
+        diffs, one_sided = _version_diff(rows)
         ids = [r["record_id"] for r in rows]
+        # as_of lets the judge apply 'newer beats older'; "unknown" where a source has no date
+        as_of = "as_of: " + " vs ".join(
+            f"{r['as_of'] or 'unknown'} ({_short(r['source'])})" for r in rows
+        )
+        context = "; ".join([*diffs, *one_sided, as_of])
         if diffs:
             detail = f"{len(rows)} versions disagree"
             issues.append(
-                _issue("versions", "conflict", ids[0], detail, ", ".join(ids[1:]), "; ".join(diffs))
+                _issue("versions", "conflict", ids[0], detail, ", ".join(ids[1:]), context)
             )
         else:
             detail = f"{len(rows)} identical versions"
-            issues.append(_issue("versions", "duplicate", ids[0], detail, ", ".join(ids[1:])))
+            issues.append(
+                _issue("versions", "duplicate", ids[0], detail, ", ".join(ids[1:]), context)
+            )
     return pd.DataFrame(links, columns=LINK_COLUMNS), issues
 
 
