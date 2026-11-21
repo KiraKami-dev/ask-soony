@@ -1,0 +1,51 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "843ab76d288c",
+  "strategy": "manual-commit",
+  "branch": "integration/verifier",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "PROGRESS.md",
+    "src/ask_soony/dispatch/__init__.py",
+    "src/ask_soony/predictor/__init__.py",
+    "tests/test_dispatch.py",
+    "tests/test_impact.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/84/3ab76d288c/0/metadata.json",
+      "transcript": "/84/3ab76d288c/0/full.jsonl",
+      "compact_transcript": "/84/3ab76d288c/0/transcript.jsonl",
+      "content_hash": "/84/3ab76d288c/0/content_hash.txt",
+      "prompt": "/84/3ab76d288c/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 18184,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 2037760,
+    "output_tokens": 6191,
+    "api_call_count": 12
+  },
+  "redaction": {
+    "replacements": 19,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 7,
+      "credentialed_uri": 0,
+      "entropy": 8,
+      "goredact": 0,
+      "key_context": 0,
+      "pii": 4,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 4,
+      "IP": 0,
+      "PHONE": 0
+    }
+  }
+}
