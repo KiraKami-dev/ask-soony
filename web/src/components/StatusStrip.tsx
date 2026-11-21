@@ -27,11 +27,14 @@ export function StatusStrip({ state, nowMs }: { state: State; nowMs: number }) {
               <div className="truncate text-sm font-semibold" title={s.breaks_first?.text}>
                 {s.breaks_first ? s.breaks_first.text : 'Nothing at risk'}
               </div>
-              {s.breaks_first?.deadline && (
-                <div className="text-xs text-ink-2">
-                  {fmtDay(s.breaks_first.deadline)} {fmtTime(s.breaks_first.deadline)}
+              {s.breaks_first?.stops_at ? (
+                <div className="text-sm text-ink-2">
+                  Line stops <span className="font-bold" style={{ color: COLORS[s.level] }}>{fmtDay(s.breaks_first.stops_at)} {fmtTime(s.breaks_first.stops_at)}</span>
+                  {s.breaks_first.deadline && <> · decide by {fmtDay(s.breaks_first.deadline)} {fmtTime(s.breaks_first.deadline)}</>}
                 </div>
-              )}
+              ) : s.breaks_first?.deadline ? (
+                <div className="text-sm text-ink-2">Decide by {fmtDay(s.breaks_first.deadline)} {fmtTime(s.breaks_first.deadline)}</div>
+              ) : null}
             </div>
           </div>
         ))}

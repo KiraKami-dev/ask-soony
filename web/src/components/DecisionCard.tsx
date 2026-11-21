@@ -17,7 +17,8 @@ interface Props {
   onDrawer: (card: Card, tab: 'evidence' | 'trail') => void
 }
 
-const first = (s?: string) => (s ? s.split(' ')[0] : '')
+// A person's first name; a role ('Head of Procurement', 'DC site lead') stays whole.
+const first = (s?: string) => (!s ? '' : /\s[a-z]/.test(s) ? s : s.split(' ')[0])
 
 export function DecisionCard({ card, nowMs, isNew, offer, onOffer, onChanged, onHover, onDrawer }: Props) {
   const [sel, setSel] = useState(0)

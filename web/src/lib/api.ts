@@ -35,6 +35,7 @@ export interface Card {
   cell_hours_lost?: number
   slack_hours?: number
   deadline?: string
+  runs_dry?: string | null
   severity?: string
   level: Level
   status: string
@@ -63,7 +64,7 @@ export interface Shipment {
 export interface StripItem {
   edition: string; label: string; level: Level; status: string
   copies_at_risk: number; slack_hours: number | null
-  breaks_first: { text?: string; deadline?: string; card: string } | null
+  breaks_first: { text?: string; deadline?: string; stops_at?: string | null; card: string } | null
 }
 export interface EventItem { id: string; at: string; path?: string; file?: string; node?: string }
 export interface ActivityItem { at?: string; text: string; kind: string; detail?: string; card?: string }
