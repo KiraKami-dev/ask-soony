@@ -6,17 +6,25 @@ the UI does not change. Output goes to data/state/, which is gitignored. Run:
 
     uv run python scripts/seed_demo_state.py            # open decisions
     uv run python scripts/seed_demo_state.py --calm     # nothing needs a human
+    uv run python scripts/seed_demo_state.py --drop     # rehearse a live drop (needs the server)
+
+--drop starts from the open state minus the late-shipment finding, then appends a portal-drop
+event for the newest file of that shipment's supplier, waits, and adds the finding: the UI should
+pulse the supplier, toast, recolour the route and slide the card in.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+from ask_soony import launch as packing  # noqa: E402
 from ask_soony.api import (  # noqa: E402
     num,
     parse_ts,
@@ -27,9 +35,8 @@ from ask_soony.api import (  # noqa: E402
     viewer_name,
 )
 
-# Placeholder staffing and pack rates: the real approver comes from the org chart and PP-07.
-PLACEHOLDER_APPROVER = "Maren Vogt"
-HOURS_PER_PACK_DAY = 16
+# Placeholder: the real approver comes from the org chart and PP-07 (criticality agent).
+PLACEHOLDER_APPROVER = os.environ.get("ASK_SEED_APPROVER", "Head of Procurement")
 
 
 def money(v: float, cur: str) -> str:
@@ -39,12 +46,15 @@ def money(v: float, cur: str) -> str:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--calm", action="store_true")
+    ap.add_argument("--drop", action="store_true", help="rehearse a live drop")
+    ap.add_argument("--delay", type=float, default=4.0, help="seconds between drop and card")
     args = ap.parse_args()
     root = portal_root()
     if root is None:
         sys.exit("No portal data found under data/ (set ASK_PORTAL_DIR).")
     soony = root / "soony"
-    now = datetime.now(tz())
+    now = parse_ts(os.environ["ASK_NOW"]) if os.environ.get("ASK_NOW") else datetime.now(tz())
+    clock = packing.load(root, tz())
 
     comps = {r["component_id"]: r for r in read_csv(soony / "master" / "components.csv")}
     products = {r["product_id"]: r for r in read_csv(soony / "master" / "products.csv")}
@@ -59,7 +69,6 @@ def main() -> None:
         soony / "erp" / "goods_receipts_update.csv"
     )
     ships = read_csv(soony / "erp" / "open_shipments.csv")
-    packout = read_csv(soony / "erp" / "packout_log.csv")
 
     def edition_of(material: str) -> tuple[str | None, float]:
         """Launch product that uses this material, preferring the one with most parts."""
@@ -72,11 +81,8 @@ def main() -> None:
         return best["parent_id"], num(best["qty_per"]) or 1.0
 
     def rate(product: str) -> float:
-        by_day: dict[str, float] = {}
-        for r in packout:
-            if r["product_id"] == product:
-                by_day[r["date"]] = by_day.get(r["date"], 0) + (num(r["units_packed"]) or 0)
-        return max(by_day.values(), default=0) / HOURS_PER_PACK_DAY or 1.0
+        ed = clock.editions.get(product)
+        return (ed.rate_per_hour if ed and ed.rate_per_hour else 0) or 1.0
 
     findings, impacts, decisions, claims, events = [], [], [], [], []
     fixed = args.calm
@@ -95,9 +101,16 @@ def main() -> None:
         latest = max((r["snapshot_date"] for r in stock), default="")
         on_hand = sum(num(r["quantity"]) or 0 for r in stock
                       if r["material_id"] == mat and r["snapshot_date"] == latest)
-        packed = sum(num(r["units_packed"]) or 0 for r in packout if r["product_id"] == prod)
-        need = (num(products.get(prod, {}).get("day_one_qty")) or 0) - packed
-        copies = int(max(0, need * per - max(0, on_hand - phantom)) / per) or int(phantom / per)
+        ed = clock.editions.get(prod)
+        need = ed.remaining if ed and ed.remaining is not None else 0
+        # A newer stock workbook (quantities as text, '77.800') beats the CSV snapshot.
+        for book in sorted((soony / "erp").glob("stock_update*.xlsx")):
+            for rows in packing._rows(book).values():
+                for r in rows:
+                    if mat in r:
+                        q = [packing._num(c) for c in r[r.index(mat) + 1:] if packing._num(c) is not None]
+                        on_hand = q[0] if q else on_hand
+        copies = int(min(need, max(0, need * per - max(0, on_hand - phantom)) / per))
         r = rate(prod) if prod else 1
         hours = round(copies / r, 1)
         desc = comps.get(mat, {}).get("description", mat)
@@ -105,7 +118,10 @@ def main() -> None:
         price, cur = num(po.get("unit_price")) or 0, po.get("currency", "EUR")
         alt = next((s for s in suppliers.values() if s["supplier_id"] != sup
                     and s["category"] == suppliers.get(sup, {}).get("category")), None)
-        deadline = (now + timedelta(hours=3)).isoformat()
+        slack = clock.slack_hours(now, prod)
+        stops = clock.line_stops(now, prod, copies)
+        # Decide-by placeholder: a few hours before the line stops (real lead times: Lucas/Farhan).
+        deadline = ((stops - timedelta(hours=3)) if stops else now + timedelta(hours=3)).isoformat()
         findings.append({
             "id": "F-1", "kind": "mismatch", "claims": ["C-1", "C-2"], "part": desc, "supplier": sup,
             "summary": f"Goods receipt {g['gr_number']} books {got:,.0f} {desc}; the PO is for {ordered:,.0f}",
@@ -122,11 +138,12 @@ def main() -> None:
         ]
         impacts.append({"finding_id": "F-1", "part": mat, "units_short": phantom, "copies_at_risk": copies,
                         "edition": prod, "cell_hours_lost": hours, "deadline": deadline,
-                        "slack_hours": 1.0})
+                        "slack_hours": slack, "runs_dry": stops.isoformat() if stops else None})
         decisions.append({
             "finding_id": "F-1", "severity": "call", "deadline": deadline,
             "headline": f"{copies:,} copies short: {desc} was booked {phantom:,.0f} too high",
-            "reason": f"Can stop the Collector's cell ({hours} h lost, 1 h slack)" if hours > 1 else "Above your limit",
+            "reason": (f"Can stop the line ({hours} h lost, {slack} h slack)"
+                       if slack is not None and hours > slack else "Above your limit"),
             "approver": PLACEHOLDER_APPROVER,
             "trail": [{"agent": "Verification", "at": (now - timedelta(minutes=7)).isoformat(),
                        "text": f"Matched goods receipt {g['gr_number']} against PO {g['po_number']}."},
@@ -212,12 +229,37 @@ def main() -> None:
 
     out = state_dir()
     out.mkdir(parents=True, exist_ok=True)
-    for name, data in [("findings", findings), ("impacts", impacts), ("decisions", decisions),
-                       ("claims", claims), ("events", events)]:
-        (out / f"{name}.json").write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    def write(fs, ims, ds, evs) -> None:
+        for name, data in [("findings", fs), ("impacts", ims), ("decisions", ds),
+                           ("claims", claims), ("events", evs)]:
+            tmp = out / f".{name}.json.tmp"
+            tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+            tmp.replace(out / f"{name}.json")
+
     for stale in ("actions.json", "decision_status.json", "trust.json"):
         (out / stale).unlink(missing_ok=True)
-    print(f"seeded {len(findings)} findings, {len(events)} events into {out}")
+    held = next((f for f in findings if f["kind"] == "forecast_late"), None)
+    if not (args.drop and held):
+        write(findings, impacts, decisions, events)
+        print(f"seeded {len(findings)} findings, {len(events)} events into {out}")
+        return
+    keep = [f for f in findings if f is not held]
+    write(keep, [i for i in impacts if i["finding_id"] != held["id"]],
+          [d for d in decisions if d["finding_id"] != held["id"]], events)
+    print(f"seeded {len(keep)} findings; dropping a file in {args.delay:.0f} s", flush=True)
+    time.sleep(args.delay)
+    sup_files = sorted((p for p in root.glob(f"suppliers/{held['supplier']}_*/**/*") if p.is_file()),
+                       key=lambda p: p.stat().st_mtime)
+    target = sup_files[-1] if sup_files else files[0]
+    drop = {"at": datetime.now(tz()).isoformat(), "path": str(target.relative_to(root)), "kind": "file"}
+    write(keep, [i for i in impacts if i["finding_id"] != held["id"]],
+          [d for d in decisions if d["finding_id"] != held["id"]], [drop, *events])
+    print(f"dropped {drop['path']}; agent card in {args.delay:.0f} s", flush=True)
+    time.sleep(args.delay)
+    held["created_at"] = datetime.now(tz()).isoformat()
+    write(findings, impacts, decisions, [drop, *events])
+    print(f"added {held['id']}: {held['summary']}")
 
 
 if __name__ == "__main__":

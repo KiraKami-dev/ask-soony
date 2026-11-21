@@ -42,4 +42,5 @@ testpaths = ["tests"]
 # Long SQL statements read better on one line.
 "src/ask_soony/store.py" = ["E501"]
 "src/ask_soony/api.py" = ["E501"]
+"src/ask_soony/launch.py" = ["E501"]
 "scripts/seed_demo_state.py" = ["E501", "F541"]

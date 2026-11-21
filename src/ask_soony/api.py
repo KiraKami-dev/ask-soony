@@ -30,6 +30,9 @@ from fastapi import Body, FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+from ask_soony import launch as launch_clock
+from ask_soony.launch import PackClock
+
 LEVEL_RANK = {"red": 3, "amber": 2, "grey": 1, "blue": 0}
 DONE_STATUSES = {"approved", "dismissed", "escalated", "handled", "sent"}
 _lock = threading.Lock()
@@ -333,6 +336,7 @@ def build_cards(net: dict, ships: dict[str, dict]) -> list[dict]:
             "number_label": "copies at risk" if short is not None else "units short",
             "edition": imp.get("edition"), "cell_hours_lost": hours, "slack_hours": slack,
             "deadline": d.get("deadline") or imp.get("deadline"),
+            "runs_dry": imp.get("runs_dry") or d.get("runs_dry"),
             "severity": sev, "level": level, "status": status,
             "approver": approver, "routed_to_other": other,
             "reason": d.get("reason"), "called_at": called.get("at") if called else None,
@@ -343,8 +347,147 @@ def build_cards(net: dict, ships: dict[str, dict]) -> list[dict]:
             "escalation_brief": escalation_brief(f, d, imp, options, viewer),
             "trusted_types": [k for k, v in trust.items() if v == "allow_always"],
         })
+    known = {c["id"] for c in cards}
+    for extra in verifier_cards(net, statuses, actions, trust, viewer) + event_cards(net, statuses, trust):
+        if extra["id"] not in known:
+            cards.append(extra)
     cards.sort(key=rank_key)
     return cards
+
+
+# ---------------------------------------------------------------- adapters for teammates' outputs
+
+
+def cards_file() -> Path:
+    return Path(os.environ.get("ASK_CARDS_FILE", "data/store/decision_cards.json"))
+
+
+def parse_when(value: Any) -> datetime | None:
+    """ISO, or the verifier's 'Sun 22 Nov 12:30' (DC clock, year of the current clock)."""
+    dt = parse_ts(value)
+    if dt or not value:
+        return dt
+    for fmt in ("%a %d %b %H:%M", "%d %b %H:%M"):
+        try:
+            d = datetime.strptime(f"{now().year} {str(value).strip()}", f"%Y {fmt}")
+            return d.replace(tzinfo=tz())
+        except ValueError:
+            continue
+    return None
+
+
+def _iso(value: Any) -> str | None:
+    dt = parse_when(value)
+    return dt.isoformat() if dt else None
+
+
+def _ui_status(cid: str, statuses: dict, default: str = "open") -> tuple[str, dict]:
+    ui = statuses.get(cid, {})
+    return ui.get("status", default), ui
+
+
+def _base_card(cid: str, **kw) -> dict:
+    card = {
+        "id": cid, "kind": None, "part": None, "headline": cid, "summary": None, "number": None,
+        "number_label": "copies at risk", "edition": None, "cell_hours_lost": None, "slack_hours": None,
+        "deadline": None, "runs_dry": None, "severity": None, "level": "blue", "status": "open",
+        "approver": None, "routed_to_other": False, "reason": None, "called_at": None, "options": [],
+        "evidence": [], "trail": [], "supplier_id": None, "supplier_name": None, "shipment": None,
+        "routes": [], "ui": {}, "created_at": None, "escalation_brief": "", "trusted_types": [],
+    }
+    card.update(kw)
+    return card
+
+
+def verifier_cards(net: dict, statuses: dict, actions: list[dict], trust: dict, viewer: str) -> list[dict]:
+    """Decision cards from the verifier (`python -m ask_soony.verifier.act`), mapped to the UI card."""
+    try:
+        data = json.loads(cards_file().read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    nodes = net.get("nodes") or {}
+    made = datetime.fromtimestamp(cards_file().stat().st_mtime, tz()).isoformat()
+    out = []
+    for vc in data.get("cards") or []:
+        cid = str(vc.get("id") or "")
+        if not cid:
+            continue
+        msgs = vc.get("messages") or []
+        at_risk = num(vc.get("at_risk")) or 0
+        runs_dry = _iso(vc.get("runs_dry"))
+        level = "red" if at_risk and runs_dry else "amber" if at_risk or vc.get("blocked_only") else "blue"
+        supplier = next((sid for sid in nodes if any(sid in str(e) for e in [*(vc.get("evidence") or []),
+                         *(m.get("to_email") or "" for m in msgs)])), None)
+        options = []
+        for i, text in enumerate(vc.get("options") or []):
+            m = msgs[i] if i < len(msgs) else None
+            options.append({
+                "index": i, "action": text, "cost": None, "effect": None, "recommended": i == 0,
+                "draft": (m or {}).get("body"), "to": (m or {}).get("to_email") or (m or {}).get("to_role"),
+                "channel": "email" if m else None, "routine_type": None,
+            })
+        if not options and msgs:
+            options = [{"index": i, "action": f"Send to {m.get('to_role')}: {m.get('subject')}", "cost": None,
+                        "effect": None, "recommended": i == 0, "draft": m.get("body"),
+                        "to": m.get("to_email") or m.get("to_role"), "channel": "email", "routine_type": None}
+                       for i, m in enumerate(msgs)]
+        approver = next((m.get("to_role") for m in msgs if m.get("to_role")), None)
+        edition = str(vc.get("edition") or "").split(" + ")[0] or None
+        status, ui = _ui_status(cid, statuses)
+        called = next((a for a in reversed(actions) if str(a.get("decision_id")) == cid
+                       and a.get("channel") == "call" and a.get("at")), None)
+        card = _base_card(
+            cid, kind="mismatch", part=vc.get("part"), headline=vc.get("title") or cid,
+            summary=vc.get("decision"), number=at_risk, edition=edition,
+            deadline=_iso(vc.get("act_by")), runs_dry=runs_dry, level=level, status=status, ui=ui,
+            approver=approver,
+            routed_to_other=bool(approver and viewer and first_name(viewer).lower() not in approver.lower()
+                                 and "buyer" not in approver.lower()),
+            reason=vc.get("decision"), called_at=called.get("at") if called else None,
+            options=options, created_at=made,
+            evidence=[{"source": "System says", "value": vc.get("system_says")},
+                      {"source": "Paper says", "value": vc.get("paper_says")},
+                      *({"source": "Evidence", "quote": e} for e in vc.get("evidence") or [])],
+            trail=[{"agent": "Verification", "at": made, "text": "Linked the records and priced the gap."}],
+            supplier_id=supplier, supplier_name=(nodes.get(supplier) or {}).get("name"),
+            trusted_types=[k for k, v in trust.items() if v == "allow_always"],
+        )
+        card["escalation_brief"] = escalation_brief({"summary": card["headline"]}, {"deadline": card["deadline"]},
+                                                    {}, options, viewer)
+        out.append(card)
+    return out
+
+
+def event_cards(net: dict, statuses: dict, trust: dict) -> list[dict]:
+    """News and notice impacts from the event impact agent (state/impacts.json keyed by event)."""
+    data = read_json("impacts.json", [])
+    if not isinstance(data, dict):
+        return []
+    nodes = net.get("nodes") or {}
+    out = []
+    for eid, r in data.items():
+        if not isinstance(r, dict) or "overall_launch_risk" not in r:
+            continue
+        cid = "EV-" + hashlib.sha1(str(eid).encode()).hexdigest()[:8]
+        risk = r.get("overall_launch_risk")
+        affected = r.get("affected") or []
+        hit = next((a for a in affected if a.get("launch_risk") == "yes"), affected[0] if affected else {})
+        status, ui = _ui_status(cid, statuses, "open" if risk == "yes" else "logged")
+        supplier = hit.get("supplier_id") if hit.get("supplier_id") in nodes else None
+        out.append(_base_card(
+            cid, kind="risk_news", part=hit.get("component_id"),
+            headline=r.get("event_summary") or str(eid), summary=r.get("recommendation"),
+            level="amber" if risk == "yes" else "grey", status=status, ui=ui,
+            reason=(r.get("recommendation") if risk == "yes" else
+                    "; ".join(a.get("mechanism", "") for a in affected[:2]) or "No part of the launch is touched."),
+            created_at=r.get("analysed_at"), supplier_id=supplier,
+            supplier_name=(nodes.get(supplier) or {}).get("name"),
+            evidence=[{"source": a.get("supplier_id"), "value": f"{a.get('effect')}, launch risk {a.get('launch_risk')}",
+                       "quote": a.get("evidence")} for a in affected],
+            trail=[{"agent": "Event impact", "at": r.get("analysed_at"), "text": f"Read {r.get('source')}."}],
+            trusted_types=[k for k, v in trust.items() if v == "allow_always"],
+        ))
+    return out
 
 
 def escalation_brief(f: dict, d: dict, imp: dict, options: list[dict], viewer: str) -> str:
@@ -377,16 +520,15 @@ def edition_labels(root: Path | None) -> dict[str, str]:
     return out
 
 
-def build_strip(cards: list[dict], root: Path | None) -> list[dict]:
+def build_strip(cards: list[dict], root: Path | None, clock: PackClock, cur: datetime) -> list[dict]:
+    """One cell per launch edition. Slack and the time a line stops come from the packing clock
+    (shift windows, rate, copies left), so a line never 'stops' at night."""
     launch = {str(e.get("edition")): e for e in (read_json("launch.json", {}).get("editions") or [])}
     labels = edition_labels(root)
-    keys: list[str] = list(launch) or []
-    for c in cards:
-        if c.get("edition") and c["edition"] not in keys:
-            keys.append(c["edition"])
-    for pid in labels:
-        if pid not in keys:
-            keys.append(pid)
+    keys: list[str] = list(launch)
+    for k in [*labels, *(c["edition"] for c in cards if c.get("edition"))]:
+        if k not in keys:
+            keys.append(k)
 
     def label_of(k: str) -> str:
         if k in launch and launch[k].get("label"):
@@ -398,20 +540,28 @@ def build_strip(cards: list[dict], root: Path | None) -> list[dict]:
 
     strip = []
     for k in keys:
-        mine = [c for c in cards if c.get("edition") == k and c["status"] == "open"]
+        mine = [c for c in cards if c.get("edition") == k and c["status"] in ("open", "escalated")]
         base = launch.get(k, {})
         worst = max((LEVEL_RANK[c["level"]] for c in mine), default=0)
-        slack_vals = [c["slack_hours"] for c in mine if c.get("slack_hours") is not None]
-        slack = base.get("slack_hours") if base.get("slack_hours") is not None else (min(slack_vals) if slack_vals else None)
+        slack = base.get("slack_hours")
+        if slack is None:
+            slack = clock.slack_hours(cur, k)
+        if slack is None:
+            vals = [c["slack_hours"] for c in mine if c.get("slack_hours") is not None]
+            slack = min(vals) if vals else None
         first = sorted(mine, key=rank_key)[0] if mine else None
+        breaks = None
+        if first:
+            stops = parse_when(first.get("runs_dry")) or clock.line_stops(cur, k, first.get("number"))
+            breaks = {"text": first.get("part") or first.get("headline"), "deadline": first.get("deadline"),
+                      "stops_at": stops.isoformat() if stops else None, "card": first["id"]}
         strip.append({
             "edition": k, "label": label_of(k),
             "level": {3: "red", 2: "amber", 1: "grey", 0: "blue"}[worst],
             "status": {3: "Stops the line", 2: "At risk", 1: "Unclear", 0: "On track"}[worst],
             "copies_at_risk": sum(c.get("number") or 0 for c in mine),
             "slack_hours": slack,
-            "breaks_first": ({"text": first.get("part") or first.get("headline"),
-                              "deadline": first.get("deadline"), "card": first["id"]} if first else None),
+            "breaks_first": breaks,
         })
     return strip
 
@@ -506,7 +656,7 @@ def build_state() -> dict:
         },
         "route_level": route_level, "badges": dict(badges),
         "shipments": list(ships.values()),
-        "strip": build_strip(cards, root),
+        "strip": build_strip(cards, root, launch_clock.load(root, tz()), cur),
         "cards": cards,
         "inbox_ids": [c["id"] for c in inbox],
         "calm": not inbox,
