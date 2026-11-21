@@ -126,6 +126,22 @@ COUNT_FIELDS = {
 }
 
 
+def parse_count(raw) -> float | None:
+    """
+    A count as written in any convention: 42900, '42.900', '42,900', '42 900'. Counts are
+    whole, so a group of three digits after a separator is a thousands group.
+    """
+    if isinstance(raw, (int, float)) and not isinstance(raw, bool):
+        return None if raw != raw else float(raw)  # NaN check
+    text = clean(raw)
+    if text is None:
+        return None
+    match = _GROUPED_THOUSANDS.fullmatch(text)
+    if match:
+        return float(re.sub(r"\D", "", text))
+    return parse_number(text)
+
+
 def count_number(field: str, raw, model_number: float | None) -> float | None:
     """
     The number a count means, from the raw text as written.
