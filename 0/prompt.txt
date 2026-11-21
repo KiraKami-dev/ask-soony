@@ -1,0 +1,60 @@
+Can you make the data like being gitignored in a folder or so? And from git history of the others or entire restore the older checkpoints as good as possible
+
+---
+
+Probably delete the leftover data? or is that commmitted? and what 4 commits?
+
+---
+
+go on another branch for now
+
+---
+
+So what is next?
+
+---
+
+For the mail "
+
+<pasted_content id="1dc7">
+Hello Soony Procurement Team,
+
+PO 4500318769, item 00020 for 36,000 CMP-GAM-001 cards, is packed and held at our dock. As noted in OA26144214, we need your written confirmation that this order proceeds EXW Boise under Sales Agreement PC-0011-2023 §4.1, or nomination of your own forwarder, before release; the ORD–FRA air booking is in place. Once we have that confirmation, we will release to the next available flight, with Frankfurt arrival approximately two days later.
+
+For structured updates, option (b), a fixed email format, is the most practical starting point for our team. I’ll check internally on the appropriate operations/IT contact for any web-form, API, or EDI discussion.
+
+Best regards,
+
+Megan Ortiz
+Boise Semiconductor Inc.
+</pasted_content id="1dc7">
+
+" can you ask if there is an IT mail or so we can reach out to (as he mentioned it but didn'T come back)
+
+---
+
+<task-notification>
+<task-id>bu09egyxq</task-id>
+<tool-use-id>toolu_011GioFu3SdtEupcc92LLJch</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/bu09egyxq.output</output-file>
+<status>completed</status>
+<summary>Background command "Wait for Boise reply about IT contact" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+"
+
+<pasted_content id="1dc7">
+Hello Soony Procurement Team,
+
+Please send the fixed-format template to me, and I will coordinate the format with our operations team. I need to check internally before providing a direct operations or IT contact, particularly for any web-form, API, or EDI work.
+
+I do not have the earlier thread available in this mailbox, so I cannot verify the stated EXW confirmation or release from here. My current record still shows the shipment held pending written EXW confirmation or your forwarder nomination. Please resend the confirmation in reply to this email, and I will have the release and flight details checked right away; logistics will need to provide the freight, insurance, and duty amounts.
+</pasted_content id="1dc7">
+
+" can you through a data and propose a format?
+
+---
+
+yes, send it
