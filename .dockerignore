@@ -1,0 +1,12 @@
+.git
+.env
+.env.*
+data/
+web/node_modules
+web/dist
+.venv
+.claude
+.playwright-mcp
+graphify-out
+challenge_docs
+**/__pycache__
