@@ -1,4 +1,4 @@
-from ask_soony.impact import _is_context_path, _json_items, _unknown_ids, is_event_path
+from ask_soony.predictor import _is_context_path, _json_items, _unknown_ids, is_event_path
 
 
 def test_event_and_context_paths():

@@ -36,13 +36,13 @@ line-length = 100
 select = ["E", "F", "I"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "verifier"]
-pythonpath = ["."]
+testpaths = ["tests", "src/ask_soony/verifier"]
+pythonpath = ["src"]
 
 [tool.ruff.lint.per-file-ignores]
 # Long SQL statements read better on one line.
 "src/ask_soony/store.py" = ["E501"]
 # Test fixtures are CSV rows and file paths; wrapping them hurts readability.
-"verifier/**/tests/*.py" = ["E501"]
+"src/ask_soony/verifier/**/tests/*.py" = ["E501"]
 # Email templates and the page's CSS read better unwrapped.
-"verifier/act/*.py" = ["E501"]
+"src/ask_soony/verifier/act/*.py" = ["E501"]
