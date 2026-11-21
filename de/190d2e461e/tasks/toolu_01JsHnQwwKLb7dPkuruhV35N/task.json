@@ -1,0 +1,15 @@
+{
+  "tool_use_id": "toolu_01JsHnQwwKLb7dPkuruhV35N",
+  "agent_id": "a5e5861d3bf603291",
+  "subagent_type": "general-purpose",
+  "task_description": "Scaffold local dashboard skeleton",
+  "token_usage": {
+    "input_tokens": 64,
+    "cache_creation_tokens": 112941,
+    "cache_read_tokens": 2603103,
+    "output_tokens": 38541,
+    "api_call_count": 31
+  },
+  "started_at": "2026-11-21T23:22:37.40108+01:00",
+  "completed_at": "2026-11-21T23:25:25.438827+01:00"
+}

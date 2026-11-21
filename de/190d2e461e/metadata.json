@@ -1,0 +1,56 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "de190d2e461e",
+  "strategy": "manual-commit",
+  "branch": "akshat/dashboard",
+  "checkpoints_count": 3,
+  "files_touched": [
+    ".gitignore"
+  ],
+  "sessions": [
+    {
+      "metadata": "/de/190d2e461e/0/metadata.json",
+      "transcript": "/de/190d2e461e/0/full.jsonl",
+      "compact_transcript": "/de/190d2e461e/0/transcript.jsonl",
+      "content_hash": "/de/190d2e461e/0/content_hash.txt",
+      "prompt": "/de/190d2e461e/0/prompt.txt",
+      "assets_manifest": "/de/190d2e461e/0/assets/manifest.json"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 40,
+    "cache_creation_tokens": 16447,
+    "cache_read_tokens": 2605986,
+    "output_tokens": 5613,
+    "api_call_count": 15,
+    "subagent_tokens": {
+      "input_tokens": 34,
+      "cache_creation_tokens": 25735,
+      "cache_read_tokens": 1592599,
+      "output_tokens": 16203,
+      "api_call_count": 16
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 2518,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 2,
+      "credentialed_uri": 0,
+      "entropy": 2516,
+      "goredact": 0,
+      "key_context": 0,
+      "pii": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 0,
+      "IP": 0,
+      "PHONE": 0
+    }
+  }
+}
