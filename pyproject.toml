@@ -6,7 +6,6 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "anthropic>=1.0",
-    "claude-agent-sdk>=0.2.187",
     "httpx>=0.28",
     "openai>=1.60",
     "openpyxl>=3.1",

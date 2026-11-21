@@ -3,12 +3,9 @@
 import asyncio
 import json
 
-from claude_agent_sdk import AssistantMessage, TextBlock
-
 from verifier.image_recognizer import run
 from verifier.image_recognizer.run import (
     Settings,
-    _clean,
     _not_retryable,
     fingerprint,
     is_done,
@@ -20,7 +17,7 @@ FP = "f" * 16
 
 
 def settings(tmp_path, model="m", effort="high") -> Settings:
-    return Settings(tmp_path, tmp_path / "out", model, effort, 1, 4, 2)
+    return Settings(tmp_path, tmp_path / "out", model, effort, 1, 2)
 
 
 def make(root, rel, data=b"x"):
@@ -66,16 +63,8 @@ def test_failed_read_is_not_done(tmp_path):
     assert not is_done(job, out, FP)
 
 
-def test_clean_drops_image_bytes_and_keeps_block_types():
-    message = AssistantMessage(content=[TextBlock(text="hi")], model="m")
-    cleaned = _clean({"msg": message, "image": {"data": "A" * 5000}})
-    assert cleaned["msg"]["_type"] == "AssistantMessage"
-    assert cleaned["msg"]["content"][0]["_type"] == "TextBlock"
-    assert "left out" in cleaned["image"]["data"]
-
-
 def test_safety_blocks_are_not_retried():
-    assert _not_retryable("API Error: Sonnet 5.5's safeguards flagged this message")
+    assert _not_retryable("refusal: cannot help")
     assert not _not_retryable("ProcessError: exit code 1")
 
 
@@ -114,7 +103,7 @@ def test_result_from_another_schema_or_model_is_read_again(tmp_path):
 def _fake_reader(results):
     calls = []
 
-    async def read(job, settings):
+    async def read(job, settings, client):
         calls.append(job.rel)
         return results[min(len(calls), len(results)) - 1]
 
@@ -124,9 +113,7 @@ def _fake_reader(results):
 def test_flaky_error_is_retried_until_it_works(tmp_path, monkeypatch):
     ok = {
         "verdict": {"verdict": {}},
-        "thinking": [],
-        "transcript": [],
-        "result": None,
+        "usage": None,
         "error": None,
     }
     read, calls = _fake_reader([{"error": "ProcessError: exit 1"}, ok])
@@ -139,7 +126,7 @@ def test_flaky_error_is_retried_until_it_works(tmp_path, monkeypatch):
 
 
 def test_safety_block_is_tried_once(tmp_path, monkeypatch):
-    read, calls = _fake_reader([{"error": "API Error: safeguards flagged this message"}])
+    read, calls = _fake_reader([{"error": "refusal: cannot help"}])
     monkeypatch.setattr(run, "read_document", read)
     monkeypatch.setattr(run, "RETRY_WAIT_SECONDS", 0)
     make(tmp_path, "x/scan.jpg")

@@ -30,8 +30,7 @@ The verdict says whether the document is clean, and lists red flags a buyer must
 corrections, short or late shipments, failed checks, conditions, or numbers inside the \
 document that contradict each other."""
 
-USER_PROMPT = """Read the document at this path with the Read tool, then return the structured \
-result.
+USER_PROMPT = """Read this document and return the structured result.
 
 Path: {path}
 File type: {suffix}"""
