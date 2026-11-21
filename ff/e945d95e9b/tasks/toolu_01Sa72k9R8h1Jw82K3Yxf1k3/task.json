@@ -1,0 +1,15 @@
+{
+  "tool_use_id": "toolu_01Sa72k9R8h1Jw82K3Yxf1k3",
+  "agent_id": "ad1c7155c018a80e4",
+  "subagent_type": "general-purpose",
+  "task_description": "Extract chunk 18",
+  "token_usage": {
+    "input_tokens": 8,
+    "cache_creation_tokens": 61242,
+    "cache_read_tokens": 208923,
+    "output_tokens": 3466,
+    "api_call_count": 4
+  },
+  "started_at": "2026-11-21T23:01:18.734791+01:00",
+  "completed_at": "2026-11-21T23:01:45.535625+01:00"
+}
