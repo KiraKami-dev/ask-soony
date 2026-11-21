@@ -1,0 +1,5 @@
+there should be a branch on sth called dashboard. could we make the test calls through that? sure telegram (or any other app that does real calls) can't do it?
+
+---
+
+yeah do it. or maybe a pwa that does a notification and on tapping a phone call? so just for testing?
