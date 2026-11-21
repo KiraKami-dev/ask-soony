@@ -59,6 +59,16 @@ uv run pytest
 
 LLM backends (`ASK_LLM_PROVIDER`): `anthropic` (Claude via the Anthropic SDK, default `claude-opus-5-5`), `openai` (OpenAI), `llamacpp` (any OpenAI-compatible server, e.g. `llama-server --jinja` with `ASK_LLM_BASE_URL=http://localhost:8080/v1`), `none` (poll and store only). Local models need vision support for scans.
 
+## Run the dashboard locally
+
+Prerequisites: [uv](https://docs.astral.sh/uv/) and Node 18 or newer.
+
+```bash
+scripts/dashboard.sh    # API on :8000, UI on http://localhost:5173, Ctrl-C stops both
+```
+
+It shows `web/fixtures/sample_state.json` (made-up data) until real output exists. To use real verifier output, run `uv run python -m verifier.act` on the verifier branch (it writes `data/store/decision_cards.json`, which the API picks up), or point `ASK_SOONY_STATE` at any file of that shape. Your clicks and the activity feed are stored in `data/state/` (gitignored).
+
 ## Data
 
 All customer data comes from the Soony portal at runtime (`GET /api/v1/files`, `/api/v1/archive.zip`). It is confidential: use it only for this hackathon, never share it outside the team and never commit it (`data/` is gitignored).
