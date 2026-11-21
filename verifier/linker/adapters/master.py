@@ -49,7 +49,16 @@ def supplier_profile_json(source, ctx) -> list[dict]:
         "notes": clean(flat.get("supplier.notes")),
         "exported_at": clean(flat.get("exportedAt")),
     }
-    return [make_record("supplier", supplier_id, source, attrs, supplier_id=supplier_id)]
+    return [
+        make_record(
+            "supplier",
+            supplier_id,
+            source,
+            attrs,
+            supplier_id=supplier_id,
+            as_of=attrs["exported_at"],
+        )
+    ]
 
 
 def parts_master(source, ctx) -> list[dict]:

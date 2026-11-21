@@ -4,6 +4,8 @@ The record: one thing in the data with an id, its join keys and everything else 
 All records share one set of join columns, so link rules are plain merges on those columns.
 """
 
+from verifier.linker.normalize import to_utc_iso
+
 RECORD_COLUMNS = [
     "record_id",  # '<kind>:<key>', plus '@<source>' when several files hold the same entity
     "entity",  # '<kind>:<key>': the thing itself, shared by all its versions
@@ -20,6 +22,7 @@ RECORD_COLUMNS = [
     "delivery_note",
     "shipment_id",
     "reference",  # container number or air waybill
+    "as_of",  # when the source says this was true (snapshot, export, update); None if unknown
     "po_numbers",  # list
     "material_ids",  # list
     "attrs",  # dict: everything that is not a join key
@@ -65,4 +68,6 @@ def make_record(kind: str, key: str, source, attrs: dict | None = None, **keys) 
         attrs=attrs or {},
         **keys,
     )
+    # One format for every source, so 'newer beats older' compares like with like
+    record["as_of"] = to_utc_iso(record["as_of"])
     return record

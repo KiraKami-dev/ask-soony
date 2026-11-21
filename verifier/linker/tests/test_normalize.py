@@ -10,6 +10,7 @@ from verifier.linker.normalize import (
     po_line,
     po_line_state,
     split_list,
+    to_utc_iso,
 )
 
 
@@ -101,3 +102,12 @@ def test_po_line_state_comes_from_facts():
     assert po_line_state(500.0, "2026-01-01") == "delivered"
     assert po_line_state(500.0, None) == "open"
     assert po_line_state(None, None) == "open"
+
+
+def test_to_utc_iso_puts_every_format_in_one_form():
+    assert to_utc_iso("2026-11-20") == "2026-11-20T00:00:00Z"
+    assert to_utc_iso("2026-11-20T10:00:00+01:00") == "2026-11-20T09:00:00Z"
+    assert to_utc_iso("2026-11-21T17:12:00") == "2026-11-21T17:12:00Z"  # naive: read as UTC
+    assert to_utc_iso("2026-11-21T16:12:00Z") == "2026-11-21T16:12:00Z"
+    assert to_utc_iso("yesterday") is None
+    assert to_utc_iso(None) is None

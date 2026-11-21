@@ -35,6 +35,7 @@ def shipments(source, ctx) -> list[dict]:
                 supplier_id=ctx.suppliers.resolve(row.get("supplier_id")),
                 shipment_id=shipment,
                 reference=clean(row.get("reference")),
+                as_of=attrs["updated_at"],
                 po_numbers=split_list(row.get("po_numbers")),
                 material_ids=split_list(row.get("material_ids")),
             )

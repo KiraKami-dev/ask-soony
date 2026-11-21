@@ -60,6 +60,7 @@ def delivery_note(source, ctx) -> list[dict]:
             source,
             {"file": _file(source), "scan_date": parse_date(meta["date"], ("%Y%m%d",))},
             delivery_note=meta["delivery_note"],
+            as_of=parse_date(meta["date"], ("%Y%m%d",)),
         )
     ]
 

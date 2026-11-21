@@ -6,7 +6,7 @@ supplier profiles at runtime.
 """
 
 import re
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 
 _LIST_SEP = re.compile(r"\s*[|,;]\s*")
 _NON_ALNUM = re.compile(r"[^0-9a-z]+")
@@ -54,7 +54,7 @@ def parse_number(value, decimal_comma: bool = False) -> float | None:
     text = clean(value)
     if text is None:
         return None
-    text = text.replace(" ", "").replace(" ", "")
+    text = text.replace("\u00a0", "").replace(" ", "")
     if decimal_comma:
         text = text.replace(".", "").replace(",", ".")
     else:
@@ -80,6 +80,29 @@ def parse_date(value, formats: tuple[str, ...] = ("%Y-%m-%d",)) -> str | None:
         except ValueError:
             continue
     return None
+
+
+def to_utc_iso(value) -> str | None:
+    """
+    One comparable timestamp form: 'YYYY-MM-DDTHH:MM:SSZ' in UTC.
+
+    Sources mix plain dates, naive timestamps and timestamps with an offset. Plain dates and
+    naive timestamps carry no zone and are read as UTC. Unparseable values give None.
+    """
+    if is_blank(value):
+        return None
+    if isinstance(value, datetime):
+        moment = value
+    elif isinstance(value, date):
+        moment = datetime(value.year, value.month, value.day)
+    else:
+        try:
+            moment = datetime.fromisoformat(str(value).strip().replace("Z", "+00:00"))
+        except ValueError:
+            return None
+    if moment.tzinfo is None:
+        moment = moment.replace(tzinfo=UTC)
+    return moment.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def po_line_state(quantity: float | None, delivered_date: str | None) -> str:

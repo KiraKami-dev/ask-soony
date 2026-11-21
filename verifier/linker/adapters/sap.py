@@ -135,10 +135,25 @@ def stock(source, ctx) -> list[dict]:
         }
         if batch:
             records.append(
-                make_record("stock_batch", batch, source, attrs, material_id=material, batch=batch)
+                make_record(
+                    "stock_batch",
+                    batch,
+                    source,
+                    attrs,
+                    material_id=material,
+                    batch=batch,
+                    as_of=attrs["snapshot_date"],
+                )
             )
         else:
             records.append(
-                make_record("stock_total", material, source, attrs, material_id=material)
+                make_record(
+                    "stock_total",
+                    material,
+                    source,
+                    attrs,
+                    material_id=material,
+                    as_of=attrs["snapshot_date"],
+                )
             )
     return records
