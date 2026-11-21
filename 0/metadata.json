@@ -1,0 +1,138 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M7Z7D2CH5ASFE6W2TVE91J32",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-21T14:15:56.464743Z",
+  "branch": "main",
+  "checkpoints_count": 20,
+  "save_step_count": 1,
+  "files_touched": [
+    "src/ask_soony/portal.py",
+    "src/ask_soony/watcher.py"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "1d86fed25be5",
+  "compact_transcript_start": 0,
+  "session_token_usage": {
+    "input_tokens": 213,
+    "cache_creation_tokens": 345005,
+    "cache_read_tokens": 21132799,
+    "output_tokens": 108466,
+    "api_call_count": 94,
+    "subagent_tokens": {
+      "input_tokens": 62,
+      "cache_creation_tokens": 166800,
+      "cache_read_tokens": 2842511,
+      "output_tokens": 21849,
+      "api_call_count": 30
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 75,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 13,
+      "credentialed_uri": 0,
+      "entropy": 32,
+      "goredact": 0,
+      "key_context": 0,
+      "pii": 30,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 26,
+      "IP": 0,
+      "PHONE": 4
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 20
+  },
+  "summary": {
+    "intent": "Get started on the Lio 'Keep the Line Running' hackathon challenge: analyze Soony's confidential launch data, decide on a product direction (a recheck-and-act agent), prepare office-hours/interview material, and build a polling watcher with an LLM analysis agent.",
+    "outcome": "Analyzed the data and found the Collector's Edition misses Sunday despite the plan saying all ok, published a findings doc and briefing page plus a Felix interview doc, and built and committed a Python watcher package (poller, versioned store, extractor, pluggable LLM agent, notifiers) with a baseline poll run against the real portal.",
+    "learnings": {
+      "repo": [
+        "Confidential portal data lives in the gitignored data/ folder (raw, drops, notes, img, store); .env holds SOONY_PORTAL_TOKEN and is gitignored, while .env.example is committed with an empty token.",
+        "Portal API has only three endpoints (GET /api/v1/files, /files/{path}, /archive.zip) with no notification or webhook; the documented approach is to poll the file list and compare SHA-256 checksums.",
+        "Existing portal files can be replaced under the same name and formats may change, so change detection must use checksums and extraction cannot assume a fixed layout.",
+        "Teammates added CLAUDE.md and PROGRESS.md with a team workflow; tasks are claimed via a 'Now' line in PROGRESS.md before building.",
+        "Entire hooks only write a checkpoint when repo files change; sessions with no modified files log 'skipping checkpoint', and Codex hooks need approval via /hooks."
+      ],
+      "code": [
+        {
+          "path": "src/ask_soony/portal.py",
+          "finding": "Large first syncs use archive.zip instead of per-file downloads, and portal requests have retries added after the baseline poll failed."
+        },
+        {
+          "path": "src/ask_soony/watcher.py",
+          "finding": "Polling loop lists files, compares checksums, stores versions in a checksum-keyed blob store plus SQLite log, and hands changed files to the LLM agent and notifiers; baseline poll can run without a model."
+        }
+      ],
+      "workflow": [
+        "Use a subagent for bulk cross-checking (200 order confirmations, 59 scans) while the main session continues reading other data.",
+        "Render scanned PDFs to images to read them; scans revealed discrepancies that structured data hid (e.g. 80,000 vs handwritten 8,000 art books).",
+        "Keep tests on invented data with fake portal and LLM responses so no confidential data or API calls are involved.",
+        "Commit in separate topics with the user's author identity set via env vars and no session trailer."
+      ]
+    },
+    "friction": [
+      "Portal token was empty at the start, blocking data access until the user supplied it.",
+      "Initial baseline poll failed on a large number of files, requiring archive.zip and retry logic.",
+      "Computer went to sleep mid-response, leaving the README/.env.example documentation step possibly incomplete.",
+      "The first commit attempt needed a retry to apply the correct author via env vars.",
+      "Unclear whether portal data and supplier replies differ per team; needs asking the Lio engineers.",
+      "The SessionStart hook was logged under a different session ID, which looked like missing hooks."
+    ],
+    "open_items": [
+      "Update the briefing page and doc with the 14:37 drop; they still show the 14:00 state.",
+      "Register sender email addresses in the portal Settings and set up an inbox the agent can send from and read replies in.",
+      "Draft and send the approved Polish order to Karton Nowak for 8,000 art books before the 24h offer expires, then reply to Boise about EXW terms.",
+      "Build the reconcile-and-act agent with one-click approval and a recompute step in plain code.",
+      "Decide whether to delete the earlier Claude doc now that the page exists.",
+      "Get Codex hooks approved via /hooks.",
+      "Ask Lio engineers whether portal data is identical across teams and whether supplier replies create portal files.",
+      "Change the portal password shared in Discord after the hack."
+    ]
+  }
+}

@@ -1,0 +1,169 @@
+Let's get started with this. What to do first? /Users/jonasstenglein/Downloads/Lio_-_Deep_dive_slides.pptx /Users/jonasstenglein/Downloads/Lio_-_Judging_criteria.pdf /Users/jonasstenglein/Downloads/Lio_-_Challenge_Keep_the_Line_Running.pdf
+
+---
+
+can it be that the entire hooks did not fire?
+
+---
+
+can you set up a .env and .env.example maybe for the token?
+
+---
+
+Ok, do you want to look into the data? or do this on an ssh machine / ada to keep it running and notify on changes (either with some claude or a local llm there)
+
+---
+
+<task-notification>
+<task-id>ae92f09781f89be87</task-id>
+<tool-use-id>toolu_01X7bTSUzDRZB5bjDXMjQazq</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/ae92f09781f89be87.output</output-file>
+<status>completed</status>
+<summary>Agent "Cross-check OCs and scans" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I compared all 200 order confirmations against SAP and read all 59 receiving scans plus the inspection report against `goods_receipts.csv`. Only one delivery note disagrees with what was booked (the art books), but the system currently counts 72,000 art books and 5,600 failed statues as usable stock for the launch.
+
+**Files I could not read: none.** Three Pune confirmations had empty text (OA26507225, OA26101187, OA26218533); I rendered and read them, and they match SAP. Separately, 11 goods receipts since September have no scan at all: DN-260725-782, DN-260831-382, DN-261102-986, DN-261106-613, SN-260730-216, SN-260810-719, SN-261007-130, WZ-260829-339, WZ-260902-594, WZ-261007-399 and WZ-261110-805.
+
+### Real discrepancies
+
+| File | What SAP says | What the document says | Why it matters for Sun 20:00 |
+|---|---|---|---|
+| WZ-261116-473 (PO 4500318768 line 3) | GR 5000413065 books 80,000 art books (CMP-GAM-008) against 8,000 ordered, remark "over delivery accepted" | Printed 80.000 is crossed out and **8 000** handwritten. 360 kg for 40 packages; 10,100 books in WZ-261109-498 weighed 420 kg, so 80,000 is physically implausible | Art book stock shows 91,300 but is really about 19,300. Collector's Edition (CE) coverage is overstated by 72,000 |
+| DN-261021-819 plus the inspection report (PO 4500318727, Pune) | 5,600 statues (CMP-GAM-010) booked "unrestricted" | 9 of 125 samples with paint defects, AQL 1.0 accept/reject 3/4, so the lot is rejected. Blocking was requested; use needs a concession signed by Supplier Quality and the Category Lead | Statue stock of 27,400 includes 5,600 unusable, leaving 21,800. The Collector's Items Category Lead post is vacant, so nobody can sign the concession |
+| Pune confirmations (all 6) and Pune contract §2.2 | Supplier is active, receiving accepted the goods | Confirmations say "approved for serial supply (PPAP submitted 2026-09-14)". The contract says serial supply needs a *completed* PPAP and a written release by Supplier Quality and the Category Lead | Pune is not formally released, so its lots should not go to stock unrestricted |
+| SN-260818-893, SN-260915-558, SN-261008-884 (Dongguan) | No PO, unknown material, booked to "misc merchandise" | PRM-GH6-PIN = Pre-order Pin "GH6" (enamel): 24,000 + 24,000 + 30,000 = 78,000 pcs, no PO on paper either | Not in any BOM and invisible to planning. Check whether the pins are meant to go into pre-order packs on Sunday, and who ordered them (no PO, so the purchase was never approved) |
+| PackRight confirmations for 4500318738 (delivered 64,000 sleeves on SN-261014-585), 752, 765, 774, 786 | Sleeve CMP-GAM-004; master data says drawing rev B | "Artwork PR-SL-0604: rev. B (GH6_sleeve_revB.pdf)" | Karton Nowak prints **rev. C** ("GH6_sleeve_revC_USK2026.pdf", received from Soony Marketing 2026-08-07). If rev C (USK 2026) is the valid artwork, the 64,000 PackRight sleeves in stock are the wrong version |
+| Boise, all 50 confirmations, including open 4500318773/780/787 and in-flight 4500318766/769 | Incoterm DDP Hamburg | EXW Boise per Sales Agreement §4.1: "DDP is not agreed"; freight, insurance and duties are added to the invoice; ship dates are estimates | Cost and risk transfer at Boise; nobody guarantees delivery to Hamburg |
+| Hwaseong 4500318555 / 705 / 641; Boise 4500318533 (all delivered) | Unit price 5.40 / 6.11 USD | 5.62 / 5.56 / 5.51 / 6.29 USD | Invoice price variance only |
+| 4500318636 (delivered); Dongguan 4500318744 line 1 (open) | Promised 2026-05-26 / 2026-12-21 | Confirmed 2026-06-09 / 2026-12-28 | Not launch-relevant |
+| Karton Nowak shutdown notice (Polish) | n/a | Translated: "Sheet-fed offset line 1 and the hardcover bindery are down from 21.11 14:00 to 23.11 06:00, with no capacity. The digital line can do at most 15,000 covers or leaflets in 36 h. Express orders for the offset line accepted only until 21.11 09:00." | No emergency art book or sleeve reprint is possible before launch |
+
+Everything else matches, including all other scans. Non-English remarks on the delivery notes are only handling notes: "handle with care", "keep dry, do not turn upside down", "protect from moisture", "EUR pallets, please return".
+
+### Lid magnets (CMP-MAG-005)
+- The PackRight confirmations and the framework agreement (Annex A/B/C) say the Collector's Box is supplied as PR-RB-2207 with 4 lid magnets (their part RM-N42-D0401, from sub-supplier Jiangxi RareMag) **fitted at PackRight's plant and included in the box price**.
+- So the CE bill of materials double-counts the 4 magnets per unit. The zero magnet stock does not block the launch, as long as all boxes come from PackRight, which is true for every box PO I saw.
+- The delivery notes never mention magnets.
+
+### Five most launch-critical
+1. **Art books:** the receipt for WZ-261116-473 is overbooked by 72,000. Correct it to 8,000 and re-plan CE volume against about 19,300 real art books.
+2. **Statue lot DN-261021-819:** 5,600 pcs failed inspection but sit as unrestricted stock. Block them, or get a concession, which is hard while the Category Lead post is vacant.
+3. **Magnets:** CMP-MAG-005 is not a real shortage. Remove the 4-per-CE line from the BOM so the planning shortage disappears.
+4. **Sleeve artwork:** PackRight's rev B and Nowak's rev C (USK 2026) are both in stock. Confirm which one is valid before packing.
+5. **Pre-order pins:** 78,000 PRM-GH6-PIN arrived without a PO or master data. Clarify whether they belong in Sunday's packs. Nowak's shutdown also rules out any print or bindery rescue this weekend.
+
+Everything stayed local. The parser (`oa.py`), its output and the rendered scans are in `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/`.</result>
+<usage><subagent_tokens>170163</subagent_tokens><tool_uses>90</tool_uses><duration_ms>230946</duration_ms></usage>
+</task-notification>
+
+---
+
+Can you create a docs or artifact with it. And should we do the recheck and act agent. And if so should it be kind of adaptable to other cases (In think that is required in the challenge, right?)
+
+---
+
+Should the questions be more specific or more general for the product?
+
+---
+
+I think more about the pain / general also
+
+---
+
+can you split it in general and specific maybe?
+
+---
+
+can you make an artifact / page instead?
+
+---
+
+What is procurement vs senior buyer?
+
+---
+
+What about the agent looking into the data in a loop? Is this running / where / with which model?
+
+---
+
+Is there any api endpoint to get notifications?
+
+---
+
+So for the actual product we could build an agent loop or like a deterministic loop (e.g. all 5min, download automatically etc.) and then take an api key to extract findings / inconsistencies (idk what) somewhere, maybe versioned? Or can you find anything in the data?
+
+---
+
+where is the Boise order confirmation file?
+
+---
+
+Do you think we need to fix this / reply? Or is the goal more building a product from this?
+
+---
+
+Is it clear if the data on the platform is the same for everyone or differs between tams / what mails we send?
+
+---
+
+got the interview with "15:15 · Felix Brunner, Senior Buyer, Game Cards · process · Lio room, table 2. Your 1st choice. Your topic: “We want to understand the most critical part of the process. What is that one process/aspect that must never fail?”
+" can you make a doc or so (no artifact) with the questions to it?
+
+---
+
+"
+
+<pasted_content id="1dc7">
+KiraKami [ST!],  — 13:34
+https://start-hack-portal-cxh3crbdaef2f8gt.westeurope-01.azurewebsites.net/
+Soony Supplier Portal
+Everything Soony knows about its suppliers, and everything that changes during the hack. Run by Lio for START Hack Munich 2026.
+login username : error404.ai
+pass : Akshat@15973
+KiraKami [ST!],  — 14:23
+interview quesiton 1 :
+jonast — 14:23
+Questions to ask genreal / on data: https://claude.ai/artifact/RomjWzs1qqvZqKsBbUQ3KL
+Claude Artifact
+Try out Artifacts created by Claude users
+Claude Artifact
+Q: If an agent wrote to suppliers for you, what must it never do without asking you first?
+Q: What is the one screen you would want to open, and what should it tell you? 
+Herit — 14:26
+Question for Felix Brunner (Senior Buyer: suppliers, trucks, stock, how things really run):
+
+What is the singular thing in all your process that if it breaks, the whole project comes crashing down. We want to understand the most critical part of the process. What is that one process/aspect that must never fail?
+jonast — 14:44
+Q: For what reason do you contact suppliers?
+</pasted_content id="1dc7">
+
+" this is what we had so far
+
+---
+
+Can you build an agent to analyze the data? maybe in a loop taking an api key (either local llama.cpp or claude or openai api key)? and make it check (idk if there are listings or checksums) download, ask agent, organize data etc. potentailly maybe also handle pdf / jpeg etc. And maybe some "communicator" outside? idk if that would be sth generic / connector that goes into the produt or for us discord (or potentially another chat or so)
+
+---
+
+what technology do you use? Pydantic AI or sth?
+
+---
+
+<task-notification>
+<task-id>b3w2xipyo</task-id>
+<tool-use-id>toolu_01XhjZULmMFgnLACC5MkcYcM</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/b3w2xipyo.output</output-file>
+<status>failed</status>
+<summary>Background command "Baseline poll against real portal, check creds" failed with exit code 1</summary>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>b4a0gmjvb</task-id>
+<tool-use-id>toolu_012toVnJoTgiXzenTTCTr8i8</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/b4a0gmjvb.output</output-file>
+<status>completed</status>
+<summary>Background command "Rerun baseline poll with archive and retries" completed (exit code 0)</summary>
+</task-notification>
