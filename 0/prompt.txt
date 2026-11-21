@@ -1,0 +1,33 @@
+/flush
+
+---
+
+Somehow the pwa on my phone on reopen only shows white
+
+---
+
+in the example it firstly pics up weird backgroudn one as chinese characters etc. and then the sample is supplier one dot example . com which will not work (I'm quite sure, check data). also the transcript renders weirdly
+
+---
+
+Also the mail should not be pre-drafted normally, should it?
+
+---
+
+"- There's a new "Hold to talk" button, on by default. The mic only sends while you hold it, so the assistant only hears what you mean for it. The checkbox "Hold to talk (noisy room)" switches back to hands-free." not a good idea I think
+
+---
+
+yeah, it got interrupted but sent the mail. now what would you do next?
+
+---
+
+yeah, before we mrege tie the response mail back in
+
+---
+
+"May I push jonas/voice-dashboard and jonas/alerts" why two branches now?
+
+---
+
+doesn't one make sense?
