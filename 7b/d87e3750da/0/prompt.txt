@@ -1,0 +1,478 @@
+can you confirm if our idea is good based on the latest data you have and we are going in the right direction and our solution could win the ps5 or not
+
+
+<pasted_content id="68c7">
+Team sync: three-way match, shipment prediction, alerts
+Recording of about 61 minutes, cleaned up from the automatic transcript.
+
+Notes on the cleanup:
+
+Speaker labels (S0 to S6) come from automatic diarisation and are unreliable: it often switched speaker in the middle of a sentence. Where a sentence was clearly cut in two, it is rejoined under one speaker.
+Mishearings fixed: "SUNY" / "Sunny" / "Sony" → Soony, "cross-ject" → cross-check, "three by match" / "freeway" → three-way match, "ERB" → ERP, "11 laps" → ElevenLabs, "GBT" → GPT, "Cloud" / "Lord" → Claude, "exosheet" → Excel sheet, "peg" → pack.
+Filler, false starts and off-topic bits (trash, room noise) are removed. Passages that were unintelligible are marked [unclear].
+Summary
+The idea. A layer on top of Soony's procurement process that finds what threatens the launch deadline and alerts the right person: a phone call if it is critical, otherwise an email or a notification in the portal.
+
+Two error sources to tackle:
+
+Three-way match (main focus): compare the purchase order in SAP, the supplier's order confirmation (PDF, in its own language) and what Hamburg actually received (scanned delivery note, sometimes with handwritten corrections like "100" crossed out, "80" written over it).
+Shipment tracking and prediction: predict whether a shipment arrives in time, using past patterns, the shipment data and news drops (weather, strikes, etc.), and propose alternatives when it won't (e.g. "this supplier can only deliver 500 of 1,000, here's a draft mail to another supplier, click send").
+Criticality. For every problem: can it wait two or three hours (notification), or must someone act now (call)? The deadline per order comes from the promised date the buyer enters with the PO.
+
+Automation and trust. Start by asking a human; let them allow an action "this time" or "always" (like a permissions prompt). Internal actions can be automatic sooner; anything sent to suppliers gets stricter rules.
+
+Boundaries agreed:
+
+We work for Soony (the buyer). We don't do the procurement, we watch the process and catch problems before they hit the launch.
+We only touch Soony's side ("the upper part"). Suppliers and logistics are out of reach except by email.
+Suppliers refuse to use our system or share tracking data; the most they accept is replying by email in a structured format.
+SAP only has the order and the pack-out data; everything in between (confirmations, tracking sheet, receipts) is email, PDFs, scans and a hand-kept Excel sheet.
+We are not a second SAP: it is a connector or plugin to Soony's SAP.
+Split of work (first part of the call):
+
+S0: alert agent (email, phone call via ElevenLabs), then notifications.
+One person: prediction model.
+One person: verification (three-way match).
+S1: dashboard and bringing the pieces together.
+Newcomer: storyline for the pitch, maybe the "our PS5 didn't arrive in time" angle.
+Open questions at the end:
+
+How do tracking updates and receiving notes get into the ERP data, and how often? If they are near real time, they can feed the prediction; if they only arrive at the end, they can't.
+Who writes open_shipments: Soony or the supplier / logistics provider?
+Transcript
+Planning the split (00:00)
+S0: Okay, so to recap: the idea is we find what's critical for the timeline, what pushes things over the deadline. If it's critical, we give a call; otherwise it's just a notification, a mail, whatever. So what do we need for that?
+
+S1: Once the order is created, in step two, when we get the confirmation, we cross-check it against SAP. If it doesn't match, then depending on the criticality, basically the deadline we have, we either call or send an email or a notification in the portal. Next thing is the shipping.
+
+S2: So this is mainly for the three-way matching, right?
+
+S1: Yeah, let's focus on the three-way matching. Order, then we confirm with the PDF, and then we confirm against what is received.
+
+S0: So we're not doing the tracking stuff right now?
+
+S1: In my mind: one module is the three-way matching. We make sure the order, the confirmation and the receiving are correct end to end, through verification and calling. Calling would be done by an agent that keeps checking the deadline and the arrangement. The second module is prediction: we predict whether a shipment will make it in time, including external factors that could affect it.
+
+S0: Maybe, if we have time, yeah.
+
+S1: And also, based on previous data, how likely it is that this shipment makes it.
+
+S0: So there are two paths: the three-way verification and the shipping delay. For the verification, a human has to say which value is correct. For the shipment, our agent probably has to propose something, like "we could reach out to the other supplier".
+
+S1: Yes, along with the prediction it gives you alternatives you can switch to quickly.
+
+S0: Then we have to think about what it does automatically. Does it send the mail or not? Maybe on the call you can say "don't ever call me again for this one". They said earlier they want it automated once they trust it, but not in every case.
+
+S1: With the verification we already do that, and with the prediction we're helping.
+
+S0: So we need some logic: the first time, you're asked; the second time, if it's not very different, it just goes through. For example, if the number for Hamburg is wrong, the first time I correct it, and the second time it's wrong the same way it's corrected automatically.
+
+S2: It's more of a settings thing: the person can enable it or not.
+
+S1: Yeah, it picks up preferences.
+
+S2: Or: if it's something internal, we do it automatically. If it's external, like sending something to the supplier, we add more restrictions.
+
+S0: For the UI I'm thinking of how Claude asks for access to folders: "allow this time" or "allow always". That's how I have it in mind, but I don't know if it works here.
+
+S0: Okay, so how do we split this, so we finally get some coding done?
+
+S2: Someone has to work on the agent that contacts people, by email or by calling. Someone has to do the prediction part, and someone the verification part.
+
+S1: Then I can do the dashboard and bring things together.
+
+S0: Maybe also an overview of all the steps, how it all ties together.
+
+S1: Let's just build it, and add things if we get more ideas. You work on the agent for criticality and calling, he works on the prediction model, he works on the verification.
+
+S0: So for criticality I'd basically get "this is an offset" or "this takes so much longer", and then we decide.
+
+S2: I'd say you focus on the email and calling part.
+
+S0: Okay, and then you give me some output and we put it together.
+
+S1: But how do we know the goal? Do we know from SAP when they need the order completed at the end?
+
+S2: I think they have something.
+
+S0: What I meant was a critical path, like this part of the product needs to be there before that one.
+
+S1: But if we don't have that in the data...
+
+S2: There's the promised date. The buyer adds it with the purchase order in step one.
+
+S1: Ah, then that's perfect. That's the deadline.
+
+S0: Okay, so we have that for the prediction model. Then we have the website, the calling and notification part, and the prediction, and whenever we're done we see how they fit together.
+
+S2: And our parts give an output to you?
+
+S0: Yes, and to the website somehow. I'll do the phone calls first, then look into notifications. I'm quite sure it works. If it costs five dollars or so, that's fine. I have ElevenLabs and GPT credits; only the call itself might cost something.
+
+Briefing the newcomer (07:44)
+S1: Are you up to speed, or do you want the idea and the plan? Brief version: there are seven steps. Soony orders something, then the supplier confirms. But sometimes they confirm the wrong product or quantity. So we verify the confirmation, and then again at the receiving step, so the three-way data is correct all the time. In between, we predict whether the product will actually make it through shipping: there can be delays and repeated patterns. If the criticality is too high, we call the head of procurement or whoever has to make the decision.
+
+All four of us are on the technical part. For you, it's building the storyline. Maybe we take the PS5 idea we discussed earlier: we were supposed to get the PS5 in time, but apparently it's not here. We act as the head of procurement using our system. You also need to understand this flow to tell the story: this is the problem, this is how we solved it, and how it works for the PS5 case as well. Maybe use a transcript of this.
+
+S0: There's one issue type in verification and one in shipping. One is not urgent, so you get a notification; the other suddenly becomes super urgent, so you get a call.
+
+What the three-way match is (10:04)
+S3: So you go straight to the verifier. You identify two or three points: first the order, and after the order, the confirmation, where you verify they confirmed the right thing...
+
+S1: ...and then whether they received the correct things.
+
+S0: They receive what they ordered. It's called a three-way match.
+
+S3: The whole essence is the same: they don't want the buyer to be the one telling them there's a problem, because it's a trust business. They want to catch the problem before it gets to the buyer.
+
+S4: Say the supplier sends the wrong amount. That's a problem you can't predict, and when you realise it, you have to act fast.
+
+S3: I understand, and I think we should do that. I'm saying we can do it before it gets to the buyer.
+
+S1: You need the complete picture. Imagine the order was for 80,000 straps, but the confirmation was only for 8,000. Throughout the process the head of procurement ultimately makes the decisions. If something goes wrong here, we flag it and it gets fixed. We read the confirmations against SAP, against the orders.
+
+S2: The senior buyer creates a PO. That's the reference, and we cross-check against it.
+
+S4: There are also a lot of problems at receiving: wrong products, defects, those things.
+
+S1: If the confirmation is correct, that won't happen, right?
+
+S5: We don't need to solve the problem before the buyer receives the shipment. We just need to solve it before the launch.
+
+S5: The buyer can get it two days before the launch, notice it's short, and reorder as fast as possible within those two days.
+
+S4: We're talking about the company that buys the parts to build the product.
+
+Who is who: Soony, suppliers, us (14:06)
+S3: Let's break this down from what we roughly drew. We want to build the verifier. We want to find out whether what party A says and what party B says match, and cross-reference them against a ground truth, which we don't have yet. We have the supplier, and we have Soony, two different parties. And then the buyers... Isn't the supplier the same as the buyer?
+
+S5: No. Soony is the buyer.
+
+S3: Then why are we calling Soony the buyer?
+
+S5: Soony buys the parts from the suppliers and puts the product together.
+
+S1: It gets all the different parts from the suppliers, and at the end they package them together.
+
+S0: Imagine Soony wants to build a shelf and needs to buy the wood, the nails and so on. We don't care about the end consumer.
+
+S3: So Soony is the buyer, and Soony is our customer. The suppliers are who Soony buys from.
+
+S1: Can you speak a bit louder so it's recorded?
+
+S3: So: us, the team of four. Soony makes its procurement, and we get the materials from the suppliers?
+
+S1: No, we don't get them. Soony does it, and we watch over it.
+
+S3: Why do we watch them do it and not do it ourselves?
+
+S5: Because it's not our job.
+
+S3: So what is our job exactly?
+
+S1: Making sure the whole process goes through.
+
+S5: And if something is about to go wrong, we know before it goes wrong.
+
+S3: Then if we're not the ones doing the procurement, why do the receipts have to go through us and into our SAP system?
+
+S5: Soony does it, but the process is too complicated for them and they want someone to come in and make it manageable. They're a product company, not strategists.
+
+S1: We come in and say: guys, your flow is broken.
+
+S3: So we're not a procurement company. Soony has its own procurement department, which has the problems we talked about, and as a startup we want to solve them. I think that's clear.
+
+S4: We're a layer on top of the supply chain. We watch everything and make sure it works.
+
+S3: So I'll put Soony in the middle and the supplier here. Soony wants items from the supplier to make its products, has all these issues, and we, as a startup that just got them as our first customer, look at their data to find the biggest problems and patterns so we know how to address them.
+
+S4: So we sit somewhere between the supplier and the buyer.
+
+S3: And we call our solution the verifier, for now.
+
+S2: But we're more on Soony's side, not the supplier side. Soony is the one paying.
+
+S3: From the data we analysed: what are the biggest patterns in the irregularities we found?
+
+S1: One of them: the confirmation from the supplier is wrong.
+
+S2: There are three ways. Soony enters the order into SAP, and something can already go wrong there, like typing one zero too many. Then the order goes to the supplier and they send a confirmation, normally a PDF or JPEG, which can have a wrong quantity, wrong terms, wrong product. That's the second part.
+
+S3: And then what?
+
+S1: Do you want the solution we're thinking of, or just the problem?
+
+S3: The process, and where the biggest challenges are within it.
+
+S1: After the confirmation, the supplier hands it to the logistics provider to forward to the destination.
+
+S5: The confirmation comes back from the supplier to Soony. In SAP we create an order for ten parts, and the confirmation comes back and suddenly it's a hundred parts. Or the other way round, which is more critical.
+
+S3: Is that what our data shows?
+
+S5: Yes. There are a lot of irregularities in the confirmations.
+
+S3: Okay, that makes sense. So we check that the confirmation and the order match. And if it matches, then we send it to shipping?
+
+S2: That's not what we do.
+
+S1: The supplier does that, not us. Everything below that line, with the suppliers, we can't interact with other than by email.
+
+S2: Maybe we can send a correction as soon as possible so it doesn't go out. I can try again, but in the first tries they didn't really want to.
+
+Where the data comes from (25:47)
+S1: Can we ask: "Hey supplier, can you ask your logistics what the status of the shipment is?" We don't have constant data, right? It gets updated, and then after twelve hours we get the latest update. If that's the case, maybe we can speed that up.
+
+S4: We have the open shipments data here. Part of it comes from the ERP system, but I think it's typed in by hand, probably by Soony, or the other way round.
+
+S1: How does the ERP know about the shipment?
+
+S2: So the third item: they ship, we get the package, and parts are missing. That's the third way we check: the receiving part.
+
+S5: Are you building the three-way part?
+
+S1: We've put it completely on you.
+
+S3: So that's one part. The other is tracking the shipment...
+
+S1: ...using a prediction.
+
+S2: Yes, and also checking whether the shipment goes wrong. How we do that in detail is still open.
+
+S5: Just ask Claude once whether you need to build a predictor, or whether the information is already in the shipment data.
+
+S2: We do need some way to predict or say when it'll be later. They also have news data that should appear today or tomorrow. The prediction part is to read those.
+
+S0: So we have two error sources: the shipment, and the three-way confirmation. If anything goes wrong, we classify it: is it okay to handle in a few hours, or is it super critical? If it's super critical, we call.
+
+S3: The three-way confirmation I understand. The rest I didn't.
+
+S1: The rest is shipment tracking. We predict that a shipment can be delayed because of the region, the weather, or past data showing it's likely to be late. Then: what decision do you want to take? Do you want an alternative?
+
+S3: Got it for the prediction.
+
+Walking through the steps again (30:43)
+S3: You said we verify again at this point?
+
+S2: Against SAP.
+
+S0: We have no influence here; this is the supplier. If we know early enough that the order will take longer, we can send an email to fix it, but that's not in our hands.
+
+S0: The confirmation comes back to Soony, and that's where we verify it: the supplier sends an order confirmation and we check it.
+
+S2: Soony books the order into SAP and sends it to the supplier. No verification there, it just goes out.
+
+S0: The supplier says "great order", makes a confirmation and sends it back to Soony. We take that confirmation, a PDF we have to extract, and check it against the SAP entry. Is it what we actually ordered, too many, too few, or something else wrong?
+
+S3: So we check that the request and the confirmation match.
+
+S0: Yes.
+
+S6: Then, and that's not our task, Soony sorts it out with the supplier. We give Soony a call if it's critical, or pre-write a mail, we'll see. Then shipping happens: either they correct it or it's fine and it ships. Shipment and tracking is a separate thing. When it's received, someone at Soony takes it and lists what actually arrived. Say you bought ten light bulbs, two broke on the way, so eight arrive. That's where the second check happens, against the receiving checklist.
+
+S5: Like when you buy something on Amazon: they confirm and then they ship.
+
+S0: Nobody checks the confirmation. That's the issue.
+
+S3: Now we're proposing it passes through our layer so we can see whether they match. What I'm saying is that this drawing is wrong.
+
+S0: We notify Soony and propose how to fix it.
+
+S6: Right now, if Soony orders 100 of a part and the supplier says "great, we'll send you 10", it all goes through and nobody is notified. What we want: they send a confirmation saying ten, they'll maybe ship it the next day, and we flag that it's ten instead of a hundred, so someone at Soony can go back and say "you messed this up". It's error detection.
+
+S6: We can't control the step between confirmation and shipping; those two are chained and we can't step in. Like Amazon: you get the confirmation and then they ship. You can cancel or adjust it within a short window if something's wrong, but these two steps we can't intercept.
+
+S3: The problem stays: whether it's more or less than ordered, it still goes to shipping.
+
+S0: But we hope to correct it, cancel it, or get the rest.
+
+S3: My mistake was imagining we could catch these before the shipment happens.
+
+S6: There is some delay. They don't ship a second after someone in the office signs. They confirm, it goes to logistics, and that takes time. We try to find errors here. Normally the error would only be found at the end: it gets shipped, tracked, received, and then "we got the wrong items". We can give that feedback earlier.
+
+S3: My worry: if an error we catch here has already gone into shipping, and we handle another error later, we might handle the same error twice.
+
+S6: But it's not instant, it's days. Shipping from China takes weeks.
+
+S3: If it takes days, can't our layer do the confirmation check in time?
+
+S6: We can't get into their process. We only work on Soony's part, not on those two steps; those are whatever the supplier does. We can write mails ("this doesn't work", "please confirm that"), but we can't do more. And in one case there's no confirmation at all; instead they say the shipping address is invalid, and we catch that too.
+
+S6: So they confirm, they ship, and then it's received. Someone in the warehouse sees the package and the delivery note and checks: of the 100 parts, 20 are broken.
+
+S2: So they cross out 100, write 80 over it, and scan it. That's how it happens: we have scanned PDFs where something is crossed out and changed.
+
+S3: I think I understood the project differently. But what you're saying makes sense.
+
+S6: Imagine you're in the warehouse expecting 100 parts. Someone unpacks them and says "we can only use 80, twenty are broken". Now there's a discrepancy between what we should have received and what we actually received.
+
+S4: And the supplier isn't necessarily responsible for transport.
+
+S6: Normally they'd just put it into the warehouse system, and when packing for the end consumer they notice "our shelf is empty, it's out of stock". So the three-way match is: the SAP entry Soony makes at the very beginning, the confirmation, and the receiving note.
+
+"Is it two-way or three-way?" (44:24)
+S6: The three ways are: the order we made (the SAP entry), the confirmation we get, and what we actually receive in the end.
+
+S4: This data has to come from them.
+
+S6: We have the data; we're working for Soony.
+
+S3: But it's not two-way? Does it really reach three?
+
+S6: It's three-way: three parts, and all three have to match. There could also be a missing link.
+
+S3: We have one, two, three, but only a direct check between these two and between those two.
+
+S6: We can also check this one against that one.
+
+S3: What is confirmed is basically what's expected, so it's expected versus received. Checking one against two is two-way; we want to add the third.
+
+S6: I drew it more as a timeline: one check before the shipment goes and one after. Before shipping we check the confirmation against SAP, which is two-way. Once it's received, we check that against the other two. So it's a three-way check.
+
+S5: It's just terminology.
+
+S6: Yes, that's just what it's called.
+
+Tracking, and where the line is (47:06)
+S6: Lucas has a very nice visualization when he's back. He's working on the tracking. That part isn't as worked out. We get some tracking data (I don't know exactly how it comes in) and want to predict whether our package is on time or delayed. If something goes wrong between tracking and receiving, we handle that as well.
+
+S6: That's not part of the three-way check, so maybe give it another colour. You have the confirmation at the start, you track the shipping, and at the end you check what's received. If anything critical goes wrong in any of these steps, we notify Soony.
+
+S0: Right now that's a hand-kept sheet someone maintains, and nobody really cares whether it's up to date. There's an Excel sheet in the data for shipment tracking.
+
+S3: Who controls the warehouse where things are received?
+
+S5: In reality the supplier doesn't, but here we assume shipping is the supplier's responsibility.
+
+S0: There's someone in the warehouse unpacking the packages; it's in the diagram.
+
+S3: If they used external warehouse services, it would get really complicated.
+
+S0: We draw a line here. These two things we don't care about.
+
+Update from the Lio booth (50:45)
+S1: Okay team, update. They said Soony is just part of the challenge to give us ideas; don't get stuck on Soony. Any good idea works. They also said we can only touch the upper part. So we only touch the upper part.
+
+S1: And SAP is only updated at the order step and at the packing step.
+
+S0: Then how do the other notes get in? The handwritten notes and the tracking stuff that's in the ERP export?
+
+S1: At step six. They track, they receive, they keep the documents, and at step six, when packing, they enter it into SAP.
+
+S5: We're overfitting to this very hard.
+
+S6: Just to close the loop: when something goes wrong at any of these steps, can you react in two or three hours? Then it's a normal notification. Or is it something where, if you don't respond now, the wrong shipment goes out? Then check immediately. We also need the predictive part. For example, if this supplier can only provide half of what we need, we have to check the other suppliers.
+
+S6: Say we order a thousand and they give us five hundred and can't do more. Then we have to figure out where to get the rest. It's a suggestion: based on past data, we propose reaching out to this and that company, with the mail already written. You click send.
+
+S6: Right now the data only gets into the system when they pack the finished product. Before that it's just mail and handwritten notes.
+
+S6: So what they do now: they place the order, then fly blind while it ships from China for two or three weeks, then open the package.
+
+S5: The shipping documents come from the supplier, and the open shipments come from Soony.
+
+S4: My hypothesis is that open shipments come from the provider, the supplier.
+
+S1: It comes from the supplier. When the supplier hands over to logistics, they hand over everything. That printed receipt goes with the shipment, and then on to the receiver.
+
+Pack-out log and suppliers' limits (56:32)
+S0: It says: step six is packing, Standard on three lines, Collector's in one cell with all seven parts. Question: does "pack-out log" mean unpacking the arriving materials, or packing the product?
+
+[Answer: packing the product.]
+
+S0: Okay. So they unload the stuff in the warehouse with no clue what they unload, and they don't log it there. But when they pack it together, how does it get into the system then?
+
+S5: Scans, uploaded to the system.
+
+S6: It could be phone calls, but I think it makes more sense that the supplier updates the ERP system. But they don't want to. I mailed them, and they don't want to.
+
+S2: But in real life they could.
+
+S6: They don't want to interact with our SAP system or provide any tracking information except by email. The most they were willing to do when I mailed them was to structure their mails in a given format so our system can process them automatically.
+
+S3: And do we have our own SAP system? Soony already has one.
+
+S6: We don't have an SAP system. It's a plugin, a connector to their SAP system.
+
+S0: Earlier they said: right now we act on it, and later you'd have a two-way connection.
+
+S1: The problem is you can't touch the suppliers. If you tell a supplier "now use our system and follow these steps", they'll refuse. There's an existing ecosystem of shipping and suppliers with their own processes, and we can't just get into that.
+
+S3: Do they currently have access to finances?
+
+S0: No.
+
+S2: And when I mailed them, they didn't want any interaction with our IT system. They want everything by mail.
+
+S1: Can the supplier tell us the location of the package, if we ask?
+
+S4: It doesn't change the solution. The only question is whether this data is more or less real time; then I can use it for the prediction. If it only comes at the end of the process, I can't.
+
+S6: I'll stop the recording now.
+</pasted_content id="68c7">
+
+---
+
+we want to make this ready for future companies we work with
+
+---
+
+its all agents agents agents ryt ?
+
+---
+
+so we are good to start ?
+
+---
+
+but how do we check before the dock finds out ?
+
+---
+
+can you cross check before you ask me question ?
+
+---
+
+can you confirm if our plan and idea is now good to get started and be worked on ?
+
+---
+
+[Image #2]
+[Image #3]
+are we taking care of all this ?
+
+---
+
+we can't touch anything in the supply side
+
+---
+
+can you confirm based on the challenge doc as well
+
+---
+
+supply side can be a future scope maybe
+
+---
+
+can you make a plan.md which expresses the complete plan in detail along with lucas doing the predicting part, farhan doing the verification thing, jonas doing the call part and agent deciding the criticality to call and make decision and me akshat i am doing visual connecting and ui/ux part to make it all come together and alive on platform
+
+---
+
+did you pulled the latest changes before checking
+
+---
+
+ya commit and push it also the agents md file is upto date ryt to push the progress even if nobody is pushing the actual code making sure everyone is upto speed on what each person is doing and when
+
+---
+
+also are you making sure they are pulling the latest changes too?
+
+---
+
+does everyone has entire setup so i can use the memory thing ?
+
+---
+
+can you mention it in agents md to have them do the entire setup before making the next push ?

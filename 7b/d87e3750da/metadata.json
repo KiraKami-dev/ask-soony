@@ -1,0 +1,46 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "7bd87e3750da",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "files_touched": null,
+  "sessions": [
+    {
+      "metadata": "/7b/d87e3750da/0/metadata.json",
+      "transcript": "/7b/d87e3750da/0/full.jsonl",
+      "compact_transcript": "/7b/d87e3750da/0/transcript.jsonl",
+      "content_hash": "/7b/d87e3750da/0/content_hash.txt",
+      "prompt": "/7b/d87e3750da/0/prompt.txt",
+      "assets_manifest": "/7b/d87e3750da/0/assets/manifest.json"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 22,
+    "cache_creation_tokens": 4145,
+    "cache_read_tokens": 1429561,
+    "output_tokens": 4036,
+    "api_call_count": 9
+  },
+  "redaction": {
+    "replacements": 19,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 18,
+      "goredact": 0,
+      "key_context": 0,
+      "pii": 1,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 0,
+      "IP": 0,
+      "PHONE": 1
+    }
+  }
+}
