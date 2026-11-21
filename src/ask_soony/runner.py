@@ -76,14 +76,15 @@ def run_pipeline(paths: list[str], root: Path) -> str:
         return "pipeline: failed (see log); UI keeps the last good state"
 
 
-def poll_once(store, client, dest: Path) -> list[str]:
+def poll_once(store, client, dest: Path) -> tuple[list[str], bool]:
+    """Changed paths since the last poll, and whether this poll was the first (baseline)."""
     from ask_soony.watcher import mirror, poll
 
     result = poll(store, client)
     mirror(store, dest)
     if result.baseline:
-        return []
-    return [v.path for v in result.new] + [v.path for v in result.changed]
+        return sorted(store.current()), True
+    return [v.path for v in result.new] + [v.path for v in result.changed], False
 
 
 def loop(interval: int, stop: threading.Event | None = None) -> None:
@@ -101,10 +102,12 @@ def loop(interval: int, stop: threading.Event | None = None) -> None:
     stop = stop or threading.Event()
     while not stop.is_set():
         try:
-            paths = poll_once(store, client, dest)
+            paths, baseline = poll_once(store, client, dest)
             if paths:
-                record_events(paths)
-                print(f"run: {len(paths)} new or changed files", file=sys.stderr)
+                if not baseline:  # the first sync is not a drop: no toast for every file
+                    record_events(paths)
+                what = "files (baseline)" if baseline else "new or changed files"
+                print(f"run: {len(paths)} {what}", file=sys.stderr)
                 print(run_pipeline(paths, dest), file=sys.stderr)
             mark_checked()
         except Exception as e:  # network hiccups: keep watching
