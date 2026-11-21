@@ -15,9 +15,12 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
+from verifier.linker.records import HUB_KINDS
+
 Predicate = Callable[[dict], bool]
 
-ISSUE_COLUMNS = ["rule", "type", "record_id", "related", "detail", "context"]
+# live: the record still affects something open; due: its nearest relevant date
+ISSUE_COLUMNS = ["rule", "type", "record_id", "related", "detail", "context", "live", "due"]
 LINK_COLUMNS = ["src", "dst", "rule", "method", "key"]
 
 
@@ -515,4 +518,96 @@ def apply_all(records: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.Dat
     for check in CHECKS:
         issues += check(records, links)
     issues_df = pd.DataFrame(issues, columns=ISSUE_COLUMNS, dtype=object)  # keep None, not NaN
-    return links, issues_df, pd.DataFrame(coverage)
+    return links, prioritise(records, links, issues_df), pd.DataFrame(coverage)
+
+
+# --- Priority ----------------------------------------------------------------------------------
+
+# Kinds whose own facts say whether they still matter. Everything else inherits from its links.
+LIVE_BY_KIND: dict[str, Predicate] = {
+    "po_line": lambda r: r["attrs"].get("state") == "open",
+    "shipment": always,  # the feed lists open shipments
+    "tracker_row": always,
+    "stock_batch": lambda r: (r["attrs"].get("quantity") or 0) > 0,
+    "supplier": always,
+}
+DUE_BY_KIND: dict[str, tuple[str, ...]] = {
+    "po_line": ("promised_date", "requested_date"),
+    "shipment": ("eta",),
+    "tracker_row": ("eta",),
+}
+INHERIT_HOPS = 2
+HUBS = HUB_KINDS  # parts and suppliers connect everything; liveness never flows through them
+
+
+def _own(record: dict, receipt_stock: dict[str, list[float]]) -> tuple[bool | None, str | None]:
+    """(live, due) from the record's own facts; live is None when its kind has no rule."""
+    due = next(
+        (record["attrs"][k] for k in DUE_BY_KIND.get(record["kind"], ()) if record["attrs"].get(k)),
+        None,
+    )
+    if record["kind"] == "goods_receipt":
+        # A receipt matters while its batch is in stock. Only stock decides: its PO line is
+        # always delivered, which says nothing. No stock row at all is unknown, so it stays live.
+        batches = receipt_stock.get(record["record_id"])
+        return (any(q > 0 for q in batches) if batches else True), due
+    predicate = LIVE_BY_KIND.get(record["kind"])
+    return (predicate(record) if predicate else None), due
+
+
+def prioritise(records: pd.DataFrame, links: pd.DataFrame, issues: pd.DataFrame) -> pd.DataFrame:
+    """
+    Mark each issue live or closed and give it a due date, then sort: live first, soonest first.
+
+    Receipts are judged by their stock batch only. A record without its own rule (a document) is
+    live if a record within two links is live. With nothing to judge by, a record stays live:
+    unknown is not hidden.
+    """
+    if issues.empty:
+        return issues
+    by_id = {r["record_id"]: r for r in records.to_dict("records")}
+    neighbours: dict[str, set[str]] = {}
+    for link in links.itertuples():
+        if (
+            by_id.get(link.src, {}).get("kind") in HUBS
+            or by_id.get(link.dst, {}).get("kind") in HUBS
+        ):
+            continue
+        neighbours.setdefault(link.src, set()).add(link.dst)
+        neighbours.setdefault(link.dst, set()).add(link.src)
+    receipt_stock: dict[str, list[float]] = {}
+    for link in links[links.rule == "stock_to_receipt"].itertuples():
+        quantity = by_id[link.src]["attrs"].get("quantity") or 0
+        receipt_stock.setdefault(link.dst, []).append(quantity)
+
+    def judge(record_id: str) -> tuple[bool, str | None]:
+        record = by_id.get(record_id)
+        if record is None:
+            return True, None
+        live, due = _own(record, receipt_stock)
+        if live is not None:
+            return live, due
+        # Walk outwards, but stop at records with their own rule: their verdict is the answer,
+        # and walking past them would borrow liveness from unrelated records behind them.
+        frontier, seen, verdicts = {record_id}, {record_id}, []
+        for _ in range(INHERIT_HOPS):
+            frontier = {n for f in frontier for n in neighbours.get(f, ())} - seen
+            seen |= frontier
+            own = {n: _own(by_id[n], receipt_stock) for n in frontier if n in by_id}
+            verdicts += [v for v in own.values() if v[0] is not None]
+            frontier = {n for n, v in own.items() if v[0] is None}
+        judged = [(lv, d) for lv, d in verdicts if lv is not None]
+        if not judged:
+            return True, None
+        dues = sorted(d for lv, d in judged if lv and d)
+        return any(lv for lv, _ in judged), (dues[0] if dues else None)
+
+    verdict = issues.record_id.map(judge)
+    issues = issues.copy()
+    issues["live"] = pd.Series([v[0] for v in verdict], index=issues.index, dtype=bool)
+    # object dtype: a missing date stays None (pandas would make it NaN)
+    issues["due"] = pd.Series([v[1] for v in verdict], index=issues.index, dtype=object)
+    order = issues.assign(_closed=~issues.live.astype(bool), _due=issues.due.fillna("9999"))
+    return issues.loc[order.sort_values(["_closed", "_due", "record_id"]).index].reset_index(
+        drop=True
+    )

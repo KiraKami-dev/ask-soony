@@ -47,13 +47,18 @@ def _summary(graph: Graph) -> None:
     print("\nIssues")
     if graph.issues.empty:
         print("  none")
-    for (_, detail), group in graph.issues.groupby(["rule", "detail"]):
-        print(f"  {len(group):>4}  {detail}")
-        for row in group.head(MAX_EXAMPLES).itertuples():
+    # Issues arrive sorted (live first, soonest first); groups keep that order
+    for (_, detail), group in graph.issues.groupby(["rule", "detail"], sort=False):
+        live, closed = group[group.live.astype(bool)], group[~group.live.astype(bool)]
+        print(f"  {len(live):>4} live  {detail}")
+        for row in live.head(MAX_EXAMPLES).itertuples():
             context = f"  ({row.context})" if row.context else ""
-            print(f"        {row.record_id}{context}")
-        if len(group) > MAX_EXAMPLES:
-            print(f"        … +{len(group) - MAX_EXAMPLES} more")
+            due = f"  due {row.due}" if row.due else ""
+            print(f"        {row.record_id}{context}{due}")
+        if len(live) > MAX_EXAMPLES:
+            print(f"        … +{len(live) - MAX_EXAMPLES} more")
+        if len(closed):
+            print(f"        + {len(closed)} closed (no longer affect anything open)")
 
 
 def _trace(graph: Graph, term: str) -> None:
@@ -91,6 +96,7 @@ def main() -> None:
     trace_cmd.add_argument("term", help="record id, key or PO number")
     issues_cmd = sub.add_parser("issues")
     issues_cmd.add_argument("--rule")
+    issues_cmd.add_argument("--live", action="store_true", help="only live issues")
     args = parser.parse_args()
 
     graph = build(args.root)
@@ -101,10 +107,16 @@ def main() -> None:
     elif args.command == "trace":
         _trace(graph, args.term)
     elif args.command == "issues":
-        issues = graph.issues if not args.rule else graph.issues[graph.issues.rule == args.rule]
+        issues = graph.issues
+        if args.rule:
+            issues = issues[issues.rule == args.rule]
+        if args.live:
+            issues = issues[issues.live.astype(bool)]
         for row in issues.itertuples():
+            state = "live  " if row.live else "closed"
+            due = row.due or "-"
             context = f"  ({row.context})" if row.context else ""
-            print(f"{row.rule:<26} {row.record_id:<32} {row.detail}{context}")
+            print(f"{state} {due:<10} {row.rule:<26} {row.record_id:<32} {row.detail}{context}")
 
 
 if __name__ == "__main__":
