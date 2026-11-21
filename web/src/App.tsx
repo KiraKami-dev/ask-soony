@@ -117,7 +117,7 @@ export default function App() {
       <StatusStrip state={state} nowMs={clock} />
       <div className="grid min-h-0 flex-1 lg:grid-cols-[3fr_2fr]">
         <section className="relative hidden min-h-0 flex-col border-r border-line lg:flex">
-          <div className="flex min-h-0 flex-1 items-center px-4"><div className="w-full">
+          <div className="relative min-h-0 flex-1">
             <SupplyMap
               state={state}
               hoverRoutes={hoverRoutes}
@@ -125,7 +125,7 @@ export default function App() {
               onSelect={setSelection}
               pulseNode={pulseNode}
             />
-          </div></div>
+          </div>
           <Legend />
         </section>
         <aside className="min-h-0 overflow-y-auto bg-white px-4 py-5 lg:px-6">
