@@ -1,0 +1,51 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M804V250W2HXN3EHTS1E5F0G",
+  "strategy": "manual-commit",
+  "branch": "jonas/voice-dashboard",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "src/ask_soony/push.py",
+    "web/public/manifest.webmanifest",
+    "web/public/sw.js",
+    "web/src/push.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt",
+      "assets_manifest": "/0/assets/manifest.json"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 17,
+    "cache_creation_tokens": 14867,
+    "cache_read_tokens": 7294518,
+    "output_tokens": 11542,
+    "api_call_count": 8
+  },
+  "redaction": {
+    "replacements": 880,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 50,
+      "credentialed_uri": 0,
+      "entropy": 145,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 661,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 583,
+      "IP": 24,
+      "PHONE": 54
+    }
+  }
+}

@@ -1,0 +1,1 @@
+"Next stage, if you like: make it installable as a PWA with push ("🔴 Launch at risk", tapping starts the conversation). On iPhone, the app has to be added to the home screen first ("Share → Add to Home Screen")." yeah do it
