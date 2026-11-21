@@ -19,9 +19,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(prog="verifier.image_recognizer")
     parser.add_argument("--root", type=Path, default=Path("data/portal"))
     parser.add_argument("--out", type=Path, default=Path("data/store/image_recognizer"))
-    parser.add_argument("--model", default="gpt-5")
+    parser.add_argument("--model", default="gpt-5.4-mini")
     parser.add_argument(
-        "--effort", default="high", choices=["low", "medium", "high", "xhigh", "max"]
+        "--effort", default="medium", choices=["low", "medium", "high", "xhigh", "max"]
     )
     parser.add_argument("--concurrency", type=int, default=4)
     parser.add_argument("--retries", type=int, default=2)

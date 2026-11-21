@@ -8,7 +8,7 @@ uv run python -m verifier.image_recognizer --only WZ-261116-473   # one document
 uv run python -m verifier.image_recognizer --images-only --limit 5
 ```
 
-Options: `--model` (default `gpt-5`), `--effort` (default `high`), `--concurrency` (default 4), `--force` (read again).
+Options: `--model` (default `gpt-5.4-mini`), `--effort` (default `medium`), `--concurrency` (default 4), `--force` (read again).
 
 ## Output: `data/store/image_recognizer/` (gitignored, confidential)
 
