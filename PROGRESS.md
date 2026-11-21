@@ -14,7 +14,7 @@ flowchart LR
 - Lucas: arrival forecast: rules for ETA + road leg, silence detection, news/notice risks, alternatives — see plan.md §5
 - Jonas: watcher (in progress) + criticality agent (call / email / notify) + ElevenLabs calls and supplier emails — see plan.md §5
 
-- Farhan (00:22): verifier linker, impact and decision cards ready; resumed the OpenAI image-recognizer run on the launch-risk documents, next: validate readings in the linker and support deploy/demo
+- Farhan (00:35): wiring portal changes into verifier/predictor/decision routing and moving verification under `src/ask_soony`; next: focused tests and handoff to UI/action integration
 
 ## Next
 - Sat 21:00 target (overdue): shared shapes in `src/ask_soony/schema.py`, sender addresses registered, office hours booked
