@@ -1,0 +1,1 @@
+- Do not implement code yourself, tell me what to implement in chat.

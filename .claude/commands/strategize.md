@@ -1,0 +1,2 @@
+- When strategizing do not change existing code files, pure brainstorming.
+- For independent analysis, you can write and run your own code, without interfering with existing codebase. 
