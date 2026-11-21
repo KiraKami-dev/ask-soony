@@ -6,12 +6,15 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "anthropic>=1.0",
+    "claude-agent-sdk>=0.2.187",
     "httpx>=0.28",
     "openai>=1.60",
     "openpyxl>=3.1",
+    "pandas>=3.1.1",
     "pillow>=11.0",
     "pypdf>=5.0",
     "pypdfium2>=4.30",
+    "tqdm>=4.70.1",
 ]
 
 [project.scripts]
@@ -34,8 +37,13 @@ line-length = 100
 select = ["E", "F", "I"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "verifier"]
+pythonpath = ["."]
 
 [tool.ruff.lint.per-file-ignores]
 # Long SQL statements read better on one line.
 "src/ask_soony/store.py" = ["E501"]
+# Test fixtures are CSV rows and file paths; wrapping them hurts readability.
+"verifier/**/tests/*.py" = ["E501"]
+# Email templates and the page's CSS read better unwrapped.
+"verifier/act/*.py" = ["E501"]
