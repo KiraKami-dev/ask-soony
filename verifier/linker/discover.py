@@ -26,11 +26,25 @@ CSV_LAYOUTS: dict[str, frozenset[str]] = {
     "shipments": frozenset({"shipment_id", "po_numbers", "material_ids", "eta", "status"}),
     "supplier_profile": frozenset({"supplier_id", "name", "legal_name", "qualification_status"}),
     "parts_master": frozenset({"component_id", "description", "abc_class", "drawing_rev"}),
+    "products": frozenset({"product_id", "launch_date", "day_one_qty"}),
+    "bom": frozenset({"parent_id", "child_id", "qty_per"}),
+    "bom_change": frozenset({"change_id", "parent_id", "child_id", "rev_old", "rev_new"}),
+    "supplier_parts": frozenset({"component_id", "share", "unit_price", "primary", "note"}),
 }
 XLSX_LAYOUTS: dict[str, frozenset[str]] = {
     "shipment_tracker": frozenset({"Shipment", "POs", "Status"}),
 }
 XLSX_HEADER_SEARCH_ROWS = 10
+# Tables inside multi-table workbooks (launch plan, stock update): table kind → header columns.
+# A workbook with any of these becomes kind 'workbook'; each found table is read separately.
+WORKBOOK_TABLES: dict[str, frozenset[str]] = {
+    "stock_count": frozenset({"Material", "Qty", "Receipts today", "Used today"}),
+    "packed_count": frozenset({"Material", "Qty", "Packed today"}),
+    "plan_edition": frozenset({"Product", "Day-one demand", "Packed", "Rate per hour"}),
+    "plan_part": frozenset({"Part", "Needed for the remaining pack-out", "ERP stock", "Status"}),
+    "plan_inbound": frozenset({"Supplier", "Part", "Quantity", "Reference", "ETA", "Status"}),
+    "plan_shift": frozenset({"Day", "Shift", "Hours"}),
+}
 # JSON layouts: kind → dotted key paths a file must have.
 JSON_LAYOUTS: dict[str, frozenset[str]] = {
     "supplier_profile_json": frozenset({"supplier.supplierId", "supplier.name"}),
@@ -89,6 +103,37 @@ def find_xlsx_table(path: Path, required: frozenset[str]) -> tuple[str, int] | N
     return None
 
 
+def find_workbook_tables(path: Path) -> list[dict]:
+    """Every known table in a workbook: [{'table', 'sheet', 'header_row', 'title'}]."""
+    workbook = openpyxl.load_workbook(path, read_only=True, data_only=True)
+    found = []
+    try:
+        for sheet in workbook.worksheets:
+            rows = []
+            for index, row in enumerate(sheet.iter_rows(values_only=True)):
+                if index >= XLSX_HEADER_SEARCH_ROWS:
+                    break
+                rows.append(row)
+                cells = {str(cell).strip() for cell in row if cell is not None}
+                for table, required in WORKBOOK_TABLES.items():
+                    if required <= cells:
+                        title = next(
+                            (str(r[0]) for r in reversed(rows[:-1]) if r and r[0] is not None),
+                            None,
+                        )
+                        found.append(
+                            {
+                                "table": table,
+                                "sheet": sheet.title,
+                                "header_row": index,
+                                "title": title,
+                            }
+                        )
+    finally:
+        workbook.close()
+    return found
+
+
 def flatten(value, prefix: str = "") -> dict:
     """{'a': {'b': 1}} → {'a.b': 1}. Lists are kept as values."""
     if not isinstance(value, dict):
@@ -125,6 +170,9 @@ def classify(path: Path) -> tuple[str, dict]:
                 table = find_xlsx_table(path, required)
                 if table:
                     return kind, {"sheet": table[0], "header_row": table[1]}
+            tables = find_workbook_tables(path)
+            if tables:
+                return "workbook", {"tables": tables}
         elif suffix == ".json":
             kind = _best_layout(set(flatten(load_json(path))), JSON_LAYOUTS)
             if kind:

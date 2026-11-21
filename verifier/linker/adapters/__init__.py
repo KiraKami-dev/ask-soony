@@ -29,7 +29,7 @@ def rows(path: Path) -> list[dict]:
     return read_csv(path).to_dict("records")
 
 
-from verifier.linker.adapters import documents, logistics, master, sap  # noqa: E402
+from verifier.linker.adapters import documents, logistics, master, planning, sap  # noqa: E402
 
 ADAPTERS = {
     "confirmation": documents.confirmation,
@@ -46,6 +46,11 @@ ADAPTERS = {
     "supplier_profile": master.supplier_profile,
     "supplier_profile_json": master.supplier_profile_json,
     "parts_master": master.parts_master,
+    "workbook": planning.workbook,
+    "products": planning.products,
+    "bom": planning.bom,
+    "bom_change": planning.bom_change,
+    "supplier_parts": planning.supplier_parts,
 }
 
 # Run first: their records teach the SupplierResolver every name of every supplier.
