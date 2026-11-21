@@ -21,3 +21,6 @@ dist/
 
 # Local copy of portal data (confidential)
 soony-data/
+
+# Agent skills
+.claude/
