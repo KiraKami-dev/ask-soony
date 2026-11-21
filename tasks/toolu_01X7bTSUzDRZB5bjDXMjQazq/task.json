@@ -1,0 +1,15 @@
+{
+  "tool_use_id": "toolu_01X7bTSUzDRZB5bjDXMjQazq",
+  "agent_id": "ae92f09781f89be87",
+  "subagent_type": "general-purpose",
+  "task_description": "Cross-check OCs and scans",
+  "token_usage": {
+    "input_tokens": 62,
+    "cache_creation_tokens": 166800,
+    "cache_read_tokens": 2842511,
+    "output_tokens": 21849,
+    "api_call_count": 30
+  },
+  "started_at": "2026-11-21T14:04:05.152959+01:00",
+  "completed_at": "2026-11-21T14:07:55.990738+01:00"
+}
