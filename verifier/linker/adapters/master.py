@@ -22,6 +22,7 @@ def supplier_profile(source, ctx) -> list[dict]:
                 "qualification_status",
                 "incoterm",
                 "preferred_language",
+                "contact_name",
                 "contact_email",
             )
         }
@@ -46,6 +47,7 @@ def supplier_profile_json(source, ctx) -> list[dict]:
         "incoterm": clean(flat.get("supplier.terms.incoterm")),
         "preferred_language": clean(flat.get("supplier.contact.language")),
         "contact_email": clean(flat.get("supplier.contact.email")),
+        "contact_name": clean(flat.get("supplier.contact.name")),
         "notes": clean(flat.get("supplier.notes")),
         "exported_at": clean(flat.get("exportedAt")),
     }

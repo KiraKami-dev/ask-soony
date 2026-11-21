@@ -138,6 +138,10 @@ def load_readings(readings_dir: Path, current_sha: dict[str, str]) -> tuple[list
             "confidence": verdict_block.get("confidence"),
             "red_flags": verdict_block.get("red_flags") or [],
             "decisions": verdict.get("decisions") or [],
+            "statements": [
+                {"topic": s.get("topic"), "text_en": s.get("text_en")}
+                for s in verdict.get("statements") or []
+            ],
             # Derived, not the reader's list: crossed-out and handwritten values
             "corrections": [
                 f"{v['field']}: {v['raw']} ({'crossed out' if v['crossed_out'] else v['written']})"
