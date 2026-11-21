@@ -13,8 +13,7 @@
       "transcript": "/5f/e43a567f75/0/full.jsonl",
       "compact_transcript": "/5f/e43a567f75/0/transcript.jsonl",
       "content_hash": "/5f/e43a567f75/0/content_hash.txt",
-      "prompt": "/5f/e43a567f75/0/prompt.txt",
-      "assets_manifest": "/5f/e43a567f75/0/assets/manifest.json"
+      "prompt": "/5f/e43a567f75/0/prompt.txt"
     }
   ],
   "token_usage": {
