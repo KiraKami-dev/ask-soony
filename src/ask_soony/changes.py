@@ -25,6 +25,8 @@ def summarize(path: str, old: bytes | None, new: bytes) -> tuple[str, str]:
             return _csv(old, new)
         if suffix in {".xlsx", ".xlsm"}:
             return _xlsx(old, new)
+        if suffix == ".json" and old is None:
+            return _json_new(new)
     except Exception as e:  # fall back to a text diff for files that do not parse cleanly
         note = f"(structured comparison failed: {type(e).__name__}) "
         summary, diff = _text(path, old, new)
@@ -176,6 +178,41 @@ def _xlsx(old: bytes | None, new: bytes) -> tuple[str, str]:
     return (
         "Workbook: " + "; ".join(parts) + "."
     ) if parts else "Workbook: no value changes.", "\n".join(lines)
+
+
+# --- JSON ----------------------------------------------------------------------------------
+
+
+def _json_new(new: bytes) -> tuple[str, str]:
+    import json
+
+    data = json.loads(decode_text(new))
+    texts: list[str] = []
+
+    def walk(node):
+        if len(texts) >= 3:
+            return
+        if isinstance(node, dict):
+            for v in node.values():
+                walk(v)
+        elif isinstance(node, list):
+            for v in node:
+                walk(v)
+        elif isinstance(node, str) and len(node) > 25 and not node[:4].isdigit():
+            texts.append(node)
+
+    walk(data)
+    if isinstance(data, dict):
+        shape = "keys: " + ", ".join(list(data)[:8])
+        lists = [f"{k} ({len(v)} items)" for k, v in data.items() if isinstance(v, list)]
+        if lists:
+            shape += "; lists: " + ", ".join(lists)
+    else:
+        shape = f"list of {len(data)} items" if isinstance(data, list) else type(data).__name__
+    summary = f"New JSON, {shape}."
+    if texts:
+        summary += " " + " / ".join(f"“{t[:110]}”" for t in texts)
+    return summary, ""
 
 
 # --- everything else -----------------------------------------------------------------------
