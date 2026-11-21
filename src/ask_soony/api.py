@@ -19,6 +19,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from ask_soony import feed, voice
+from ask_soony.basic_auth import BasicAuth
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "web" / "fixtures" / "sample_state.json"
@@ -28,6 +29,7 @@ DIST = ROOT / "web" / "dist"
 log = logging.getLogger("uvicorn.error")
 app = FastAPI(title="ask-soony dashboard")
 app.include_router(voice.router)
+app.add_middleware(BasicAuth)
 
 
 def _store_dir() -> Path:

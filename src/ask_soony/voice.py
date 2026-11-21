@@ -46,7 +46,8 @@ def instructions(card: dict) -> str:
         f"Title: {card.get('title', '')}",
         f"Edition: {card.get('edition', '')}, part: {card.get('part', '')}",
         f"Copies at risk: {card.get('at_risk')} (if we act: {card.get('at_risk_if_acted')})",
-        f"Act by: {card.get('act_by') or 'not given'}; runs dry: {card.get('runs_dry') or 'not given'}",
+        f"Act by: {card.get('act_by') or 'not given'}",
+        f"Runs dry: {card.get('runs_dry') or 'not given'}",
         f"System says: {card.get('system_says', '')}",
         f"Documents say: {card.get('paper_says', '')}",
         f"Options:\n{options}",
@@ -57,8 +58,8 @@ def instructions(card: dict) -> str:
         + "\n".join(facts)
         + "\n\nStart by stating the problem in two short sentences and the recommended option. "
         "Answer questions only with the facts above; if you do not know, say so. Then ask for a "
-        "decision: approve the recommended action, escalate to the next person, or reject. When they "
-        "decide, call record_decision, confirm in one sentence and say goodbye.\n\n"
+        "decision: approve the recommended action, escalate to the next person, or reject. "
+        "When they decide, call record_decision, confirm in one sentence and say goodbye.\n\n"
         "The person may be in a noisy room. Only respond to what they say to you about this card. "
         "Ignore background conversations, other languages and fragments; if unsure, ask: 'Sorry, "
         "was that for me?' Never record a decision from background speech."
