@@ -69,7 +69,8 @@ class BasicAuth(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         path = request.url.path
-        if not self.password or path in PUBLIC_PATHS:
+        # Call webhooks authenticate themselves (signature or per-alert token), see calls.py.
+        if not self.password or path in PUBLIC_PATHS or path.startswith("/hooks/"):
             return await call_next(request)
 
         if path == "/login":

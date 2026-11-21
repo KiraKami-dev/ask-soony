@@ -68,6 +68,15 @@ uv run ask-soony serve --interval 300   # poll every 5 min + dashboard on http:/
 uv run ask-soony dashboard              # dashboard only
 ```
 
+The product runs as one server: the decision inbox app with the call webhooks (`/hooks/*`) and, with `ASK_BACKGROUND=on`, the portal watcher, alert escalation and the supplier reply poller as background loops:
+
+```bash
+(cd web && npm run build)
+ASK_BACKGROUND=on uv run uvicorn ask_soony.api:app --port 8000
+```
+
+With `ASK_DASHBOARD_PASSWORD` set in the environment, the app asks for it on a login page (30-day cookie, so it works as a home screen app) or via basic auth; the call webhooks check their own signature or per-alert token instead.
+
 Set `ASK_DASHBOARD_PASSWORD` in `.env` (HTTP basic auth, any user name). The dashboard listens on localhost only and refuses other addresses without a password. To share it, put a tunnel in front, for example a Cloudflare Tunnel with its own config file:
 
 ```yaml

@@ -18,7 +18,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from ask_soony import cardtools, feed, push, replies, voice
+from ask_soony import background, calls, cardtools, feed, push, replies, voice
 from ask_soony.basic_auth import BasicAuth
 from ask_soony.network import build_network
 
@@ -34,7 +34,8 @@ app.include_router(voice.router)
 app.include_router(push.router)
 app.include_router(cardtools.router)
 app.include_router(replies.router)
-replies.start_background()
+app.include_router(calls.router)
+background.start()
 app.add_middleware(BasicAuth)
 
 
