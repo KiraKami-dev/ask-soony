@@ -38,14 +38,7 @@ export default function VoiceCall({
       return next;
     });
   const drop = (id: string) => setLines((prev) => prev.filter((p) => p.id !== id));
-  // Hold to talk: the mic only sends while the button is held (for noisy rooms).
-  const [holdToTalk, setHoldToTalk] = useState(true);
-  const [talking, setTalking] = useState(false);
-  const micTrack = useRef<MediaStreamTrack | null>(null);
-  const setMic = (on: boolean) => {
-    if (micTrack.current) micTrack.current.enabled = on;
-    setTalking(on);
-  };
+
   const [info, setInfo] = useState("");
   // Opened from a push notification: show the card as an incoming call.
   const params = new URLSearchParams(location.search);
@@ -80,8 +73,6 @@ export default function VoiceCall({
         audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
       });
       mic.getTracks().forEach((t) => peer.addTrack(t, mic));
-      micTrack.current = mic.getAudioTracks()[0] ?? null;
-      if (micTrack.current) micTrack.current.enabled = !holdToTalk;
 
       const dc = peer.createDataChannel("oai-events");
       let decided = false;
@@ -204,37 +195,10 @@ export default function VoiceCall({
             Talk to the assistant
           </button>
         ) : (
-          <>
-            {holdToTalk && (
-              <button
-                className={`select-none rounded-full px-5 py-2 text-sm font-semibold text-white ${talking ? "bg-emerald-600" : "bg-slate-700"}`}
-                style={{ WebkitUserSelect: "none", touchAction: "none" }}
-                onPointerDown={() => setMic(true)}
-                onPointerUp={() => setMic(false)}
-                onPointerLeave={() => setMic(false)}
-                onPointerCancel={() => setMic(false)}
-                onContextMenu={(e) => e.preventDefault()}
-              >
-                {talking ? "Listening…" : "Hold to talk"}
-              </button>
-            )}
-            <button className="rounded-md border border-danger px-3 py-1.5 text-sm font-medium text-danger" onClick={hangUp}>
-              Hang up
-            </button>
-          </>
+          <button className="rounded-md border border-danger px-3 py-1.5 text-sm font-medium text-danger" onClick={hangUp}>
+            Hang up
+          </button>
         )}
-        <label className="flex items-center gap-1 text-xs text-slate-600">
-          <input
-            type="checkbox"
-            checked={holdToTalk}
-            onChange={(e) => {
-              setHoldToTalk(e.target.checked);
-              if (micTrack.current) micTrack.current.enabled = !e.target.checked;
-              setTalking(false);
-            }}
-          />
-          Hold to talk (noisy room)
-        </label>
         {pushSupported() && !live && (
           <>
             <button className="rounded-md border border-slate-300 px-3 py-1.5 text-sm" onClick={async () => setInfo(await enableAlerts())}>
@@ -248,7 +212,7 @@ export default function VoiceCall({
         <span className="text-xs text-slate-500">
           {info && <span className="mr-2">{info}</span>}
           {status === "connecting" && "Connecting…"}
-          {status === "live" && (holdToTalk ? "Live: hold the button while you speak" : "Live: speak normally")}
+          {status === "live" && "Live: speak normally"}
           {status === "ended" && "Call ended"}
           {status === "error" && "Call failed"}
         </span>
