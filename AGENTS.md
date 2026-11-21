@@ -13,6 +13,8 @@ Our entry for the Lio challenge "Keep the Line Running" at START Hack Munich 202
 
 The product idea is not fixed yet. Check the README and recent commits for the current direction.
 
+**Read [`docs/challenge.md`](docs/challenge.md) before any substantive task.** It is the full challenge brief: the end goal, the one rule, judging criteria, deliverables and deadlines. It describes the problem only; solutions are the team's work and do not go in that file. Keep every change pointed at what it asks for.
+
 ## The rules that shape the code
 
 - **Agents do real work.** They read, decide and act: write to suppliers, open decisions, escalate. A dashboard on top of a spreadsheet is not enough.

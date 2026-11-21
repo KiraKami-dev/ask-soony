@@ -1,0 +1,325 @@
+# Lio Challenge: "Keep the Line Running" (START Hack Munich 2026)
+
+This file is the complete challenge context, compiled from the four official documents Lio provided: the challenge brief, the judging criteria, the deep-dive slides (including speaker notes) and a challenge summary. It describes the problem only. It contains no proposed solution or architecture. Those decisions are open.
+
+> Soony, Popstar Studios and Grand Heist 6 are entirely fictional.
+> Use the challenge data only for this hackathon and do not share it outside the team.
+
+---
+
+## 1. Role and framing
+
+- The team plays **Lio**, a young AI startup that has just closed its **first paying customer, Soony**.
+- Lio (the real company) runs procurement end to end for 175+ global enterprises (BMW, Siemens, ZEISS, among others) with a multi-agent system of hundreds of specialised AI agents.
+- Soony bought "an AI solution to save the launch." **That solution does not exist yet. The team has to build it.**
+- Why Soony bought a startup: no time for a tender or a big vendor project. They needed help this weekend. The last three weeks nearly broke their team.
+- Sales call: the CPO asked, "Can it chase suppliers for us?" The answer was, "Yes, sort of." The pitch was "an AI workforce that keeps their supply chain running."
+- **Soony's ask: "No more surprises."**
+- Soony's stated pain: "Suppliers tell us about problems way too late. By then, our launch date is already at risk, and every fix is expensive."
+- Quote from Soony: "Our fans have waited years for this game. If it is not on the shelf on Sunday, nobody will remember the game. They will remember that we missed it."
+
+---
+
+## 2. The customer: Soony Interactive GmbH
+
+- A console and games publisher headquartered in **Munich**.
+- Releasing **Grand Heist 6**, developed by Popstar Studios. The heist series is back after 13 years. It's the biggest game release of the year.
+- **Soony makes nothing itself.** Six suppliers deliver the parts, and every copy is packed at **one site: Soony's distribution center in Hamburg**. There is **no plan B site**.
+- From Hamburg, trucks take the boxes to retailers across Europe.
+
+### Key facts
+
+| Fact | Value |
+|---|---|
+| Launch | **Sunday 22 November 2026, 20:00**. The date cannot move: it's fixed by retail and by pre-orders |
+| Trucks to retail | Leave Hamburg from Sunday 20:00. **Whatever is not on them misses launch day** |
+| Pre-orders | 487,000 |
+| Standard Edition demand (day one) | 640,000 copies |
+| Collector's Edition demand | 72,000 copies, **every copy numbered, all pre-ordered** |
+| Suppliers | 6 |
+| Logistics providers | 4 (ocean, air cargo, a forwarder in India, trucks from Poznań) |
+| Distribution center | 1, in Hamburg |
+| Packing time left | **30 hours**: Sat 06:00–22:00 and Sun 06:00–20:00. **No night shift** |
+| Why so late | The game master was finished late, so the programmed game cards only started arriving three weeks ago |
+
+---
+
+## 3. Situation at kickoff: "80% packed, the last 20% is on you"
+
+| | Standard Edition | Collector's Edition |
+|---|---|---|
+| Packed at kickoff | 512,000 of 640,000 (80%) | 46,800 of 72,000 (65%) |
+| Still to pack | 128,000 | 25,200 |
+| Parts per box | 4 | 7 |
+| Packing setup | 3 pack lines | 1 manual cell; **all 7 parts must be present at the same time** |
+| Hours needed (of 30 left) | 21 | 28 |
+| Slack | 9 hours | **2 hours** |
+| Rate (derived) | ~6,100 copies/hour | **900 copies/hour; every hour the cell waits for a part costs 900 copies** |
+
+Additional facts:
+- **Standard Edition parts:** game card, clear case, cover sleeve, activation code leaflet.
+- **Collector's Edition parts:** game card, steel case, collector's box, art book, city map poster, die-cast statue, leaflet.
+- The Standard pack lines are **not exclusively reserved** for the launch: Grand Heist 5 reprints still run on the side.
+- Standard "is not where the launch breaks, as long as the game cards keep coming."
+- Collector's Edition: fans paid for a specific numbered copy, so Soony **cannot ship fewer or swap them**. If one part is missing (e.g. the statue or the art book), the whole cell stands still. Lio calls the Collector's Edition "the real risk this weekend."
+- The first 80% took three weeks of firefighting: chasing suppliers by phone, rebooking freight, packing whatever arrived that day. The team is exhausted. The last 20% has no buffer.
+- Soony's fear: something in the last 20% blows up and nobody notices until Sunday.
+- **Hint from the brief:** "The system says we are fine. My gut says we are not." (*Somebody at Soony, probably. Find out who is right.*)
+
+---
+
+## 4. Supply network
+
+All parts end up in the Hamburg distribution center.
+
+| Supplier | Country | Supplies | Route / transit |
+|---|---|---|---|
+| Hwaseong Memory | South Korea | **70% of game cards** | Sea via Busan (36 days) or air via Incheon |
+| Boise Semi | USA | **30% of game cards** | Air via Chicago |
+| Guangzhou PackRight | China | Card cases, sleeves, collector's boxes | Sea from Yantian |
+| Dongguan Precision Housings | China | Steel cases, **80% of statues**, card cases | Sea from Yantian |
+| Pune Diecast Works | India | **20% of statues**; new supplier since August | Sea from Nhava Sheva, via a forwarder |
+| Karton Nowak | Poland | Sleeves, art book, poster, leaflets | Truck from Poznań, one truck day |
+
+From Lio's speaker notes:
+- "Anything ordered from Asia today arrives after the launch."
+- "The only supplier that can still deliver before Sunday is Karton Nowak."
+- "Everything else that will save this launch is already on a ship, on a plane, at a terminal or in the warehouse."
+- Brief: "What is ordered now will mostly arrive too late."
+
+---
+
+## 5. Process: how a part gets into the box
+
+| # | Step | Where it lives | Notes |
+|---|---|---|---|
+| 1 | Order | **SAP** (system of record) | Felix, the senior buyer, raises a purchase order |
+| 2 | Confirm | Email, PDF | Supplier confirms in its own language and format |
+| 3 | Ship | 4 logistics providers | Sea, air or truck |
+| 4 | Track | Spreadsheet | ~20 open shipments, hand-kept, updated "when someone remembers" |
+| 5 | Receive | Paper scans | Hamburg checks the delivery note, books the goods receipt, stocks the parts |
+| 6 | Pack | **Pack-out log** (system of record) | Standard on 3 lines; Collector's in 1 manual cell |
+| 7 | Sell | Sun 20:00 | Retail plus 487,000 pre-orders |
+
+- **Only 2 of 7 steps have a system.** Everything in between runs on email, PDFs, scans and phone calls.
+- Once the order leaves Soony and goes to the supplier, **Soony is blind until the truck shows up in Hamburg**. Lio: "That gap is where surprises are born, and that gap is where your agents can do real work."
+- Head of Procurement: **"We find out at the dock."**
+- Suppliers write in their own language: **Korean, Chinese, Polish, English**.
+- On the data, Soony says: **"It is what it is."**
+
+### Onboarding notes (in the data as `soony/context/onboarding_notes.md`)
+
+```
+Kickoff w/ Soony – notes (11 Nov)
+
+- launch: Sun 22 Nov, 20:00. 487k pre-orders. date cannot move.
+- SAP has the purchase orders. nothing else. rest = Excel, PDFs, paper
+- suppliers write in their own language: KR, CN, PL, EN
+- ~20 open shipments in a spreadsheet, updated "when someone remembers"
+- head of procurement: "We find out at the dock."
+- why us: suppliers flag problems too late. launch at risk, every fix expensive
+- on the data: "It is what it is."
+- first demo: Sunday (!!)
+```
+
+---
+
+## 6. What can go wrong (Lio's list)
+
+1. A shipment is late, split into several deliveries, or stuck at a port.
+2. A supplier delivers the wrong part, the wrong version, or too little.
+3. A part is in stock in the system but not on the shelf.
+4. A contract or price changes in the small print.
+5. Nobody knows who approves the fix.
+6. The world happens: strikes, export bans, weather (the summary also mentions geopolitics and earthquakes).
+
+Lio: "This happens every week in every company that buys things. The difference this weekend: there are only 50 hours left. A problem found on Sunday morning is a problem found too late."
+
+---
+
+## 7. The mission
+
+- **Build what was sold.** Lio prescribes no technology, architecture or product idea.
+- **The team decides:** the pain point to own, the product, the tech (software, hardware, voice, anything), the business model.
+- **The team gets:** a customer with a real problem, their messy data and a world that keeps moving, their suppliers (who write back), and three people from their team to interview.
+
+### THE ONE RULE
+
+> **Agents do real work. Your AI reads, decides and acts (writes, escalates, talks to people). A dashboard on top of a spreadsheet is not enough.**
+
+- "Do not build everything. Nobody saves a launch in 30 hours by fixing everything. Pick the pain that excites you most, one the customer's team tells you about or one nobody has noticed yet, and go deep."
+- The jury wants to see the agents work on Soony's real, messy data, and to hear **what they found that Soony's team missed**.
+- Do not treat it as a one-off consulting job. Build a scalable product.
+
+### Ten directions from Lio
+"Not a checklist. Pick one, combine three, or ignore all of them."
+
+1. **Launch Control Room**: Will we make Sunday 20:00? And what breaks first?
+2. **Supplier Chaser**: Agents that ask, confirm and escalate before it is too late.
+3. **Stock Truth**: What the system says vs. what is really there.
+4. **Plan B**: Something is missing. What can still arrive in time?
+5. **Truck & Port Tracker**: Containers, trucks, slots, delays.
+6. **Contract Intelligence**: What do the contracts actually say, and who owes whom?
+7. **Release Gate**: What may legally and safely go into the box?
+8. **Decision Copilot**: A recommendation with a price on it, for a boss with no time.
+9. **Supplier-side Tools**: Build for the other side of the table.
+10. **Wildcard**: The idea we did not think of.
+
+---
+
+## 8. Toolkit
+
+### Customer portal
+- URL: `https://start-hack-portal-cxh3crbdaef2f8gt.westeurope-01.azurewebsites.net`
+- **Register** the team, then log in with the team name and password.
+- **Data view:** browse the current state folder by folder. New drops show up as a notification, and the page updates by itself.
+- **Settings:** the team token for the API, sender addresses for supplier email, office-hour booking.
+- Announcements also appear on the portal dashboard and on Discord.
+
+### API
+Authenticate with the team token from Settings. The full docs are in the portal, and the exact auth scheme is in the OpenAPI spec.
+
+| Endpoint | Returns |
+|---|---|
+| `GET /api/v1/files` | Every file with size, checksum and URL |
+| `GET /api/v1/files/{path}` | One file |
+| `GET /api/v1/archive.zip` | Everything at once |
+| `GET /api/v1/openapi.json` | The OpenAPI spec |
+
+### Data at kickoff
+"Realistic, which means it is messy, incomplete and occasionally contradicts itself. **There are things hidden in it that a careful team will find.**" Some shipments are missing from master data or buried in random spreadsheets, and documents come in multiple languages.
+
+| Category | Contents |
+|---|---|
+| Master data | Products, editions, bills of materials, suppliers, sites |
+| Transactions | Purchase orders, goods receipts, stock, shipments |
+| Documents | Contracts and supplier documents (order confirmations, notices, scans), in more than one format |
+| Context | How Soony's procurement is organised, its policies, the onboarding notes |
+
+### A live, changing world
+- New information lands in the portal during the hack, **unannounced**. **Nobody tells you what changed.** "You get files, not explanations."
+- The dataset starts relatively small. More data and changes are released step by step.
+- "You do not have to react to every drop. Use what helps your product and your story." The agents should notice.
+- It's **sleep-friendly**: "Not even Soony works at night."
+- Lio advises against hardcoding fixes or overfitting to specific events. It wants a system that handles these kinds of change generally.
+
+Four kinds of drops:
+
+| Type | Description |
+|---|---|
+| Logistics | Shipments and trucks that do not go to plan |
+| Suppliers | Messages and documents that change the picture |
+| Customer | New requests and rules from Soony |
+| News | What happens in the world and touches the launch |
+
+Two illustrative examples from Lio (these exact events won't happen, but similar ones will):
+- **Something new appears:** `suppliers/<ID>/notices/bank_details_change.pdf` is added. The IBAN doesn't match the contract. Real change, or invoice fraud?
+- **Something stops changing:** in `soony/erp/open_shipments.json`, `updated_at` stops moving and there are no new statuses for 18 hours (the carrier got hacked). "No news isn't good news: nobody knows where those containers are right now."
+
+### Supplier inbox
+- All 6 suppliers have real email addresses and **write back**.
+- **Register every sender address in Settings first**, including any address the agents send from. Mail from unregistered addresses gets no reply.
+- "Where to reach them, and how they react, is yours to find out." "Agent to agent, if you dare."
+- Treat them like real business partners. Keep emails concise, professional and targeted. Suppliers who get spammed may get frustrated and stop cooperating.
+
+### Tech
+Any stack, language, framework, model or orchestration. Hardware is optional. Lio engineers are at the booth all weekend for technical questions. Questions go to Discord.
+
+---
+
+## 9. Office hours: Soony's project team
+
+Three personas, each played by people from Lio's team. Each knows things that are **not in the data**.
+
+| Persona | Role | Ask about |
+|---|---|---|
+| **Dr. Maren Vogt** | Head of Procurement (CPO) | Money, priorities, what a missing copy costs, who signs what. "What matters, and what does it cost?" |
+| **Felix Brunner** | Senior Buyer | Suppliers, trucks, stock, how things really run (not how the handbook says), the workarounds nobody wrote down |
+| **Nils Berger** | IT & Systems Lead | Data, files, exports, systems: "Why does this file look like that?" Precise questions only |
+
+- 3 blocks over the weekend. Times are announced in the portal and on Discord (the deep-dive slides listed Sat 14:00, Sat 17:00, Sun 09:00; the portal showed Block A at Sat 15:00).
+- 10 minutes per team and person, booked in the portal. Wishes are ranked and seats drawn by lottery, one talk per block.
+
+How Soony's team behaves:
+- They answer what you ask. **They do not volunteer.** Good questions get good answers.
+- They're the customer, not a mentor: busy, a little skeptical, and pleased when you have clearly read the data.
+- They only know what has happened so far. Nobody at Soony knows what comes next.
+- They don't speak for suppliers. To get something from a supplier, write to the supplier.
+- Talking doesn't change the data. Telling them what to do is not the same as making it happen.
+
+---
+
+## 10. Judging
+
+Lio judges "the way an investor and a customer would judge a young startup." No trick questions, no hidden metric, no hidden test set or secret evaluation data. Judging weighs the strength of the logic, the problem-solving approach, the idea, the prototype and the presentation more than heavy coding.
+
+### Entry ticket (required to be judged)
+- The system runs **live in front of the jury**.
+- A working prototype (**deployed** if possible).
+- Pitch deck (the slides you present).
+- Demo video, **3 minutes max**.
+- Repo (e.g. GitHub) with a short README.
+- **Submission deadline: Sunday 22 Nov, 12:00.**
+
+### Four criteria
+
+**1. A pitch that sticks.** A clear story from problem to solution to impact. "Five teams later, the jury should still remember yours."
+- Do we understand the problem in the first 30 seconds?
+- Is there a clear line from what hurts at Soony to what you built?
+- Did you use what you learned from Soony's team, not just from the data?
+- Strong: a story with a real moment in it ("On Saturday, Felix told us… so we built…"). Weak: a feature tour, or ten slides of architecture before anyone knows why it matters.
+
+**2. A real business case.** Why this, why now, what is it worth? "Soony is your first customer, not your only one."
+- Is it well motivated: why this problem, why now, what is it worth in money or time?
+- Why would Soony pay for it, and roughly how much?
+- Who else has this problem? Does it work beyond one game launch?
+- Strong: a number the customer cares about, and a clear path to the next ten customers. Weak: "The market is huge," or a solution that only works for this one weekend.
+
+**3. Technical depth.** Agents do real work on messy, changing data, and nothing is hardcoded.
+- Do the agents take real actions (decide, write, escalate), or only summarise?
+- Is there a solid architecture (tool use, reasoning, state), not one big prompt?
+- How is messy and contradictory data handled? Is anything hardcoded?
+- When a new drop arrives, does the system cope, or does it need rebuilding?
+- Strong: agents that take real actions on the messy data, and a team that can explain what happens when the system gets something wrong. Weak: a chat window around one prompt, or values copied from the data into the code.
+
+**4. Taste.** Does it look and feel like a real product? "Soony's team has ten minutes and forty dashboards."
+- Does it look and feel like a real product?
+- Is it all of a piece: one design language, a clear layout, nothing bolted on?
+- Would the people you interviewed use it on a stressful Sunday?
+- Are the small details right: wording, defaults, the moment a human has to decide?
+- Strong: one product with a clean, consistent design, a clear recommendation and one click to act. Weak: every number on one screen, mixed styles and default components, leaving the user to figure out what to do.
+
+Plus: **a live demo on real data. Not optional.**
+
+### Demo format
+- Demos are on **Sunday from 14:00**.
+- **3 minutes of pitch on stage, then 2 minutes of jury questions.**
+  1. **The problem**: what hurts at Soony, and what you learned by asking.
+  2. **Your system**: agents at work on real customer data, live.
+  3. **The business**: why Soony pays for it, and who else would.
+- Jury tips: "Show, don't tell. Start the demo early. Slides are support, not the show." "Have a backup. If the Wi-Fi dies, your demo video saves you. Still, the live run is what counts." "Go deep, not wide. One problem solved properly beats a tour of everything."
+
+---
+
+## 11. Timeline
+
+| When | What |
+|---|---|
+| Sat 21 Nov, morning | Kickoff (about 50 hours before launch) |
+| Sat 06:00–22:00 | Soony packing shift 1 |
+| Sat afternoon | Office hours, Block A (portal: 15:00) |
+| Sat 17:00 | Office hours, Block B |
+| Night | No data drops ("sleep-friendly") |
+| Sun 06:00–20:00 | Soony packing shift 2 |
+| Sun 09:00 | Office hours, Block C |
+| **Sun 12:00** | **Submission deadline** |
+| Sun 14:00 | Demos |
+| Sun 20:00 | Grand Heist 6 launches, trucks leave Hamburg |
+
+---
+
+## 12. Prize and fine print
+
+- Prize: **a PS5 and GTA 6 for every member of the winning team.** "If Soony doesn't launch on time… neither do you."
+- Use the data only for this hackathon. Do not share it outside the team.
+- Hardware is optional. Questions go to Discord or the Lio booth.
