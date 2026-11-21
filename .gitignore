@@ -3,9 +3,8 @@
 .env.*
 !.env.example
 
-# Portal data: only data/portal is tracked, so we can see what changed
-data/*
-!data/portal/
+# Portal data: fetch it through the API, never commit it
+data/
 
 # Agent config is shared in this repo (overrides a global .claude ignore);
 # personal settings stay local
@@ -20,8 +19,7 @@ __pycache__/
 node_modules/
 dist/
 
-# Local copy of portal data (confidential)
-soony-data/
+
 
 # Agent skills
 .claude/
