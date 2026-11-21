@@ -3,8 +3,8 @@ Act: one decision card per cause of copies at risk.
 
 A card says what is at risk, why (system vs paper), what could close the gap, and who has to do
 something, with the message ready to send. Who to ask follows the routing table in
-verifier/README.md: what arrived → Hamburg receiving; what shipped → the supplier; what is
-allowed → an approver (PP-07; a vacant role escalates to the Head of Procurement).
+verifier/README.md: what arrived → the site lead; what shipped → the supplier; what is
+allowed → an approver. Role holders come from the org charts and the policy (people.py).
 
 Nothing is sent automatically: a person reads the card and clicks send.
 """
@@ -13,11 +13,9 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
+from verifier.act.people import People, decider, site_lead
 from verifier.impact.shortfall import PartNeed, Shortfall
 from verifier.impact.timing import fmt
-
-HAMBURG = "DC Hamburg (receiving and logistics)"
-APPROVER = "Head of Procurement (Category Lead is vacant, PP-07 §6)"
 
 
 @dataclass
@@ -98,6 +96,28 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
     directory = _Directory(records)
     launch = min((e.launch_date for e in result.editions if e.launch_date), default="launch")
     cards: list[Card] = []
+    # Who does what, read from the org charts and the approval policy (see people.py)
+    readings = records[records.kind == "reading"].to_dict("records")
+    people = People(readings, result.now)
+    sites = {r["key"]: r for r in records[records.kind == "site"].to_dict("records")}
+    stock_sites = {
+        r["attrs"].get("site") for r in records[records.kind == "stock_count"].to_dict("records")
+    }
+    site_names = [
+        n
+        for s in stock_sites
+        if s
+        for n in (s, *(sites.get(s, {}).get("attrs", {}) or {}).values())
+        if n
+    ]
+    site = people.label(site_lead(people, site_names), "DC site lead")
+    site_record = next((sites[s] for s in stock_sites if s in sites), None)
+    dc = site_record["attrs"].get("name") if site_record else "our distribution center"
+    categories = {
+        r["material_id"]: r["attrs"].get("category")
+        for r in records[records.kind == "part"].to_dict("records")
+    }
+    quality = people.holder("supplier quality")
     for need in result.parts:
         part, desc = need.part, need.description or need.part
         edition = _edition_of(need, result)
@@ -126,7 +146,7 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
                     ],
                     messages=[
                         Message(
-                            HAMBURG,
+                            site,
                             None,
                             f"Urgent: collect {s['reference']} ({desc}) for the {launch} pack-out",
                             f"Hello,\n\nshipment {s['reference']} with {_n(s['quantity'])} {desc} ({part}) "
@@ -155,7 +175,7 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
             )
             card.messages.append(
                 Message(
-                    HAMBURG,
+                    site,
                     None,
                     f"Please count {desc} ({part}) and correct receipt {phantom.issue.split(':')[-1]}",
                     f"Hello,\n\nreceipt {phantom.issue.split(':')[-1]} books more {desc} than the "
@@ -184,7 +204,7 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
                         f"Order: {_n(offer['quantity'])} {desc} from stock, per your offer",
                         f"Dear {person or 'Sir or Madam'},\n\nthank you for your offer. We would like to "
                         f"order the {_n(offer['quantity'])} {desc} ({part}) you have in stock, at the "
-                        f"normal price, for delivery to DC Hamburg as soon as possible.\n\nPlease confirm "
+                        f"normal price, for delivery to {dc} as soon as possible.\n\nPlease confirm "
                         f"the loading time and the truck's arrival time. A PO follows."
                         + _signature(),
                     )
@@ -194,6 +214,9 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
         # 3. A failed lot: someone has to decide on a concession
         failed = reasons.get("failed inspection")
         if failed:
+            concession_to, concession_why = decider(people, categories.get(part))
+            if quality and quality.name:
+                concession_to += f" (cc {people.label(quality, '')})"
             cards.append(
                 Card(
                     id=f"concession-{part}",
@@ -211,13 +234,12 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
                     decision=f"Use the failed lot under a concession, or accept {_n(need.gap)} fewer copies?",
                     messages=[
                         Message(
-                            APPROVER,
+                            concession_to,
                             None,
                             f"Decision needed today: failed lot of {desc} ({part})",
                             f"Hello,\n\nthe lot ({failed.issue.split(':')[-1]}) failed incoming inspection: "
                             f"{failed.context}.\n\nWithout it we are {_n(need.gap)} {desc} short for the "
-                            f"launch pack-out. The Category Lead role is vacant, so per PP-07 the decision on a "
-                            f"concession sits with you.\n\nPlease decide: concession (sort and use) or no "
+                            f"launch pack-out. Why you: {concession_why}.\n\nPlease decide: concession (sort and use) or no "
                             f"concession." + _signature(),
                         )
                     ],
@@ -241,7 +263,7 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
                         options=["Block or rebook it so the line doesn't pack it"],
                         messages=[
                             Message(
-                                HAMBURG,
+                                site,
                                 None,
                                 f"Please block/rebook: {_n(d.units)} {desc} ({reason})",
                                 f"Hello,\n\n{d.context}.\n\nPlease block it for the GH6 pack-out and correct "
@@ -284,9 +306,15 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
             ],
             decision=f"Which edition gets the {_n(need.usable)} {desc}?",
         )
+        # A trade-off between editions is an exception to the plan: the policy's approver of exceptions
+        approver = people.exception_approver()
+        card.evidence.append(
+            f"Routing: allocation across editions is an exception; {people.policy_name} names the "
+            f"{approver.role if approver else 'approver of exceptions'}"
+        )
         card.messages.append(
             Message(
-                APPROVER,
+                people.label(approver, f"approver of exceptions (see {people.policy_name})"),
                 None,
                 f"Decision needed: allocate {desc} between editions",
                 f"Hello,\n\nwe have {_n(need.usable)} {desc} for {_n(need.needed)} still to pack "
@@ -301,7 +329,7 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
                     email,
                     f"{desc} ({need.part}): any quantity earlier than planned?",
                     f"Dear {person or 'Sir or Madam'},\n\nwe are {_n(need.gap)} {desc} short for our launch "
-                    f"pack-out, which ends on {launch}. Can any part of the open balance reach DC Hamburg "
+                    f"pack-out, which ends on {launch}. Can any part of the open balance reach {dc} "
                     f"earlier, for example on an earlier flight? Please reply with quantity and arrival "
                     f"time." + _signature(),
                 )

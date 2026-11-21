@@ -134,7 +134,9 @@ def test_cards_route_and_render(tmp_path):
     result = compute(graph.records, graph.issues)
     cards = build_cards(result, graph.issues, graph.records)
     concession = next(c for c in cards if c.id == "concession-CMP-A")
-    assert concession.decision and concession.messages[0].to_role.startswith("Head of Procurement")
+    assert concession.decision
+    # No org chart in this portal: the card names the role to find, not a person
+    assert concession.messages[0].to_role == "approver of exceptions (see the approval policy)"
     page = render(result, cards, "now")
     assert "Will we make the launch?" in page and "decide on the failed lot" in page
 
