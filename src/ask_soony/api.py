@@ -5,7 +5,9 @@ Reads the verifier's decision cards, stores human decisions, the autonomy mode a
 under data/state/. Nothing about the customer is hardcoded here: the state file is passed through.
 """
 
+import glob
 import json
+import logging
 import os
 from datetime import datetime, timezone
 from pathlib import Path
@@ -16,16 +18,30 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from ask_soony import feed
+
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "web" / "fixtures" / "sample_state.json"
+FIXTURES = [FIXTURE, ROOT / "web" / "fixtures" / "sample_forecast_cards.json"]
 DIST = ROOT / "web" / "dist"
 
+log = logging.getLogger("uvicorn.error")
 app = FastAPI(title="ask-soony dashboard")
 
 
-def _cards_path() -> Path:
-    default = ROOT / "data" / "store" / "decision_cards.json"
-    return Path(os.environ.get("ASK_SOONY_STATE") or default)
+def _store_dir() -> Path:
+    return Path(os.environ.get("ASK_DATA_DIR") or ROOT / "data" / "store")
+
+
+def _card_files() -> list[Path]:
+    """ASK_SOONY_STATE (paths, globs, comma-separated) or every *cards*.json in the store."""
+    spec = os.environ.get("ASK_SOONY_STATE")
+    if spec:
+        found: list[Path] = []
+        for part in filter(None, (p.strip() for p in spec.split(","))):
+            found += [Path(m) for m in sorted(glob.glob(part))]
+        return [p for p in found if p.is_file()]
+    return sorted(_store_dir().glob("*cards*.json"))
 
 
 def _state_dir() -> Path:
@@ -50,29 +66,64 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
-def _add_event(agent: str, text: str) -> None:
+def _add_event(actor: str, text: str, ref: str | None = None) -> None:
     path = _state_dir() / "feed.json"
     events = _read(path, [])
-    events.append({"ts": _now(), "agent": agent, "text": text})
+    event = {"at": _now(), "actor": actor, "text": text}
+    if ref:
+        event["ref"] = ref
+    events.append(event)
     _write(path, events)
+
+
+def _load_state(files: list[Path]) -> dict:
+    """Merge card files: cards by id (later wins), other fields from the first file with them."""
+    state: dict = {"editions": [], "parts": [], "cards": []}
+    cards: dict[str, dict] = {}
+    for f in files:
+        data = _read(f, {})
+        if not isinstance(data, dict):
+            continue
+        for key in ("editions", "parts", "now", "hours_left", "packing_ends"):
+            if data.get(key) and not state.get(key):
+                state[key] = data[key]
+        for card in data.get("cards", []):
+            cid = card.get("id")
+            if cid in cards:
+                log.warning(
+                    "duplicate card id %s: %s overrides %s", cid, f.name, cards[cid]["source_file"]
+                )
+            cards[cid] = {**card, "source_file": f.name, "module": f.stem}
+    state["cards"] = list(cards.values())
+    return state
 
 
 @app.get("/api/state")
 def get_state():
-    path = _cards_path()
-    if path.exists():
-        state, source = _read(path, {}), "verifier"
+    files = _card_files()
+    if files:
+        state, source = _load_state(files), "files"
     else:
-        state, source = _read(FIXTURE, {}), "fixture"
-    state.pop("feed", None)
+        state, source = _load_state([p for p in FIXTURES if p.exists()]), "fixture"
     state["source"] = source
+    state["sources"] = [f.name for f in files or FIXTURES]
     decisions = _read(_state_dir() / "decisions.json", {})
-    for card in state.get("cards", []):
-        mine = decisions.get(card.get("id"))
-        if mine:
-            card["human_decision"] = mine
+    status = _action_status()
+    for card in state["cards"]:
+        if card["id"] in decisions:
+            card["human_decision"] = decisions[card["id"]]
+        if card["id"] in status:
+            card["action_status"] = status[card["id"]]
     state["mode"] = _read(_state_dir() / "mode.json", {}).get("mode", "ask")
     return state
+
+
+def _action_status() -> dict[str, dict]:
+    """data/state/actions.json: {card_id: {...}} or a list of {card_id, status, at, reply?}."""
+    raw = _read(_state_dir() / "actions.json", {})
+    if isinstance(raw, list):
+        raw = {r["card_id"]: r for r in raw if isinstance(r, dict) and "card_id" in r}
+    return raw if isinstance(raw, dict) else {}
 
 
 class Action(BaseModel):
@@ -92,10 +143,20 @@ def post_action(card_id: str, body: Action):
 
 @app.get("/api/feed")
 def get_feed():
-    events = _read(_state_dir() / "feed.json", [])
+    events = []
+    for e in _read(_state_dir() / "feed.json", []):  # older files used ts/agent
+        events.append(
+            {
+                **e,
+                "at": e.get("at") or e.get("ts", ""),
+                "actor": e.get("actor") or e.get("agent", ""),
+            }
+        )
+    store = _store_dir()
+    events += feed.db_events(store / "ask-soony.db") + feed.mail_events(store.parent)
     if not events:
         events = _read(FIXTURE, {}).get("feed", [])
-    return sorted(events, key=lambda e: e.get("ts", ""), reverse=True)
+    return sorted(events, key=lambda e: e.get("at", ""), reverse=True)
 
 
 class Mode(BaseModel):

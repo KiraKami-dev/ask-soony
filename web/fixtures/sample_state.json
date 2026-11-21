@@ -48,7 +48,7 @@
      "runs_dry": null, "blocked_only": false}
   ],
   "feed": [
-    {"ts": "2030-01-10T08:55:00+00:00", "agent": "reader", "text": "Read delivery_note.pdf (1 page)"},
-    {"ts": "2030-01-10T08:56:00+00:00", "agent": "verifier", "text": "Found 2 mismatches against the ERP export"}
+    {"at": "2030-01-10T08:55:00+00:00", "actor": "reader", "text": "Read delivery_note.pdf (1 page)"},
+    {"at": "2030-01-10T08:56:00+00:00", "actor": "verifier", "text": "Found 2 mismatches against the ERP export"}
   ]
 }
