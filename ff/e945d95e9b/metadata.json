@@ -11,8 +11,7 @@
       "transcript": "/ff/e945d95e9b/0/full.jsonl",
       "compact_transcript": "/ff/e945d95e9b/0/transcript.jsonl",
       "content_hash": "/ff/e945d95e9b/0/content_hash.txt",
-      "prompt": "/ff/e945d95e9b/0/prompt.txt",
-      "assets_manifest": "/ff/e945d95e9b/0/assets/manifest.json"
+      "prompt": "/ff/e945d95e9b/0/prompt.txt"
     }
   ],
   "token_usage": {
@@ -31,14 +30,14 @@
     "subagent_tokens_complete": true
   },
   "redaction": {
-    "replacements": 2499,
+    "replacements": 2500,
     "layers": {
       "betterleaks": 0,
       "connection_string": 0,
       "credential_key": 0,
       "credential_value": 2,
       "credentialed_uri": 0,
-      "entropy": 2497,
+      "entropy": 2498,
       "goredact": 0,
       "key_context": 0,
       "pii": 0,
