@@ -118,19 +118,31 @@ def trace(graph: Graph, term: str, max_depth: int = 4) -> list[tuple[int, str, s
     Returns (depth, record id, reached via). 'via' shows hops into other orders, e.g. through a
     shipment that carries several POs.
     """
-    kinds = dict(zip(graph.records.record_id, graph.records.kind))
+    r = graph.records
+    kinds = dict(zip(r.record_id, r.kind))
+    po_of = dict(zip(r.record_id, r.po_number))
     neighbours: dict[str, set[str]] = {}
     for link in graph.links.itertuples():
         neighbours.setdefault(link.src, set()).add(link.dst)
         neighbours.setdefault(link.dst, set()).add(link.src)
 
     start = find(graph, term)
+    starts = r[r.record_id.isin(start)]
+    own_pos = set(starts.po_number.dropna()) | {
+        po for pos in starts.po_numbers if isinstance(pos, list) for po in pos
+    }
+
+    def other_order(rid: str) -> bool:
+        return bool(po_of.get(rid)) and po_of[rid] not in own_pos
+
     seen: dict[str, tuple[int, str | None]] = {rid: (0, None) for rid in start}
     queue = deque(start)
     while queue:
         current = queue.popleft()
         depth = seen[current][0]
         if depth >= max_depth or (kinds.get(current) in HUB_KINDS and depth > 0):
+            continue
+        if depth > 0 and other_order(current):  # shown, but not expanded
             continue
         for nxt in sorted(neighbours.get(current, ())):
             if nxt not in seen:
