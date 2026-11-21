@@ -10,6 +10,7 @@ flowchart LR
 
 ## Now
 - Akshat: picking product direction (proposal: launch-weekend war-room agent)
+- Jonas: data watcher agent: polls the portal, keeps every file version, LLM analysis of each change, notifiers (`src/ask_soony/`)
 
 ## Next
 - Pick the product direction (one problem, go deep)
