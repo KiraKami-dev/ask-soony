@@ -1,0 +1,112 @@
+<task-notification>
+<task-id>bhb2ijk3d</task-id>
+<tool-use-id>toolu_01UdMAUck2KPTcXRgnk2wCrz</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/bhb2ijk3d.output</output-file>
+<status>completed</status>
+<summary>Background command "Wait for Boise reply to template mail" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+what is erp vs sap?
+
+---
+
+How does open_shipments_tracker_v37_FINAL_final2.xlsx compare to open_shipments.csv?
+
+---
+
+But doesn't the slide say SAP is only in two steps?   [Image #5]
+
+---
+
+We used up the IT question slot. My notes on that "
+
+<pasted_content id="1dc7">
+Technician type stuff manually in sap (what they get)
+Technician more trust in own system
+Can trust different suppliers differently?
+Most problems come from humans (put wrong stuff, put wrong address, eliminate human errors)
+Want not only help but also further time
+Tech type in data manually into database. Mostly from internal or forwarded
+Have to input all data by hand
+Wrong information months later
+Data scattered and bad quality
+Human errors inconsistent data, data missing
+If system unsure or big one then would like to know it but generally rely on it
+If SAP is single source of truth that would be great.
+Unclear processes. Different people have different preferred ways. No overall structured.
+File in portal is SAP export
+Don’t want to use spreadsheets and random PDFs flying around besides SAP
+Integration (bidirectional) with SAP would be good
+They want to fully trust their data
+</pasted_content id="1dc7">
+
+" so we can't ask again. Can we somehow resolve this?
+
+---
+
+This is the transcript also. But it was load so there is maybe sth else in there /Users/jonasstenglein/Downloads/Interview\ Lio\ IT\ transcript.txt . And if needed from the senior buyer from my notes "
+
+<pasted_content id="1dc7">
+Tell before supplier that it does not arrive
+Packaging in Hamburg is most important
+Otherwise won’t use
+Status of packages could be useful
+Not arriving is the issue.
+
+Human should have options to intervene at every step (at any point wants to be able to decide)
+Needs to gain trust first
+
+If way more expensive, get higher level involved. Higher input / escalate if impact on game output. E.g. when switching suppliers
+
+Approvals / signatures. Eg approval limit (hierarchy, but don’t need this)
+
+Ship game as main goal. Could also call sth if critical. So maybe bypass if critical
+
+Flip switch for autonomy. Should be able to run autonomously
+
+Get notification BEFORE sth gets wrong
+
+Fix problems in data. We’re founder and don’t know what is wrong. But solution should generalize.
+
+Prefer sth more focused
+
+Build product (have a product sense)
+
+We’re founder. Close this customer. 
+
+Find main problems in data (also are big ones). Product should be generalizable
+</pasted_content id="1dc7">
+
+" and (again not good quality) transcript): /Users/jonasstenglein/Downloads/First\ interview\ Lio\ Senior\ Buyer\ transcript.txt
+
+---
+
+Yeah, do this. Then do you want to sketch a product / ui. or first a demo? Are we right we want to compare original SAP entries then with receipts (extract from pdf) and later the received scanned ones? And update in between (maybe not looking at shipping for now)?
+
+---
+
+Could we give people an automated call if sth is critical wrong that threatens the launch? What services are there for this?
+
+---
+
+Can you ask the supplier (respond) what the location of the package is / if there is a shipping link (maybe to the first thread where they confirmed the shipping)?
+
+---
+
+can you also ask it for the second thread maybe (also confirmed shipping) and ask if the format works?
+
+---
+
+<task-notification>
+<task-id>bbps9welz</task-id>
+<tool-use-id>toolu_01Azrtd7NUqfHcKBoUYquGsH</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/bbps9welz.output</output-file>
+<status>completed</status>
+<summary>Background command "Wait for Boise tracking reply" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+Basically (idk if we just do it in another granch or open that for merge or drop) we next want for me to build the call for notification part. Can we tackle this? Also summary from our sync: /Users/jonasstenglein/Downloads/Recording\ update-explanation-sync\ \(clean\).md

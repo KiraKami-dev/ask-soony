@@ -1,0 +1,151 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M7ZX6TTC2H10K9JZ9CDDFKHY",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-21T20:37:01.915746Z",
+  "branch": "jonas/alerts",
+  "checkpoints_count": 12,
+  "files_touched": [
+    "src/ask_soony/alerts.py",
+    "src/ask_soony/escalation.py",
+    "tests/test_alerts.py"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "c4074e42ab6e",
+  "checkpoint_transcript_start": 3319,
+  "transcript_lines_at_start": 3319,
+  "compact_transcript_start": 319,
+  "token_usage": {
+    "input_tokens": 104,
+    "cache_creation_tokens": 716067,
+    "cache_read_tokens": 28195664,
+    "output_tokens": 55619,
+    "api_call_count": 43,
+    "subagent_tokens": {
+      "input_tokens": 10,
+      "cache_creation_tokens": 82332,
+      "cache_read_tokens": 159615,
+      "output_tokens": 7985,
+      "api_call_count": 5
+    },
+    "subagent_tokens_complete": true
+  },
+  "session_token_usage": {
+    "input_tokens": 657,
+    "cache_creation_tokens": 1293593,
+    "cache_read_tokens": 121285339,
+    "output_tokens": 300572,
+    "api_call_count": 275,
+    "subagent_tokens": {
+      "input_tokens": 72,
+      "cache_creation_tokens": 249132,
+      "cache_read_tokens": 3002126,
+      "output_tokens": 29834,
+      "api_call_count": 35
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 754,
+    "layers": {
+      "betterleaks": 26,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 23,
+      "credentialed_uri": 0,
+      "entropy": 92,
+      "goredact": 0,
+      "key_context": 0,
+      "pii": 617,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 546,
+      "IP": 24,
+      "PHONE": 47
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 71
+  },
+  "summary": {
+    "intent": "Support a hackathon team building an early-warning/verifier product in front of SAP for a fictional customer (Soony): analyze supplier data and interview transcripts, query the supplier about shipment status, and build an automated phone-call/escalation alert feature for launch-critical issues.",
+    "outcome": "Clarified ERP vs SAP and the data contradictions using interview notes, merged interview findings into the team doc, confirmed a three-way-match product direction, got consistent shipment replies from Boise in both threads, and built the alerts feature (alerts.py, escalation.py, dashboard Alerts page, Twilio/ElevenLabs webhooks, CLI, tests) committed on a new alerts branch.",
+    "learnings": {
+      "repo": [
+        "Project is ask-soony (src/ask_soony/); supplier mails are saved to data/inbox/mail-N.eml and shown on the dashboard under 'Supplier mail'.",
+        "data/notes/ is gitignored and used for local interview syntheses.",
+        "Lint config exempts long SQL lines in store.py and now alerts.py from the line-length rule.",
+        "Alert feature is layered: alerts.py (criticality, channels: dry run, email, Twilio, ElevenLabs), escalation.py (chain with timeout), dashboard Alerts page with decision buttons, webhooks for Twilio/ElevenLabs, CLI `ask-soony alert raise/list/decide/tick`, and `serve` runs escalation every 30s.",
+        "Alert emails are opt-in; dry-run is the default channel.",
+        "Everything in erp/ is a SAP export, but only ordering and packing originate in a system; other data is typed into SAP by hand.",
+        "The ERP shipment list, Excel tracker and supplier mails disagree; neither list has quantities, so partial shipments are invisible."
+      ],
+      "code": [
+        {
+          "path": "src/ask_soony/escalation.py",
+          "finding": "After an escalation the alert status must be reset to 'notified'; otherwise the next timeout re-calls the same person instead of the next one in the chain."
+        }
+      ],
+      "workflow": [
+        "Background watcher commands (task-notifications) are useful for waiting on supplier replies without blocking.",
+        "A string-replace edit failed because the file had already been auto-reformatted; re-reading the current lines before patching fixed it.",
+        "Supplier in this simulation only remembers within one thread, so repeating context in each thread yields consistent answers.",
+        "Twilio trial accounts only call pre-verified numbers; prices/terms were not verified and should be checked before signing up."
+      ]
+    },
+    "friction": [
+      "Interview transcripts were fragmented and low quality, needing a merge step to be readable.",
+      "The slide's '2 of 7 steps have a system' contradicted the contents of the erp/ folder, and the IT question slot was already used up.",
+      "An edit to make email opt-in did not apply because of auto-formatting, requiring a second attempt.",
+      "Boise cannot provide a tracking link or airline name; only planned status is known, so real-time tracking isn't possible."
+    ],
+    "open_items": [
+      "Decide whether the alerts branch gets merged or kept separate (user was unsure).",
+      "Build a watcher parser for #SOONY-STATUS blocks and a per-line status dashboard (offered, not yet approved).",
+      "Write the demo script and UI sketch for the team doc, then build the single-screen UI.",
+      "Implement a 'Shipments' page comparing ERP, tracker and supplier status (proposed, not confirmed).",
+      "Someone must create a Twilio/ElevenLabs account and put credentials in .env for live calls; verify current prices and terms.",
+      "Add 'missing SHIPPED confirmation by planned departure' as a risk signal in the early-warning logic.",
+      "Add trust-per-supplier and configurable approval/escalation rules as product requirements.",
+      "Verifier-before-SAP comparison (order ↔ confirmation ↔ receipt/scan) is not implemented yet."
+    ]
+  }
+}
