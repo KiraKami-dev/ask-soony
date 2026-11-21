@@ -40,8 +40,25 @@ Prefer working, deployed and demoable over complete. Go deep on one problem.
 Entire records agent sessions as checkpoints and links them to commits.
 
 - Hooks for Claude Code (`.claude/settings.json`) and Codex (`.codex/hooks.json`) are committed; they do nothing if `entire` is not installed
-- To be tracked: install the Entire CLI, then run `entire enable` once in your clone; Codex users approve the hooks with `/hooks`
 - Checkpoints upload to this (private) repo on `git push`
+
+### Setup (once per clone)
+
+1. Install the CLI. macOS: `brew install --cask entireio/tap/entire`. Other systems: see https://docs.entire.io/cli/installation
+2. Check it runs: `entire --version`
+3. In your clone, install the git hooks (they link commits to checkpoints and upload them on push):
+
+   ```bash
+   entire enable --agent claude-code --local --telemetry=false
+   entire agent add codex    # only if you use Codex
+   ```
+
+   `--local` writes your choices to `.entire/settings.local.json`, so the shared `.entire/settings.json` stays unchanged. Drop `--telemetry=false` if you don't mind anonymous usage stats.
+4. Codex only: open `/hooks` inside Codex and approve the Entire hooks
+5. Verify: `entire status` should show `Enabled`, your agents, `Checkpoints sync to: origin` and `Secret scanners · betterleaks, goredact`
+6. If `entire enable` changed `.claude/settings.json` or `.codex/hooks.json`, check `git diff` before committing; the committed versions already work for everyone
+
+`entire doctor` diagnoses and fixes stuck sessions.
 - Shared redaction settings (PII, betterleaks, goredact) live in `.entire/settings.json`; personal settings go in `.entire/settings.local.json` (gitignored)
 - Redaction is best effort: never paste secrets into agent sessions
 
