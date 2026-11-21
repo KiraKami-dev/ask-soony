@@ -1,77 +1,77 @@
-# ask-soony
+# ask-soony: the system says fine, the paper says otherwise
 
-Our entry for the **Lio challenge "Keep the Line Running"** at START Hack Munich 2026.
+Our entry for the **Lio challenge "Keep the Line Running"** (START Hack Munich 2026).
 
-Soony, a (fictional) games publisher, launches Grand Heist 6 on **Sunday 22 Nov, 20:00**. Every copy is packed in one distribution center in Hamburg, six suppliers deliver the parts, and the last 20% is not packed yet. Soony's data lives in SAP, spreadsheets, PDFs and scans, in four languages. Soony's head of procurement: "We find out at the dock."
+Soony launches Grand Heist 6 on **Sunday 20:00**. Its launch plan says every part is **ok**. We read every delivery note, confirmation, inspection report and contract, scans and four languages included, and checked the system against the paper. On the same data:
 
-We build agents that read that data, decide what is at risk and act on it before it is too late.
+| | Launch plan | Paper trail |
+|---|---|---|
+| Standard Edition | ok | **32,000 copies at risk**: only 6,000 clear cases in stock, while 350,000 sit uncollected at the Hamburg port |
+| Collector's Edition | ok | **5,900 at risk**: SAP booked 80,000 art books, and the delivery note says 8,000 (handwritten correction) |
+| Game cards | ok | **6,800 short**: only 28,000 of 48,000 flew |
+| If everyone acts in time | | **only the 6,800 game cards remain at risk** |
 
-## Status
+Every number comes with its evidence, a deadline ("order by Sat 22:16") and who has to act.
 
-Work in progress. The product direction is being decided; this README will describe it once it is fixed.
+## How it works
 
-## Getting started
-
-1. Clone the repo and install [uv](https://docs.astral.sh/uv/), then `uv sync --group dev`
-2. Create your `.env` from the template: `cp .env.example .env`. It is gitignored; never commit it or paste keys in chat.
-3. Put the keys into `.env`:
-
-   | Variable | Where to get it | Needed for |
-   |---|---|---|
-   | `SOONY_PORTAL_TOKEN` | Portal → Settings → API token | Everything (download, poll, watch) |
-   | `ANTHROPIC_API_KEY` | [Claude Console](https://console.anthropic.com/) → API keys | `analyze` and `watch` with the default Claude backend |
-   | `ASK_LLM_PROVIDER` + `ASK_LLM_API_KEY` | OpenAI key, or empty for a local llama.cpp server | Only if you use another backend (see below) |
-
-   `SOONY_PORTAL_URL` is already filled in by the template.
-4. Set up Entire so your agent sessions are tracked: see [AGENTS.md](AGENTS.md#entire-session-tracking)
-
-### Download the portal data once
-
-Needs only `SOONY_PORTAL_TOKEN`, no LLM key:
-
-```bash
-uv run ask-soony download              # all current files into data/portal/, under their portal paths
-uv run ask-soony download some/folder  # or into another folder
+```
+portal data ──► linker ──► image recognizer ──► impact ──► act
+(SAP, Excel,    connect     read every scan     what's      decision cards:
+ PDFs, scans)   the records and PDF with Claude really      who, what, by when
+                and find    (claims + verdict)  missing,
+                the gaps                        by when
 ```
 
-Run it again any time to bring the folder up to date: only new or changed files are fetched (the first run uses `archive.zip`). Files removed from the portal stay in the folder. Every version also lands in the version store (`data/store/`, see below). All of `data/` is gitignored: the data is confidential.
+1. **Linker** (`verifier/linker/`): connects every record about the same order, delivery or lot (PO → confirmation → shipment → delivery note → receipt → stock → inspection), and lists what doesn't fit.
+2. **Image recognizer** (`verifier/image_recognizer/`): Claude reads each document once and records what's on the paper, including handwriting, crossed-out values and stamps.
+3. **Impact** (`verifier/impact/`):
+   - **Usable stock:** book stock minus everything the evidence says isn't real or usable.
+   - **Gap:** usable stock against what's still to pack, from the BOM.
+   - **Run-out time:** when each part runs out at the packing rate.
+4. **Act** (`verifier/act/`): one decision card per cause, with *system says* vs *paper says*, the options, the decision needed, and a ready message to the right person. People and roles are read from the org chart and the approval policy. A person decides; nothing is sent on its own.
 
-## Data watcher (`src/ask_soony`)
-
-A fixed loop polls the portal, keeps every file version and lets an LLM agent analyse each change.
-
-1. **Poll** `GET /api/v1/files` and compare SHA-256 checksums. New or replaced files are downloaded (the first sync uses `archive.zip`) and stored by checksum under `data/store/blobs/`; nothing is overwritten.
-2. **Log** every version, poll, analysis and finding in SQLite (`data/store/ask-soony.db`), so each finding points at the exact file version behind it.
-3. **Analyse** each new or changed file with an agent. It reads the file (text, or page images for scans and photos), cross-checks other files with tools (`list_files`, `read_file`, `search_files`, `list_open_findings`) and submits a summary plus findings with evidence. Scans get a transcription that later searches can use.
-4. **Notify** through console, macOS notifications, a Discord webhook or a generic JSON webhook.
-
-The first poll stores the current state as a baseline without analysing it; only later changes are analysed. `analyze --path <prefix>` queues existing files on purpose.
+## Run it
 
 ```bash
-uv run ask-soony download       # one-off: fetch everything into data/portal/ (no LLM needed)
-uv run ask-soony poll           # one poll; the first one stores the baseline
-uv run ask-soony analyze --path suppliers/SUP-0028_Karton_Nowak/notices/   # analyse chosen files
-uv run ask-soony watch          # poll, analyse and notify every ASK_INTERVAL_SECONDS
-uv run ask-soony findings       # open findings
-uv run ask-soony status
-uv run pytest
+uv sync --group dev
+cp .env.example .env                    # put SOONY_PORTAL_TOKEN in it (portal → Settings)
+uv run ask-soony download               # fetch the portal data into data/portal/
 ```
 
-LLM backends (`ASK_LLM_PROVIDER`): `anthropic` (Claude via the Anthropic SDK, default `claude-opus-5-5`), `openai` (OpenAI), `llamacpp` (any OpenAI-compatible server, e.g. `llama-server --jinja` with `ASK_LLM_BASE_URL=http://localhost:8080/v1`), `none` (poll and store only). Local models need vision support for scans.
+| Step | Command | Output |
+|---|---|---|
+| Read the documents (Claude, via the Agent SDK) | `uv run python -m verifier.image_recognizer` | `data/store/image_recognizer/` (resumable, one read per file version) |
+| Link and check | `uv run python -m verifier.linker build` | Issues, live ones first, soonest first |
+| Follow one order | `uv run python -m verifier.linker trace 4500318768` | The whole chain of that PO, with its issues |
+| What's really missing | `uv run python -m verifier.impact` | Need, book stock, usable, gap per part |
+| Decision cards | `uv run python -m verifier.act && open data/store/decision_cards.html` | The page, plus `decision_cards.json` for other agents |
+| Tests | `uv run pytest` | 127 tests on made-up data |
 
-## Data
+**The image recognizer uses your Claude Code login.** No API key is needed. Its results are cached by checksum, so the other steps run without any model calls.
 
-All customer data comes from the Soony portal at runtime (`GET /api/v1/files`, `/api/v1/archive.zip`). It is confidential: use it only for this hackathon, never share it outside the team and never commit it (`data/` is gitignored).
+## What makes it hold up
 
-## Hand-in (Sun 12:00)
+- **Nothing hardcoded:**
+  - Files are recognised by their columns or tables, so a new drop needs no code change.
+  - Supplier names, part mappings, role holders and lead times are all read from the data.
+- **Contradictions are shown, not resolved silently:**
+  - When two sources disagree, both versions are kept and the difference is named.
+  - Link certainty is labelled: `exact` vs `po_level`.
+- **Reader mistakes are fixed in code:** for example "19.000" is 19,000, and signatures aren't treated as corrections. The raw text is always kept as evidence.
+- **Deterministic:** "now" is the time of the newest stock figures, so the same data always gives the same answer.
+- **A human decides:** the system recommends and drafts; concessions and allocations go to the role the policy names.
 
-- [ ] Working prototype, deployed
-- [ ] Pitch deck
-- [ ] Demo video, max 3 minutes
-- [ ] This repo with a short README (how to run, what it does)
+## More
 
-Live demo from Sun 14:00: 3 minutes of pitch, 2 minutes of questions.
+| Topic | Where |
+|---|---|
+| Verifier design: evidence rules, routing, linking keys | [verifier/README.md](verifier/README.md) |
+| Linker build order and principles | [verifier/linker/linker_strategy.md](verifier/linker/linker_strategy.md) |
+| What the document reading found | [verifier/image_recognizer/findings.md](verifier/image_recognizer/findings.md) |
+| Hand-off for sending messages | [verifier/act/HANDOFF.md](verifier/act/HANDOFF.md) |
+| Product strategy | [strategy.md](strategy.md) |
+| Data watcher (polls the portal, keeps every version) | [docs/INSTRUCTIONS.md](docs/INSTRUCTIONS.md#data-watcher-srcask_soony) |
+| Team setup and conventions | [docs/INSTRUCTIONS.md](docs/INSTRUCTIONS.md), [AGENTS.md](AGENTS.md) |
 
-## For coding agents
-
-Read [AGENTS.md](AGENTS.md) first.
+Soony and all its data are fictional, from the challenge. The data is used only for this hackathon.
