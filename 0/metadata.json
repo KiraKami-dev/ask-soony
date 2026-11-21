@@ -1,0 +1,146 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M7ZENXAAHBKANEF0009MJTE7",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-21T16:23:10.038639Z",
+  "branch": "main",
+  "checkpoints_count": 8,
+  "save_step_count": 1,
+  "files_touched": [
+    "README.md",
+    "src/ask_soony/dashboard.py"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "881adb639c0a",
+  "compact_transcript_start": 0,
+  "session_token_usage": {
+    "input_tokens": 465,
+    "cache_creation_tokens": 535947,
+    "cache_read_tokens": 71359048,
+    "output_tokens": 207606,
+    "api_call_count": 196,
+    "subagent_tokens": {
+      "input_tokens": 62,
+      "cache_creation_tokens": 166800,
+      "cache_read_tokens": 2842511,
+      "output_tokens": 21849,
+      "api_call_count": 30
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 603,
+    "layers": {
+      "betterleaks": 20,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 23,
+      "credentialed_uri": 0,
+      "entropy": 65,
+      "goredact": 0,
+      "key_context": 0,
+      "pii": 499,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 471,
+      "IP": 24,
+      "PHONE": 4
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 49
+  },
+  "summary": {
+    "intent": "Win the Lio 'Keep the Line Running' hackathon challenge: analyze Soony's confidential launch data, find hidden risks, and build a general agent product (poller, versioned store, LLM analysis, supplier email, dashboard) that acts on new data drops.",
+    "outcome": "Found that the launch plan hides real gaps (art books, statues, game cards, card cases, sleeve revision). Built and pushed a portal watcher with a one-off download command. Set up Gmail SMTP/IMAP and resolved the Boise delivery-terms thread by email. Built change-summary versioning and a password-protected dashboard served through a Cloudflare tunnel. Committed locally, not yet pushed.",
+    "learnings": {
+      "repo": [
+        "The portal API has only three endpoints (files list, single file, archive.zip), with no webhooks. Files are replaced under the same name, so change detection has to compare SHA-256 checksums.",
+        "The team workflow (CLAUDE.md, AGENTS.md, PROGRESS.md) is to claim work in the 'Now' section of PROGRESS.md, `git pull --rebase`, and push straight to main, with no branches or PRs. PROGRESS.md is the usual conflict point.",
+        "Confidential portal data, scans, inbox/outbox, findings notes and .env are all in gitignored paths (data/, .env). Only code, tests, README and .env.example are committed.",
+        "Versioned store keeps files by checksum under data/store/blobs, which is unreadable for browsing; `ask-soony download` mirrors current files under their original paths (default data/portal/) with path-traversal checks.",
+        "The Entire hook only creates a checkpoint when repo files change, and it pushes checkpoints on git push. Commits may need extra hook timeout.",
+        "Suppliers share one inbound mail domain (suppliers.juliansibbing.de) and appear automated. They reply in about 3-4 minutes, in-thread via In-Reply-To, and only to senders registered in portal Settings.",
+        "dashboard.py and store.py are exempt from the linter's line-length rule because of long inline HTML/CSS strings.",
+        "Change summaries are deterministic: CSV row/column diffs with rename detection on shared rows only, Excel cell diffs, and text line diffs. They need no LLM key."
+      ],
+      "code": [
+        {
+          "path": "src/ask_soony/changes.py",
+          "finding": "Column rename detection must only compare values on rows present in both versions, otherwise added rows make column lengths differ and detection fails."
+        },
+        {
+          "path": "src/ask_soony/dashboard.py",
+          "finding": "Dashboard is protected by a password from .env, since it exposes confidential data, and is served by `ask-soony serve` behind a Cloudflare tunnel."
+        }
+      ],
+      "workflow": [
+        "Checking the Entire logs showed the hooks had fired but skipped checkpointing because no files were modified.",
+        "A subagent cross-checking 200 order confirmations and 59 scans against SAP surfaced the key discrepancies (overbooked art books, failed statue lot, sleeve revision) faster than reading them serially.",
+        "Cloudflare Email Routing receiving needs Cloudflare-controlled MX. A subdomain (agents.stenglein.dev) can be routed alongside a root domain on Private Email, but sending needs Workers Paid; a fresh Gmail account with an app password was the fast fallback.",
+        "The hackathon network blocks QUIC (UDP), so cloudflared tunnels must run over HTTP/2.",
+        "The agent asks before pushing or sending outward-facing mail, and keeps secrets (passwords, tokens) out of output and docs."
+      ]
+    },
+    "friction": [
+      "The portal token was empty at first, which blocked data access until the user supplied it.",
+      "The Cloudflare route needed Workers Paid ($5/month), and Email Sending returned 401 without it; the user chose Gmail instead.",
+      "The user's main domain mail is hosted at Private Email, which ruled out Email Routing on it and led to repeated rethinking of the mail setup.",
+      "The PROGRESS.md rebase conflict with a teammate's line had to be resolved by hand.",
+      "QUIC being blocked on the hackathon Wi-Fi broke the first tunnel start.",
+      "The first change-summary rename-detection test failed when rows had been added.",
+      "Portal data kept changing (new drops at 14:37 and 16:57), so the earlier briefing page and doc went stale.",
+      "Supplier reply timing and whether replies are automated were unclear until the first Boise response."
+    ],
+    "open_items": [
+      "Send the Karton Nowak order for 8,000 art books (offer valid about 24h, 16,800 EUR). Awaiting user go-ahead.",
+      "Analyze the 16:57 drop with the LLM agent, which needs an ANTHROPIC_API_KEY in .env.",
+      "Build the mail outbox with approval, the IMAP inbox with reply matching and the supplier allowlist into the watcher; currently done through ad-hoc scripts.",
+      "Push the latest commits (change summaries and dashboard) after pull --rebase.",
+      "Update the briefing page and Claude doc to the 14:37 and 16:57 states, and decide whether to delete the older doc.",
+      "Decide the deploy target (ada vs Mac vs Cloudflare); the dashboard currently runs on the Mac via tmux and a tunnel, not on ada.",
+      "Register or confirm the sender address in the portal, and decide on removing the agents.stenglein.dev Email Routing subdomain setup.",
+      "Soony-internal fixes to raise: correct DDP to EXW on open Boise POs in SAP, the statue lot sorting sign-off, and the card case pickup at the Hamburg terminal.",
+      "Await Boise's flight details and freight costs; also ask the Lio engineers whether portal data is the same for every team and whether supplier replies create portal files.",
+      "Consider changing the portal password that was shared in Discord after the hack."
+    ]
+  }
+}

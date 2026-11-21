@@ -1,0 +1,59 @@
+Which branch?
+
+---
+
+I added the .env with app password. can you check if it works (has blank spaces)
+
+---
+
+1. done. can you send a mail to "Boise Semiconductor Inc" do we have mail? To ask for /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/data/drops/1437/OA26144214_4500318769.pdf if there are lists of correct addresses, correct it and maybe if there is any db or resource we can see correct values?
+
+---
+
+Are you sure it is the right one? or am I wrong with sth? as no response? are the responses automated or by hand by them?
+
+---
+
+<task-notification>
+<task-id>bk1qlqaop</task-id>
+<tool-use-id>toolu_01F6nd2izY7gMRmis3fBZRSd</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/bk1qlqaop.output</output-file>
+<status>completed</status>
+<summary>Background command "Wait up to 10 min for Boise reply via IMAP" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+Ok, now the reply is in, can you try sorting this out? and then check what this means for us?
+
+---
+
+<task-notification>
+<task-id>bgqn4vp6i</task-id>
+<tool-use-id>toolu_013NhVx5ptcEGJQ3WVTdgkMV</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/bgqn4vp6i.output</output-file>
+<status>completed</status>
+<summary>Background command "Wait for next supplier reply in background" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+Can you set up a dashboard (maybe via ada and tunnel through cloudflare) and rerun every x minutes. and maybe version the file changes and for each one say what changed?
+
+---
+
+"One thing to keep in mind with ada: the confidential portal data and the portal token will then live on a university machine. If that's fine for you, I'll go ahead. First I'll check what ada offers:" I mean or on cloudflare. But idk if that is worth it
+
+---
+
+Can you send another mail outside the thread and check if they remember the previous conversation? but it has to be a proper mail cause their ai can block us if it gets annoyed. Maybe also ask if they would be willing to integrate some solution to update this automatically / outside mail or sth from the deck?
+
+---
+
+<task-notification>
+<task-id>bmi7cxtau</task-id>
+<tool-use-id>toolu_011APWsN85SZ68SoDmu5LBj9</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/bmi7cxtau.output</output-file>
+<status>completed</status>
+<summary>Background command "Wait for reply to the new-thread mail" completed (exit code 0)</summary>
+</task-notification>
