@@ -129,6 +129,19 @@ Action    { id, decision_id, channel: call|email|portal,
 - **Pitch and video** with the team: problem (with a quote from Maren or Felix), live demo, business slide.
 - **Done when:** the art books path runs end to end on the deployed URL, clicked by a person.
 
+### Gaps from the interviews (Felix, Nils, 2026-11-21)
+
+The plan fits both interviews. These six gaps are still open (owner in brackets):
+
+1. **Early warning in the demo (Lucas, Akshat).** Felix: "Your tool has to tell me *before the supplier does* that something will not arrive. Otherwise, I will not use it." Art books is caught after the dock. Add **#3 game cards** (shipping advice says 20,000 arrive 24 Nov, feed still "booked") as the second demo beat: the catch before arrival.
+2. **Approvals: keep them light (Jonas).** Felix: approval chains are "not the priority" this weekend; waiting on approvers stalls the launch. Name one approver from PP-07 / org chart and stop. No chain engine.
+3. **Wrong receipts are reclaimed, never edited (Farhan, Jonas).** Nils: a wrong receipt is reclaimed and goes to Finance. We never write corrections into SAP or supplier documents; "Reclaim via Finance" is a standard action option. Bi-directional SAP sync is roadmap.
+4. **Supplier replies update our state, in the same thread (Jonas).** Emails don't change the portal data, so every reply becomes a Claim (source: email) in `data/state/`. Always reply in the same thread: a new email resets the supplier's memory.
+5. **Show both modes in the demo (Jonas, Akshat).** Felix's demo tip: one action stops for a human click, then one runs autonomously after "Allow always".
+6. **Second business case: manual receipt entry (pitch).** Nils types every receipt into SAP by hand and finds errors "weeks or months later". Our claim extraction already does that reading: "saves IT hours per order", with automatic SAP entry as roadmap.
+
+Pitch lines: Felix's "before the supplier does" for the problem, Nils's "If I can fully trust my data, I will sleep a lot better" for what we built. Still missing: Maren's cost per missing Collector's copy for the business slide.
+
 ## 6. Timeline
 
 | When | Milestone | Check |
