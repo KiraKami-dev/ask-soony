@@ -1,0 +1,82 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "fee5dc916164",
+  "session_id": "e4460761-a976-4c7a-9815-c68d6fdbc5a5",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-21T23:21:27.684508Z",
+  "branch": "integration/verifier",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "verifier/image_recognizer/__main__.py"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "7a0d0598bc66",
+  "compact_transcript_start": 0,
+  "session_token_usage": {
+    "input_tokens": 226,
+    "cache_creation_tokens": 227079,
+    "cache_read_tokens": 14721546,
+    "output_tokens": 52530,
+    "api_call_count": 95
+  },
+  "redaction": {
+    "replacements": 28,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 14,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "goredact": 0,
+      "key_context": 0,
+      "pii": 14,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 12,
+      "IP": 0,
+      "PHONE": 2
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_014nxMDRCzXAWBH9cCozYBBh",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "7a0d0598bc66",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 269,
+        "end": 270,
+        "entry_ids": [
+          "44050684-0b91-45c3-bbb8-4270b5d8bfb3"
+        ],
+        "tool_use_id": "toolu_014nxMDRCzXAWBH9cCozYBBh"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_014nxMDRCzXAWBH9cCozYBBh"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 1
+  }
+}
