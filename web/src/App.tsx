@@ -112,7 +112,7 @@ function CardRow({
 export default function App() {
   const { data: state, setData: setState, error } = usePoll<State>(getState);
   const { data: feed } = usePoll<FeedEvent[]>(getFeed);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(new URLSearchParams(location.search).get("card"));
   const [offset, setOffset] = useState(0);
 
   useEffect(() => {

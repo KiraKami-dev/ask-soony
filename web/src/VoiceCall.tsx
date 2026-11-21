@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { enableAlerts, pushSupported, registerServiceWorker, sendTestAlert } from "./push";
 import type { ActionKind, Card } from "./types";
 
 // Voice conversation about one card with OpenAI gpt-realtime over WebRTC. The server mints a
@@ -26,6 +27,13 @@ export default function VoiceCall({
   const pc = useRef<RTCPeerConnection | null>(null);
   const started = useRef(false);
   const add = (l: Line) => setLines((prev) => [...prev, l].slice(-12));
+  const [info, setInfo] = useState("");
+  // Opened from a push notification: show the card as an incoming call.
+  const params = new URLSearchParams(location.search);
+  const [ringing, setRinging] = useState(params.get("talk") === "1" && params.get("card") === card.id);
+  useEffect(() => {
+    void registerServiceWorker();
+  }, []);
 
   function hangUp() {
     pc.current?.getSenders().forEach((s) => s.track?.stop());
@@ -104,6 +112,35 @@ export default function VoiceCall({
   if (autoStart && !started.current) void start();
 
   const live = status === "connecting" || status === "live";
+  if (ringing && !live) {
+    return (
+      <div className="rounded-lg border-2 border-danger bg-danger/5 p-4 text-center">
+        <div className="text-xs font-semibold uppercase tracking-wide text-danger">Incoming launch alert</div>
+        <div className="mt-1 text-base font-semibold">{card.title}</div>
+        <div className="mt-4 flex justify-center gap-3">
+          <button
+            className="rounded-full bg-emerald-600 px-6 py-3 text-base font-semibold text-white"
+            onClick={() => {
+              setRinging(false);
+              history.replaceState(null, "", `/?card=${encodeURIComponent(card.id)}`);
+              void start();
+            }}
+          >
+            Answer
+          </button>
+          <button
+            className="rounded-full border border-slate-300 px-6 py-3 text-base"
+            onClick={() => {
+              setRinging(false);
+              history.replaceState(null, "", `/?card=${encodeURIComponent(card.id)}`);
+            }}
+          >
+            Later
+          </button>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="rounded-md border border-slate-200 p-3">
       <div className="flex flex-wrap items-center gap-3">
@@ -116,7 +153,18 @@ export default function VoiceCall({
             Hang up
           </button>
         )}
+        {pushSupported() && !live && (
+          <>
+            <button className="rounded-md border border-slate-300 px-3 py-1.5 text-sm" onClick={async () => setInfo(await enableAlerts())}>
+              Enable call alerts on this device
+            </button>
+            <button className="rounded-md border border-slate-300 px-3 py-1.5 text-sm" onClick={async () => setInfo(await sendTestAlert(card.id))}>
+              Send test alert
+            </button>
+          </>
+        )}
         <span className="text-xs text-slate-500">
+          {info && <span className="mr-2">{info}</span>}
           {status === "connecting" && "Connecting…"}
           {status === "live" && "Live: speak normally, decide with approve, escalate or reject"}
           {status === "ended" && "Call ended"}
