@@ -23,6 +23,7 @@ from ask_soony.store import Store
 
 # Folders whose files are events rather than master or transactional data.
 EVENT_FOLDERS = {"news", "notices", "events", "alerts"}
+PREDICTOR_FOLDERS = EVENT_FOLDERS | {"logistics", "shipments"}
 # Folders that describe the supply network. Small tabular files only, so the context stays tight.
 CONTEXT_FOLDERS = {"master", "erp", "logistics"}
 CONTEXT_SUFFIXES = {".csv", ".json", ".xlsx"}
@@ -136,6 +137,10 @@ def is_event_path(path: str) -> bool:
     return any(part.lower() in EVENT_FOLDERS for part in Path(path).parts[:-1])
 
 
+def is_predictor_path(path: str) -> bool:
+    return any(part.lower() in PREDICTOR_FOLDERS for part in Path(path).parts[:-1])
+
+
 def _is_context_path(path: str) -> bool:
     p = Path(path)
     if p.suffix.lower() not in CONTEXT_SUFFIXES:
@@ -179,6 +184,26 @@ class ImpactAgent:
                 for i, item in enumerate(items):
                     eid = str(item.get("id") or f"{path}#{i}")
                     events.append(Event(eid, path, json.dumps(item, ensure_ascii=False)))
+            elif text.strip():
+                events.append(Event(path, path, text[:MAX_EVENT_CHARS]))
+        return events
+
+    def events_for_paths(self, paths: list[str]) -> list[Event]:
+        """Turn exactly the changed event or logistics files into predictor inputs."""
+        events = []
+        for path in paths:
+            if path not in self.store.current() or not is_predictor_path(path):
+                continue
+            text = self._text(path)
+            if is_event_path(path):
+                items = _json_items(text)
+                if items:
+                    events.extend(
+                        Event(str(item.get("id") or f"{path}#{i}"), path, json.dumps(item))
+                        for i, item in enumerate(items)
+                    )
+                elif text.strip():
+                    events.append(Event(path, path, text[:MAX_EVENT_CHARS]))
             elif text.strip():
                 events.append(Event(path, path, text[:MAX_EVENT_CHARS]))
         return events

@@ -30,6 +30,7 @@ flowchart LR
 ## Blockers
 - Art books: Nowak rush order must go out tonight to reach the Collector's cell before it runs out (~12:30 Sun) — needs a human decision, plan.md §3
 - Cases: 6,000 in stock vs 38,000 needed for Sunday; 350,000 waiting at CTA Hamburg
+- Predictor needs a launch-date guard: its PackRight notice reading correctly records `effective_from: 2026-12-01` but incorrectly labels it a 22 Nov launch risk; dispatch does not yet turn predictor output into a notify/email/call decision
 
 ## Decisions
 - Coordinate through this file, not a board: zero setup, and agents follow it via AGENTS.md

@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from ask_soony.predictor import ImpactAgent, is_event_path
+from ask_soony.predictor import ImpactAgent, is_predictor_path
 from ask_soony.verifier.act.cards import build_cards
 from ask_soony.verifier.act.render import render, to_json
 from ask_soony.verifier.impact.shortfall import compute
@@ -18,13 +18,9 @@ class Routes:
 
 def routes_for(paths: list[str]) -> Routes:
     """Verification checks every changed datum; prediction only gets event/logistics changes."""
-    parts = [set(Path(path).parts[:-1]) for path in paths]
     return Routes(
         verifier=bool(paths),
-        predictor=any(
-            is_event_path(path) or {"logistics", "shipments"} & item
-            for path, item in zip(paths, parts)
-        ),
+        predictor=any(is_predictor_path(path) for path in paths),
     )
 
 
@@ -38,7 +34,7 @@ def refresh(
     """Refresh the affected systems and leave approval-gated action cards for the UI."""
     routes = routes_for(paths)
     if routes.predictor and predictor:
-        predictor.run(predictor.events_from_portal(), force=False)
+        predictor.run(predictor.events_for_paths(paths), force=True)
     if routes.verifier:
         graph = build(root, readings)
         result = compute(graph.records, graph.issues)

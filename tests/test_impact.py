@@ -1,9 +1,16 @@
-from ask_soony.predictor import _is_context_path, _json_items, _unknown_ids, is_event_path
+from ask_soony.predictor import (
+    _is_context_path,
+    _json_items,
+    _unknown_ids,
+    is_event_path,
+    is_predictor_path,
+)
 
 
 def test_event_and_context_paths():
     assert is_event_path("soony/news/feed.json")
     assert is_event_path("suppliers/SUP-1/notices/x.pdf")
+    assert is_predictor_path("soony/logistics/open_shipments.csv")
     assert not is_event_path("soony/master/bom.csv")
     assert _is_context_path("soony/master/bom.csv")
     assert _is_context_path("suppliers/SUP-1/components.csv")
