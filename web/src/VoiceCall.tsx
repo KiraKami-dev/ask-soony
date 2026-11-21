@@ -76,6 +76,8 @@ export default function VoiceCall({
 
       const dc = peer.createDataChannel("oai-events");
       let decided = false;
+      let closing = false;
+      let fallback: ReturnType<typeof setTimeout> | undefined;
       dc.onopen = () => {
         setStatus("live");
         dc.send(JSON.stringify({ type: "response.create" })); // assistant speaks first
@@ -132,8 +134,13 @@ export default function VoiceCall({
               }));
               dc.send(JSON.stringify({ type: "response.create" }));
             });
-        } else if (msg.type === "response.done" && decided) {
-          setTimeout(hangUp, 4000); // let the goodbye play out
+        } else if (msg.type === "response.done" && decided && !closing) {
+          // Hang up once the goodbye has finished playing, not on a fixed timer.
+          closing = true;
+          fallback = setTimeout(hangUp, 20000);
+        } else if (msg.type === "output_audio_buffer.stopped" && closing) {
+          clearTimeout(fallback);
+          setTimeout(hangUp, 800);
         } else if (msg.type === "error") {
           add({ who: "system", text: `Error: ${msg.error?.message ?? "unknown"}` });
         }
