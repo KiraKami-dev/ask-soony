@@ -6,7 +6,10 @@
 # Portal data: fetch it through the API, never commit it
 data/
 
-# Personal agent settings (shared ones in .claude/settings.json are committed)
+# Agent config is shared in this repo (overrides a global .claude ignore);
+# personal settings stay local
+!.claude/
+!.claude/**
 .claude/settings.local.json
 
 # Tooling
