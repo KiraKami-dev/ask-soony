@@ -63,8 +63,39 @@ Entire records agent sessions as checkpoints and links them to commits.
 - Shared redaction settings (PII, betterleaks, goredact) live in `.entire/settings.json`; personal settings go in `.entire/settings.local.json` (gitignored)
 - Redaction is best effort: never paste secrets into agent sessions
 
+## Entire Brain (shared team memory)
+
+Brain distills agent sessions into durable memories and syncs them across the team. Agents read `.entire/agent-guide.md` (linked from `AGENTS.md` and `CLAUDE.md`) for how to use it.
+
+### Setup (once per clone, after the Entire setup above)
+
+1. The CLI must be 0.11.6 or newer: `entire --version`. Upgrade with `brew upgrade --cask entire`. If an older `entire` sits earlier on your `PATH` (e.g. `~/.local/bin`), remove it
+2. Install the plugins:
+
+   ```bash
+   entire plugin install brain
+   entire plugin install graph
+   ```
+
+3. In your clone, build the brain and connect it to the team's hosted memory set:
+
+   ```bash
+   entire brain setup
+   entire brain connect
+   ```
+
+   `setup` also installs a background watcher that refreshes the brain every 5 minutes. It refuses to index a dirty working tree, so commit or stash first
+4. Restart your agents, as above
+5. Verify: `entire brain status` should show `Daemon | running` and `Brainstore | connected`
+6. If `entire brain setup` changed `AGENTS.md`, `CLAUDE.md` or `.claude/settings.json`, check `git diff`; the committed versions already work for everyone
+
 ## Conventions
 
 - Commit subjects in imperative mood, at most 50 characters; details as bullets in the body
 - One commit per topic
 - Keep secrets, tokens and personal data out of code, fixtures and commit messages
+
+<!-- entire-agent:begin -->
+Read .entire/agent-guide.md for this repository's workflow, source inspection, and verification guidance.
+@.entire/agent-guide.md
+<!-- entire-agent:end -->
