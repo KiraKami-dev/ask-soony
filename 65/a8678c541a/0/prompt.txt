@@ -1,0 +1,22 @@
+There is another branch about verification, which goal is to check for inconsistencies in the database different sources and formats. Would be possible to integrate it nicely and well organie and understandable and redable such that we have a system responsible for verification like three way matching, another system for verification of events, and another system that their output and acts on it? DO not change anything, just check if that would work.
+
+---
+
+does it mention somewhere that we cannot commit data to github?
+
+---
+
+ca you organize the system nicely into folders like verification, predictor, some name for the agent that takes action nicely organized in the repo? create  a plan for that
+
+---
+
+what are current open branches?
+
+---
+
+ok, i believe verifier i not merged to mai it but i would like to integarte it already with my branch and main to test it, and later easily merge to main
+
+---
+
+ok, i believe verifier i not merged to mai it but i would like to integarte it already
+  with my branch and main to test it, and later easily merge to main
