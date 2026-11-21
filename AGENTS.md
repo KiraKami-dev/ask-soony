@@ -11,7 +11,7 @@ Our entry for the Lio challenge "Keep the Line Running" at START Hack Munich 202
 - Still open at kickoff: 128,000 Standard Editions (4 parts each) and 25,200 numbered Collector's Editions (7 parts each)
 - Packing time left: Sat 06:00 to 22:00, Sun 06:00 to 20:00
 
-The product idea is not fixed yet. Check the README and recent commits for the current direction.
+The product direction and who owns which part are in [`plan.md`](plan.md): read it before you start work.
 
 **Read [`docs/challenge.md`](docs/challenge.md) before any substantive task.** It is the full challenge brief: the end goal, the one rule, judging criteria, deliverables and deadlines. It describes the problem only; solutions are the team's work and do not go in that file. Keep every change pointed at what it asks for.
 
@@ -44,6 +44,7 @@ Who is doing what lives in `PROGRESS.md` at the repo root. Humans and agents fol
 - **Before starting:** `git pull --rebase`, read `PROGRESS.md`, add or update your line under **Now** (`- <name>: <task>`), then commit and push that change right away so others see it
 - **Don't take work someone else is on.** If your task touches files another person's **Now** line covers, talk to them first
 - **While working:** small commits, one topic each; `git pull --rebase` before every `git push`; push at least every hour
+- **Status, even without code:** when your status changes, and at least every 2 hours, update your **Now** line with the time and what's next (`- <name> (HH:MM): <doing>, next: <next>`), then commit and push it. No code to push is no reason to stay silent
 - **When done:** move your line to **Done** with the date, note any decision under **Decisions** and any blocker under **Blockers**, then push
 - **Conflicts in `PROGRESS.md`:** keep both sides; edit only your own line
 - Agents: do the above on behalf of the person you work for, using their name
