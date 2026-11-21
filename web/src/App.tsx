@@ -361,13 +361,23 @@ export default function App() {
           <CardRow key={c.id} card={c} now={now} selected={detailCard?.id === c.id} onSelect={() => pickCard(c)} onAction={act} />
         ))}
         {handled.length > 0 && (
-          <details className="rounded-lg border border-slate-800 bg-slate-900 p-3">
-            <summary className="cursor-pointer text-sm text-slate-300">Handled automatically ({handled.length})</summary>
+          <details
+            className="rounded-lg border border-slate-800 bg-slate-900 p-3"
+            open={handled.some((c) => c.action_status?.status === "replied" || c.id === detailCard?.id)}
+          >
+            <summary className="cursor-pointer text-sm text-slate-300">Handled ({handled.length})</summary>
             <ul className="mt-2 space-y-1 text-sm">
               {handled.map((c) => (
-                <li key={c.id} className="flex justify-between gap-3">
-                  <span>{c.title}</span>
-                  <span className="shrink-0 text-slate-400">{c.human_decision?.action.replace("_", " ")}</span>
+                <li key={c.id}>
+                  <button
+                    className={`flex w-full justify-between gap-3 rounded px-1 text-left hover:bg-slate-800 ${detailCard?.id === c.id ? "bg-slate-800" : ""}`}
+                    onClick={() => pickCard(c)}
+                  >
+                    <span>{c.title}</span>
+                    <span className="shrink-0 text-slate-400">
+                      {c.action_status?.status === "replied" ? "replied" : c.human_decision?.action.replace("_", " ")}
+                    </span>
+                  </button>
                 </li>
               ))}
             </ul>
