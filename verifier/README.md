@@ -148,7 +148,7 @@ uv run python -m verifier.act      # decision cards → data/store/decision_card
   - **Run-out time** = usable stock ÷ (packing rate × parts per copy), walked through the shifts.
   - **Act-by time** = run-out time minus the lead time. The lead time is read from the document, e.g. "loaded within 4 h" plus "about 9 hours driving" gives 13 h.
 - **Each edition shows two numbers:** copies at risk **now**, and **if you act in time** (collect, order, concede).
-- **act/cards.py** makes one decision card per cause, with copies at risk, *system says* vs *paper says*, the options, the decision needed, and ready emails routed by the table above. Supplier addresses come from the profiles. Nothing is sent automatically: a person clicks *Email* (mailto) or *Copy text*. **For an email agent:** `data/store/decision_cards.json` lists every card with its messages (`to_email`, `subject`, `body`) and `act_by`. The sender address must be registered in the portal.
+- **act/cards.py** makes one decision card per cause, with copies at risk, *system says* vs *paper says*, the options, the decision needed, and ready emails routed by the table above. Supplier addresses come from the profiles. Nothing is sent automatically: a person clicks *Email* (mailto) or *Copy text*. **For an email agent** (owned by colleagues; see [act/HANDOFF.md](act/HANDOFF.md)): `data/store/decision_cards.json` lists every card with its messages (`to_email`, `subject`, `body`) and `act_by`. The sender address must be registered in the portal.
 
 ## Building blocks
 
