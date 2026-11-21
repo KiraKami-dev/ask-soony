@@ -93,7 +93,11 @@ def voice_session(card_id: str):
             "output": {"voice": os.environ.get("OPENAI_REALTIME_VOICE", "marin")},
             "input": {
                 "noise_reduction": {"type": "near_field"},
-                "transcription": {"model": "gpt-4o-mini-transcribe"},
+                "transcription": {
+                    "model": "gpt-4o-mini-transcribe",
+                    "language": "en",
+                    "prompt": "A buyer talking about a supply chain decision card.",
+                },
                 "turn_detection": {
                     "type": "server_vad",
                     "threshold": float(os.environ.get("OPENAI_VAD_THRESHOLD", "0.8")),
