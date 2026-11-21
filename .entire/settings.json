@@ -1,0 +1,15 @@
+{
+  "enabled": true,
+  "redaction": {
+    "pii": {
+      "enabled": true
+    },
+    "externalize_images": true,
+    "betterleaks": {
+      "enabled": true
+    },
+    "goredact": {
+      "enabled": true
+    }
+  }
+}
