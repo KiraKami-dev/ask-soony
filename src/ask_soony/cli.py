@@ -3,10 +3,12 @@
 import argparse
 import json
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
 from ask_soony.agent import Analyst
 from ask_soony.config import Settings
+from ask_soony.impact import Event, ImpactAgent, format_impact
 from ask_soony.llm import make_backend
 from ask_soony.notify import build_notifiers
 from ask_soony.portal import PortalClient
@@ -49,6 +51,11 @@ def main(argv: list[str] | None = None) -> int:
     p_f = sub.add_parser("findings", help="Print findings")
     p_f.add_argument("--all", action="store_true", help="Include resolved findings")
     p_f.add_argument("--json", action="store_true")
+    p_imp = sub.add_parser("impact", help="Trace news/notices to suppliers, parts, products")
+    p_imp.add_argument("--path", default="", help="Only events under this path prefix")
+    p_imp.add_argument("--text", help="Analyse this free-text event instead of portal files")
+    p_imp.add_argument("--force", action="store_true", help="Re-analyse events already done")
+    p_imp.add_argument("--list", action="store_true", help="Print stored impacts only")
     sub.add_parser("status", help="Versions, pending analyses and open findings")
     args = parser.parse_args(argv)
 
@@ -105,6 +112,27 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"    Action: {f['suggested_action']}")
         if not items:
             print("No findings.")
+        return 0
+    if args.cmd == "impact":
+        if args.list:
+            agent = ImpactAgent(store, None, settings.data_dir.parent / "state")
+            results = list(agent.load().values())
+        else:
+            backend = make_backend(
+                settings.llm_provider, settings.llm_model, settings.llm_api_key,
+                settings.llm_base_url, settings.llm_effort,
+            )
+            agent = ImpactAgent(store, backend, settings.data_dir.parent / "state")
+            if args.text:
+                eid = "manual-" + datetime.now(UTC).strftime("%Y%m%dT%H%M%S")
+                events = [Event(eid, "manual", args.text)]
+            else:
+                events = agent.events_from_portal(args.path)
+            results = agent.run(events, args.force)
+        for r in results:
+            print(format_impact(r) + "\n")
+        if not results:
+            print("No new events.", file=sys.stderr)
         return 0
     if args.cmd == "status":
         q = store.db.execute
