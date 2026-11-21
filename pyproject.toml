@@ -45,3 +45,5 @@ pythonpath = ["."]
 "src/ask_soony/store.py" = ["E501"]
 # Test fixtures are CSV rows and file paths; wrapping them hurts readability.
 "verifier/**/tests/*.py" = ["E501"]
+# Email templates and the page's CSS read better unwrapped.
+"verifier/act/*.py" = ["E501"]
