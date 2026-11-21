@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { ActionKind, Card, Evidence, Option } from "./types";
+import VoiceCall from "./VoiceCall";
 
 function EvidenceItem({ e }: { e: Evidence }) {
   if (typeof e === "string") return <li className="text-slate-700">{e}</li>;
@@ -89,6 +90,8 @@ export default function Detail({
           </div>
         </div>
       )}
+
+      <VoiceCall key={card.id} card={card} onAction={onAction} />
 
       <div>
         <div className={h}>Edit before sending</div>
