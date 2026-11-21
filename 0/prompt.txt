@@ -1,0 +1,13 @@
+/flush
+
+---
+
+Somehow the pwa on my phone on reopen only shows white
+
+---
+
+in the example it firstly pics up weird backgroudn one as chinese characters etc. and then the sample is supplier one dot example . com which will not work (I'm quite sure, check data). also the transcript renders weirdly
+
+---
+
+Also the mail should not be pre-drafted normally, should it?
