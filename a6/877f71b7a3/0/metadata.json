@@ -29,14 +29,14 @@
     "api_call_count": 38
   },
   "redaction": {
-    "replacements": 12,
+    "replacements": 13,
     "layers": {
       "betterleaks": 0,
       "connection_string": 0,
       "credential_key": 0,
       "credential_value": 0,
       "credentialed_uri": 0,
-      "entropy": 11,
+      "entropy": 12,
       "goredact": 0,
       "key_context": 0,
       "pii": 1,
