@@ -9,7 +9,7 @@ flowchart LR
 ```
 
 ## Now
-- Akshat (22:45): plan.md written; next: platform UI/UX and wiring all modules together
+- Akshat (00:27): UI spec agreed (plan.md §5); next: building decision inbox + supply map, then wiring modules
 - Farhan: verification: claim extraction from documents + three-way match (PO ↔ confirmation ↔ receipt) — see plan.md §5
 - Lucas: arrival forecast: rules for ETA + road leg, silence detection, news/notice risks, alternatives — see plan.md §5
 - Jonas: watcher (in progress) + criticality agent (call / email / notify) + ElevenLabs calls and supplier emails — see plan.md §5
