@@ -1,0 +1,17 @@
+did you tested it all components in real data
+
+---
+
+what model are you using for each step?
+
+---
+
+is claude capable of reading pdf that are image
+
+---
+
+how expensive is it for the lagest pdf
+
+---
+
+can you change everything to be simpler and use openai?
