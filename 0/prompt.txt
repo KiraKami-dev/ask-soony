@@ -1,0 +1,21 @@
+"Open a card" what does that mean?
+
+---
+
+I can't see any details?
+
+---
+
+ah found it, just really hidden
+
+---
+
+ok, now what next? should we give it some tool calling / let it do actual stuff?
+
+---
+
+yeah, do this
+
+---
+
+but is the mail drafted before the call and proposed? or on the fly? and is it in an appropriate place?
