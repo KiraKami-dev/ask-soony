@@ -19,6 +19,8 @@ from pathlib import Path, PurePosixPath
 from urllib.parse import parse_qs, quote, urlparse
 from zoneinfo import ZoneInfo
 
+from ask_soony.alerts import AlertBook
+from ask_soony.escalation import KEYPAD
 from ask_soony.store import Store
 
 TZ = ZoneInfo("Europe/Berlin")
@@ -49,6 +51,9 @@ font:12.5px/1.45 ui-monospace,Menlo,monospace;white-space:pre}
 .add{color:var(--new)}.rem{color:var(--del)}
 table{border-collapse:collapse;width:100%;font-size:14px}td,th{text-align:left;padding:6px 8px;
 border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:500;font-size:12px}
+.btn{font:inherit;font-size:14px;padding:6px 12px;border-radius:6px;border:1px solid var(--line);
+background:var(--card);color:var(--ink);cursor:pointer}.btn.go{background:var(--new);color:#fff;border-color:var(--new)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}form.inline{display:flex;gap:8px;flex-wrap:wrap}
 .sev{font-weight:600}.sev.critical,.sev.high{color:var(--del)}.sev.medium{color:var(--chg)}
 nav{display:flex;gap:16px;flex-wrap:wrap;font-size:14px}
 """
@@ -69,7 +74,7 @@ def page(title: str, body: str, refresh: bool = True) -> bytes:
         "<!doctype html><html><head><meta charset='utf-8'>"
         "<meta name='viewport' content='width=device-width,initial-scale=1,viewport-fit=cover'>"
         f"{meta}<title>{escape(title)}</title><style>{CSS}</style></head><body><main>"
-        "<nav><a href='/'>Changes</a><a href='/findings'>Findings</a><a href='/mail'>Supplier mail</a>"
+        "<nav><a href='/alerts'>Alerts</a><a href='/'>Changes</a><a href='/findings'>Findings</a><a href='/mail'>Supplier mail</a>"
         "<a href='/files'>All files</a></nav>"
         f"{body}</main></body></html>"
     ).encode()
@@ -250,6 +255,56 @@ class Dashboard:
         )
         return page("Supplier mail", "<h1>Supplier mail</h1>" + (cards or "<p>No mail yet.</p>"))
 
+    def alerts(self, store: Store) -> bytes:
+        book = AlertBook(store)
+        rows = "".join(
+            f"<tr><td class='sev {a.severity}'>{a.severity}</td><td><a href='/alerts/{a.id}'><b>"
+            f"{escape(a.title)}</b></a><div class='meta'>{escape(a.message[:160])}</div></td>"
+            f"<td>{a.status}</td><td>{fmt_time(a.created_at)}</td></tr>"
+            for a in book.list()
+        )
+        body = (
+            "<h1>Alerts</h1><section class='card'><table><tr><th>Severity</th><th>Alert</th><th>Status</th>"
+            f"<th>Raised</th></tr>{rows}</table></section>"
+            if rows
+            else "<h1>Alerts</h1><section class='card'>No alerts.</section>"
+        )
+        return page("Alerts", body)
+
+    def alert(self, store: Store, alert_id: int) -> bytes | None:
+        book = AlertBook(store)
+        a = book.get(alert_id)
+        if not a:
+            return None
+        events = "".join(
+            f"<tr><td>{fmt_time(e['at'])}</td><td>{escape(e['kind'])}</td><td>{escape(e['channel'])}</td>"
+            f"<td>{escape(e['contact'])}</td><td>{escape(e['detail'])}</td></tr>"
+            for e in book.events(alert_id)
+        )
+        open_ = a.status in {"open", "notified", "escalated"}
+        buttons = (
+            f"<form class='inline' method='post' action='/alerts/{a.id}/decide'>"
+            "<button class='btn go' name='decision' value='approve'>Approve action</button>"
+            "<button class='btn' name='decision' value='escalate'>Escalate</button>"
+            "<button class='btn' name='decision' value='reject'>Reject</button>"
+            "<button class='btn' name='decision' value='resolve'>Mark resolved</button></form>"
+            if open_
+            else f"<div class='meta'>Decided: {a.status} by {escape(a.decision_by or '')} "
+            f"{fmt_time(a.decision_at)}</div>"
+        )
+        body = (
+            f"<header><h1>{escape(a.title)}</h1><div class='meta'><span class='sev {a.severity}'>{a.severity}"
+            f"</span> · {a.status} · from {escape(a.source)} · impact {escape(a.impact)}"
+            f"{' · goes to a supplier' if a.external else ''}"
+            f"{' · deadline ' + fmt_time(a.deadline) if a.deadline else ''}</div></header>"
+            f"<section class='card'><div class='sum'>{escape(a.message)}</div>"
+            f"<h2 style='margin-top:12px'>Proposed action</h2><div class='sum'>{escape(a.action or 'none')}</div>"
+            f"<div style='margin-top:12px'>{buttons}</div></section>"
+            f"<section class='card'><h2>History</h2><table><tr><th>When</th><th>What</th><th>Channel</th>"
+            f"<th>Contact</th><th>Detail</th></tr>{events}</table></section>"
+        )
+        return page(a.title, body)
+
     # --- server ----------------------------------------------------------------------------
 
     def handler(self):
@@ -310,6 +365,90 @@ class Dashboard:
                         return self._send(200, dash.findings(store))
                     if url.path == "/mail":
                         return self._send(200, dash.mail())
+                    if url.path == "/alerts":
+                        return self._send(200, dash.alerts(store))
+                    if url.path.startswith("/alerts/") and url.path[8:].isdigit():
+                        body = dash.alert(store, int(url.path[8:]))
+                        return self._send(200 if body else 404, body or b"not found")
+                    return self._send(404, b"not found")
+                finally:
+                    store.db.close()
+
+            def _body(self) -> bytes:
+                length = min(int(self.headers.get("Content-Length") or 0), 64_000)
+                return self.rfile.read(length)
+
+            def do_POST(self):
+                url = urlparse(self.path)
+                store = Store(dash.data_dir)
+                book = AlertBook(store)
+                try:
+                    # Phone keypad answer from Twilio: authenticated by the alert's secret token.
+                    if url.path.startswith("/hooks/twilio/") and url.path[14:].isdigit():
+                        form = parse_qs(self._body().decode())
+                        token = parse_qs(url.query).get("token", [""])[0]
+                        digit = form.get("Digits", [""])[0]
+                        decision = KEYPAD.get(digit)
+                        if not decision:
+                            say = "Sorry, that was not a valid choice. Please decide in the dashboard."
+                        else:
+                            try:
+                                book.decide(
+                                    int(url.path[14:]),
+                                    decision,
+                                    by=form.get("To", ["phone"])[0],
+                                    channel="call",
+                                    token=token,
+                                )
+                                say = f"Thank you. Your decision, {decision}, is recorded."
+                            except (KeyError, PermissionError):
+                                return self._send(403, b"forbidden")
+                        twiml = f"<Response><Say>{escape(say)}</Say></Response>".encode()
+                        return self._send(200, twiml, "text/xml")
+                    # Decision from the ElevenLabs voice agent's server tool.
+                    if url.path == "/hooks/elevenlabs/decision":
+                        try:
+                            data = json.loads(self._body() or b"{}")
+                            a = book.decide(
+                                int(data["alert_id"]),
+                                str(data["decision"]).lower(),
+                                by=str(data.get("by") or "voice agent"),
+                                channel="call",
+                                token=str(data.get("token", "")),
+                            )
+                        except PermissionError:
+                            return self._send(403, b'{"ok":false}', "application/json")
+                        except (KeyError, ValueError, TypeError) as e:
+                            return self._send(
+                                400,
+                                json.dumps({"ok": False, "error": str(e)}).encode(),
+                                "application/json",
+                            )
+                        return self._send(
+                            200,
+                            json.dumps({"ok": True, "status": a.status}).encode(),
+                            "application/json",
+                        )
+                    if not self._authorized():
+                        self.send_response(401)
+                        self.send_header("WWW-Authenticate", 'Basic realm="ask-soony"')
+                        self.end_headers()
+                        return
+                    if url.path.startswith("/alerts/") and url.path.endswith("/decide"):
+                        alert_id = url.path[8:-7]
+                        decision = parse_qs(self._body().decode()).get("decision", [""])[0]
+                        if not alert_id.isdigit():
+                            return self._send(404, b"not found")
+                        try:
+                            book.decide(
+                                int(alert_id), decision, by="dashboard", channel="dashboard"
+                            )
+                        except (KeyError, ValueError):
+                            return self._send(400, b"invalid decision")
+                        self.send_response(303)
+                        self.send_header("Location", f"/alerts/{alert_id}")
+                        self.end_headers()
+                        return
                     return self._send(404, b"not found")
                 finally:
                     store.db.close()

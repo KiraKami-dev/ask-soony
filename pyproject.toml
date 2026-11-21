@@ -39,5 +39,6 @@ testpaths = ["tests"]
 [tool.ruff.lint.per-file-ignores]
 # Long SQL statements read better on one line.
 "src/ask_soony/store.py" = ["E501"]
+"src/ask_soony/alerts.py" = ["E501"]
 # Inline HTML and CSS templates.
 "src/ask_soony/dashboard.py" = ["E501"]

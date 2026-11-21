@@ -49,6 +49,9 @@ class Settings:
     notify_min_severity: str = "high"
     dashboard_password: str = ""
     dashboard_port: int = 8765
+    alert_policy: Path = Path("data/alert-policy.json")
+    call_provider: str = "dry_run"
+    public_url: str = ""
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -72,4 +75,7 @@ class Settings:
             notify_min_severity=_env("ASK_NOTIFY_MIN_SEVERITY", "high").lower(),
             dashboard_password=_env("ASK_DASHBOARD_PASSWORD"),
             dashboard_port=int(_env("ASK_DASHBOARD_PORT", "8765")),
+            alert_policy=Path(_env("ASK_ALERT_POLICY", "data/alert-policy.json")),
+            call_provider=_env("ASK_CALL_PROVIDER", "dry_run").lower(),
+            public_url=_env("ASK_PUBLIC_URL").rstrip("/"),
         )

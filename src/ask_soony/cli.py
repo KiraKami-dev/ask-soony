@@ -34,6 +34,30 @@ def _analyst(settings: Settings, store: Store) -> Analyst | None:
     return Analyst(store, backend)
 
 
+def _escalation_loop(settings: Settings, every: int = 30) -> None:
+    """Background loop: escalate undecided alerts once their answer time has run out."""
+    import time
+
+    from ask_soony.alerts import AlertBook, Policy
+    from ask_soony.escalation import Escalator, Mailer, make_caller
+
+    while True:
+        try:
+            store = Store(settings.data_dir)
+            escalator = Escalator(
+                AlertBook(store),
+                Policy.load(settings.alert_policy),
+                make_caller(settings.call_provider),
+                Mailer.from_env(),
+                settings.public_url,
+            )
+            escalator.tick()
+            store.db.close()
+        except Exception as e:  # keep the loop alive; problems show up in the log
+            print(f"escalation loop: {e}", file=sys.stderr)
+        time.sleep(every)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="ask-soony", description=__doc__)
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -67,6 +91,25 @@ def main(argv: list[str] | None = None) -> int:
     p_serve.add_argument("--interval", type=int, help="Seconds between polls")
     p_serve.add_argument("--host", default="127.0.0.1")
     p_serve.add_argument("--port", type=int)
+    p_alert = sub.add_parser("alert", help="Raise, list and decide alerts")
+    asub = p_alert.add_subparsers(dest="alert_cmd", required=True)
+    a_raise = asub.add_parser("raise", help="Raise an alert and notify per the escalation policy")
+    a_raise.add_argument("--title", required=True)
+    a_raise.add_argument("--message", required=True)
+    a_raise.add_argument("--action", default="")
+    a_raise.add_argument(
+        "--severity", default="medium", choices=["info", "low", "medium", "high", "critical"]
+    )
+    a_raise.add_argument(
+        "--deadline", help="ISO 8601 with offset; with --impact launch it raises severity"
+    )
+    a_raise.add_argument("--impact", default="launch", choices=["launch", "cost", "data"])
+    a_raise.add_argument("--external", action="store_true", help="The action goes to a supplier")
+    asub.add_parser("list", help="List alerts")
+    a_dec = asub.add_parser("decide", help="Record a decision")
+    a_dec.add_argument("alert_id", type=int)
+    a_dec.add_argument("decision", choices=["approve", "reject", "escalate", "resolve"])
+    asub.add_parser("tick", help="Escalate alerts whose answer time ran out")
     p_f = sub.add_parser("findings", help="Print findings")
     p_f.add_argument("--all", action="store_true", help="Include resolved findings")
     p_f.add_argument("--json", action="store_true")
@@ -118,6 +161,45 @@ def main(argv: list[str] | None = None) -> int:
             args.analyze_baseline,
         )
         return 0
+    if args.cmd == "alert":
+        from ask_soony.alerts import AlertBook, Policy
+        from ask_soony.escalation import Escalator, Mailer, make_caller
+
+        policy = Policy.load(settings.alert_policy)
+        book = AlertBook(store)
+        escalator = Escalator(
+            book,
+            policy,
+            make_caller(settings.call_provider),
+            Mailer.from_env(),
+            settings.public_url,
+        )
+        if args.alert_cmd == "raise":
+            alert = book.raise_alert(
+                title=args.title,
+                message=args.message,
+                action=args.action,
+                severity=args.severity,
+                deadline=args.deadline,
+                impact=args.impact,
+                external=args.external,
+                policy=policy,
+            )
+            escalator.notify(alert)
+            print(f"Alert #{alert.id} ({alert.severity}) raised.", file=sys.stderr)
+            for e in book.events(alert.id):
+                print(f"  {e['kind']:9} {e['channel']:9} {e['contact']:12} {e['detail']}")
+        elif args.alert_cmd == "list":
+            for a in book.list():
+                print(f"#{a.id} [{a.severity}] {a.status:9} {a.title}")
+        elif args.alert_cmd == "decide":
+            a = book.decide(args.alert_id, args.decision, by="cli", channel="cli")
+            if args.decision == "escalate":
+                escalator.tick()
+            print(f"Alert #{a.id}: {a.status}", file=sys.stderr)
+        elif args.alert_cmd == "tick":
+            print(f"Escalated {escalator.tick()} alerts.", file=sys.stderr)
+        return 0
     if args.cmd in {"dashboard", "serve"}:
         import threading
 
@@ -137,6 +219,7 @@ def main(argv: list[str] | None = None) -> int:
             server.serve_forever()
             return 0
         threading.Thread(target=server.serve_forever, daemon=True).start()
+        threading.Thread(target=_escalation_loop, args=(settings,), daemon=True).start()
         watch(
             store,
             PortalClient(settings.portal_url, settings.portal_token),

@@ -89,6 +89,28 @@ cloudflared tunnel --config ~/.cloudflared/ask-soony.yml run
 
 Pass `--config` to `route dns` too: without it, `cloudflared` takes the tunnel from the default `config.yml` and may attach the hostname to a different tunnel.
 
+### Alerts: notify, call, escalate
+
+Other modules (verification, prediction, the watcher) raise alerts; the alert module decides how loud they get and who has to decide.
+
+- **Criticality**: the producer sets a severity; with a deadline and `--impact launch` it is raised automatically (less than `critical_hours` left = critical, less than three times that = at least high).
+- **Escalation policy** (`ASK_ALERT_POLICY`, default `data/alert-policy.json`, gitignored because it holds phone numbers; see `docs/alert-policy.example.json`): contacts, which channels each severity uses, the order of people to try and how many minutes each gets to decide before the next one is notified.
+- **Channels**: dashboard (`/alerts`, with Approve / Escalate / Reject buttons), email (only with `ASK_ALERT_EMAIL=on`), call. Calls go through `ASK_CALL_PROVIDER`:
+  - `dry_run` (default): logs what would be said, no credentials, no cost
+  - `twilio`: reads the alert and takes a keypad answer (1 approve, 2 escalate, 3 reject), posted to `/hooks/twilio/<id>`. Needs `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`
+  - `elevenlabs`: a voice agent talks the alert through. Needs `ELEVENLABS_API_KEY`, `ELEVENLABS_AGENT_ID`, `ELEVENLABS_PHONE_NUMBER_ID` (a Twilio number imported into ElevenLabs)
+- **Webhooks** need `ASK_PUBLIC_URL` (the tunnel). They bypass the dashboard password and are authenticated by a secret token per alert.
+
+```bash
+uv run ask-soony alert raise --severity high --impact launch --deadline 2026-01-10T06:00:00+01:00 \
+  --title "Part short for launch" --message "5,900 missing" --action "Order 8,000 from supplier X"
+uv run ask-soony alert list
+uv run ask-soony alert decide 1 approve
+uv run ask-soony serve        # also escalates undecided alerts every 30 seconds
+```
+
+ElevenLabs agent setup (dashboard): the call passes `contact_name`, `alert_id`, `alert_title`, `alert_message`, `proposed_action`, `deadline`, `decision_url` and `secret__alert_token` as dynamic variables. Use them in the prompt (for example "You are the procurement alert assistant. Tell {{contact_name}}: {{alert_title}}. {{alert_message}} Proposed action: {{proposed_action}}. Ask whether to approve, escalate or reject."), and add a server tool `record_decision` that POSTs JSON `{"alert_id": "{{alert_id}}", "decision": "<approve|escalate|reject>", "token": "{{secret__alert_token}}"}` to `{{decision_url}}`.
+
 LLM backends (`ASK_LLM_PROVIDER`): `anthropic` (Claude via the Anthropic SDK, default `claude-opus-5-5`), `openai` (OpenAI), `llamacpp` (any OpenAI-compatible server, e.g. `llama-server --jinja` with `ASK_LLM_BASE_URL=http://localhost:8080/v1`), `none` (poll and store only). Local models need vision support for scans.
 
 ## Data
