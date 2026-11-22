@@ -28,7 +28,7 @@ COOKIE_DAYS = 30
 LOGIN_PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#fbfbfa"><title>Lighthouse</title>
-<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3">
 <link rel="stylesheet"
 href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap">
 <style>*{{box-sizing:border-box}}body{{margin:0;min-height:100vh;display:grid;place-items:center;
@@ -54,9 +54,9 @@ label:has(input:focus-visible){{outline:2px solid #2348d0;outline-offset:2px}}
 fieldset+input{{margin-top:16px}}</style></head><body>
 <form method="post" action="/login">
 <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path
-d="M2.5 8V2.5H8M16 2.5h5.5V8M21.5 16v5.5H16M8 21.5H2.5V16" fill="none" stroke="#18181a"
-stroke-width="2.4" stroke-linecap="square"/><rect x="6.5" y="9.5" width="11" height="5" rx="1"
-fill="#18181a"/></svg>
+d="M7.5 22.5h9L15 12H9z" fill="#18181a"/><path d="M9 3h6v7.5H9zm2 2v3.5h2V5z"
+fill="#18181a" fill-rule="evenodd"/><path
+d="M1.5 3 7.5 5.5v2.5L1.5 10.5zM22.5 3l-6 2.5v2.5l6 2.5z" fill="#18181a"/></svg>
 <h1>Lighthouse</h1><p>Sign in to see what needs you today.</p>{error}
 <input type="hidden" name="next" value="{next}">{who}
 <input type="password" name="password" placeholder="Password" aria-label="Password"

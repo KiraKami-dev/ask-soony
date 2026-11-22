@@ -8,8 +8,10 @@ export type Page = 'today' | 'launch' | 'suppliers' | 'routines' | 'history'
 export function Mark({ size = 20 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M2.5 8V2.5H8M16 2.5h5.5V8M21.5 16v5.5H16M8 21.5H2.5V16" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="square" />
-      <rect x="6.5" y="9.5" width="11" height="5" rx="1" fill="currentColor" />
+      {/* A lighthouse: tapered tower, lantern with its window, two beams. */}
+      <path d="M7.5 22.5h9L15 12H9z" fill="currentColor" />
+      <path d="M9 3h6v7.5H9zm2 2v3.5h2V5z" fill="currentColor" fillRule="evenodd" />
+      <path d="M1.5 3 7.5 5.5v2.5L1.5 10.5zM22.5 3l-6 2.5v2.5l6 2.5z" fill="currentColor" />
     </svg>
   )
 }
