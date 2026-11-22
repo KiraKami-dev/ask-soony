@@ -427,3 +427,31 @@ def test_reply_facts_are_stored_and_after_launch_pushes(agent_env, monkeypatch):
     }
     rec = routines.run(_routine(spec), dry=True)
     assert rec["did"] and rec["did"][0]["text"] == "Late: 300 copies short"
+
+
+def test_repeated_decisions_become_a_suggestion(agent_env, monkeypatch):
+    from ask_soony import api
+
+    def two_alike():
+        s = orig()
+        base = s["cards"][0]
+        twin = {**base, "id": "gap-Y", "headline": base["headline"].replace("300", "450")}
+        s["cards"] = [base, twin]
+        s["inbox_ids"] = ["gap-X", "gap-Y"]
+        return s
+
+    orig = api.build_state
+    monkeypatch.setattr(api, "build_state", two_alike)
+    api._record("gap-X", "approved", {"kind": "approve", "action": "a", "status": "approved"})
+    assert routines.suggestions() == []  # once is not a pattern
+    api._record("gap-Y", "approved", {"kind": "approve", "action": "a", "status": "approved"})
+
+    def decided():
+        s = two_alike()
+        for c in s["cards"]:
+            c["status"] = "approved"
+        return s
+
+    monkeypatch.setattr(api, "build_state", decided)
+    out = routines.suggestions()
+    assert len(out) == 1 and out[0]["count"] == 2 and set(out[0]["card_ids"]) == {"gap-X", "gap-Y"}

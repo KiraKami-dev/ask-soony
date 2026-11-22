@@ -1499,6 +1499,73 @@ def _public(r: dict) -> dict:
     return {**{k: v for k, v in r.items() if k != "seen"}, "mode": mode_of(r)}
 
 
+_SHAPE_NUM = re.compile(r"\d[\d,.' ]*\d|\d")
+
+
+def _shape(text: str) -> str:
+    """A headline with its numbers taken out, so 'PO 4500318752' and 'PO 4500318765' match."""
+    return " ".join(_SHAPE_NUM.sub("#", text or "").split()).lower()
+
+
+def suggestions(min_count: int = 2) -> list[dict]:
+    """
+    Repeated decisions worth a routine: decided cards grouped like the inbox groups look-alikes
+    (supplier, kind, headline shape) plus what the person did. A group decided at least
+    `min_count` times without a routine for it becomes a suggestion, newest first.
+    """
+    from ask_soony import api
+
+    state = api.build_state()
+    by_id = {c["id"]: c for c in state["cards"]}
+    automated = {r.get("created_from") for r in _all() if r.get("created_from")}
+    latest: dict[str, dict] = {}
+    for a in api.read_list("actions.json"):
+        if a.get("kind") in ("approve", "escalate", "dismiss") and a.get("decision_id"):
+            latest[str(a["decision_id"])] = a
+    groups: dict[str, dict] = {}
+    for cid, act in latest.items():
+        card = by_id.get(cid)
+        if card is None or card.get("status") == "open":
+            continue
+        key = "|".join(
+            [
+                str(card.get("supplier_id") or card.get("supplier_name") or ""),
+                str(card.get("kind") or ""),
+                _shape(card.get("headline") or ""),
+                act["kind"],
+            ]
+        )
+        g = groups.setdefault(
+            key,
+            {
+                "key": key,
+                "card_ids": [],
+                "decision": act["kind"],
+                "action": act.get("action"),
+                "last_at": "",
+            },
+        )
+        g["card_ids"].append(cid)
+        if str(act.get("at") or "") >= g["last_at"]:
+            g.update(
+                last_at=str(act.get("at") or ""),
+                last_card_id=cid,
+                label=by_id[cid].get("headline"),
+                supplier=by_id[cid].get("supplier_name"),
+            )
+    out = [
+        {**g, "count": len(g["card_ids"])}
+        for g in groups.values()
+        if len(g["card_ids"]) >= min_count and not automated.intersection(g["card_ids"])
+    ]
+    return sorted(out, key=lambda g: g["last_at"], reverse=True)
+
+
+@router.get("/api/routines/suggestions")
+def get_suggestions():
+    return {"suggestions": suggestions()}
+
+
 @router.get("/api/routines")
 def list_routines():
     return {"routines": [_public(r) for r in _all()]}
