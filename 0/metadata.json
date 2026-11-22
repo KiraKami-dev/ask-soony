@@ -1,0 +1,174 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M814GGQKJ86FHY5GWNE02MKS",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T08:04:00.723496Z",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "5c92c34c8b05",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 6,
+    "cache_creation_tokens": 533,
+    "cache_read_tokens": 1287625,
+    "output_tokens": 3018,
+    "api_call_count": 2
+  },
+  "session_token_usage": {
+    "input_tokens": 2996,
+    "cache_creation_tokens": 3012576,
+    "cache_read_tokens": 655469216,
+    "output_tokens": 1222073,
+    "api_call_count": 1299,
+    "subagent_tokens": {
+      "input_tokens": 3078,
+      "cache_creation_tokens": 6619853,
+      "cache_read_tokens": 228958090,
+      "output_tokens": 1795277,
+      "api_call_count": 1468
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 2144,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 73,
+      "credentialed_uri": 0,
+      "entropy": 722,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 1325,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1210,
+      "IP": 50,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 262
+  },
+  "summary": {
+    "intent": "Win the Lio 'Keep the Line Running' hackathon challenge for Soony by analyzing the confidential launch data and building a general recheck-and-act agent product (poller, extraction, recompute, approvals, supplier emails) with a demo and hand-in materials by Sunday 12:00.",
+    "outcome": "Found that Soony's plan said all ok while Collector's Edition and Standard were short (overbooked art books, failed statues, stuck container, game card offload). Built and deployed the app with Today/Launch views, routines, an approval loop and a dry-run demo instance, and wrote the README and a demo script; pending pushes and pitch work remain.",
+    "learnings": {
+      "repo": [
+        "Portal API has only three endpoints (files list, single file, archive.zip) and no notifications or webhooks; the way to detect drops is to poll the file list and compare SHA-256, since files are replaced under the same name.",
+        "Confidential portal data lives in the gitignored data/ folder and .env is gitignored; .env.example is committed with an empty SOONY_PORTAL_TOKEN.",
+        "Team workflow files (CLAUDE.md, PROGRESS.md) exist and tasks are claimed in PROGRESS.md; work is on branch jonas/today-flow.",
+        "Entire hooks only write a checkpoint when repo files change; sessions with no file changes log 'skipping checkpoint', and checkpoints are pushed along with git push.",
+        "Demo instance runs separately via scripts/demo.sh (reset, snapshot, stop) with dry mail mode, so supplier emails are only recorded in data/demo/state/dry_outbox.json; routines and mailbox sync are off there.",
+        "ASK_SIGNOFF_SIMULATE=<seconds> (off by default) auto-approves a passed-on escalation as 'simulated for the demo'; push goes to every subscribed device, with no per-person routing.",
+        "ASK_TEAMS_WEBHOOK is empty in .env, so Teams messages are not sent; internal messages and escalations originally only got recorded until the sign-off loop was built.",
+        "Proposals prepared by routines can go stale when the case is decided by hand; they now expire automatically and are deduplicated across routines.",
+        "The shared mailbox sync wrote back an old copy of the action log and lost concurrent records; fixed by appending under the shared lock, with a test."
+      ],
+      "code": [
+        {
+          "path": "src/ask_soony/signoff.py",
+          "finding": "New sign-off module: one-time /ok/<token> links, Approve/Decline page, approval recorded as via='signoff' or 'signoff-simulated'; basic_auth.py lets valid links through without the password."
+        },
+        {
+          "path": "web/src/components/Today.tsx",
+          "finding": "J/K navigation must step by grouped row, not by individual card, otherwise folded look-alike groups lose their highlight; the left column groups prepared steps per routine."
+        }
+      ],
+      "workflow": [
+        "Use subagents for large cross-checks (200 order confirmations and 59 scans) and for parallel builds while the main thread does docs.",
+        "Check the live state before recommending: the portal had 5 new files within 37 minutes, which changed the risk picture.",
+        "Confidential data must stay out of the repo and out of external requests; the README for the jury avoids challenge numbers.",
+        "Verify UI fixes in a headless browser (e.g. pressing J ten times and counting highlighted rows) and run tests (320 passing) before committing.",
+        "Confirm before outward-facing actions: pushes were requested explicitly, and real supplier emails were only sent on the user's instruction."
+      ]
+    },
+    "friction": [
+      "Portal token was initially empty, causing 401s and blocking data access until the user added it.",
+      "Cloudflare Error 1033 on the demo host because the first DNS route pointed at the wrong tunnel; fixed by re-routing to the ask-soony tunnel.",
+      "Safari caches favicons stubbornly, so a version query string was added to the icon links.",
+      "Approved Hamburg proposals failed with 'not an open card' because they were stale, and the left column showed four near-identical cards.",
+      "The 07:58 art book approval record was lost to the mailbox sync race and had to be restored from the Sent folder.",
+      "Internal escalations ('collect the container', Maren) went nowhere and the UI falsely said the DC site lead had it.",
+      "PackRight received repeated rev C requests after already saying it was not possible.",
+      "Teams not configured, so Hamburg questions went only as push notifications."
+    ],
+    "open_items": [
+      "Duplicate routine 'Ask Hamburg to count book stock' is still not deleted (user not yet confirmed).",
+      "Add 'What still saves it' section to Launch (latest arrival per blocker, ~900 Collector's copies per hour of delay).",
+      "Prepare the question for Felix about who gets container NHSU4471921 from the terminal to the DC today (09:00 office hours).",
+      "Create a Teams incoming webhook and set ASK_TEAMS_WEBHOOK in .env.",
+      "Per-person push routing is missing; 'Sent to Maren's phone' is true only if Maren's phone is the subscribed one.",
+      "Maren's top bar still says 'nothing needs you' because it counts Felix's list.",
+      "Push the latest local commits (demo script commit; user pushed up to 3468eb8).",
+      "Pitch outline, 3-minute video and final hand-in checks by Sunday 12:00.",
+      "Register sender addresses and clarify whether portal data is identical across teams (ask the Lio engineers).",
+      "Undo on an approved internal message does not recall an already sent push; simulation timers are lost on restart.",
+      "Briefing page and doc still reflect the 14:00 state, not the later drops; the earlier Claude doc may be deleted."
+    ]
+  }
+}
