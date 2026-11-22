@@ -42,17 +42,59 @@ input{{margin-top:32px;padding:0 16px;background:#f3f3f1;color:#18181a}}
 input:focus,button:focus-visible{{outline:2px solid #2348d0;outline-offset:2px}}
 button{{margin-top:12px;background:#2348d0;color:#fff;font-weight:500;cursor:pointer;
 box-shadow:0 1px 2px rgba(35,72,208,.25)}}button:hover{{background:#1d3db5}}
-.err{{color:#c8321f}}</style></head><body>
+.err{{color:#c8321f}}
+fieldset{{margin:28px 0 0;padding:0;border:0;display:grid;gap:8px}}
+legend{{font-size:13px;color:#5d5d63;padding:0 0 8px}}
+label{{display:flex;align-items:baseline;gap:10px;padding:12px 14px;border-radius:14px;
+background:#f3f3f1;cursor:pointer;font-size:16px}}label span{{color:#5d5d63;font-size:14px}}
+label:has(input:checked){{background:#18181a;color:#fff}}
+label:has(input:checked) span{{color:#c9c9cc}}
+fieldset input{{position:absolute;opacity:0;width:0;height:0;margin:0}}
+label:has(input:focus-visible){{outline:2px solid #2348d0;outline-offset:2px}}
+fieldset+input{{margin-top:16px}}</style></head><body>
 <form method="post" action="/login">
 <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path
 d="M2.5 8V2.5H8M16 2.5h5.5V8M21.5 16v5.5H16M8 21.5H2.5V16" fill="none" stroke="#18181a"
 stroke-width="2.4" stroke-linecap="square"/><rect x="6.5" y="9.5" width="11" height="5" rx="1"
 fill="#18181a"/></svg>
 <h1>Ask Soony</h1><p>Sign in to see what needs you today.</p>{error}
-<input type="hidden" name="next" value="{next}">
-<input type="password" name="password" placeholder="Password" aria-label="Password" autofocus
+<input type="hidden" name="next" value="{next}">{who}
+<input type="password" name="password" placeholder="Password" aria-label="Password"
 autocomplete="current-password">
 <button>Sign in</button></form></body></html>"""
+
+
+ROLES = ("buyer", "approver")
+_TITLES = {"buyer": "Buys and chases", "approver": "Signs what costs money"}
+
+
+def _people() -> dict[str, str]:
+    """
+    Who signs in, read from the portal like everywhere else: the buyer on most orders and the
+    approver of exceptions. Empty when the data cannot say; the form then shows the titles alone.
+    """
+    try:
+        from ask_soony import api
+
+        return {
+            "buyer": api.viewer_name(api.portal_root()) or "",
+            "approver": api.exception_approver() or "",
+        }
+    except Exception:  # noqa: BLE001  the sign-in page must render without data
+        return {}
+
+
+def _who_field(chosen: str = "") -> str:
+    names = _people()
+    chosen = chosen if chosen in ROLES else "buyer"
+    rows = []
+    for role in ROLES:
+        name = (names.get(role) or "").split(",")[0].strip()
+        title = _TITLES[role]
+        text = f"{html.escape(name)} <span>{title}</span>" if name else title
+        checked = " checked" if role == chosen else ""
+        rows.append(f'<label><input type="radio" name="as" value="{role}"{checked}>{text}</label>')
+    return "<fieldset><legend>Who is signing in</legend>" + "".join(rows) + "</fieldset>"
 
 
 class BasicAuth(BaseHTTPMiddleware):
@@ -76,9 +118,13 @@ class BasicAuth(BaseHTTPMiddleware):
     def _cookie_ok(self, request: Request) -> bool:
         return hmac.compare_digest(request.cookies.get(COOKIE, ""), self.token)
 
-    def _login_page(self, next_url: str, error: str = "", status: int = 200) -> HTMLResponse:
+    def _login_page(
+        self, next_url: str, error: str = "", status: int = 200, chosen: str = ""
+    ) -> HTMLResponse:
         err = f'<p class="err">{error}</p>' if error else ""
-        page = LOGIN_PAGE.format(error=err, next=html.escape(next_url, quote=True))
+        page = LOGIN_PAGE.format(
+            error=err, next=html.escape(next_url, quote=True), who=_who_field(chosen)
+        )
         return HTMLResponse(page, status_code=status)
 
     async def dispatch(self, request: Request, call_next):
@@ -111,7 +157,10 @@ class BasicAuth(BaseHTTPMiddleware):
                 next_url = str(form.get("next") or "/")
                 if not next_url.startswith("/") or next_url.startswith("//"):
                     next_url = "/"
+                role = str(form.get("as") or "")
                 if hmac.compare_digest(str(form.get("password") or ""), self.password):
+                    if role in ROLES:  # the app reads ?as= once, remembers it, drops it
+                        next_url += ("&" if "?" in next_url else "?") + f"as={role}"
                     resp = RedirectResponse(next_url, status_code=303)
                     resp.set_cookie(
                         COOKIE,
@@ -122,7 +171,7 @@ class BasicAuth(BaseHTTPMiddleware):
                         samesite="lax",
                     )
                     return resp
-                return self._login_page(next_url, "Wrong password.", 401)
+                return self._login_page(next_url, "Wrong password.", 401, role)
             return self._login_page(request.query_params.get("next", "/"))
 
         if self._cookie_ok(request) or self._basic_ok(request):
