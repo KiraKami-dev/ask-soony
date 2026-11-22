@@ -71,7 +71,11 @@ export interface StripItem {
   breaks_first: { text?: string; deadline?: string; stops_at?: string | null; card: string } | null
 }
 export interface EventItem { id: string; at: string; path?: string; file?: string; node?: string }
-export interface ActivityItem { at?: string; text: string; kind: string; detail?: string; card?: string }
+export interface ActivityItem {
+  at?: string; text: string; kind: string; detail?: string | null; card?: string
+  /** Who handled it: "inbox", "voice" or "routine: <name>". Missing on older items. */
+  via?: string | null
+}
 
 export interface State {
   now: string
@@ -135,4 +139,62 @@ export function until(iso: string | undefined, nowMs: number): { text: string; u
   if (min <= 0) return { text: 'now', urgent: true }
   const text = min < 60 ? `${min} min` : `${Math.floor(min / 60)} h ${min % 60 ? `${min % 60} min` : ''}`.trim()
   return { text: `in ${text}`, urgent: min < 180 }
+}
+
+export const DONE_WORD: Record<string, string> = {
+  approved: 'Approved', sent: 'Sent', escalated: 'Escalated', dismissed: 'Dismissed',
+}
+export const DECIDED = Object.keys(DONE_WORD)
+
+/** What handled an activity item, read from its `via` field. */
+export function viaOf(a: ActivityItem): { kind: 'routine'; name: string } | { kind: 'voice' } | null {
+  const v = (a.via ?? '').trim()
+  if (/^routine\s*:/i.test(v)) return { kind: 'routine', name: v.replace(/^routine\s*:\s*/i, '') }
+  if (/^voice$/i.test(v)) return { kind: 'voice' }
+  return null
+}
+
+// Internal part / product codes (CMP-GAM-001, FG-GH6-STD): never shown on their own.
+const CODE = /^[A-Z]{2,5}(-[A-Z0-9]+)+$/
+
+/** A readable name for a part code, found on the cards; undefined if none has one. */
+export function partName(part: string | undefined, cards: Card[]): string | undefined {
+  if (!part) return undefined
+  if (!CODE.test(part)) return part
+  const c = cards.find(
+    (c) => c.part && !CODE.test(c.part) && (c.id.endsWith(part) || c.options.some((o) => o.action?.includes(`(${part})`))),
+  )
+  return c?.part
+}
+
+const fmtDate = (ymd: string) =>
+  new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }).format(
+    new Date(`${ymd}T00:00:00Z`),
+  )
+
+/** Display text: drop bracketed internal codes, write ISO dates as "Mon 23 Nov". */
+export function tidy(t: string | undefined | null): string {
+  if (!t) return ''
+  return t
+    .replace(/\s*\((?:[A-Z]{2,5}-)+[A-Z0-9-]+\)/g, '')
+    .replace(/\b(\d{4}-\d{2}-\d{2})(?:T[\d:.]+(?:Z|[+-]\d{2}:\d{2})?)?\b/g, (_, d: string) => fmtDate(d))
+}
+
+const cap = (t: string) => (t ? t[0].toUpperCase() + t.slice(1) : t)
+
+/** One cost wording everywhere. */
+export function costText(cost: string | undefined | null): string {
+  const c = (cost ?? '').trim()
+  if (!c || /^(none|no cost|free|0|-|–|n\/a)$/i.test(c)) return 'No cost'
+  return cap(tidy(c))
+}
+export const sentence = (t: string | undefined | null) => cap(tidy(t))
+
+/** Slack as people say it; "–" when it would only confuse (on track, or nothing at risk). */
+export function slackText(hours: number | null, onTrack: boolean, atRisk: number): string {
+  if (hours == null || (onTrack && (hours < 0 || atRisk === 0))) return '–'
+  const sign = hours < 0 ? '−' : ''
+  const a = Math.abs(hours)
+  if (a < 1) return `${sign}${Math.round(a * 60)} min`
+  return `${sign}${Math.round(a * 10) / 10} h`
 }

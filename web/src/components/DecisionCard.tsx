@@ -1,20 +1,20 @@
-import { Check, ChevronRight, FileSearch, Phone, Workflow } from 'lucide-react'
-import { useState } from 'react'
+import { Check, ChevronRight, FileSearch, MoreHorizontal, Phone, Workflow } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { VoiceCall } from '@/components/VoiceCall'
-import { COLORS, fmtDay, fmtNum, fmtTime, post, until, type Card } from '@/lib/api'
+import {
+  COLORS, DONE_WORD, costText, fmtDay, fmtNum, fmtTime, partName, post, sentence, tidy, until, type Card,
+} from '@/lib/api'
 import { cn } from '@/lib/utils'
-
-export interface Offer { cardId: string; type: string; card: Card }
 
 interface Props {
   card: Card
   nowMs: number
+  /** All cards, to give a part code a readable name. */
+  cards?: Card[]
   isNew?: boolean
   /** Opened from the deep link (/d/<id>): whoever it is routed to can act on it here. */
   direct?: boolean
-  offer?: Offer | null
-  onOffer: (o: Offer | null) => void
   onChanged: () => void
   onHover?: (routes: string[]) => void
   onDrawer: (card: Card, tab: 'evidence' | 'trail') => void
@@ -25,20 +25,49 @@ interface Props {
 // A person's first name; a role ('Head of Procurement', 'DC site lead') stays whole.
 const first = (s?: string) => (!s ? '' : /\s[a-z]/.test(s) ? s : (s.split(' ').find((w) => !w.endsWith('.')) ?? s))
 
+// Same split as the evidence drawer: what the system says against what a document says.
+const SYSTEM = /system|sap|erp|plan|book stock/i
+const PAPER = /paper|document|scan|advice|confirmation|delivery note|notice|invoice/i
+const sourceName = (src: string | undefined, fallback: string) =>
+  (src ?? '').replace(/^(System|Paper) says\s*·?\s*/i, '').trim() || fallback
+
+function mismatch(card: Card) {
+  const sys = card.evidence.findIndex((e) => SYSTEM.test(e.source ?? '') && e.value != null)
+  const doc = card.evidence.findIndex((e, i) => i !== sys && PAPER.test(e.source ?? '') && e.value != null)
+  if (sys < 0 || doc < 0) return null
+  const s = card.evidence[sys]
+  const d = card.evidence[doc]
+  return {
+    system: { label: sourceName(s.source, 'System'), value: tidy(String(s.value)) },
+    doc: { label: sourceName(d.source, 'Document'), value: tidy(String(d.value)) },
+  }
+}
+
 export function DecisionCard({
-  card, nowMs, isNew, direct, offer, onOffer, onChanged, onHover, onDrawer, ringing, onRingingDone,
+  card, nowMs, cards, isNew, direct, onChanged, onHover, onDrawer, ringing, onRingingDone,
 }: Props) {
-  const [sel, setSel] = useState(0)
+  const [sel, setSel] = useState(() => Math.max(0, card.options.findIndex((o) => o.recommended)))
   const [mode, setMode] = useState<'idle' | 'edit' | 'escalate'>('idle')
   const [text, setText] = useState('')
   const [note, setNote] = useState('')
   const [busy, setBusy] = useState(false)
+  const [more, setMore] = useState(false)
+  const moreRef = useRef<HTMLDivElement>(null)
   const color = COLORS[card.level]
   const opt = card.options[sel]
   const due = until(card.deadline, nowMs)
   const other = card.routed_to_other || card.status === 'escalated'
+  const closed = card.status !== 'open' && card.status !== 'escalated'
   const who = first(card.approver) || 'the approver'
-  const decided = !!offer && offer.cardId === card.id
+  const part = partName(card.part, cards ?? [card])
+  const diff = mismatch(card)
+
+  useEffect(() => {
+    if (!more) return
+    const off = (e: MouseEvent) => { if (!moreRef.current?.contains(e.target as Node)) setMore(false) }
+    document.addEventListener('mousedown', off)
+    return () => document.removeEventListener('mousedown', off)
+  }, [more])
 
   async function act(fn: () => Promise<unknown>) {
     setBusy(true)
@@ -46,50 +75,62 @@ export function DecisionCard({
   }
   const approve = () =>
     act(async () => {
-      const r = await post<{ offer_trust: string | null }>(`/api/cards/${card.id}/approve`, {
-        option: sel, text: mode === 'edit' ? text : undefined,
-      })
-      if (r.offer_trust) onOffer({ cardId: card.id, type: r.offer_trust, card })
+      await post(`/api/cards/${card.id}/approve`, { option: sel, text: mode === 'edit' ? text : undefined })
       setMode('idle')
       onChanged()
     })
   const escalate = () =>
     act(async () => { await post(`/api/cards/${card.id}/escalate`, { note }); setMode('idle'); onChanged() })
-  const dismiss = () => act(async () => { await post(`/api/cards/${card.id}/dismiss`); onChanged() })
-  const trust = (m: 'allow_always' | 'ask') =>
-    act(async () => { await post('/api/trust', { action_type: offer!.type, mode: m }); onOffer(null); onChanged() })
+  const dismiss = () => act(async () => { setMore(false); await post(`/api/cards/${card.id}/dismiss`); onChanged() })
 
   return (
     <article
+      id={`card-${card.id}`}
       onMouseEnter={() => onHover?.(card.routes)}
       onMouseLeave={() => onHover?.([])}
-      className={cn('relative rounded-2xl border border-line bg-white p-5 pl-6', isNew && 'slide-in', other && 'bg-panel')}
+      className={cn('relative scroll-mt-4 rounded-2xl border border-line bg-white p-4 pl-5 sm:p-5 sm:pl-6', isNew && 'slide-in', other && 'bg-panel')}
     >
       <span className="absolute inset-y-0 left-0 w-1.5 rounded-l-2xl" style={{ background: color }} />
 
-      <div className="flex flex-wrap items-center gap-x-2 text-sm text-ink-3">
-        <span className="font-semibold text-ink-2">{card.supplier_name || card.part || 'Soony'}</span>
-        {card.supplier_name && card.part && <span>· {card.part}</span>}
+      <div className="flex min-w-0 items-center gap-x-1.5 text-sm text-ink-3">
+        <span className="shrink-0 font-semibold text-ink-2">{card.supplier_name || part || 'Soony'}</span>
+        {card.supplier_name && part && <span className="truncate" title={part}>· {part}</span>}
       </div>
 
-      <h2 className="mt-1.5 text-[21px] font-bold leading-snug">{card.headline}</h2>
+      <h2 className="mt-1.5 text-[19px] font-bold leading-snug sm:text-[21px]">{tidy(card.headline)}</h2>
 
-      <div className="mt-4 flex flex-wrap items-end gap-x-8 gap-y-2">
+      <div className="mt-4 flex flex-wrap items-end gap-x-8 gap-y-3">
         {card.number != null && card.number > 0 && (
           <div>
-            <div className="text-[40px] font-extrabold leading-none tabular-nums" style={{ color }}>{fmtNum(card.number)}</div>
+            <div className="text-[34px] font-extrabold leading-none tabular-nums sm:text-[40px]" style={{ color }}>{fmtNum(card.number)}</div>
             <div className="mt-1 text-sm font-medium text-ink-3">{card.number_label}</div>
           </div>
         )}
-        {card.deadline && (
+        {card.deadline && !closed && (
           <div>
-            <div className={cn('text-[28px] font-extrabold leading-none tabular-nums', due?.urgent && 'text-stop')}>
+            <div className={cn('text-[24px] font-extrabold leading-none tabular-nums sm:text-[28px]', due?.urgent && 'text-stop')}>
               {fmtDay(card.deadline)} {fmtTime(card.deadline)}
             </div>
-            <div className="mt-1 text-sm font-medium text-ink-3">decide by{due ? ` · ${due.text}` : ''}</div>
+            <div className="mt-1 text-sm font-medium text-ink-3">Decide by{due ? ` · ${due.text}` : ''}</div>
           </div>
         )}
       </div>
+
+      {diff && (
+        <button
+          onClick={() => onDrawer(card, 'evidence')}
+          className="group mt-4 block w-full cursor-pointer rounded-lg border border-line px-3 py-2 text-left text-sm hover:bg-panel"
+          title="Open the evidence"
+        >
+          <span className="grid grid-cols-2 gap-3">
+            <Says head="System" label={diff.system.label} value={diff.system.value} />
+            <Says head="Document" label={diff.doc.label} value={diff.doc.value} strong />
+          </span>
+          <span className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-ok group-hover:underline">
+            They do not match · see the documents <ChevronRight size={13} />
+          </span>
+        </button>
+      )}
 
       {other && (
         <div className="mt-4 flex items-start gap-2 rounded-lg bg-white px-3 py-2 text-sm text-ink-2 ring-1 ring-line">
@@ -100,33 +141,45 @@ export function DecisionCard({
                 ? `Waiting for ${who}`
                 : `With ${who}${card.called_at ? ` · called ${fmtTime(card.called_at)}` : ''}`}
             </span>
-            {card.reason && <div>{card.reason}</div>}
+            {card.reason && <div>{sentence(card.reason)}</div>}
           </div>
         </div>
       )}
 
-      {(!other || direct) && !decided && opt && (
+      {closed && (
+        <div className="mt-4 flex items-center gap-2 rounded-lg bg-ok/10 px-3 py-2 text-[15px] font-semibold text-ok">
+          <Check size={18} /> {DONE_WORD[card.status] ?? 'Done'}
+          {card.ui?.at && <span className="font-normal text-ink-2">· {fmtDay(card.ui.at)} {fmtTime(card.ui.at)}</span>}
+        </div>
+      )}
+
+      {(!other || direct) && !closed && opt && (
         <>
           <div className="mt-4 rounded-xl border-2 p-4" style={{ borderColor: `${color}55`, background: `${color}0d` }}>
             <div className="text-xs font-bold uppercase tracking-wide" style={{ color }}>
-              {sel === 0 ? 'Recommended' : 'Option'}
+              {opt.recommended || (sel === 0 && !card.options.some((o) => o.recommended)) ? 'We recommend' : 'Your choice'}
             </div>
-            <div className="mt-1 text-[17px] font-bold leading-snug">{opt.action}</div>
-            <div className="mt-1 text-[15px] text-ink-2">{[opt.cost, opt.effect].filter(Boolean).join(' · ')}</div>
+            <div className="mt-1 text-[17px] font-bold leading-snug">{sentence(opt.action)}</div>
+            {opt.effect && <div className="mt-1 text-[15px] text-ink-2">{sentence(opt.effect)}</div>}
+            <div className="mt-2 inline-flex rounded-md bg-white/80 px-2 py-0.5 text-sm font-semibold text-ink ring-1 ring-line">
+              {costText(opt.cost)}
+            </div>
           </div>
 
           {card.options.length > 1 && (
-            <ul className="mt-2 space-y-1">
+            <ul className="mt-2 space-y-0.5">
               {card.options.map((o, i) =>
                 i === sel ? null : (
                   <li key={i}>
                     <button
                       onClick={() => { setSel(i); setMode('idle') }}
-                      className="flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-left text-[15px] text-ink-2 hover:bg-panel"
+                      className="flex w-full cursor-pointer items-start gap-2 rounded-lg px-3 py-2 text-left text-[15px] text-ink-2 hover:bg-panel"
                     >
-                      <ChevronRight size={16} className="shrink-0 text-ink-3" />
-                      <span className="font-medium">{o.action}</span>
-                      <span className="ml-auto shrink-0 text-sm text-ink-3">{o.cost}</span>
+                      <ChevronRight size={16} className="mt-0.5 shrink-0 text-ink-3" />
+                      <span className="min-w-0 font-medium">
+                        <span className="text-ink-3">Or: </span>{sentence(o.action)}
+                      </span>
+                      <span className="ml-auto shrink-0 pl-2 text-sm text-ink-3">{costText(o.cost)}</span>
                     </button>
                   </li>
                 ),
@@ -146,7 +199,7 @@ export function DecisionCard({
           {mode === 'escalate' && (
             <div className="mt-3 rounded-lg border border-line p-3">
               <div className="text-xs font-semibold uppercase tracking-wide text-ink-3">Brief for {who}</div>
-              <p className="mt-1 text-[15px] text-ink-2">{card.escalation_brief}</p>
+              <p className="mt-1 text-[15px] text-ink-2">{tidy(card.escalation_brief)}</p>
               <input
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
@@ -160,8 +213,8 @@ export function DecisionCard({
             </div>
           )}
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Button disabled={busy} onClick={approve}>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <Button disabled={busy} onClick={approve} className="w-full px-6 sm:w-auto">
               <Check size={18} /> {mode === 'edit' ? 'Approve edited' : 'Approve'}
             </Button>
             <Button
@@ -173,7 +226,23 @@ export function DecisionCard({
               Edit
             </Button>
             <Button variant="outline" onClick={() => setMode(mode === 'escalate' ? 'idle' : 'escalate')}>Escalate</Button>
-            <Button variant="ghost" disabled={busy} onClick={dismiss}>Dismiss</Button>
+            <div ref={moreRef} className="relative ml-auto">
+              <Button variant="ghost" className="w-11 px-0" aria-label="More actions" onClick={() => setMore(!more)}>
+                <MoreHorizontal size={18} />
+              </Button>
+              {more && (
+                <div className="absolute right-0 top-12 z-20 w-56 rounded-xl border border-line bg-white p-1 shadow-lg">
+                  <button
+                    disabled={busy}
+                    onClick={dismiss}
+                    className="w-full cursor-pointer rounded-lg px-3 py-2 text-left text-[15px] font-semibold text-ink-2 hover:bg-panel"
+                  >
+                    Dismiss
+                    <span className="block text-xs font-normal text-ink-3">Nothing to do; take it off the list</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </>
       )}
@@ -194,23 +263,7 @@ export function DecisionCard({
         </div>
       )}
 
-      {!decided && (
-        <VoiceCall card={card} onChanged={onChanged} ringing={ringing} onRingingDone={onRingingDone} />
-      )}
-
-      {decided && offer && (
-        <div className="mt-4 rounded-xl border-2 border-ok/40 bg-ok/5 p-4">
-          <div className="flex items-center gap-2 text-[15px] font-bold text-ok"><Check size={18} /> Approved</div>
-          <p className="mt-2 text-[17px] font-semibold leading-snug">
-            Send routine ETA chasers like this one automatically from now on?
-          </p>
-          <p className="mt-1 text-[15px] text-ink-2">You'll still approve anything that costs money.</p>
-          <div className="mt-3 flex gap-2">
-            <Button disabled={busy} onClick={() => trust('allow_always')}>Allow always</Button>
-            <Button variant="outline" disabled={busy} onClick={() => trust('ask')}>Ask me each time</Button>
-          </div>
-        </div>
-      )}
+      {!closed && <VoiceCall card={card} onChanged={onChanged} ringing={ringing} onRingingDone={onRingingDone} />}
 
       <div className="mt-4 flex gap-5 border-t border-line pt-3 text-sm font-semibold text-ink-2">
         <button className="inline-flex cursor-pointer items-center gap-1.5 hover:text-ink" onClick={() => onDrawer(card, 'evidence')}>
@@ -221,5 +274,17 @@ export function DecisionCard({
         </button>
       </div>
     </article>
+  )
+}
+
+function Says({ head, label, value, strong }: { head: string; label: string; value: string; strong?: boolean }) {
+  return (
+    <span className="block min-w-0 leading-snug">
+      <span className="block truncate text-xs text-ink-3" title={label}>
+        <span className="font-semibold uppercase tracking-wide">{head}</span>
+        {label !== head && ` · ${label}`}
+      </span>
+      <span className={cn('mt-0.5 block font-semibold', strong ? 'text-stop' : 'text-ink')}>{value}</span>
+    </span>
   )
 }

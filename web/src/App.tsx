@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AlertsButton } from '@/components/AlertsButton'
-import { DecisionCard, type Offer } from '@/components/DecisionCard'
+import { DecisionCard } from '@/components/DecisionCard'
 import { EvidenceDrawer, type DrawerView } from '@/components/EvidenceDrawer'
-import { Rail } from '@/components/Rail'
+import { AutomateOffer, Rail } from '@/components/Rail'
 import { Routines } from '@/components/Routines'
 import { StatusStrip } from '@/components/StatusStrip'
 import { SupplyMap, type MapSelection } from '@/components/SupplyMap'
-import { COLORS, fetchState, type Card, type State } from '@/lib/api'
+import { COLORS, DECIDED, fetchState, viaOf, type Card, type State } from '@/lib/api'
 
 const POLL_MS = 5000
 
@@ -17,7 +17,6 @@ export default function App() {
   const [selection, setSelection] = useState<MapSelection>({})
   const [hoverRoutes, setHoverRoutes] = useState<string[]>([])
   const [drawer, setDrawer] = useState<DrawerView>(null)
-  const [offer, setOffer] = useState<Offer | null>(null)
   const [toast, setToast] = useState<string | null>(null)
   const [pulseNode, setPulseNode] = useState<string | null>(null)
   const [fresh, setFresh] = useState<Set<string>>(new Set())
@@ -71,10 +70,10 @@ export default function App() {
 
       const prev = lastStatus.current
       if (prev) {
-        const done = s.cards.find(
-          (c) => prev.get(c.id) === 'open' && ['approved', 'sent', 'escalated', 'dismissed'].includes(c.status),
-        )
-        if (done) setJustDecided(done)
+        const done = s.cards.find((c) => prev.get(c.id) === 'open' && DECIDED.includes(c.status))
+        // Not when a routine made the decision, nor when a routine already covers this card.
+        const byRoutine = (c: Card) => s.activity.some((a) => a.card === c.id && viaOf(a)?.kind === 'routine')
+        if (done && !byRoutine(done) && !(await hasRoutine(done.id))) setJustDecided(done)
       }
       lastStatus.current = new Map(s.cards.map((c) => [c.id, c.status]))
     } catch {
@@ -92,6 +91,7 @@ export default function App() {
   }, [load])
 
   const openDrawer = useCallback((card: Card, tab: 'evidence' | 'trail') => setDrawer({ card, tab }), [])
+  const automateFrom = (card: Card) => { setAutomate({ cardId: card.id, k: Date.now() }); setJustDecided(null) }
 
   if (!state) {
     return (
@@ -103,35 +103,35 @@ export default function App() {
   const single = path.match(/^\/d\/(.+)$/)
   if (single) {
     const id = decodeURIComponent(single[1])
-    const card = state.cards.find((c) => c.id === id) ?? (offer?.card.id === id ? offer.card : undefined)
+    const card = state.cards.find((c) => c.id === id)
     return (
       <div className="min-h-full bg-white">
         <main className="mx-auto max-w-xl space-y-4 px-4 py-5">
           <div className="flex items-center justify-between gap-3">
             <a href="/" className="text-sm font-semibold text-ok hover:underline">← Inbox</a>
-            <AlertsButton />
+            <div className="flex items-center gap-2">
+              <Routines state={state} onChanged={load} request={automate} />
+              <AlertsButton />
+            </div>
           </div>
           {card ? (
             <>
-              {card.status !== 'open' && !offer && (
-                <p className="rounded-lg bg-panel px-3 py-2 text-sm font-semibold text-ink-2">
-                  Already {card.status === 'escalated' ? 'escalated' : card.status}.
-                </p>
-              )}
               <DecisionCard
                 card={card}
+                cards={state.cards}
                 nowMs={clock}
                 direct
-                offer={offer}
-                onOffer={setOffer}
                 onChanged={load}
                 onDrawer={openDrawer}
                 ringing={ringing && card.status === 'open'}
                 onRingingDone={stopRinging}
               />
+              {justDecided?.id === card.id && (
+                <AutomateOffer card={justDecided} onYes={() => automateFrom(justDecided)} onNo={() => setJustDecided(null)} />
+              )}
             </>
           ) : (
-            <p className="text-ink-2">This decision does not exist (any more).</p>
+            <p className="text-ink-2">This decision is no longer open.</p>
           )}
         </main>
         <EvidenceDrawer view={drawer} onClose={() => setDrawer(null)} />
@@ -166,8 +166,9 @@ export default function App() {
             selection={selection}
             onClear={() => setSelection({})}
             fresh={fresh}
-            offer={offer}
-            onOffer={setOffer}
+            decided={justDecided}
+            onAutomate={automateFrom}
+            onSkipAutomate={() => setJustDecided(null)}
             onChanged={load}
             onHover={setHoverRoutes}
             onDrawer={openDrawer}
@@ -181,31 +182,20 @@ export default function App() {
         </div>
       )}
       <EvidenceDrawer view={drawer} onClose={() => setDrawer(null)} />
-      {justDecided && (
-        <AutomateOffer
-          card={justDecided}
-          onYes={() => { setAutomate({ cardId: justDecided.id, k: Date.now() }); setJustDecided(null) }}
-          onNo={() => setJustDecided(null)}
-        />
-      )}
     </div>
   )
 }
 
-const DONE_WORD: Record<string, string> = { approved: 'Approved', sent: 'Sent', escalated: 'Escalated', dismissed: 'Dismissed' }
-
-function AutomateOffer({ card, onYes, onNo }: { card: Card; onYes: () => void; onNo: () => void }) {
-  return (
-    <div className="toast-in fixed bottom-4 left-1/2 z-50 w-[min(640px,calc(100vw-32px))] -translate-x-1/2 rounded-2xl border border-line bg-white p-4 shadow-xl">
-      <div className="text-sm font-semibold text-ok">{DONE_WORD[card.status] ?? 'Done'}: {card.headline}</div>
-      <div className="mt-1 text-[17px] font-bold leading-snug">Handle cards like this automatically next time?</div>
-      <div className="mt-1 text-[15px] text-ink-2">An agent writes a small routine from your decision and shows you a test run first. Anything that costs money still comes to you.</div>
-      <div className="mt-3 flex gap-2">
-        <button onClick={onYes} className="cursor-pointer rounded-lg bg-ok px-4 py-2 text-[15px] font-semibold text-white hover:bg-[#1859b8]">Write a routine</button>
-        <button onClick={onNo} className="cursor-pointer rounded-lg px-4 py-2 text-[15px] font-semibold text-ink-2 hover:bg-panel">Not now</button>
-      </div>
-    </div>
-  )
+// A routine already written from this card: do not offer to automate it again.
+async function hasRoutine(cardId: string): Promise<boolean> {
+  try {
+    const r = await fetch('/api/routines')
+    if (!r.ok) return false
+    const { routines } = (await r.json()) as { routines: { created_from?: string }[] }
+    return routines.some((x) => x.created_from === cardId)
+  } catch {
+    return false
+  }
 }
 
 function Legend() {

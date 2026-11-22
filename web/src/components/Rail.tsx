@@ -1,6 +1,7 @@
-import { CheckCircle2, X } from 'lucide-react'
-import { DecisionCard, type Offer } from '@/components/DecisionCard'
-import { ago, fmtDay, fmtTime, type ActivityItem, type Card, type State } from '@/lib/api'
+import { CheckCircle2, Mic, Sparkles, Workflow, X } from 'lucide-react'
+import { DecisionCard } from '@/components/DecisionCard'
+import { Button } from '@/components/ui/button'
+import { DONE_WORD, ago, fmtDay, fmtTime, sentence, tidy, viaOf, type ActivityItem, type Card, type State } from '@/lib/api'
 import type { MapSelection } from '@/components/SupplyMap'
 
 interface Props {
@@ -9,12 +10,16 @@ interface Props {
   selection: MapSelection
   onClear: () => void
   fresh: Set<string>
-  offer: Offer | null
-  onOffer: (o: Offer | null) => void
+  /** A card the person just decided: offer to handle the next one like it on its own. */
+  decided: Card | null
+  onAutomate: (card: Card) => void
+  onSkipAutomate: () => void
   onChanged: () => void
   onHover: (routes: string[]) => void
   onDrawer: (card: Card, tab: 'evidence' | 'trail') => void
 }
+
+export const HEADING = 'text-xs font-semibold uppercase tracking-wide text-ink-3'
 
 export function Rail(p: Props) {
   const { state, selection } = p
@@ -22,7 +27,6 @@ export function Rail(p: Props) {
     selection.routeId ? c.routes.includes(selection.routeId) : selection.nodeId ? c.supplier_id === selection.nodeId : true
   const mine = state.cards.filter((c) => c.status === 'open' && !c.routed_to_other && match(c))
   const withOther = state.cards.filter((c) => (c.routed_to_other && c.status === 'open') || c.status === 'escalated')
-  const pinned = p.offer && !mine.some((c) => c.id === p.offer!.cardId) ? p.offer.card : null
   const filterName = selection.routeId
     ? `route ${selection.routeId}`
     : selection.nodeId
@@ -33,10 +37,9 @@ export function Rail(p: Props) {
     <DecisionCard
       key={c.id}
       card={c}
+      cards={state.cards}
       nowMs={p.nowMs}
       isNew={p.fresh.has(c.id)}
-      offer={p.offer}
-      onOffer={p.onOffer}
       onChanged={p.onChanged}
       onHover={p.onHover}
       onDrawer={p.onDrawer}
@@ -45,6 +48,10 @@ export function Rail(p: Props) {
 
   return (
     <div className="space-y-4">
+      {p.decided && (
+        <AutomateOffer card={p.decided} onYes={() => p.onAutomate(p.decided!)} onNo={p.onSkipAutomate} />
+      )}
+
       {filterName && (
         <button
           onClick={p.onClear}
@@ -54,21 +61,18 @@ export function Rail(p: Props) {
         </button>
       )}
 
-      {pinned && card(pinned)}
       {mine.length > 0 ? (
         <>
-          <h1 className="text-sm font-bold uppercase tracking-wide text-ink-3">
-            Needs you · {mine.length}
-          </h1>
+          <h1 className={HEADING}>Needs you · {mine.length}</h1>
           {mine.map(card)}
         </>
       ) : (
-        !pinned && <Calm state={state} nowMs={p.nowMs} filtered={!!filterName} />
+        <Calm state={state} nowMs={p.nowMs} filtered={!!filterName} waiting={withOther.length} />
       )}
 
       {withOther.length > 0 && (
         <>
-          <h2 className="pt-2 text-sm font-bold uppercase tracking-wide text-ink-3">With others · {withOther.length}</h2>
+          <h2 className={`pt-2 ${HEADING}`}>With others · {withOther.length}</h2>
           {withOther.map(card)}
         </>
       )}
@@ -78,17 +82,54 @@ export function Rail(p: Props) {
   )
 }
 
-function Calm({ state, nowMs, filtered }: { state: State; nowMs: number; filtered: boolean }) {
+/** The one place that offers automation: after a decision, by button or by voice. */
+export function AutomateOffer({ card, onYes, onNo }: { card: Card; onYes: () => void; onNo: () => void }) {
   return (
-    <section className="rounded-2xl border border-line p-6">
-      <CheckCircle2 size={36} className="text-ok" />
-      <h1 className="mt-3 text-[26px] font-extrabold leading-tight">
-        {filtered ? 'Nothing open here.' : 'On track. Nothing needs you right now.'}
+    <section className="slide-in rounded-xl border-2 border-ok/40 bg-ok/5 p-4" aria-live="polite">
+      <div className="flex items-start gap-1.5 text-sm font-semibold text-ok">
+        <CheckCircle2 size={16} className="mt-0.5 shrink-0" />
+        <span className="min-w-0">{DONE_WORD[card.status] ?? 'Done'}: {tidy(card.headline)}</span>
+      </div>
+      <div className="mt-1.5 text-[17px] font-bold leading-snug">Handle the next one like this on its own?</div>
+      <p className="mt-1 text-[15px] text-ink-2">
+        You'll see what it would do before it starts. Anything that costs money or changes the plan still comes to you.
+      </p>
+      <div className="mt-3 flex gap-2">
+        <Button size="sm" onClick={onYes}><Sparkles size={16} /> Show me how</Button>
+        <Button size="sm" variant="ghost" onClick={onNo}>Not now</Button>
+      </div>
+    </section>
+  )
+}
+
+function Calm({ state, nowMs, filtered, waiting }: { state: State; nowMs: number; filtered: boolean; waiting: number }) {
+  const suppliers = new Set(state.shipments.map((s) => s.supplier_id)).size
+  return (
+    <section className="rounded-2xl border border-line p-5 sm:p-6">
+      <CheckCircle2 size={32} className="text-ok" />
+      <h1 className="mt-3 text-[22px] font-extrabold leading-tight sm:text-[24px]">
+        {filtered ? 'Nothing open here.' : 'Nothing needs you right now.'}
       </h1>
       <p className="mt-2 text-[15px] text-ink-2">
-        Agents read {state.read_since_6} new files since 06:00 · last check {ago(state.last_check_at, nowMs)}
+        {waiting > 0 && `${waiting} ${waiting === 1 ? 'decision is' : 'decisions are'} with others. `}
+        Agents are watching {state.shipments.length} shipments from {suppliers} suppliers and every new portal file
+        {state.read_since_6 > 0 && ` (${state.read_since_6} read since 06:00)`}. Last check {ago(state.last_check_at, nowMs)}.
       </p>
+      <p className="mt-1 text-sm text-ink-3">When something needs a decision, it shows up here first.</p>
     </section>
+  )
+}
+
+function Via({ a }: { a: ActivityItem }) {
+  const v = viaOf(a)
+  if (!v) return null
+  const chip = 'inline-flex max-w-full items-center gap-1 rounded bg-ok/10 px-1.5 py-0.5 text-xs font-semibold text-ok'
+  return v.kind === 'routine' ? (
+    <span className={chip} title={`Handled by the routine "${v.name}"`}>
+      <Workflow size={12} className="shrink-0" /> <span className="truncate">By routine · {v.name}</span>
+    </span>
+  ) : (
+    <span className={chip}><Mic size={12} className="shrink-0" /> By voice</span>
   )
 }
 
@@ -96,16 +137,17 @@ function Activity({ items }: { items: ActivityItem[] }) {
   if (!items.length) return null
   return (
     <section className="pt-2">
-      <h2 className="text-sm font-bold uppercase tracking-wide text-ink-3">Activity</h2>
+      <h2 className={HEADING}>Activity</h2>
       <ul className="mt-2 divide-y divide-line">
         {items.slice(0, 12).map((a, i) => (
           <li key={i} className="flex gap-3 py-2.5 text-[15px]">
-            <span className="w-[72px] shrink-0 text-sm tabular-nums text-ink-3">
+            <span className="w-[72px] shrink-0 pt-px text-sm tabular-nums text-ink-3">
               {a.at ? `${fmtDay(a.at)} ${fmtTime(a.at)}` : ''}
             </span>
             <span className="min-w-0 text-ink-2">
-              <span className="break-words">{a.text}</span>
-              {a.detail && <span className="block text-sm text-ink-3">{a.detail}</span>}
+              <span className="break-words">{sentence(a.text)}</span>
+              {a.detail && <span className="block text-sm text-ink-3">{tidy(a.detail)}</span>}
+              {viaOf(a) && <span className="mt-1 block"><Via a={a} /></span>}
             </span>
           </li>
         ))}

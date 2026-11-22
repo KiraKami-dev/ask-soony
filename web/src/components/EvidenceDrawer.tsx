@@ -2,7 +2,7 @@ import { ExternalLink } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { type Anchor, AnchorList, CitedText, OpenAnchor, useAnchors } from '@/components/SourceAnchors'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
-import { fmtDay, fmtTime, type Card } from '@/lib/api'
+import { fmtDay, fmtTime, tidy, type Card } from '@/lib/api'
 
 export type DrawerView = { card: Card; tab: 'evidence' | 'trail' } | null
 
@@ -69,7 +69,7 @@ function Evidence({ card }: { card: Card }) {
           {rest.map(([e, i]) => (
             <section key={i} className="rounded-xl border border-line p-4">
               <div className="flex items-baseline justify-between gap-3">
-                <div className="text-[15px] font-semibold">{e.source}</div>
+                <div className="text-[15px] font-semibold">{e.source && !/^evidence$/i.test(e.source) ? e.source : 'Supporting note'}</div>
                 {e.value != null && String(e.value).length <= 24 && <div className="text-xl font-extrabold tabular-nums">{typeof e.value === 'number' ? e.value.toLocaleString('en-GB') : e.value}</div>}
               </div>
               {e.value != null && String(e.value).length > 24 && <p className="mt-1.5 text-[15px] font-semibold text-ink">{e.value}</p>}
@@ -112,7 +112,7 @@ function Side({ e, tone, anchors, ready }: {
   return (
     <section className={tone === 'system' ? 'rounded-xl border border-line bg-panel p-4' : 'rounded-xl border-2 border-stop/40 bg-white p-4'}>
       <div className="text-xs font-bold uppercase tracking-wide text-ink-3">{tone === 'system' ? 'The system says' : 'The document says'}</div>
-      <div className="mt-1 text-[22px] font-extrabold leading-tight tabular-nums">{e.value}</div>
+      <div className="mt-1 text-[22px] font-extrabold leading-tight tabular-nums">{tidy(String(e.value ?? ''))}</div>
       <div className="mt-1 text-sm text-ink-2">{e.source?.replace(/^(System|Paper) says\s*·\s*/i, '')}</div>
       {e.quote && <blockquote className="mt-2 border-l-4 border-line pl-3 text-sm leading-relaxed text-ink">“{cited(String(e.quote))}”</blockquote>}
       {e.translation && <p className="mt-1.5 text-sm text-ink-2">In English: {e.translation}</p>}
