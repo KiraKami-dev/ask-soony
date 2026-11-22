@@ -180,7 +180,7 @@ export function Today(p: Props) {
           {ready}
           {p.order.length > 0 && <QuietList {...p} card={p.caseCard ? null : p.card} />}
           {groups}
-          {!phone && p.order.length > 0 && <p className="t-small text-ink-3"><kbd>⌘</kbd><kbd>↵</kbd> approve · <kbd>O</kbd> more options · <kbd>J</kbd> <kbd>K</kbd> move</p>}
+          {!phone && p.order.length > 0 && <p className="t-small text-ink-3">approve <kbd>⌘</kbd><kbd>↵</kbd> · options <kbd>O</kbd> · move <kbd>J</kbd> <kbd>K</kbd></p>}
         </aside>
         <main className="relative min-w-0">{body}</main>
       </div>
