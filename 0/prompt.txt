@@ -377,3 +377,7 @@ Files are in `web/src/components/`:
 ---
 
 what is the difference of today and plan now tbh?
+
+---
+
+and are automations offered automatically?
