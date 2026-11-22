@@ -94,6 +94,14 @@ export function Today(p: Props) {
     window.setTimeout(() => (g ? document.getElementById(`group-${g}`) : allRef.current)?.scrollIntoView({ block: 'start', behavior: 'smooth' }), 50)
   }
   const allReq = p.allReq ?? 0
+  // Desktop: the list keeps its scroll position; only bring the selected row into view if needed.
+  const asideRef = useRef<HTMLElement>(null)
+  const selectedId = p.caseCard?.id ?? card?.id
+  useEffect(() => {
+    const id = window.requestAnimationFrame(() =>
+      asideRef.current?.querySelector('[aria-current="true"]')?.scrollIntoView({ block: 'nearest' }))
+    return () => window.cancelAnimationFrame(id)
+  }, [selectedId])
   useEffect(() => { if (allReq) reveal() }, [allReq]) // eslint-disable-line react-hooks/exhaustive-deps
   const toggleGroup = (g: GroupKey) =>
     setOpenGroups((o) => { const n = new Set(o); if (n.has(g)) n.delete(g); else n.add(g); return n })
@@ -154,8 +162,8 @@ export function Today(p: Props) {
   return (
     <div className="relative flex-1">
       <div className="mx-auto grid w-full max-w-[1440px] grid-cols-[240px_minmax(0,640px)] gap-x-16 px-12 pb-32 pt-24 xl:grid-cols-[300px_640px] xl:gap-x-[124px] xl:px-24">
-        <aside aria-label="Cases" className="sticky top-6 -mx-4 max-h-[calc(100vh-48px)] space-y-10 self-start overflow-y-auto px-4 pb-6 [scrollbar-width:thin]">
-          {p.order.length > 0 && <QuietList {...p} />}
+        <aside ref={asideRef} aria-label="Cases" className="sticky top-6 -mx-4 max-h-[calc(100vh-48px)] space-y-10 self-start overflow-y-auto px-4 pb-6 [scrollbar-width:thin]">
+          {p.order.length > 0 && <QuietList {...p} card={p.caseCard ? null : p.card} />}
           {groups}
           {!phone && <p className="t-small text-ink-3"><kbd>J</kbd> <kbd>K</kbd> move · <kbd>1</kbd>–<kbd>9</kbd> choose · <kbd>A</kbd> go</p>}
         </aside>
@@ -182,6 +190,8 @@ function QuietList({ order, card, onFocus, state, nowMs }: Props) {
   // Five by default; all when asked, or when the case in focus sits further down (j/k, links).
   const [all, setAll] = useState(false)
   const focusAt = rows.findIndex((r) => r.c.id === card?.id || (card && r.c.group && r.c.group === card.group))
+  // Once the focus opened the list, it stays open: collapsing it would make everything below jump.
+  useEffect(() => { if (focusAt >= 5) setAll(true) }, [focusAt])
   const open = all || focusAt >= 5
   const shown = open ? rows : rows.slice(0, 5)
   const more = rows.slice(5).reduce((n, r) => n + r.n, 0)
