@@ -366,7 +366,7 @@ export default function App() {
   return (
     <div className="flex min-h-full flex-col bg-ground">
       {bar}
-      <Launch state={state} nowMs={nowMs} phone={narrow} onOpen={openCase} role={role} />
+      <Launch state={state} nowMs={nowMs} phone={narrow} onOpen={openCase} role={role} onHistory={() => go('/history')} />
       {overlays}
     </div>
   )

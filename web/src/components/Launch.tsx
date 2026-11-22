@@ -21,6 +21,8 @@ interface Props {
   onOpen: (cardId: string) => void
   /** Who uses this device: "with you" means them. */
   role?: Role | null
+  /** Opens History (who decided what today). */
+  onHistory?: () => void
 }
 
 const OPEN = new Set(['open', 'escalated'])
@@ -135,7 +137,7 @@ function useDataHealth(stamp: unknown): DataHealth | null {
   return h
 }
 
-export function Launch({ state, nowMs, phone, onOpen, role = null }: Props) {
+export function Launch({ state, nowMs, phone, onOpen, role = null, onHistory }: Props) {
   const health = useDataHealth(state)
   const gaps = (health?.issues ?? []).filter((i) => i.kind !== 'unused')
   const unused = (health?.issues ?? []).filter((i) => i.kind === 'unused')
@@ -168,7 +170,7 @@ export function Launch({ state, nowMs, phone, onOpen, role = null }: Props) {
             </ul>
           </div>
         )}
-        <FixedToday state={state} nowMs={nowMs} onOpen={onOpen} />
+        <FixedToday state={state} nowMs={nowMs} onOpen={onOpen} onHistory={onHistory} />
         <LaunchBrief state={state} nowMs={nowMs} phone={phone} role={role} onOpen={onOpen} />
       </div>
 
@@ -382,7 +384,7 @@ type Win = { at: number; text: string; card?: string }
  * from the site that replaced a guess, decisions acted on. Facts with a time, never "all fine";
  * the check mark and the past tense carry it, the green only adds to it.
  */
-function FixedToday({ state, nowMs, onOpen }: { state: State; nowMs: number; onOpen: (id: string) => void }) {
+function FixedToday({ state, nowMs, onOpen, onHistory }: { state: State; nowMs: number; onOpen: (id: string) => void; onHistory?: () => void }) {
   const dayStart = new Date(nowMs); dayStart.setHours(0, 0, 0, 0)
   const today = (iso?: string | null) => !!iso && t(iso) >= dayStart.getTime() && t(iso) <= nowMs
   const site = state.launch?.floor?.site ?? 'The site'
@@ -433,9 +435,13 @@ function FixedToday({ state, nowMs, onOpen }: { state: State; nowMs: number; onO
         {acted.length > 0 && (
           <li className="flex items-baseline gap-2">
             <Check size={14} strokeWidth={2.25} className="shrink-0 translate-y-0.5 text-routine" aria-hidden="true" />
-            <span className="text-ink-2">
+            <a
+              href="/history"
+              onClick={(e) => { if (onHistory) { e.preventDefault(); onHistory() } }}
+              className="text-ink-2 hover:text-ink hover:underline"
+            >
               {acted.length} {acted.length === 1 ? 'decision' : 'decisions'} acted on{byRoutine > 0 ? `, ${byRoutine} by routines` : ''}
-            </span>
+            </a>
           </li>
         )}
       </ul>
