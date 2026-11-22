@@ -107,7 +107,10 @@ export default function App() {
     return (
       <div className="min-h-full bg-white">
         <main className="mx-auto max-w-xl space-y-4 px-4 py-5">
-          <a href="/" className="text-sm font-semibold text-ok hover:underline">← Inbox</a>
+          <div className="flex items-center justify-between gap-3">
+            <a href="/" className="text-sm font-semibold text-ok hover:underline">← Inbox</a>
+            <AlertsButton />
+          </div>
           {card ? (
             <>
               {card.status !== 'open' && !offer && (
@@ -132,14 +135,17 @@ export default function App() {
           )}
         </main>
         <EvidenceDrawer view={drawer} onClose={() => setDrawer(null)} />
-        <AlertsButton />
       </div>
     )
   }
 
   return (
     <div className="flex h-full flex-col bg-white">
-      <StatusStrip state={state} nowMs={clock} />
+      <StatusStrip
+        state={state}
+        nowMs={clock}
+        actions={<><Routines state={state} onChanged={load} request={automate} /><AlertsButton /></>}
+      />
       <div className="grid min-h-0 flex-1 lg:grid-cols-[3fr_2fr]">
         <section className="relative hidden min-h-0 flex-col border-r border-line lg:flex">
           <div className="relative min-h-0 flex-1">
@@ -175,8 +181,6 @@ export default function App() {
         </div>
       )}
       <EvidenceDrawer view={drawer} onClose={() => setDrawer(null)} />
-      <AlertsButton />
-      <Routines state={state} onChanged={load} request={automate} />
       {justDecided && (
         <AutomateOffer
           card={justDecided}

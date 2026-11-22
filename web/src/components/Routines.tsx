@@ -73,9 +73,15 @@ export function Routines({
     <>
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-16 left-4 z-40 inline-flex cursor-pointer items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-ink-2 shadow-md hover:bg-panel"
+        title="Routines: what the agents do on their own"
+        aria-label="Routines"
+        className="relative inline-flex h-9 cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border border-line bg-white px-2.5 text-sm font-semibold text-ink-2 hover:bg-panel 2xl:px-3.5"
       >
-        <Cog size={16} className={active ? 'text-ok' : ''} /> Routines{active ? ` · ${active} on` : ''}
+        <Cog size={16} className={active ? 'text-ok' : ''} />
+        <span className="hidden 2xl:inline">Routines</span>
+        {active > 0 && (
+          <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-ok px-1 text-[10px] font-bold text-white">{active}</span>
+        )}
       </button>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent>

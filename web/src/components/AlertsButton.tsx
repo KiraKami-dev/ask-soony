@@ -22,12 +22,12 @@ export function AlertsButton() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-40 flex flex-col items-end gap-2">
+    <div className="relative">
       {info && (
-        <div className="max-w-xs rounded-xl border border-line bg-white px-4 py-2 text-sm text-ink-2 shadow-lg">{info}</div>
+        <div className="absolute right-0 top-11 z-50 w-72 rounded-xl border border-line bg-white px-4 py-2 text-sm text-ink-2 shadow-lg">{info}</div>
       )}
       <button
-        className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-ink-2 shadow-md hover:bg-panel"
+        className="inline-flex h-9 cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border border-line bg-white px-2.5 text-sm 2xl:px-3.5 font-semibold text-ink-2 hover:bg-panel"
         onClick={async () => {
           if (!supported) return say('This browser cannot receive alerts. On iPhone: Share → Add to Home Screen, then open the app.')
           if (!on) {
@@ -38,9 +38,10 @@ export function AlertsButton() {
           say(await sendTestAlert(''))
         }}
         title={on ? 'Send a test alert to this device' : 'Get launch alerts on this device'}
+        aria-label={on ? 'Test alert' : 'Enable alerts'}
       >
         {on ? <BellRing size={16} className="text-ok" /> : <Bell size={16} />}
-        {on ? 'Test alert' : 'Enable alerts'}
+        <span className="hidden 2xl:inline">{on ? 'Test alert' : 'Enable alerts'}</span>
       </button>
     </div>
   )

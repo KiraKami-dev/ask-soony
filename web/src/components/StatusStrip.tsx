@@ -1,6 +1,7 @@
+import type { ReactNode } from 'react'
 import { COLORS, ago, fmtDay, fmtNum, fmtTime, type State } from '@/lib/api'
 
-export function StatusStrip({ state, nowMs }: { state: State; nowMs: number }) {
+export function StatusStrip({ state, nowMs, actions }: { state: State; nowMs: number; actions?: ReactNode }) {
   return (
     <header className="flex flex-wrap items-stretch gap-x-2 border-b border-line bg-white px-5 py-3 lg:px-6">
       <div className="mr-4 flex items-center gap-2.5 self-center">
@@ -43,6 +44,7 @@ export function StatusStrip({ state, nowMs }: { state: State; nowMs: number }) {
         <div>Last portal drop</div>
         <div className="text-sm font-semibold text-ink-2">{ago(state.last_drop_at, nowMs)}</div>
       </div>
+      {actions && <div className="flex items-center gap-2 self-center pl-3">{actions}</div>}
     </header>
   )
 }
