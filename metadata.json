@@ -1,0 +1,63 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M817GM6FS31506RK06WF1DEE",
+  "strategy": "manual-commit",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "src/ask_soony/alerts.py",
+    "src/ask_soony/api.py",
+    "src/ask_soony/card_alerts.py",
+    "src/ask_soony/cli.py",
+    "tests/test_card_alerts.py",
+    "web/src/App.tsx",
+    "web/src/components/Today.tsx",
+    "web/src/lib/api.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt",
+      "assets_manifest": "/0/assets/manifest.json"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 10,
+    "cache_creation_tokens": 6939,
+    "cache_read_tokens": 2755717,
+    "output_tokens": 2010,
+    "api_call_count": 4,
+    "subagent_tokens": {
+      "input_tokens": 54,
+      "cache_creation_tokens": 41396,
+      "cache_read_tokens": 3502136,
+      "output_tokens": 30401,
+      "api_call_count": 27
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 2183,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 78,
+      "credentialed_uri": 0,
+      "entropy": 736,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 1345,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1230,
+      "IP": 50,
+      "PHONE": 65
+    }
+  }
+}

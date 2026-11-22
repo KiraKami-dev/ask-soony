@@ -1,0 +1,19 @@
+{
+  "tool_use_id": "toolu_01QC3THYUFrhy9unYBXPkocj",
+  "agent_id": "a8dbd30d2cdde29d7",
+  "subagent_type": "general-purpose",
+  "task_description": "Bridge phone calls to cases",
+  "files": [
+    "src/ask_soony/card_alerts.py",
+    "tests/test_card_alerts.py"
+  ],
+  "token_usage": {
+    "input_tokens": 96,
+    "cache_creation_tokens": 146844,
+    "cache_read_tokens": 5210617,
+    "output_tokens": 38267,
+    "api_call_count": 48
+  },
+  "started_at": "2026-11-22T09:47:26.257094+01:00",
+  "completed_at": "2026-11-22T09:55:39.841809+01:00"
+}

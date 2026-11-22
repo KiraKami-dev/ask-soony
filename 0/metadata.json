@@ -1,0 +1,197 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M817GM6FS31506RK06WF1DEE",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T08:56:30.382221Z",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 1,
+  "save_step_count": 2,
+  "files_touched": [
+    "src/ask_soony/alerts.py",
+    "src/ask_soony/api.py",
+    "src/ask_soony/card_alerts.py",
+    "src/ask_soony/cli.py",
+    "tests/test_card_alerts.py",
+    "web/src/App.tsx",
+    "web/src/components/Today.tsx",
+    "web/src/lib/api.ts"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "010dd09eb0c4",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 10,
+    "cache_creation_tokens": 6939,
+    "cache_read_tokens": 2755717,
+    "output_tokens": 2010,
+    "api_call_count": 4,
+    "subagent_tokens": {
+      "input_tokens": 54,
+      "cache_creation_tokens": 41396,
+      "cache_read_tokens": 3502136,
+      "output_tokens": 30401,
+      "api_call_count": 27
+    },
+    "subagent_tokens_complete": true
+  },
+  "session_token_usage": {
+    "input_tokens": 3091,
+    "cache_creation_tokens": 3061613,
+    "cache_read_tokens": 683477888,
+    "output_tokens": 1253738,
+    "api_call_count": 1341,
+    "subagent_tokens": {
+      "input_tokens": 3174,
+      "cache_creation_tokens": 6766697,
+      "cache_read_tokens": 234168707,
+      "output_tokens": 1833544,
+      "api_call_count": 1516
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 2183,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 78,
+      "credentialed_uri": 0,
+      "entropy": 736,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 1345,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1230,
+      "IP": 50,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 269
+  },
+  "summary": {
+    "intent": "Win the Lio 'Keep the Line Running' hackathon challenge by analyzing Soony's confidential launch data, then building a general recheck-and-act agent product (poller, extraction, recompute, supplier emails with approvals) and preparing demo, pitch and interview material before the Sunday 12:00 hand-in.",
+    "outcome": "Found that Soony's plan hid real shortfalls (overbooked art books, failed statues, slow Collector's packing), built and deployed the product with sign-off, phone-alert bridge, live and demo instances, README and demo script, and rehearsed all three demo stories. The latest phone-bridge work was being committed and many commits remained unpushed.",
+    "learnings": {
+      "repo": [
+        "Confidential portal data lives in gitignored data/ (raw, drops, notes, img); .env holds SOONY_PORTAL_TOKEN and is gitignored, .env.example is committed.",
+        "Portal API has only three endpoints (files list, single file, archive.zip) with no webhooks; changes must be detected by polling and comparing SHA-256, and existing files can be replaced under the same name.",
+        "Team workflow files CLAUDE.md and PROGRESS.md exist; work is claimed with a Now line in PROGRESS.md.",
+        "Live instance runs on :8000 and demo instance on :8001 via scripts/demo.sh (reset, snapshot, stop; CALLS=twilio switches real calls). Demo uses dry-mail mode so supplier emails are only recorded in data/demo/state/dry_outbox.json.",
+        "Live and demo servers share one alert database, so alert-to-case links are stored per state folder.",
+        "Web UI polls state every 5 s (POLL_MS=5000) and routines every 15 s; there is no server push.",
+        "Phone calls default to ASK_CALL_PROVIDER=dry_run; real Twilio calls cost about $0.38/min; ASK_PUBLIC_URL must be set for keypad/voice webhooks; ASK_CARD_ALERTS=off disables the case-alert bridge.",
+        "Entire only writes a checkpoint when repo files change; no-change turns log 'skipping checkpoint', and checkpoints are pushed with git push.",
+        "Sign-off flow: one-time /ok/<token> links bypass basic auth (basic_auth.py), approve runs through api.approve with via='signoff'."
+      ],
+      "code": [
+        {
+          "path": "src/ask_soony/alerts.py",
+          "finding": "AlertBook.decide now forwards phone decisions to the linked case via the new card_alerts bridge, applied exactly once."
+        },
+        {
+          "path": "src/ask_soony/card_alerts.py",
+          "finding": "New bridge raises one alert per red or near-deadline case untouched for 15 min, applies phone decisions to cases, and closes alerts when the case is decided elsewhere."
+        },
+        {
+          "path": "src/ask_soony/cli.py",
+          "finding": "The background escalation loop runs the card-alert bridge before its usual tick every 30 s."
+        },
+        {
+          "path": "src/ask_soony/signoff.py",
+          "finding": "Implements one-time sign-off links, push/Teams delivery, and simulation fallback via ASK_SIGNOFF_SIMULATE."
+        }
+      ],
+      "workflow": [
+        "Delegating independent builds and cross-checks (200 order confirmations, 59 scans, sign-off loop, phone bridge) to subagents while writing docs in parallel saved significant time.",
+        "Verify UI changes in a real browser on the demo instance (e.g., pressing J ten times and counting highlighted rows) rather than trusting type checks alone.",
+        "Ask before spending money (Twilio calls) and before outward-facing actions; keep real supplier emails off the demo instance.",
+        "Keep confidential data out of code, docs sent to external services, and the repo; README avoids challenge numbers because the repo goes to the jury.",
+        "Check for concurrent edits on shared docs before rewriting sections."
+      ]
+    },
+    "friction": [
+      "Cloudflare Error 1033 on the demo hostname after the DNS record was first routed to the wrong tunnel; fixed by re-routing.",
+      "A race in the shared mailbox sync wrote back a stale action log and lost the 07:58 art-book approval record; fixed with an append-under-lock and restored from the Sent folder.",
+      "J/K navigation walked through folded cases individually, so the row highlight vanished and order seemed to jump.",
+      "Safari caches favicons stubbornly, so a versioned link was needed.",
+      "Rev B case sentence dropped the order number and began with 'usable, but …'.",
+      "Servers on :8000 and :8001 needed a restart to pick up new backend code, otherwise the done screen was stale.",
+      "Push notifications go to every subscribed phone, with no per-person targeting.",
+      "The assistant's earlier note that the Entire SessionStart was logged under a different session ID was a minor oddity; Codex hooks still need approval in /hooks."
+    ],
+    "open_items": [
+      "Several commits unpushed, including the phone bridge, the demo script and the ⌘↵ shortcut work; the phone-bridge commit was still in progress.",
+      "Restart live and demo servers to load the phone bridge; consider ASK_CARD_ALERTS=off on live to avoid dry-run alerts in the shared DB.",
+      "Register sender email addresses in the portal Settings and decide on a team inbox so supplier mail can really be sent and replied to.",
+      "Optional: 'What still saves it' section on Launch, replaying supplier replies on the demo, folding the count questions, and Maren's top bar saying 'nothing needs you'.",
+      "Delete the duplicate routine (awaiting user decision) and decide whether to delete the earlier Claude doc.",
+      "Hand-in tasks before 12:00: video, pitch deck, final demo rehearsal; run scripts/demo.sh reset before each rehearsal and the pitch.",
+      "Question for Felix at the 09:00 office hours about who gets the container to the DC; write down a quote for the 'Felix told us…' moment.",
+      "Rotate the portal login that was pasted into Discord after the hack.",
+      "Phone alerts for already-overdue red cases could cost money with real calls; tune ASK_CALL_AFTER_MIN and ASK_CALL_MAX_OPEN."
+    ]
+  }
+}
