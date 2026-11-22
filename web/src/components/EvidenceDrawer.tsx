@@ -33,16 +33,16 @@ const PAPER = /paper|document|scan|advice|confirmation|delivery note|notice|invo
 
 function Evidence({ card }: { card: Card }) {
   const anchors = useAnchors(card.id)
+  const [open, setOpen] = useState<Anchor | null>(null)
   if (!card.evidence.length) return <p className="text-ink-2">No source documents attached to this decision yet.</p>
   // Lead with the contradiction: what the system says against what the paper says, each with its
   // source opened at the spot. Everything else follows as supporting evidence.
   const sys = card.evidence.findIndex((e) => SYSTEM.test(e.source ?? ''))
   const paper = card.evidence.findIndex((e, i) => i !== sys && PAPER.test(e.source ?? ''))
   const pair = sys >= 0 && paper >= 0 ? [sys, paper] : []
-  const rest = card.evidence.map((e, i) => [e, i] as const).filter(([, i]) => !pair.includes(i))
-  const order = [...pair, ...rest.map(([, i]) => i)]
+  const rest = card.evidence.map((_, i) => i).filter((i) => !pair.includes(i))
+  const order = [...pair, ...rest]
   const all = order.flatMap((i) => anchors.items?.[i] ?? [])
-  const [open, setOpen] = useState<Anchor | null>(null)
   const point = card.summary || card.reason
   return (
     <>
@@ -66,32 +66,8 @@ function Evidence({ card }: { card: Card }) {
       {rest.length > 0 && (
         <>
           {pair.length > 0 && <div className="pt-2 text-xs font-semibold uppercase tracking-wide text-ink-3">More evidence</div>}
-          {rest.map(([e, i]) => (
-            <section key={i} className="rounded-xl border border-line p-4">
-              <div className="flex items-baseline justify-between gap-3">
-                <div className="text-[15px] font-semibold">{e.source && !/^evidence$/i.test(e.source) ? e.source : 'Supporting note'}</div>
-                {e.value != null && String(e.value).length <= 24 && <div className="text-xl font-extrabold tabular-nums">{typeof e.value === 'number' ? e.value.toLocaleString('en-GB') : e.value}</div>}
-              </div>
-              {e.value != null && String(e.value).length > 24 && <p className="mt-1.5 text-[15px] font-semibold text-ink">{e.value}</p>}
-              {e.quote && (
-                <blockquote className="mt-3 border-l-4 border-line pl-3 text-[15px] text-ink">
-                  “{e.quote}”
-                  {e.language && <span className="ml-2 text-xs uppercase text-ink-3">{e.language}</span>}
-                </blockquote>
-              )}
-              {e.translation && <p className="mt-2 text-sm text-ink-2">In English: {e.translation}</p>}
-              {e.doc && !anchors.items?.[i]?.length && (
-                <a
-                  href={`/api/file?path=${encodeURIComponent(e.doc)}${e.page ? `#page=${e.page}` : ''}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-ok hover:underline"
-                >
-                  Open source document{e.page ? `, page ${e.page}` : ''} <ExternalLink size={14} />
-                </a>
-              )}
-              <AnchorList anchors={anchors.items?.[i]} ready={anchors.ready} />
-            </section>
+          {rest.map((i) => (
+            <EvidenceItem key={i} e={card.evidence[i]} anchors={anchors.items?.[i]} ready={anchors.ready} />
           ))}
         </>
       )}
@@ -99,7 +75,38 @@ function Evidence({ card }: { card: Card }) {
   )
 }
 
-function Side({ e, tone, anchors, ready }: {
+/** One supporting evidence line: its value, the quote and translation, and where it was found. */
+export function EvidenceItem({ e, anchors, ready }: { e: Card['evidence'][number]; anchors?: Anchor[]; ready: boolean }) {
+  return (
+    <section className="rounded-xl border border-line p-4">
+      <div className="flex items-baseline justify-between gap-3">
+        <div className="text-[15px] font-semibold">{e.source && !/^evidence$/i.test(e.source) ? tidy(e.source) : 'Supporting note'}</div>
+        {e.value != null && String(e.value).length <= 24 && <div className="text-xl font-extrabold tabular-nums">{typeof e.value === 'number' ? e.value.toLocaleString('en-GB') : tidy(e.value)}</div>}
+      </div>
+      {e.value != null && String(e.value).length > 24 && <p className="mt-1.5 text-[15px] font-semibold text-ink">{tidy(String(e.value))}</p>}
+      {e.quote && (
+        <blockquote className="mt-3 border-l-4 border-line pl-3 text-[15px] text-ink">
+          “{e.quote}”
+          {e.language && <span className="ml-2 text-xs uppercase text-ink-3">{e.language}</span>}
+        </blockquote>
+      )}
+      {e.translation && <p className="mt-2 text-sm text-ink-2">In English: {e.translation}</p>}
+      {e.doc && !anchors?.length && (
+        <a
+          href={`/api/file?path=${encodeURIComponent(e.doc)}${e.page ? `#page=${e.page}` : ''}`}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-ok hover:underline"
+        >
+          Open source document{e.page ? `, page ${e.page}` : ''} <ExternalLink size={14} />
+        </a>
+      )}
+      <AnchorList anchors={anchors} ready={ready} />
+    </section>
+  )
+}
+
+export function Side({ e, tone, anchors, ready }: {
   e: Card['evidence'][number]; tone: 'system' | 'paper'; anchors?: Anchor[]; ready: boolean
 }) {
   const [open, setOpen] = useState<Anchor | null>(null)
@@ -122,7 +129,7 @@ function Side({ e, tone, anchors, ready }: {
   )
 }
 
-function Trail({ card }: { card: Card }) {
+export function Trail({ card }: { card: Card }) {
   if (!card.trail.length) return <p className="text-ink-2">No agent steps recorded for this decision yet.</p>
   return (
     <ol className="space-y-4">
