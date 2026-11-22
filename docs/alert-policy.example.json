@@ -1,0 +1,14 @@
+{
+  "dashboard_url": "https://ask-soony.example.com",
+  "critical_hours": 24,
+  "contacts": [
+    {"id": "buyer", "name": "Senior Buyer", "role": "buyer", "phone": "+15550000001", "email": "buyer@example.com"},
+    {"id": "head", "name": "Head of Procurement", "role": "head_of_procurement", "phone": "+15550000002", "email": "head@example.com"},
+    {"id": "cpo", "name": "Chief Procurement Officer", "role": "cpo", "phone": "+15550000003", "email": "cpo@example.com"}
+  ],
+  "routes": {
+    "critical": {"channels": ["dashboard", "email", "call"], "chain": ["buyer", "head", "cpo"], "ack_minutes": 10},
+    "high": {"channels": ["dashboard", "email"], "chain": ["buyer", "head"], "ack_minutes": 120},
+    "medium": {"channels": ["dashboard"], "chain": ["buyer"], "ack_minutes": 0}
+  }
+}

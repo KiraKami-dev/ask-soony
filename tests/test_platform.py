@@ -4,8 +4,7 @@ import json
 
 import pytest
 from fastapi.testclient import TestClient
-
-from tests.test_launch import make_portal
+from test_launch import make_portal
 
 
 @pytest.fixture

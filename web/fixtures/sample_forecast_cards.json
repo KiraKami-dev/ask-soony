@@ -1,0 +1,16 @@
+{
+  "cards": [
+    {"id": "card-widget-c", "title": "Widget C: arrival forecast is late",
+     "edition": "WG-1", "at_risk": 45, "part": "P-300",
+     "system_says": "Shipment status booked, arrives on time",
+     "paper_says": "Forecast puts arrival after the packing window",
+     "stage": "before_arrival",
+     "evidence": ["Carrier schedule for the example voyage"],
+     "options": [{"action": "Ask Supplier Three to expedite", "cost": "example fee", "effect": "arrives in time", "recommended": true}],
+     "decision": null,
+     "messages": [{"to_role": "Supplier contact", "to_email": "logistics@supplier-three.example.com",
+                   "subject": "Expedite request", "body": "Can the second container be moved to an earlier departure?"}],
+     "at_risk_if_acted": 0, "act_by": "2030-01-10T11:00:00+00:00",
+     "runs_dry": null, "blocked_only": false}
+  ]
+}

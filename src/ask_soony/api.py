@@ -676,7 +676,7 @@ app = FastAPI(title="ask-soony")
 
 
 @app.get("/api/state")
-def get_state() -> dict:
+def get_inbox_state() -> dict:
     return build_state()
 
 
@@ -723,7 +723,7 @@ def approve(card_id: str, body: dict = Body(default_factory=dict)) -> dict:
 def escalate(card_id: str, body: dict = Body(default_factory=dict)) -> dict:
     card = _card(card_id)
     note = (body.get("note") or "").strip()
-    brief = card["escalation_brief"] + (f" Note from {first_name(get_state()['viewer'])}: {note}" if note else "")
+    brief = card["escalation_brief"] + (f" Note from {first_name(build_state()['viewer'])}: {note}" if note else "")
     return _record(card_id, "escalated", {
         "kind": "escalate", "to": card.get("approver"), "brief": brief, "note": note, "status": "requested",
     })
@@ -757,6 +757,32 @@ def get_file(path: str):
     if not target.is_file() or root.resolve() not in target.parents:
         raise HTTPException(404)
     return FileResponse(target)
+
+
+# ---------------------------------------------------------------- Jonas: alert agent in one server
+# Voice, push, card tools, supplier replies and call webhooks are routers from the alert agent. They
+# read verifier-shaped cards through `api.get_state()` and the helpers below, which live in
+# globe_api (his original dashboard API); importing it also starts his opt-in background loops
+# (ASK_BACKGROUND=on, ASK_REPLY_POLL=on). The inbox's own state stays at /api/state.
+
+from ask_soony import calls, cardtools, globe_api, push, replies, voice  # noqa: E402
+from ask_soony.basic_auth import BasicAuth  # noqa: E402
+from ask_soony.globe_api import (  # noqa: E402,F401  used by the routers as api.<name>
+    ROOT,
+    _action_status,
+    _add_event,
+    _now,
+    _read,
+    _state_dir,
+    _write,
+)
+
+get_state = globe_api.get_state
+for _router in (voice.router, push.router, cardtools.router, replies.router, calls.router):
+    app.include_router(_router)
+_GLOBE_ROUTES = {"/api/feed", "/api/network", "/api/mode", "/api/cards/{card_id}/action"}
+app.router.routes.extend(r for r in globe_api.app.router.routes if getattr(r, "path", None) in _GLOBE_ROUTES)
+app.add_middleware(BasicAuth)
 
 
 def mount_frontend() -> None:

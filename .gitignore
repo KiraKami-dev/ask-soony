@@ -24,3 +24,5 @@ soony-data/
 
 # Lio challenge documents (kept locally, not shared through the repo)
 challenge_docs/
+# Playwright MCP scratch
+.playwright-mcp/

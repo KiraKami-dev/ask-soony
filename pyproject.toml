@@ -14,8 +14,10 @@ dependencies = [
     "pillow>=11.0",
     "pypdf>=5.0",
     "pypdfium2>=4.30",
-    "uvicorn>=0.54.0",
     "tqdm>=4.70.1",
+    "pywebpush>=2.5.0",
+    "uvicorn[standard]>=0.54.0",
+    "websockets>=17.4",
 ]
 
 [project.scripts]
@@ -51,3 +53,7 @@ pythonpath = ["src"]
 "src/ask_soony/verifier/**/tests/*.py" = ["E501"]
 # Email templates and the page's CSS read better unwrapped.
 "src/ask_soony/dispatch/decisions/*.py" = ["E501"]
+"src/ask_soony/alerts.py" = ["E501"]
+"src/ask_soony/openai_calls.py" = ["E501"]
+# Inline HTML and CSS templates.
+"src/ask_soony/dashboard.py" = ["E501"]

@@ -12,7 +12,7 @@ flowchart LR
 - Akshat (00:59): platform (API, decision inbox, supply map, run loop) moved to branch akshat/platform for review; next: rebase it after Jonas's PR #3 merges
 - Farhan: verification: claim extraction from documents + three-way match (PO ↔ confirmation ↔ receipt) — see plan.md §5
 - Lucas: arrival forecast: rules for ETA + road leg, silence detection, news/notice risks, alternatives — see plan.md §5
-- Jonas: watcher (in progress) + criticality agent (call / email / notify) + ElevenLabs calls and supplier emails — see plan.md §5
+- Jonas (00:37): alert agent on branch `jonas/alert-agent` (on top of Akshat's dashboard): voice conversation per card (gpt-realtime), PWA push alerts, send drafted supplier mail after a spoken yes, supplier replies tied back to the card (Hwaseong: remaining 20,000 game cards arrive Tue 24 Nov, too late), phone calls via Twilio; next: auto-escalation critical card → push → call, then merge with Akshat
 
 
 ## Next
