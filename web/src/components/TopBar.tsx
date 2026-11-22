@@ -45,13 +45,20 @@ function roleChoices({ people }: Pick<RoleProps, 'people'>): { role: Role; label
 type Link = { page: Page; label: string; path: string }
 /**
  * The buyer works the whole inbox and builds the routines; the person who signs gets the launch,
- * the cases that reach her, and the record of what was decided. Nobody chose: the buyer's set.
+ * the cases that reach her, the record of what was decided, and can look at the routines too.
+ * Nobody chose: the buyer's set.
  */
 function linksFor(role: Role | null): Link[] {
   const history: Link = { page: 'history', label: 'History', path: '/history' }
   const suppliers: Link = { page: 'suppliers', label: 'Suppliers', path: '/suppliers' }
   if (role === 'approver') {
-    return [{ page: 'launch', label: 'Launch', path: '/launch' }, { page: 'today', label: 'Inbox', path: '/' }, history, suppliers]
+    return [
+      { page: 'launch', label: 'Launch', path: '/launch' },
+      { page: 'today', label: 'Inbox', path: '/' },
+      history,
+      { page: 'routines', label: 'Routines', path: '/routines' },
+      suppliers,
+    ]
   }
   return [
     { page: 'today', label: 'Today', path: '/' },
