@@ -1,0 +1,49 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "c64753b62454",
+  "strategy": "manual-commit",
+  "branch": "llm-task-update",
+  "checkpoints_count": 12,
+  "files_touched": [
+    "scripts/demo_cards.py",
+    "tests/test_clock.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/c6/4753b62454/0/metadata.json",
+      "transcript": "/c6/4753b62454/0/full.jsonl",
+      "compact_transcript": "/c6/4753b62454/0/transcript.jsonl",
+      "content_hash": "/c6/4753b62454/0/content_hash.txt",
+      "prompt": "/c6/4753b62454/0/prompt.txt",
+      "assets_manifest": "/c6/4753b62454/0/assets/manifest.json"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 99,
+    "cache_creation_tokens": 98069,
+    "cache_read_tokens": 22155686,
+    "output_tokens": 21221,
+    "api_call_count": 40
+  },
+  "redaction": {
+    "replacements": 2322,
+    "layers": {
+      "betterleaks": 34,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 90,
+      "credentialed_uri": 0,
+      "entropy": 804,
+      "goredact": 8,
+      "key_context": 0,
+      "pii": 1400,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1263,
+      "IP": 72,
+      "PHONE": 65
+    }
+  }
+}
