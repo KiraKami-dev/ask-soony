@@ -53,7 +53,8 @@ const headOf = (h: string | null, part?: string | null) => {
 /** 'Message DC site lead: Expect the van' -> 'Expect the van'. */
 const subjectOf = (s: string | null, to: string) => (s ?? '').replace(new RegExp(`^(Message|Tell|Ask)\\s+${to.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}:?\\s*`), '') || s || ''
 
-export function OkPage({ token }: { token: string }) {
+/** `embedded`: inside the app (the approver's inbox), without the page frame and app link. */
+export function OkPage({ token, embedded = false, onAnswered }: { token: string; embedded?: boolean; onAnswered?: () => void }) {
   const [page, setPage] = useState<Page | null>(null)
   const [gone, setGone] = useState(false)
   const [note, setNote] = useState('')
@@ -67,7 +68,7 @@ export function OkPage({ token }: { token: string }) {
       .then(async (r) => (r.ok ? setPage(await r.json()) : setGone(true)))
       .catch(() => setGone(true))
   useEffect(() => {
-    document.title = 'Your OK · Lighthouse'
+    if (!embedded) document.title = 'Your OK · Lighthouse'
     void load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token])
@@ -82,6 +83,7 @@ export function OkPage({ token }: { token: string }) {
       setDup(null)
       if (a === 'got_it') { await load(); return }
       setDone(j.text)
+      onAnswered?.()
     } catch (e) {
       setError((e as Error).message)
     } finally { setBusy(null) }
@@ -90,7 +92,9 @@ export function OkPage({ token }: { token: string }) {
   // The approver goes on to Launch as themselves (?as=<first name>, remembered on this device).
   const asWho = page?.kind === 'escalation' ? firstNameOf(page.who || page.to).toLowerCase() : ''
   const appLink = asWho ? `/launch?as=${encodeURIComponent(asWho)}` : '/'
-  const shell = (children: ReactNode) => (
+  const shell = (children: ReactNode) => embedded ? (
+    <div className="max-w-[560px]">{children}</div>
+  ) : (
     <main className="min-h-full bg-ground px-6 pb-[max(32px,env(safe-area-inset-bottom))] pt-12">
       <div className="mx-auto max-w-[440px]">
         {children}

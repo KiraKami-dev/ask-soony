@@ -4,6 +4,7 @@ import { AlertsButton } from '@/components/AlertsButton'
 import { EvidenceDrawer, type DrawerView } from '@/components/EvidenceDrawer'
 import { History } from '@/components/History'
 import { Launch } from '@/components/Launch'
+import { OkPage } from '@/components/OkPage'
 import { Routines, RoutinesLive } from '@/components/Routines'
 import { pendingOf, refreshNow, suggestionFor, useLive } from '@/components/routines/live'
 import { MapLegend, SupplierList, SupplyMap, type MapSelection } from '@/components/SupplyMap'
@@ -49,9 +50,11 @@ export default function App() {
   const openKey = useRef('')
   // Who uses this device: the approver lands on Launch, the buyer (and no choice) on Today.
   const [role, setRoleState] = useState<Role | null>(savedRole)
-  const chooseRole = useCallback((r: Role | null) => { saveRole(r); setRoleState(r) }, [])
+  const chooseRole = useCallback((r: Role | null) => { saveRole(r); setRoleState(r); setDone(null) }, [])
   // The approver's inbox: what reaches her (default) or every open case, as the buyer sees it.
   const [allCases, setAllCases] = useState(false)
+  // The approver chose "See all cases" instead of the requests waiting for her OK.
+  const [skipOk, setSkipOk] = useState(false)
   const roleRef = useRef(role)
   roleRef.current = role
   const landed = useRef(false)
@@ -285,13 +288,27 @@ export default function App() {
         return r?.kind === 'escalation' && !r.answer && !!approver && firstNameOf(r.to) === firstNameOf(approver)
       })
       : []
+    // Her OK first: what waits for her fills the page, until she answers or looks at all cases.
+    if (forMe.length > 0 && !single && !skipOk) {
+      return (
+        <div className="flex min-h-full flex-col bg-ground">
+          {bar}
+          <ForYourOk cards={forMe} nowMs={nowMs} phone={narrow} onChanged={load} onSkip={() => setSkipOk(true)} />
+          {overlays}
+        </div>
+      )
+    }
     return (
       <div className="flex min-h-full flex-col bg-ground">
         {bar}
+        {role === 'approver' && forMe.length > 0 && (
+          <button onClick={() => setSkipOk(false)} className="t-small mx-auto mt-6 w-full max-w-[1440px] cursor-pointer px-12 text-left text-accent xl:px-24">
+            {forMe.length} waiting for your OK
+          </button>
+        )}
         {role === 'approver' && (
           <Scope all={allCases} onAll={(v) => { setAllCases(v); setFocusId(null); if (single) go('/') }} mine={mine.length} total={allOpen.length} phone={narrow} />
         )}
-        {forMe.length > 0 && <ForYourOk cards={forMe} nowMs={nowMs} phone={narrow} />}
         <Today
           state={state}
           nowMs={nowMs}
@@ -399,39 +416,58 @@ async function hasRoutine(cardId: string): Promise<boolean> {
   }
 }
 
-/** Cases the buyer passed on for her OK: one click opens the sign-off page she knows from her phone. */
-function ForYourOk({ cards, nowMs, phone }: { cards: Card[]; nowMs: number; phone: boolean }) {
-  const [err, setErr] = useState<string | null>(null)
-  const open = async (id: string) => {
-    try {
-      const r = await fetch(`/api/cards/${encodeURIComponent(id)}/signoff/open`)
-      if (!r.ok) throw new Error()
-      window.location.assign((await r.json()).path)
-    } catch {
-      setErr('This one was answered already.')
-    }
+/**
+ * What waits for the approver's OK, as her main view: the waiting requests on the left, the first
+ * one in full in the main column (the same page as the link on her phone: case, recommendation,
+ * cost, Approve or Decline). "See all cases" goes on to her usual inbox.
+ */
+function ForYourOk({ cards, nowMs, phone, onChanged, onSkip }: { cards: Card[]; nowMs: number; phone: boolean; onChanged: () => void; onSkip: () => void }) {
+  const [pick, setPick] = useState<string | null>(null)
+  const card = cards.find((c) => c.id === pick) ?? cards[0]
+  const [token, setToken] = useState<string | null>(null)
+  const [err, setErr] = useState(false)
+  useEffect(() => {
+    let live = true
+    setToken(null); setErr(false)
+    fetch(`/api/cards/${encodeURIComponent(card.id)}/signoff/open`)
+      .then(async (r) => { if (!r.ok) throw new Error(); const p = (await r.json()).path as string; if (live) setToken(p.replace(/^\/ok\//, '')) })
+      .catch(() => live && setErr(true))
+    return () => { live = false }
+  }, [card.id])
+  const ago = (c: Card) => {
+    const asked = c.signoff_request?.asked_at
+    const min = asked ? Math.max(0, Math.round((nowMs - new Date(asked).getTime()) / 60000)) : null
+    return min == null ? '' : min < 60 ? `${min} min` : `${Math.floor(min / 60)} h`
   }
-  return (
-    <section aria-label="Waiting for your OK" className={phone ? 'mx-auto w-full max-w-[560px] px-7 pt-4' : 'mx-auto -mb-12 w-full max-w-[1440px] px-12 pt-16 xl:px-24'}>
-      <h2 className="t-small text-ink-3">Waiting for your OK</h2>
-      <ul className="mt-2 divide-y divide-hair border-y border-hair">
-        {cards.map((c) => {
-          const asked = c.signoff_request?.asked_at
-          const min = asked ? Math.max(0, Math.round((nowMs - new Date(asked).getTime()) / 60000)) : null
-          return (
-            <li key={c.id}>
-              <button onClick={() => void open(c.id)} className="flex w-full cursor-pointer items-baseline justify-between gap-4 py-3 text-left hover:bg-soft">
-                <span className="min-w-0 text-ink">{tidy(c.headline)}</span>
-                <span className="t-small shrink-0 text-accent">
-                  Review{min != null && <span className="text-ink-3"> · asked {min < 60 ? `${min} min` : `${Math.floor(min / 60)} h`} ago</span>}
-                </span>
-              </button>
-            </li>
-          )
-        })}
+  const list = (
+    <div>
+      <p className="t-small mb-3 text-ink-3">Waiting for your OK</p>
+      <ul className="space-y-1">
+        {cards.map((c) => (
+          <li key={c.id}>
+            <button
+              onClick={() => setPick(c.id)}
+              aria-current={c.id === card.id}
+              className={c.id === card.id ? 't-small w-full rounded-xl bg-soft px-3 py-2.5 text-left text-ink' : 't-small w-full rounded-xl px-3 py-2.5 text-left text-ink-2 hover:bg-soft'}
+            >
+              <span className="line-clamp-2">{tidy(c.headline)}</span>
+              {ago(c) && <span className="block text-ink-3">asked {ago(c)} ago</span>}
+            </button>
+          </li>
+        ))}
       </ul>
-      {err && <p className="t-small mt-2 text-late">{err}</p>}
-    </section>
+      <button onClick={onSkip} className="t-small mt-8 cursor-pointer text-ink-3 hover:text-ink"><span className="border-b border-hair">See all cases</span></button>
+    </div>
+  )
+  const main = err
+    ? <p className="t-body text-ink-2">This one was answered already.</p>
+    : token ? <OkPage key={token} token={token} embedded onAnswered={() => window.setTimeout(onChanged, 2500)} /> : <p className="t-small text-ink-3">Loading…</p>
+  if (phone) return <main className="mx-auto w-full max-w-[560px] px-7 pb-24 pt-5">{main}<div className="mt-14">{list}</div></main>
+  return (
+    <div className="mx-auto grid w-full max-w-[1440px] grid-cols-[240px_minmax(0,640px)] gap-x-16 px-12 pb-32 pt-24 xl:grid-cols-[300px_640px] xl:gap-x-[124px] xl:px-24">
+      <aside className="-mx-4 self-start px-4">{list}</aside>
+      <section aria-label="Your OK" className="min-w-0">{main}</section>
+    </div>
   )
 }
 
