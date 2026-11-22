@@ -1,0 +1,7 @@
+{
+  "tool_use_id": "toolu_01JCyvMngwNphKD319mUxJU4",
+  "agent_id": "ad0f41a0d38eecaee",
+  "subagent_type": "general-purpose",
+  "task_description": "Find real document vs SAP cases",
+  "started_at": "2026-11-22T03:41:06.11538+01:00"
+}

@@ -1,0 +1,15 @@
+{
+  "tool_use_id": "toolu_018fTiZGY6TaCZPuBbF7onFs",
+  "agent_id": "af8db5e33935a0a7e",
+  "subagent_type": "Plan",
+  "task_description": "Jury devil's advocate review",
+  "token_usage": {
+    "input_tokens": 10,
+    "cache_creation_tokens": 44573,
+    "cache_read_tokens": 147594,
+    "output_tokens": 3952,
+    "api_call_count": 5
+  },
+  "started_at": "2026-11-22T03:40:38.060424+01:00",
+  "completed_at": "2026-11-22T03:41:20.712567+01:00"
+}

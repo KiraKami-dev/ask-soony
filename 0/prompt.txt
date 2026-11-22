@@ -1,0 +1,171 @@
+can you tailor the whole ui it to it? Spin up some ui experts, some ux experts, how to make this best, maybe visualize the routines created, allow edits with writing or drag and drop, maybe also after calls or so allow it? or better said take this idea to win us the hackathon?
+
+---
+
+spin out multiple agents for everything you need, also researching the slides etc again /Users/jonasstenglein/Downloads/Lio_-_Deep_dive_slides.pptx /Users/jonasstenglein/Downloads/Lio_-_Judging_criteria.pdf /Users/jonasstenglein/Downloads/Lio_-_Challenge_Keep_the_Line_Running.pdf /Users/jonasstenglein/Downloads/First\ interview\ Lio\ Senior\ Buyer\ transcript.txt /Users/jonasstenglein/Downloads/Interview\ Lio\ IT\ transcript.txt
+
+---
+
+<task-notification>
+<task-id>af8db5e33935a0a7e</task-id>
+<tool-use-id>toolu_018fTiZGY6TaCZPuBbF7onFs</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/af8db5e33935a0a7e.output</output-file>
+<status>completed</status>
+<summary>Agent "Jury devil's advocate review" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>## Juror verdict on Ask Soony: notes from Lio
+
+### 1. What impresses me, what makes me skeptical, and which story leads
+
+**What impresses me.** The evidence drawer (screenshot 4). It shows "SAP says 48,000 due Sat 21 Nov" next to "Korean shipping advice says 28,000 flown, 20,000 arrive Tue 24 Nov", with the numbers circled on the scan and the Korean line translated. That answers our One Rule ("reads, decides, acts") and the brief's line "the system says we are fine, my gut says we are not". It is also the procurement problem we deal with every day.
+
+**What makes me skeptical.**
+- **The dashboard contradicts itself.** Collector's shows "On track · 0 copies at risk · **−7 h slack**". Standard shows 32,000 at risk while the cards show 20,000 and 34,800.
+- **Two cards cover the same Hwaseong cards with different numbers.** That looks like duplicate findings.
+- **Raw codes are on screen.** "Breaks first CMP-GAM-001" is shown to a CPO.
+- **The routines panel says "Nothing in the inbox matches right now".** That is a dead end on stage.
+- **"Free" is decided by reading a text field.** In `_costs_money` (routines.py), an option is free when its cost text is empty or "none". "Re-plan: give the 28,000 to Collector's first" has cost "none". So a routine could carry out an allocation decision with no human. "Costs nothing" is not the same as "harmless".
+
+**Lead with anchored document truth.** Routines can be the closing twist. Anchored truth is the problem Soony named ("we find out at the dock"), it shows something Soony's team missed, and it is hard to fake. "Decisions teach routines" is a platform story. It is clever, but in a 3-minute slot on a weekend with no history, the jury will ask "routines for what?" Use it as the last 30 seconds and the scaling answer: "and the second time, it handles this itself."
+
+### 2. The five hardest Q&amp;A questions, with short answers
+
+1. **"The OCR or the LLM misreads a number. Then what?"**
+   "No number reaches a card without an anchor. It has to be found in the source at the page, row or word box and shown highlighted. If two sources disagree, we show both and never resolve it silently. Maths is plain code. Nothing goes to a supplier, and no money is spent, without a click."
+2. **"What if a routine is wrong?"**
+   "It is type-checked, runs in a Monty sandbox with no network or files, does a dry run on the live inbox before you turn it on, and handles each card only once. Every action is logged under the routine's name. It can only take options with no cost and only notify about the rest. One switch turns it off." Fix the allocation gap before the demo: mark re-plans and orders as never automatic, by their type, not by their cost text.
+3. **"How is this different from Lio, or from Zapier?"**
+   "Zapier moves fields between systems that already work. Our problem is the gap between them: PDFs, scans, Korean emails. Lio runs procurement before and at the PO. We run after it: confirmation to dock, where SAP is blind. We are a layer that plugs into Lio, not a competitor." (Lio does supplier chasing, so be humble about that.)
+4. **"How does it work for customer #2?"**
+   "Nothing Soony-specific is in the code. The anchor index runs on any files we are given. Connect the ERP export and the supplier inbox, and the findings appear on day one. Routines are learned per customer from their own decisions, so the setup work drops over time."
+5. **"What did Soony's people tell you?"**
+   Have the three quotes ready:
+   - Felix: "Tell me before the supplier does."
+   - Nils types receipts in by hand and finds errors months later.
+   - Nils: "If I can fully trust my data, I will sleep better."
+   Then: "So every number links to its source."
+
+### 3. What looks like a trick or a dashboard, and what to do instead
+
+- **The world map.** It is decoration with fake GPS positions. Shrink it or open on the card. A map with a KPI strip is exactly "a dashboard on a spreadsheet".
+- **The top status strip.** Fix the contradictions or hide it.
+- **The test call.** A voice call you trigger yourself looks staged. Let a new portal drop trigger it, or skip it.
+- **"Talk it through" and push/Teams alerts together.** Too many channels turns into a feature tour. Show one.
+- **The routine dry run.** Do it on a card that is really in the inbox. "Nothing matches" kills the moment.
+- **The USD 196k Boise recommendation.** "If Boise has stock" is a guess. Boise's terms are disputed (contract EXW, PO DDP) and its cards are "on hold at our dock". Say so, or recommend "ask both suppliers what they can do" first.
+
+### 4. The moment I would remember
+
+Someone clicks 48,000 in SAP. The drawer opens on the Korean scan with 28,000 and 20,000 circled, and the presenter says: "Soony's system says Saturday. Hwaseong said Tuesday, in Korean, two days ago. Nobody read it." Then one tap on Approve, and the supplier's real reply appears in the thread live. If routines stay in, the follow-up is a second, similar card being handled by the routine just written, marked with its name.
+
+### 5. Business case
+
+**The number:** copies that miss launch day, priced with Maren's cost per missing Collector's copy. Present it as "20,000 game cards SAP counts but that arrive after launch, caught about 3 days before the dock."
+
+**Pricing that sounds believable:** a platform fee per connected ERP (around €3–5k/month) plus a fee per supplier watched (around €100–200/month). For Soony that is roughly €5k a month, which is less than one day of air freight. The path to the next ten customers is every Lio customer that ships physical parts, sold as an add-on.
+
+### Critical files
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/routines.py (`_costs_money` is the gap to close)
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/anchors.py
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/cardtools.py
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/plan.md
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/docs/challenge.md</result>
+<usage><subagent_tokens>53285</subagent_tokens><tool_uses>8</tool_uses><duration_ms>42706</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>a5b04f7874603f898</task-id>
+<tool-use-id>toolu_01U5kYC8JK5Xf1gPtQmBpDBd</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a5b04f7874603f898.output</output-file>
+<status>completed</status>
+<summary>Agent "UX strategist: winning demo flow" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I went through the brief, plan, PROGRESS.md, the interviews, all 7 screenshots, `App.tsx`, `DecisionCard.tsx`, `Routines.tsx` and `routines.py`. Below is a plan you can build on.
+
+## 1. Positioning and the 3-minute script
+
+**One sentence:** "Ask Soony checks every supplier document against SAP, shows you the exact line where they disagree, and turns each decision you make into a routine that handles the next one. Anything that costs money still comes to you."
+
+Tagline for the slide: **"Every decision teaches the next one."**
+
+| Time | On screen | What is said |
+|---|---|---|
+| 0:00–0:25 | The inbox, one red card: "20,000 game cards arrive after launch, but SAP still counts them" | "Felix told us: tell me before the supplier does, or I won't use it. SAP says 48,000 game cards for Saturday. Hwaseong's Korean shipping advice says 20,000 land Tuesday, after launch." |
+| 0:25–0:55 | Open Evidence. The highlighted 20,000 in the scan, the Korean line with its translation, and the SAP row 227 above it | "Every number links to the spot in the source. That's how a buyer trusts a machine on a Sunday." |
+| 0:55–1:25 | Click "Talk it through". Say: "Give the 28,000 to Collector's first and ask Boise about stock. Don't book the flight yet." | Voice carries out the free option. The USD 196k air freight stays open with a lock: "Costs money, needs you." |
+| 1:25–2:10 | **The spine.** Open the silent-carrier card (7 shipments stale since 19 Nov). Approve "Ask the carrier for a status". The offer appears inline: "6 more shipments went quiet the same way. Handle them like this?" Dry run lists all 6. Click Turn on. The 6 cards collapse into "Handled for you · 6" | "Felix said: let me decide first, flip a switch once I trust it. Here is the switch. An agent wrote this routine from his click. It runs in a closed sandbox with no internet, can't spend money, and shows a test run first." |
+| 2:10–2:35 | Trigger a portal drop live (a reply or a new advice). A routine handles it: "Handled by: Chase silent shipments · Undo". A paid follow-up arrives as a card marked "Prepared by a routine, needs you: costs €X" | "It now works while Felix sleeps, and it still stops before spending." |
+| 2:35–3:00 | Playbook tab: 3 routines, each with its trust level and "handled today" | "Every customer of Lio makes these decisions every week. The playbook is the customer's own way of working, learned rather than configured. That's the product we'd sell after Soony." |
+
+**Clock warning:** the card's "decide by Sun 10:00" has already passed when you demo at 14:00. Either show a visible chip "Replay: portal as of Sat 22:00", or recompute deadlines against the live clock. Don't let the jury see an expired deadline that isn't explained.
+
+## 2. Information architecture
+
+Three tabs in the header: **Inbox** (primary) · **Playbook** · **Map**. On wide screens the map can stay beside the inbox, but it is secondary and you don't narrate it.
+
+**Inbox, top to bottom:**
+1. **Needs you**: red, then amber.
+2. **Prepared by a routine, needs you**: anything that costs money, plus cases where the routine is unsure. The two exceptions Nils asked for are exactly these.
+3. **Handled for you · N**: collapsed. Each row reads "Handled by: &lt;routine&gt; · 14:02 · Undo".
+4. A "Would have been handled" hint on open cards matched by a routine that is switched off: "Your routine 'Chase silent shipments' would handle this. Turn it on?"
+
+**Playbook** replaces the cog sheet. Each row shows:
+- the routine's name and its trigger in plain words;
+- a trust level with three steps: **Ask me** / **Do it and tell me** / **Do it quietly**. Paid options are locked at "Ask me" with a lock icon and the line "Costs money: always you";
+- "Learned from your decision on Sat 22:14";
+- "Handled 6 today", with the latest run.
+
+"Show the code" stays collapsed. It is there for the Q&amp;A only.
+
+## 3. When the product offers a routine
+
+Always show the offer inline on the decided card, never as a toast over the map. Remove the old "Allow always / Ask me each time" block in `DecisionCard.tsx` and put the routine offer in its place. Right now there are two competing mechanisms.
+
+- **After a button decision:** "Done. Next time a shipment goes quiet like this, should I ask the carrier myself? You'll see a test run first." Buttons: **Show me the test run** / Not now. If similar cards are already open, lead with the count: "6 more like this are open."
+- **After voice or a phone call:** when the buyer says "next time just do it", the agent replies out loud: "Got it. I'll write that as a routine and put the test run on your screen." The card then shows the draft. If the decision had a paid part: "I'll prepare the rest, but the air freight stays with you."
+- **After an edit:** "You changed the email to ask for the dock pick-up time too. Use your version from now on?" This updates the existing routine instead of creating a new one.
+- **When the same kind of card appears a second time:** "You decided this the same way on Saturday. Want me to take it from here?"
+- **After a dismiss:** "Hide warnings like this when they don't affect the launch?" This fits the magnet export-ban false alarm well.
+- **Always shown in small text:** "Runs in a closed sandbox. Never spends money. Undo any time."
+
+## 4. Cut or hide for the demo
+
+- **Contradictory numbers.** The header says 32,000 at risk, the card says 20,000, and a second game-card card says 34,800. Merge them into one card. Also, Collector's shows "On track" next to "−7 h slack", which is a contradiction the jury will see.
+- **Internal codes and wording.** Hide part codes like CMP-GAM-001 in headlines. Replace "status: approved" with "Approved".
+- **"Last portal drop 8 h ago".** It looks dead. Show "Watching the portal · checked 1 min ago" instead.
+- **Two near-duplicate routines** in the current state ("Tell DC site lead to collect ready shipment from port" and "Tell DC site lead to collect at port"). Reset the state before the demo.
+- **Secondary actions.** Move Escalate, Dismiss, Agent trail, Run now and Delete into a "⋯" menu.
+- **Things to mention only in Q&amp;A:** the phone call, push alerts, the mobile view and the supply map.
+
+## 5. Build list (one developer)
+
+**P0 (about 4 h)**
+1. Fix the number and status consistency, hide codes, fix the clock chip, and write a demo reset script with seeded state that includes the 7 silent shipments as separate cards. *1.25 h*
+2. One inline offer on the card that replaces the trust block, with the "N more like this" count and the dry-run list. *1 h*
+3. Inbox sections: "Handled for you" with Undo, and "Prepared by a routine, needs you" for paid or unsure cases. *1 h*
+4. Playbook tab with the trust levels and the money lock (reuse `Routines.tsx`). *0.75 h*
+
+**P1 (about 2 h; the first two can still fit if P0 goes smoothly)**
+- A `teach_routine` tool in the voice session that feeds the same offer. *0.75 h*
+- A "Would have been handled" hint: dry-run switched-off routines against open cards. *0.5 h*
+- The repeat-decision offer and the dismiss offer. *0.5 h*
+- A live drop button that injects a matching card for beat 5. *0.25 h*
+
+**P2 (skip)**
+- Updating a routine from an edit, with a diff
+- Routine offers in Teams
+- Trust levels per supplier
+- A full audit log
+
+Lock the script by 10:30 and record the backup video at 11:00.
+
+### Critical files
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/App.tsx
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/components/DecisionCard.tsx
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/components/Routines.tsx
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/routines.py
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/api.py (the old trust offer around lines 850-860, and `routine_type`)</result>
+<usage><subagent_tokens>64867</subagent_tokens><tool_uses>16</tool_uses><duration_ms>85090</duration_ms></usage>
+</task-notification>
