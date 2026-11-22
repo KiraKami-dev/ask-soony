@@ -458,3 +458,22 @@ probably we should make it more general.
 ---
 
 also would pipelines adapt if content changes? or we warn they need to be adapted?
+
+---
+
+One cannot click the recommended option but only "approve" 
+
+<pasted_content id="1dc7">
+5,600 statues "The Getaway" on the shelf failed inspection.
+SAP says 5,600, 27,400 in stock, but the inspection report says lot rejected.
+For today: Collector's runs out of statues "The Getaway" at 14:03, six hours before the trucks.
+We recommend
+Ask Supplier Quality for a concession or a 100% sort today.
+No cost. The good parts of the lot can be packed.
+Or tell Pune Diecast Works the lot failed and ask for replacements. No cost.
+Or pass it on to the approver
+Or dismiss: nothing to do
+All evidence · 2
+How we know
+Approve
+</pasted_content id="1dc7">
