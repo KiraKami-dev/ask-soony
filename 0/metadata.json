@@ -1,0 +1,183 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M8175D8TJKV8RBJHY5G82534",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T08:50:22.901595Z",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "755903673f01",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 26,
+    "cache_creation_tokens": 17590,
+    "cache_read_tokens": 8788799,
+    "output_tokens": 13396,
+    "api_call_count": 13,
+    "subagent_tokens": {
+      "input_tokens": 42,
+      "cache_creation_tokens": 105448,
+      "cache_read_tokens": 1708481,
+      "output_tokens": 7866,
+      "api_call_count": 21
+    },
+    "subagent_tokens_complete": true
+  },
+  "session_token_usage": {
+    "input_tokens": 3081,
+    "cache_creation_tokens": 3054674,
+    "cache_read_tokens": 680722171,
+    "output_tokens": 1251728,
+    "api_call_count": 1337,
+    "subagent_tokens": {
+      "input_tokens": 3120,
+      "cache_creation_tokens": 6725301,
+      "cache_read_tokens": 230666571,
+      "output_tokens": 1803143,
+      "api_call_count": 1489
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 2178,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 77,
+      "credentialed_uri": 0,
+      "entropy": 732,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 1345,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1230,
+      "IP": 50,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 268
+  },
+  "summary": {
+    "intent": "Win the Lio 'Keep the Line Running' hackathon challenge for Soony: analyze the confidential supply-chain data drops, then build and polish a product that rechecks the launch plan, flags contradictions, and acts through supplier emails and approvals, with a demo and hand-in at 12:00 Sunday.",
+    "outcome": "Found that the launch plan's 'all ok' hid real shortfalls (art books overbooked by 72,000, failed statues, game cards short). Built and deployed the ask-soony app (polling loop, versioned store, agent, Today/Launch views, sign-off loop, demo instance, README, demo script) on branch jonas/today-flow. Demo rehearsal was still in progress at the end.",
+    "learnings": {
+      "repo": [
+        "Portal data is confidential: keep it in gitignored data/, never put values in code, and never commit .env (only .env.example).",
+        "The portal API has only three endpoints (files list, single file, archive.zip) with no webhooks. Change detection must poll the file list and compare SHA-256, because files are replaced under the same name and formats can change.",
+        "New data drops arrive unannounced (five files in the first 37 minutes), so the product needs a fixed poller with a versioned store, with agents working on changed files.",
+        "The team workflow lives in CLAUDE.md and PROGRESS.md: claim work with a 'Now' line in PROGRESS.md before building.",
+        "Entire only writes a checkpoint when repo files change, so a read-only session shows 'no files modified, skipping checkpoint'.",
+        "The demo instance runs on its own hostname via a Cloudflare tunnel and is controlled with scripts/demo.sh (reset, snapshot, stop, CALLS=twilio). It sends supplier emails in dry mode, and the demo DNS record had to be corrected to point at the ask-soony tunnel.",
+        "Phone calls are off by default (ASK_CALL_PROVIDER=dry_run in .env) and cost about $0.38 per minute when enabled. The UI polls state every 5 seconds (POLL_MS=5000)."
+      ],
+      "code": [
+        {
+          "path": "src/ask_soony/signoff.py",
+          "finding": "New sign-off module: 'Pass it on' sends a one-time /ok/<token> link by push and Teams. Approve runs the chosen option through api.approve once per link and records via=signoff. ASK_SIGNOFF_SIMULATE=<seconds> auto-approves after a delay as 'simulated', and decline is never simulated."
+        },
+        {
+          "path": "src/ask_soony/basic_auth.py",
+          "finding": "Lets valid /ok and count-page links bypass the dashboard password; the login page mark was also switched from yellow to ink."
+        },
+        {
+          "path": "src/ask_soony/api.py",
+          "finding": "Holds escalate, approve, build_state and the sign-off router. Push goes to every subscribed device, with no per-person targeting."
+        }
+      ],
+      "workflow": [
+        "Use subagents for large cross-checks (200 order confirmations plus 59 scans) and for parallel builder tasks while the main session writes docs.",
+        "Ask before spending money or sending outward-facing messages (calls, supplier emails). Verify what would be sent first.",
+        "Verify UI changes in a real browser with a screenshot or scripted keypresses; one claimed fix still needed a second pass.",
+        "Keep the repo free of confidential numbers: README has no challenge figures, since the repo goes to the jury.",
+        "A mailbox sync that rewrote its stale copy of the action log lost a record. Appending under the shared lock fixed it, and a regression test was added."
+      ]
+    },
+    "friction": [
+      "The portal token was initially empty in .env, so the API returned 401 and blocked the first data step.",
+      "Cloudflare Error 1033 on the demo hostname, because the first DNS route pointed at the wrong tunnel.",
+      "J/K navigation skipped or lost the highlight on folded groups of similar cases.",
+      "The shared mailbox sync race dropped the 07:58 approval record, though the email did go out.",
+      "Browsers cached the old yellow favicon, so a version query parameter and a cache clear were needed.",
+      "Routine lines said 'Watching' while switched off, and only the word 'show' was clickable.",
+      "Push notifications reach every subscribed device, so the demo needs a second phone to play Maren.",
+      "The Boise order confirmation and parts of the data were contradictory or messy (EXW vs DDP, overbooked receipt, a sleeve artwork revision mismatch).",
+      "A password was pasted into Discord chat, so it is exposed in history."
+    ],
+    "open_items": [
+      "Finish rehearsing the three demo stories end to end on the demo instance; story 3 was still in progress.",
+      "Replay real supplier replies on the demo instance with a clear replay marker.",
+      "Fold the four similar 'count parts' cases into one case.",
+      "Add a 'What still saves it' section on Launch (latest arrival per blocker, about 900 copies per hour of delay).",
+      "Fix the Maren top bar, which says 'nothing needs you' because it counts Felix's list.",
+      "Unpushed commits remain (demo script, favicon, J/K, shortcuts, routine fixes). Hand-in work remains: pitch deck, video, final README polish.",
+      "Decide whether to delete the duplicate routine and the earlier Claude doc, and when to enable real phone calls for notifications on the demo only.",
+      "Bridge phone-call decisions to cases (agent task started), and per-person push routing is deferred.",
+      "Change the exposed portal password after the hackathon; Codex hooks still need approval via /hooks."
+    ]
+  }
+}
