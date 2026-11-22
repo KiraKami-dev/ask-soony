@@ -112,6 +112,19 @@ def push_subscribe(sub: Subscription):
     return {"devices": len(subs)}
 
 
+class Unsubscribe(BaseModel):
+    endpoint: str
+
+
+@router.post("/api/push/unsubscribe")
+def push_unsubscribe(body: Unsubscribe):
+    """Alerts off on one device: forget its subscription."""
+    subs = [s for s in subscriptions() if s.get("endpoint") != body.endpoint]
+    _subs_path().parent.mkdir(parents=True, exist_ok=True)
+    _subs_path().write_text(json.dumps(subs))
+    return {"devices": len(subs)}
+
+
 class TestPush(BaseModel):
     card_id: str | None = None
 

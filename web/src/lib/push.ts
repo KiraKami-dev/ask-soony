@@ -47,3 +47,17 @@ export async function sendTestAlert(cardId: string): Promise<string> {
   const out = await res.json();
   return out.sent ? `Test alert sent to ${out.sent} device(s). Lock your phone to see it.` : `Not delivered: ${out.failed?.join(", ")}`;
 }
+
+/** Alerts off on this device: the server forgets it, then the browser drops the subscription. */
+export async function disableAlerts(): Promise<string> {
+  const reg = await registerServiceWorker()
+  const sub = await reg?.pushManager.getSubscription()
+  if (!sub) return "Alerts are off for this device."
+  await fetch("/api/push/unsubscribe", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ endpoint: sub.endpoint }),
+  }).catch(() => undefined)
+  await sub.unsubscribe()
+  return "Alerts are off for this device."
+}
