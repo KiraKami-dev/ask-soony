@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import io
 import json
 import math
 import os
@@ -108,11 +109,21 @@ def read_list(name: str) -> list[dict]:
 
 
 def read_csv(path: Path) -> list[dict]:
+    """
+    Rows of a CSV as dicts, whatever the export looks like: UTF-8 (with or without BOM), else
+    Windows-1252 (SAP and Excel exports from German systems), and ';' or ',' as separator.
+    """
     try:
-        with path.open(encoding="utf-8-sig", newline="") as fh:
-            return list(csv.DictReader(fh))
+        raw = path.read_bytes()
     except OSError:
         return []
+    try:
+        text = raw.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        text = raw.decode("cp1252", errors="replace")
+    first = text.split("\n", 1)[0]
+    sep = ";" if first.count(";") > first.count(",") else ","
+    return list(csv.DictReader(io.StringIO(text, newline=""), delimiter=sep))
 
 
 def num(value: Any) -> float | None:

@@ -83,8 +83,12 @@ def sniff_separator(first_line: str) -> str:
 
 
 def csv_header(path: Path) -> set[str]:
-    with path.open(encoding="utf-8-sig") as handle:
-        first = handle.readline().strip()
+    raw = path.read_bytes()
+    try:
+        text = raw.decode("utf-8-sig")
+    except UnicodeDecodeError:  # German SAP/Excel exports are Windows-1252
+        text = raw.decode("cp1252", errors="replace")
+    first = text.split("\n", 1)[0].strip()
     return {col.strip() for col in first.split(sniff_separator(first))}
 
 

@@ -26,7 +26,8 @@ FOLDERS = ("soony/erp", "soony/master")
 
 def _header(f: Path) -> list[str]:
     rows = api.read_csv(f)
-    return list(rows[0].keys()) if rows else []
+    # A row with more fields than the header adds a column without a name: not a column.
+    return [k for k in rows[0].keys() if isinstance(k, str) and k] if rows else []
 
 
 def _verifier_reads(f: Path) -> bool:
@@ -90,7 +91,7 @@ def check(root: Path | None = None, now: datetime | None = None) -> dict:
             seen = dict(reads.get(rel) or {"read": False, "wanted": []})
             if not seen["read"] and _verifier_reads(f):
                 seen["read"] = True
-            lost = [c for c in old.get(rel, []) if c not in head]
+            lost = [c for c in old.get(rel, []) if isinstance(c, str) and c not in head]
             if not seen["read"] and seen["wanted"]:
                 missing = sorted({c for w in seen["wanted"] for c in w["missing"]})
                 issues.append(

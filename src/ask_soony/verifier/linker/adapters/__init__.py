@@ -19,10 +19,20 @@ class Context:
     suppliers: SupplierResolver | None
 
 
+def csv_encoding(path: Path) -> str:
+    """UTF-8 when the file is UTF-8, else Windows-1252 (German SAP and Excel exports)."""
+    try:
+        path.read_bytes().decode("utf-8-sig")
+        return "utf-8-sig"
+    except UnicodeDecodeError:
+        return "cp1252"
+
+
 def read_csv(path: Path) -> pd.DataFrame:
-    with path.open(encoding="utf-8-sig") as handle:
+    encoding = csv_encoding(path)
+    with path.open(encoding=encoding) as handle:
         separator = sniff_separator(handle.readline())
-    return pd.read_csv(path, sep=separator, dtype=str, encoding="utf-8-sig")
+    return pd.read_csv(path, sep=separator, dtype=str, encoding=encoding)
 
 
 def rows(path: Path) -> list[dict]:
