@@ -55,6 +55,9 @@ def start() -> None:
     from ask_soony import replies
 
     if os.environ.get("ASK_BACKGROUND", "").lower() in ON:
+        from ask_soony import anchors
+
+        anchors.ensure_index()  # evidence anchoring: index portal files (cached by hash)
         for loop in (_watcher, _escalation):
             threading.Thread(target=_guard(loop), daemon=True, name=loop.__name__).start()
         os.environ.setdefault("ASK_REPLY_POLL", "on")
