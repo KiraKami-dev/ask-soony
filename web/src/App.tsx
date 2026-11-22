@@ -3,6 +3,7 @@ import { AlertsButton } from '@/components/AlertsButton'
 import { DecisionCard, type Offer } from '@/components/DecisionCard'
 import { EvidenceDrawer, type DrawerView } from '@/components/EvidenceDrawer'
 import { Rail } from '@/components/Rail'
+import { Routines } from '@/components/Routines'
 import { StatusStrip } from '@/components/StatusStrip'
 import { SupplyMap, type MapSelection } from '@/components/SupplyMap'
 import { COLORS, fetchState, type Card, type State } from '@/lib/api'
@@ -162,6 +163,7 @@ export default function App() {
       )}
       <EvidenceDrawer view={drawer} onClose={() => setDrawer(null)} />
       <AlertsButton />
+      <Routines state={state} onChanged={load} />
     </div>
   )
 }
