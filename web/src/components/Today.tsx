@@ -72,7 +72,7 @@ type Choice = { kind: 'option'; i: number } | { kind: 'escalate' } | { kind: 'di
 const sameChoice = (a: Choice, b: Choice) => a.kind === b.kind && (a.kind !== 'option' || a.i === (b as { i: number }).i)
 /** The recommended option; without options, pass it on (or, with nobody to pass it to, dismiss). */
 const defaultChoice = (card: Card): Choice =>
-  card.options.length ? { kind: 'option', i: recommendedIndex(card) } : card.escalate_to ? { kind: 'escalate' } : { kind: 'dismiss' }
+  card.options.length ? { kind: 'option', i: recommendedIndex(card) } : passTo(card) ? { kind: 'escalate' } : { kind: 'dismiss' }
 
 const typing = (t: EventTarget | null) =>
   t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))
@@ -334,6 +334,8 @@ function QuietList({ order, card, onFocus, state, nowMs, phone }: Props) {
 
 type GroupKey = 'waiting' | 'handled' | 'done'
 const firstWord = (s?: string) => (s ?? '').split(' ').find((w) => !w.endsWith('.')) || ''
+/** Who "Pass it on" reaches; a server without `escalate_to` (older build) means the approver. */
+const passTo = (c: Card) => (c.escalate_to === undefined ? c.approver : c.escalate_to)
 
 /**
  * Below "Needs you": what waits on others, what routines handled and what you decided. Folded
@@ -592,7 +594,7 @@ function Focus(p: Props & {
   const escalate = (text: string = note, option?: number) =>
     act(async () => {
       const r = await post<{ id?: string; channels?: string[] }>(`/api/cards/${encodeURIComponent(card.id)}/escalate`, { note: text, ...(option != null ? { option } : {}) })
-      return { text: `Passed on to ${card.escalate_to || 'the approver'}.`, sub: sentSub(firstWord(card.escalate_to ?? '') || 'the approver', r?.channels), actionId: r?.id ?? null }
+      return { text: `Passed on to ${passTo(card) || 'the approver'}.`, sub: sentSub(firstWord(passTo(card) ?? '') || 'the approver', r?.channels), actionId: r?.id ?? null }
     })
   const dismiss = () =>
     act(async () => {
@@ -612,7 +614,7 @@ function Focus(p: Props & {
   const choices: Choice[] = [
     // A half-done decision does not offer what was already done; indices stay the server's.
     ...card.options.flatMap((o, i): Choice[] => (o.done ? [] : [{ kind: 'option', i }])),
-    ...(card.escalate_to ? [{ kind: 'escalate' } as Choice] : []), { kind: 'dismiss' },
+    ...(passTo(card) ? [{ kind: 'escalate' } as Choice] : []), { kind: 'dismiss' },
   ]
   const chosenKey = Math.max(0, choices.findIndex((c) => sameChoice(c, choice)))
   const keys = useKeyboardUser()
@@ -779,7 +781,7 @@ function Focus(p: Props & {
             </button>
           ) : choice.kind === 'escalate' ? (
             <>
-              <p className="t-body text-ink">Pass it on to {card.escalate_to || 'the approver'}.</p>
+              <p className="t-body text-ink">Pass it on to {passTo(card) || 'the approver'}.</p>
               <p className="t-small mt-2 text-ink-3">They get this brief:</p>
               <p className="t-small mt-1 text-ink-2">{tidy(card.escalation_brief)}</p>
               <input
