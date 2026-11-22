@@ -32,6 +32,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from ask_soony import launch as launch_clock
+from ask_soony import launch_view
 from ask_soony.launch import PackClock
 
 LEVEL_RANK = {"red": 3, "amber": 2, "grey": 1, "blue": 0}
@@ -1247,6 +1248,7 @@ def build_state() -> dict:
         "shipments": list(ships.values()),
         "strip": strip,
         "clock": build_clock(strip, clock, cur),
+        "launch": launch_view.build(cards, net["shipments_raw"], clock, cur, strip),
         "cards": cards,
         "inbox_ids": [c["id"] for c in inbox],
         "calm": not inbox,
