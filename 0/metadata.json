@@ -1,0 +1,192 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M80YM8X8MX6ME0VYMNXX9X36",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T06:21:11.885974Z",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 1,
+  "save_step_count": 2,
+  "files_touched": [
+    "web/src/components/Routines.tsx",
+    "web/src/components/routines/FlowGraph.tsx",
+    "web/src/components/routines/RoutineCard.tsx",
+    "web/src/components/routines/funnel.ts"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "3847314eee0c",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 10,
+    "cache_creation_tokens": 9470,
+    "cache_read_tokens": 1320566,
+    "output_tokens": 1731,
+    "api_call_count": 3,
+    "subagent_tokens": {
+      "input_tokens": 34,
+      "cache_creation_tokens": 34402,
+      "cache_read_tokens": 2229558,
+      "output_tokens": 9080,
+      "api_call_count": 13
+    },
+    "subagent_tokens_complete": true
+  },
+  "session_token_usage": {
+    "input_tokens": 2660,
+    "cache_creation_tokens": 2820076,
+    "cache_read_tokens": 572761561,
+    "output_tokens": 1104136,
+    "api_call_count": 1148,
+    "subagent_tokens": {
+      "input_tokens": 2710,
+      "cache_creation_tokens": 5775921,
+      "cache_read_tokens": 200141667,
+      "output_tokens": 1585489,
+      "api_call_count": 1288
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 1898,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 68,
+      "credentialed_uri": 0,
+      "entropy": 625,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 1181,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1084,
+      "IP": 32,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 239
+  },
+  "summary": {
+    "intent": "Win the Lio 'Keep the Line Running' hackathon challenge: analyze Soony's confidential supply-chain data drops, then build a generalizable agent product that rechecks the launch plan on every new drop, flags contradictions, and drafts or takes approved supplier actions.",
+    "outcome": "Found that the Collector's Edition misses Sunday's launch despite the plan saying 'ok' (overbooked art books, failed statues, sleeve revision conflict), and built a working app with watcher, verifier, tracking, email review, outbox sync, drop-rehearsal fixes and a routines UI redesign. Many commits are local on jonas/today-flow, and a Karton Nowak art-book order was sent and answered.",
+    "learnings": {
+      "repo": [
+        "Portal API has only three endpoints (files list, single file, archive.zip) and no notification or webhook; the documented approach is polling the file list and comparing SHA-256 checksums, since files are replaced in place under the same name.",
+        "Confidential portal data lives in gitignored data/; .env is gitignored and .env.example is committed with an empty SOONY_PORTAL_TOKEN.",
+        "The team shares one mailbox, so the app cannot see emails sent by hand or by teammates' code (e.g. Lucas's Pulse console on origin/new-approach, which has no recipient allow-list). Reading the sent folder and a duplicate-send guard (409 unless 'Send anyway') fixed this.",
+        "Supplier send targets must come from known contacts (profile, reply senders); addresses in newer JSON profiles are only used after explicit confirmation, as protection against the brief's fraud scenario.",
+        "Team workflow is in CLAUDE.md and PROGRESS.md; tasks are claimed with a 'Now' line in PROGRESS.md.",
+        "Drop rehearsals should run on a copy of data/portal, state and store with background loops off (ASK_REPLY_POLL=off, ASK_LLM_PROVIDER=none) so nothing polls, sends mail or places calls.",
+        "Two modules (predictor and papercheck) wrote the same impacts.json with different shapes, crashing the pipeline on news drops; the predictor now writes event_impacts.json.",
+        "Replies to side-channel tracking emails must not mark the original case 'sent'; otherwise cases drop out of 'Needs you'."
+      ],
+      "code": [
+        {
+          "path": "src/ask_soony/tracking.py",
+          "finding": "New module reconciling shipment status across receipts, site answers, supplier docs/replies, hand-kept tracker and system export, with precedence rules and 'never move backwards'; tracker versions are chosen by highest version then newest file."
+        },
+        {
+          "path": "src/ask_soony/outbox.py",
+          "finding": "New module syncing the shared mailbox's sent folder, assigning mails to cases by thread reference, supplier plus PO, or a part number matching exactly one case."
+        },
+        {
+          "path": "src/ask_soony/supplier_master.py",
+          "finding": "Compares newer JSON supplier profiles against profile.csv; imported by api.py, so it had to be committed together with the api.py changes."
+        },
+        {
+          "path": "web/src/components/routines/funnel.ts",
+          "finding": "Computes per-condition funnel counts in the browser, mirroring routines.py logic, so it can drift from the server."
+        }
+      ],
+      "workflow": [
+        "Commits can accidentally pick up another agent's uncommitted edits in a shared working tree (b0cff82 imported an untracked module), so check git status and split commits by topic.",
+        "Parallel subagents work well for cross-checking 200 order confirmations and 59 scans, drop drills and UX reviews, but their results must be verified before committing.",
+        "Entire only creates a checkpoint when repo files change; sessions with no file changes log 'skipping checkpoint', which is expected.",
+        "Keep confidential challenge data out of external services and out of git; sensitive credentials pasted in chat should be rotated afterwards."
+      ]
+    },
+    "friction": [
+      "Portal token was empty at first, blocking the data pull until the user supplied it.",
+      "A binding 8,000 art-book order was sent by hand at 07:04, duplicating the app's 06:50 approved send, because the app could not see the shared mailbox's sent items.",
+      "Lucas's Pulse console sent unrelated internal-style emails to Hwaseong and one to an external Gmail address through the shared mailbox, with no allow-list.",
+      "UI bugs: a stray period wrapping onto its own line (buttons are block-level), and the chosen option lacking a key number.",
+      "Drop drill found real gaps: a renamed CSV column auto-closed 3 real cases, news drops crashed the pipeline, and no case was produced for delay notices.",
+      "17 cases in 'Needs you' is crowded.",
+      "It is unclear whether portal data and supplier reactions are identical across teams."
+    ],
+    "open_items": [
+      "Push the 8+ local commits on jonas/today-flow (user permission pending).",
+      "Decide whether to send Hwaseong a note disregarding the three Pulse test emails, and draft a message to Lucas about Pulse's missing allow-list.",
+      "Consolidate the four 'Are there really…' count questions into one case or show them only at higher urgency.",
+      "Approval routing should use the policy limits (e.g. Paul Winter's 50k EUR) rather than sending every costed case to Maren.",
+      "Rev B card for PackRight should pick up Lin Hui's reply instead of recommending the old email again.",
+      "The Floor receipts check treats any same-order/part receipt as booked regardless of date; a TODO is left.",
+      "Possible double count of 28,000 cards on 020-48113256 in the verifier (received 21 Nov but counted as arriving).",
+      "Memo rules ('Quality & Compliance last word', 'air/rush to CPO within the hour') are extracted but not used for routing; the news predictor was not tested against a real model.",
+      "Update the briefing page and doc with the 14:37 and later drops; decide whether to delete the earlier Claude doc.",
+      "Ask Lio engineers whether portal data and supplier replies differ per team; register sender addresses in portal Settings.",
+      "Add copy to internal colleagues once internal addresses are known; header edits are not carried by a spoken 'yes'."
+    ]
+  }
+}
