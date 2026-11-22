@@ -142,6 +142,9 @@ function Focus(p: Props & { card: Card }) {
   const [passOn, setPassOn] = useState(false)
   const [note, setNote] = useState('')
   const [source, setSource] = useState<number | null>(null)
+  // An email to a supplier is shown before it goes out: it cannot be taken back.
+  const [review, setReview] = useState(false)
+  const [draft, setDraft] = useState('')
   const [linesEl, setLinesEl] = useState<HTMLDivElement | null>(null)
   const anchors = useAnchors(card.id)
   const claim = claimOf(card)
@@ -149,6 +152,7 @@ function Focus(p: Props & { card: Card }) {
   const opt = card.options[sel]
   const recommended = sel === recommendedIndex(card)
   const money = opt ? costsMoney(card, sel) : false
+  const emails = !!opt && opt.channel === 'email' && /@/.test(opt.to ?? '')
   const late = card.level === 'red'
 
   async function act(fn: () => Promise<{ text: string; sub: string; actionId: string | null }>) {
@@ -161,15 +165,23 @@ function Focus(p: Props & { card: Card }) {
       setError(`That did not go through: ${(e as Error).message}. Nothing was sent.`)
     } finally { setBusy(false); setConfirm(false) }
   }
-  const approve = () =>
+  const approve = (text?: string) =>
     act(async () => {
-      const r = await post<{ action?: { id?: string; status?: string } }>(`/api/cards/${encodeURIComponent(card.id)}/approve`, { option: sel })
+      const edited = text != null && text.trim() !== (opt?.draft ?? '').trim()
+      const r = await post<{ action?: { id?: string; status?: string } }>(
+        `/api/cards/${encodeURIComponent(card.id)}/approve`,
+        edited ? { option: sel, text } : { option: sel },
+      )
       const status = r.action?.status
-      const sub = status === 'sent'
-        ? "The email is out. You'll see the reply here."
+      const at = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+      const sent = status === 'sent'
+      const sub = sent
+        ? `Sent to ${shortName(card.supplier_name) || opt?.to} at ${at}. You'll see the reply here.`
         : opt?.channel === 'notify' && opt.to ? `${opt.to} has it now.` : 'Recorded.'
-      return { text: doneFrom(card, sel, status), sub, actionId: r.action?.id ?? null }
+      // A sent email cannot be undone, so no Undo is offered for it.
+      return { text: doneFrom(card, sel, status), sub, actionId: sent ? null : r.action?.id ?? null }
     })
+  const openReview = () => { setDraft(opt?.draft ?? ''); setReview(true) }
   const escalate = () =>
     act(async () => {
       const r = await post<{ id?: string }>(`/api/cards/${encodeURIComponent(card.id)}/escalate`, { note })
@@ -180,19 +192,23 @@ function Focus(p: Props & { card: Card }) {
       const r = await post<{ id?: string }>(`/api/cards/${encodeURIComponent(card.id)}/dismiss`)
       return { text: 'Taken off the list.', sub: 'Nothing was sent.', actionId: r?.id ?? null }
     })
-  const onApprove = () => (money ? setConfirm(true) : void approve())
+  const onApprove = () => (emails ? openReview() : money ? setConfirm(true) : void approve())
 
   // Keyboard (desktop): j/k walk, a asks, Enter approves, Esc cancels.
-  const ref = useRef({ approve, confirm, busy })
-  ref.current = { approve, confirm, busy }
+  const ref = useRef({ approve, confirm, busy, emails, openReview })
+  ref.current = { approve, confirm, busy, emails, openReview }
   useEffect(() => {
     if (phone) return
     const onKey = (e: KeyboardEvent) => {
-      if (typing(e.target) || e.metaKey || e.ctrlKey || e.altKey || source != null) return
+      if (typing(e.target) || e.metaKey || e.ctrlKey || e.altKey || source != null || review) return
       const k = e.key
       if (ref.current.confirm && k === 'Enter') { e.preventDefault(); void ref.current.approve() }
       else if (k === 'Escape') { setConfirm(false); setOthers(false) }
-      else if ((k === 'a' || k === 'A') && opt && !ref.current.busy) { e.preventDefault(); setConfirm(true) }
+      else if ((k === 'a' || k === 'A') && opt && !ref.current.busy) {
+        e.preventDefault()
+        if (ref.current.emails) ref.current.openReview()
+        else setConfirm(true)
+      }
       else if (k === 'j' || k === 'k' || k === 'ArrowDown' || k === 'ArrowUp') {
         const i = p.order.findIndex((c) => c.id === card.id)
         const n = p.order[Math.min(p.order.length - 1, Math.max(0, i + (k === 'j' || k === 'ArrowDown' ? 1 : -1)))]
@@ -201,7 +217,7 @@ function Focus(p: Props & { card: Card }) {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [phone, source, opt, card.id, p])
+  }, [phone, source, review, opt, card.id, p])
 
   const decideBy = card.deadline ? (new Date(card.deadline).getTime() <= nowMs ? 'decide now' : `decide by ${when(card.deadline, nowMs)}`) : ''
   const meta = [card.supplier_name || card.part_name, decideBy].filter(Boolean).join(' · ')
@@ -218,7 +234,7 @@ function Focus(p: Props & { card: Card }) {
         {error && <p className="t-small mb-3 text-late" role="alert">{error}</p>}
         <div className={cn(phone ? 'grid justify-items-center gap-3.5' : 'flex flex-wrap items-center gap-6', p.ringing && phone && 'gap-5')}>
           <button
-            onClick={confirm ? approve : onApprove}
+            onClick={confirm ? () => approve() : onApprove}
             disabled={busy}
             className={cn(
               'inline-flex cursor-pointer items-center justify-center rounded-xl font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-60 t-body',
@@ -227,7 +243,7 @@ function Focus(p: Props & { card: Card }) {
               phone ? 'h-[54px] w-full rounded-[14px]' : 'h-12 px-7',
             )}
           >
-            {busy ? 'Sending…' : confirm ? 'Yes, approve' : 'Approve'}
+            {busy ? 'Sending…' : confirm ? 'Yes, approve' : emails ? 'Review email' : 'Approve'}
           </button>
           <div className={cn('flex items-center', phone ? 't-small gap-7' : 't-body gap-6', p.ringing && 'order-first w-full flex-col gap-4 pb-2 lg:items-start')}>
             <VoiceCall card={card} onChanged={p.onChanged} ringing={p.ringing} onRingingDone={p.onRingingDone} quiet linesEl={linesEl} />
@@ -318,7 +334,76 @@ function Focus(p: Props & { card: Card }) {
       {actions}
 
       <SourceSheet card={card} claim={claim} index={source} anchors={anchors.items} ready={anchors.ready} onIndex={setSource} />
+      {opt && (
+        <EmailReview
+          open={review}
+          onOpenChange={setReview}
+          to={opt.to ?? ''}
+          toName={card.supplier_name ?? ''}
+          subject={(opt as { subject?: string }).subject || headlineOf(card, state)}
+          draft={draft}
+          onDraft={setDraft}
+          cost={money ? costLine(card, sel).replace(/\.$/, '') : null}
+          busy={busy}
+          error={error}
+          onSend={() => { setReview(false); void approve(draft) }}
+        />
+      )}
     </article>
+  )
+}
+
+// ---------------------------------------------------------------- email review
+
+function EmailReview({
+  open, onOpenChange, to, toName, subject, draft, onDraft, cost, busy, error, onSend,
+}: {
+  open: boolean; onOpenChange: (o: boolean) => void; to: string; toName: string; subject: string
+  draft: string; onDraft: (t: string) => void; cost: string | null; busy: boolean; error: string; onSend: () => void
+}) {
+  return (
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fade fixed inset-0 z-40 bg-[rgba(24,24,26,.28)]" />
+        <Dialog.Content
+          aria-describedby={undefined}
+          className={cn(
+            'sheet-up fixed z-50 overflow-y-auto bg-ground focus:outline-none',
+            'inset-x-0 bottom-0 max-h-[92vh] rounded-t-[22px] px-6 pb-[max(28px,env(safe-area-inset-bottom))] pt-3 shadow-[0_-10px_40px_-16px_rgba(0,0,0,.25)]',
+            'md:inset-x-auto md:bottom-auto md:left-1/2 md:top-[8vh] md:max-h-[84vh] md:w-[640px] md:-translate-x-1/2 md:rounded-2xl md:px-8 md:pb-8 md:pt-7 md:shadow-[0_20px_60px_-20px_rgba(0,0,0,.3)]',
+          )}
+        >
+          <div className="mx-auto mb-5 h-[5px] w-9 rounded-full bg-hair md:hidden" aria-hidden="true" />
+          <Dialog.Title className="t-small font-normal text-ink-3">This email goes out when you press Send</Dialog.Title>
+          <dl className="t-small mt-4 grid grid-cols-[64px_minmax(0,1fr)] gap-y-2 text-ink-2">
+            <dt className="text-ink-3">To</dt>
+            <dd className="min-w-0 break-words text-ink">{toName ? `${toName} · ` : ''}<span className="text-ink-2">{to}</span></dd>
+            <dt className="text-ink-3">Subject</dt>
+            <dd className="min-w-0 break-words text-ink">{subject}</dd>
+          </dl>
+          <label htmlFor="email-draft" className="sr-only">Email text</label>
+          <textarea
+            id="email-draft"
+            value={draft}
+            onChange={(e) => onDraft(e.target.value)}
+            rows={10}
+            className="t-body mt-4 w-full resize-y rounded-xl bg-soft p-4 leading-relaxed text-ink focus:outline-2 focus:outline-accent"
+          />
+          {cost && <p className="t-small mt-3 text-ink-2">This commits money: <span className="text-ink">{cost}</span>.</p>}
+          {error && <p className="t-small mt-3 text-late" role="alert">{error}</p>}
+          <div className="mt-6 flex items-center gap-6">
+            <button
+              onClick={onSend}
+              disabled={busy || !draft.trim()}
+              className="t-body inline-flex h-12 cursor-pointer items-center justify-center rounded-xl bg-accent px-7 font-medium text-white hover:bg-[#1d3db5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-60"
+            >
+              {busy ? 'Sending…' : 'Send email'}
+            </button>
+            <Dialog.Close className="t-body cursor-pointer text-ink-2 hover:text-ink">Cancel</Dialog.Close>
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   )
 }
 
