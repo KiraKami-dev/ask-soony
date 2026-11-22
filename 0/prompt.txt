@@ -1,0 +1,32 @@
+ok, can you push and request merge from akshat?
+
+---
+
+is my entire setup working?
+
+---
+
+But another agent said my logs are not pushed?
+
+---
+
+from another review: 
+
+<pasted_content id="1dc7">
+Decide these before it goes to main:
+Removed controls: Jonas's "Ask me / Autonomous" mode and his per-card allow, edit or dismiss
+options are gone. Your per-routine trust toggle seemed to cover the same thing. Check with Jonas whether he relies on them.
+Email sending is inconsistent: on a voice call, a spoken "yes" sends the supplier email straight away. The Approve button in the inbox only records the decision and sends nothing. These should behave the same before the demo.
+Push only offered with cards: push alerts are only offered once a decision card is on screen. On a fresh visit with no cards, they aren't.
+Tell Jonas: his state-folder setting ASK_SOONY_STATE_DIR is replaced by ASK_STATE_DIR. His sample data in web/fixtures and his dashboard contract doc no longer match the new setup.
+</pasted_content id="1dc7">
+
+---
+
+For me it still says ready to merge on the merge request?
+
+---
+
+"My suggestion:
+1. Close PR #3 with a note: "Merged by hand into akshat/integration (f5dc402); follow-up fixes come as a new PR into that branch." I can do that if you say yes.
+2. Then do the fixes from my previous answer on a branch from akshat/integration, and open a new merge request into it, after a heads-up to Akshat." yeah do it
