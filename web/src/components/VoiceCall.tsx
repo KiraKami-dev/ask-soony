@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 // server through /api/cards/{id}/tool, the same path as the inbox buttons.
 
 type Line = { who: 'assistant' | 'you' | 'system'; text: string; id?: string }
-type ToolResult = { ok?: boolean; status?: string; sent_to?: string | null; error?: string }
+type ToolResult = { ok?: boolean; status?: string; sent_to?: string | null; error?: string; name?: string }
 
 interface Props {
   card: Card
@@ -70,13 +70,23 @@ export function VoiceCall({ card, onChanged, ringing = false, onRingingDone }: P
       let decided = false
       let closing = false
       let fallback: ReturnType<typeof setTimeout> | undefined
+      let hangTimer: ReturnType<typeof setTimeout> | undefined
+      // Hold the hang-up while the person speaks again or a tool runs (e.g. "next time just do
+      // that" right after a decision drafts a routine).
+      const holdOn = () => {
+        closing = false
+        clearTimeout(fallback)
+        clearTimeout(hangTimer)
+      }
       dc.onopen = () => {
         setStatus('live')
         dc.send(JSON.stringify({ type: 'response.create' })) // assistant speaks first
       }
       dc.onmessage = (ev) => {
         const msg = JSON.parse(ev.data)
-        if (msg.type === 'input_audio_buffer.committed') {
+        if (msg.type === 'input_audio_buffer.speech_started') {
+          holdOn()
+        } else if (msg.type === 'input_audio_buffer.committed') {
           upsert({ who: 'you', text: '…', id: msg.item_id })
         } else if (msg.type === 'conversation.item.input_audio_transcription.completed') {
           if (msg.transcript?.trim()) upsert({ who: 'you', text: msg.transcript.trim(), id: msg.item_id })
@@ -94,6 +104,7 @@ export function VoiceCall({ card, onChanged, ringing = false, onRingingDone }: P
         } else if (msg.type === 'response.output_audio_transcript.done') {
           upsert({ who: 'assistant', text: msg.transcript, id: msg.item_id })
         } else if (msg.type === 'response.function_call_arguments.done') {
+          holdOn()
           const args = JSON.parse(msg.arguments || '{}')
           fetch(`/api/cards/${encodeURIComponent(card.id)}/tool`, {
             method: 'POST',
@@ -106,6 +117,9 @@ export function VoiceCall({ card, onChanged, ringing = false, onRingingDone }: P
               if (msg.name === 'decide' && out.ok) {
                 decided = true
                 add({ who: 'system', text: out.sent_to ? `Email sent to ${out.sent_to}` : `Recorded: ${out.status}` })
+                onChanged()
+              } else if (msg.name === 'teach_routine' && out.ok) {
+                add({ who: 'system', text: `Routine drafted: ${out.name} · review it under Routines` })
                 onChanged()
               }
               dc.send(JSON.stringify({
@@ -120,7 +134,7 @@ export function VoiceCall({ card, onChanged, ringing = false, onRingingDone }: P
           fallback = setTimeout(hangUp, 20000)
         } else if (msg.type === 'output_audio_buffer.stopped' && closing) {
           clearTimeout(fallback)
-          setTimeout(hangUp, 800)
+          hangTimer = setTimeout(hangUp, 4000)
         } else if (msg.type === 'error') {
           add({ who: 'system', text: `Error: ${msg.error?.message ?? 'unknown'}` })
         }

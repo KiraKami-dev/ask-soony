@@ -702,17 +702,27 @@ def build_strip(cards: list[dict], root: Path | None, clock: PackClock, cur: dat
 
 def build_activity(cards: list[dict], events: list[dict], root: Path | None) -> list[dict]:
     items = []
+    # Who decided: the card's recorded action (decision_status action_id), else its latest action.
+    actions = read_list("actions.json")
+    by_id = {a.get("id"): a for a in actions if a.get("id")}
+    latest = {str(a.get("decision_id")): a for a in actions}
+
+    def via(c: dict) -> str | None:
+        act = by_id.get((c.get("ui") or {}).get("action_id")) or latest.get(c["id"]) or {}
+        return act.get("via")
+
     for e in events:
         items.append({"at": e.get("at"), "text": f"Read {e.get('path') or e.get('file')}", "kind": "read"})
     for c in cards:
         if c["status"] in ("dismissed", "logged"):
             items.append({"at": c.get("created_at"), "kind": "dismissed", "card": c["id"],
                           "text": f"{'No launch risk' if c['status'] == 'logged' else 'Dismissed'}: {c['headline']}",
-                          "detail": c.get("reason") or c.get("summary")})
+                          "detail": c.get("reason") or c.get("summary"), "via": via(c)})
         elif c["status"] != "open":
             ui = c.get("ui") or {}
             items.append({"at": ui.get("at") or c.get("created_at"), "kind": c["status"], "card": c["id"],
-                          "text": f"{c['status'].title()}: {c['headline']}", "detail": ui.get("note")})
+                          "text": f"{c['status'].title()}: {c['headline']}", "detail": ui.get("note"),
+                          "via": via(c)})
     items.sort(key=lambda x: (parse_ts(x.get("at")) or datetime.min.replace(tzinfo=tz())), reverse=True)
     return items[:40]
 
@@ -867,13 +877,16 @@ def escalate(card_id: str, body: dict = Body(default_factory=dict)) -> dict:
     brief = card["escalation_brief"] + (f" Note from {first_name(build_state()['viewer'])}: {note}" if note else "")
     return _record(card_id, "escalated", {
         "kind": "escalate", "to": card.get("approver"), "brief": brief, "note": note, "status": "requested",
+        "via": body.get("via") or "inbox",
     })
 
 
 @app.post("/api/cards/{card_id}/dismiss")
 def dismiss(card_id: str, body: dict = Body(default_factory=dict)) -> dict:
     _card(card_id)
-    return _record(card_id, "dismissed", {"kind": "dismiss", "note": body.get("note"), "status": "dismissed"})
+    return _record(card_id, "dismissed", {
+        "kind": "dismiss", "note": body.get("note"), "status": "dismissed", "via": body.get("via") or "inbox",
+    })
 
 
 @app.post("/api/trust")

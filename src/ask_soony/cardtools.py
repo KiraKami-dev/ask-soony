@@ -6,7 +6,8 @@ What the alert agent does with an inbox card, for the voice assistant and the Ap
   else (internal roles, no draft) is only recorded, never sent.
 - POST /api/cards/{id}/tool: the voice assistant's tools. They call the inbox's own approve /
   escalate / dismiss, so a spoken "yes" and a click behave the same and land in the same
-  actions.json and decision_status.json.
+  actions.json and decision_status.json. teach_routine only drafts a routine from a decided card
+  (routine_drafts.json, GET /api/routines/drafts); turning it on stays a click under Routines.
 """
 
 import os
@@ -49,6 +50,23 @@ TOOLS = [
                 },
             },
             "required": ["decision", "confirmed"],
+        },
+    },
+    {
+        "type": "function",
+        "name": "teach_routine",
+        "description": "The person wants cases like this handled automatically next time (for "
+        "example 'next time just do that'). Drafts a routine from the decision on this card for "
+        "them to check on screen; it does not switch anything on. Only after the card is decided.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "instruction": {
+                    "type": "string",
+                    "description": "What the person said they want automated, in their words",
+                }
+            },
+            "required": ["instruction"],
         },
     },
 ]
@@ -138,6 +156,8 @@ def run_tool(card_id: str, call: ToolCall):
     args = call.arguments or {}
     if call.name == "get_card_details":
         return _details(card)
+    if call.name == "teach_routine":
+        return teach_routine(card, str(args.get("instruction") or "").strip()[:300])
     if call.name != "decide":
         raise HTTPException(400, f"unknown tool {call.name}")
 
@@ -160,7 +180,7 @@ def run_tool(card_id: str, call: ToolCall):
             "offer_trust": out.get("offer_trust"),
         }
     if decision == "escalate":
-        action = api.escalate(card_id, {"note": note or "escalated by voice"})
+        action = api.escalate(card_id, {"note": note or "escalated by voice", "via": "voice"})
         try:
             from ask_soony import push
 
@@ -169,6 +189,54 @@ def run_tool(card_id: str, call: ToolCall):
             pass
         return {"ok": True, "status": "escalated", "to": action.get("to")}
     if decision == "reject":
-        api.dismiss(card_id, {"note": note or "rejected by voice"})
+        api.dismiss(card_id, {"note": note or "rejected by voice", "via": "voice"})
         return {"ok": True, "status": "dismissed"}
     return {"ok": False, "error": f"unknown decision {decision}"}
+
+
+DRAFTS = "routine_drafts.json"
+
+
+def teach_routine(card: dict, instruction: str) -> dict:
+    """
+    Draft a routine from the decision on this card, for the buyer to review under Routines.
+    Never saves or enables a routine: that stays a click on screen.
+    """
+    from ask_soony import api, routines
+
+    if card.get("status") in ("open", None):
+        return {"ok": False, "error": "decide first"}
+    try:
+        out = routines.suggest(card["id"])
+    except HTTPException as exc:
+        return {"ok": False, "error": str(exc.detail)}
+    routine = {**out.get("routine", {}), "enabled": False}
+    drafts = api.read_json(DRAFTS, {})
+    drafts = drafts if isinstance(drafts, dict) else {}
+    drafts[card["id"]] = {
+        "card_id": card["id"],
+        "instruction": instruction,
+        "at": api.now().isoformat(),
+        "via": "voice",
+        "routine": routine,
+        "preview": out.get("preview"),
+    }
+    api.write_json(DRAFTS, drafts)
+    name = routine.get("name") or "New routine"
+    try:
+        from ask_soony import push
+
+        push.send("Routine draft ready", name, card["id"])
+    except Exception:  # no devices: the draft is on screen anyway
+        pass
+    return {"ok": True, "name": name, "description": routine.get("description")}
+
+
+@router.get("/api/routines/drafts")
+def routine_drafts():
+    """Routine drafts the voice assistant made, newest first, for the Routines screen."""
+    from ask_soony import api
+
+    drafts = api.read_json(DRAFTS, {})
+    items = list(drafts.values()) if isinstance(drafts, dict) else []
+    return {"drafts": sorted(items, key=lambda d: str(d.get("at")), reverse=True)}
