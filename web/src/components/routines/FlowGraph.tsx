@@ -1,20 +1,33 @@
 import { Filter, GripVertical, Plus, Radar, ShieldCheck, X } from 'lucide-react'
 import { useEffect, useRef, useState, type DragEvent, type KeyboardEvent, type ReactNode } from 'react'
+import type { State } from '@/lib/api'
 import { cn } from '@/lib/utils'
+import { funnel, lookAlikeConds, type Funnel } from './funnel'
 import { StepIcon, merge, type Mark, type Row } from './RoutineFlow'
 import { PALETTE, condWords, paletteKey, triggerText, type Cond, type Run, type Spec, type Step } from './types'
 
-// The routine as a calm node editor, drawn from the recipe alone and edited in place:
-// WHEN (trigger, then every condition) and THEN (the steps) as two lanes, and the fixed guard as
-// its own ALWAYS lane underneath. With `onChange` the buyer edits it here: × on a condition or
-// step removes it, steps drag to a new place, "Add step" opens a small picker. With `before`
-// every node shows what a change does (new, changed, removed, moved). Counters come from the
-// latest run; a test run's counts stay ink-3, a real run's read in routine green.
-// Below the `lg` breakpoint (and without `wide`) it is one vertical, thumb-friendly path.
+// The routine as a calm editor, drawn from the recipe alone and edited in place. Three groups
+// with arrows only between them: WHEN (the trigger), ONLY IF (every condition as one checklist,
+// an AND list, not a sequence) and THEN (the steps, in order: the hero, the only boxes). The
+// fixed guard is a quiet ALWAYS line underneath. Each condition shows how many open cases are
+// still left after it right now (funnel.ts), so "why does nothing run" reads off the diagram.
+// With `onChange` the buyer edits it here: × on a condition or step (on hover or focus, always
+// on touch), steps drag to a new place, "Add step" opens a small picker, look-alike conditions
+// offer to drop the repeat. With `before` every line shows what a change does. Step counters
+// come from the latest run; a test run's stay ink-3, a real run's read in routine green.
+// Below `lg` (and without `wide`) the same groups stack into one thumb-friendly column.
 
 const REFUSED = 'Needs you, it costs money or changes the plan'
 
 interface Counts { matched: number; byStep: Map<string, string>; guard: number }
+
+const NOUN: Record<string, [string, string]> = {
+  decisions: ['open decision', 'open decisions'],
+  replies: ['supplier answer', 'supplier answers'],
+  waiting: ['message waiting', 'messages waiting'],
+  shipments: ['shipment', 'shipments'],
+}
+const noun = (spec: Spec, n: number) => (NOUN[spec.on ?? 'decisions'] ?? NOUN.decisions)[n === 1 ? 0 : 1]
 
 function count(spec: Spec, run?: Run): Counts | null {
   if (!run || !run.ok) return null
@@ -69,9 +82,9 @@ type Edge = 'before' | 'after' | null
  * it a little; a change rings it in accent so the before/after reads at a glance.
  */
 function Node({
-  icon, title, text, was, badge, active, wide, person, mark, moved, onRemove, edge, axis, grip,
+  icon, title, text, was, badge, active, person, mark, moved, onRemove, edge, axis, grip,
 }: {
-  icon: ReactNode; title: string; text: string; badge?: string; active?: boolean; wide?: boolean
+  icon: ReactNode; title: string; text: string; badge?: string; active?: boolean
   /** The text before a change, struck through. */
   was?: string
   person?: boolean
@@ -93,9 +106,8 @@ function Node({
     <div
       className={cn(
         'group relative w-full min-w-0 rounded-xl border bg-white px-3.5 pb-3 pt-2.5 transition-[border-color,box-shadow,opacity] duration-200',
-        'border-hair hover:border-ink-3/35 hover:shadow-[0_6px_18px_-10px_rgba(24,24,26,.18)] focus-within:border-ink-3/35',
+        'border-hair shadow-[0_1px_2px_rgba(24,24,26,.04)] hover:border-ink-3/35 hover:shadow-[0_6px_18px_-10px_rgba(24,24,26,.18)] focus-within:border-ink-3/35',
         onRemove && 'max-lg:pr-12',
-        wide && 'lg:w-[232px] lg:shrink-0',
         ringed && 'border-accent/45 bg-[color-mix(in_srgb,var(--color-accent)_3%,white)] shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-accent)_9%,transparent)]',
         mark === 'removed' && 'border-dashed bg-transparent opacity-60',
         edgeShadow,
@@ -115,7 +127,7 @@ function Node({
           <GripVertical size={14} className="shrink-0 text-ink-3 opacity-0 transition-opacity group-hover:opacity-100 max-lg:hidden" aria-hidden />
         ) : null}
       </div>
-      {!same(title, text) && <div className={cn('t-small mt-1.5 line-clamp-3 text-ink-2', wide && 'lg:line-clamp-4', mark === 'removed' && 'line-through decoration-ink-3')}>
+      {!same(title, text) && <div className={cn('t-small mt-1 line-clamp-4 text-ink-2', mark === 'removed' && 'line-through decoration-ink-3')}>
         {was && was !== text && <><span className="text-ink-3 line-through">{was}</span>{' '}</>}
         {text}
       </div>}
@@ -251,7 +263,7 @@ function AddStep({ ed, wide }: { ed: Editor; wide?: boolean }) {
         className={cn(
           't-small inline-flex cursor-pointer items-center gap-2 rounded-xl border border-dashed text-ink-2 transition-colors hover:border-ink-3/60 hover:text-ink focus-visible:outline-2 focus-visible:outline-accent',
           open ? 'border-ink-3/60 bg-white text-ink' : 'border-ink-3/35',
-          wide ? 'h-[54px] px-4' : 'h-12 w-full justify-center',
+          wide ? 'h-[54px] px-4' : 'h-11 w-full justify-center',
         )}
       >
         <Plus size={14} /> Add step
@@ -291,179 +303,225 @@ function AddStep({ ed, wide }: { ed: Editor; wide?: boolean }) {
   )
 }
 
-/** The fixed guard: its own lane, the same in every routine and every mode. */
+/** The fixed guard: one quiet, reassuring line under the routine, the same in every mode. */
 function Guard({ badge, active }: { badge?: string; active?: boolean }) {
   return (
-    <div className="flex items-start gap-3 rounded-xl bg-soft px-4 py-3">
-      <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-md bg-white text-ink shadow-[0_0_0_1px_var(--color-hair)]">
-        <ShieldCheck size={14} strokeWidth={1.75} />
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="t-small font-medium text-ink">Money and plan changes come to you</p>
-        <p className="t-small text-ink-2">Whatever the routine says, an option that costs money or changes the plan is never carried out. It asks you instead.</p>
-      </div>
+    <div className="flex items-start gap-2.5 border-t border-hair pt-4">
+      <ShieldCheck size={15} strokeWidth={1.75} className="mt-[3px] shrink-0 text-ink-3" aria-hidden />
+      <p className="t-small min-w-0 flex-1 text-ink-3">
+        <span className="font-medium text-ink-2">Always: money and plan changes come to you.</span>{' '}
+        Whatever the routine says, an option that costs money or changes the plan is never carried out. It asks you instead.
+      </p>
       {badge && <span className={cn('t-small shrink-0 whitespace-nowrap', active ? 'dot-routine text-routine' : 'text-ink-3')}>{badge}</span>}
     </div>
   )
 }
 
-interface StepNode { key: string; drag: DragProps; dragging: boolean; node: ReactNode }
+const head = 't-small mb-2.5 font-medium text-ink-3'
 
-function nodesFor(spec: Spec, run: Run | undefined, wide: boolean, before: Spec | undefined, ed: Editor, axis: 'x' | 'y') {
-  const c = count(spec, run)
-  const guard = <Guard badge={c?.guard ? `${c.guard} came to you` : undefined} active={!!c?.guard && !run?.dry} />
-  const trigger = (
-    <Node
-      wide={wide}
-      icon={<Radar size={14} strokeWidth={1.75} />}
-      title={triggerText(spec.on).title}
-      text={triggerText(spec.on).text}
-      mark={before && before.on !== spec.on ? 'changed' : undefined}
-    />
-  )
-  const conds: Row<Cond>[] = merge<Cond>(spec.when, before?.when)
-  let seen = 0
-  const conditions = conds.map((row) => {
-    const isLive = row.mark !== 'removed'
-    const first = isLive && seen === 0
-    if (isLive) seen += 1
-    const last = isLive && seen === spec.when.length
-    return {
-      key: row.item.id,
-      node: (
-        <Node
-          wide={wide}
-          icon={<Filter size={14} strokeWidth={1.75} />}
-          title={first || !isLive ? 'Only if' : 'And'}
-          text={condWords(row.item)}
-          was={row.mark === 'changed' && row.old ? condWords(row.old) : undefined}
-          mark={row.mark}
-          badge={last && c ? `${c.matched} matched` : undefined}
-          active={last && !!c?.matched && !run?.dry}
-          onRemove={ed.editable && isLive ? () => ed.removeCond(row.item.id) : undefined}
-        />
-      ),
-    }
-  })
-  const steps: StepNode[] = merge<Step>(spec.then, before?.then).map((row) => {
-    const s = row.item
-    const badge = c?.byStep.get(s.id)
-    const isLive = row.mark !== 'removed'
-    const drag = isLive ? ed.stepDrag(s.id, axis) : {}
-    return {
-      key: s.id,
-      drag,
-      dragging: ed.drag?.kind === 'step' && ed.drag.id === s.id,
-      node: (
-        <Node
-          wide={wide}
-          icon={<StepIcon step={s} size={14} className="" />}
-          person={s.do === 'call'}
-          title={stepTitle(s)}
-          text={s.text}
-          was={row.mark === 'changed' && row.old ? row.old.text : undefined}
-          mark={row.mark}
-          moved={row.moved}
-          badge={badge}
-          active={!!badge && !run?.dry && !badge.endsWith('for your OK')}
-          edge={isLive ? ed.edgeOf(s.id) : null}
-          axis={axis}
-          grip={!!drag.draggable}
-          onRemove={ed.editable && isLive ? () => ed.removeStep(s.id) : undefined}
-        />
-      ),
-    }
-  })
-  return { guard, trigger, conditions, steps }
-}
-
-const grab = (s: { drag: DragProps; dragging: boolean }) =>
-  cn('rise min-w-0', s.drag.draggable && 'cursor-grab active:cursor-grabbing', s.dragging && 'opacity-40')
-
-/** A lane: its label in a narrow column, the nodes to the right. */
-function Lane({ label, children, line }: { label: string; children: ReactNode; line?: boolean }) {
+/** WHEN: what the routine looks at, and how many cases that is right now. No box: it is context. */
+function Trigger({ spec, before, fun }: { spec: Spec; before?: Spec; fun: Funnel | null }) {
+  const t = triggerText(spec.on)
+  const changed = !!before && (before.on ?? 'decisions') !== (spec.on ?? 'decisions')
   return (
-    <div className="grid grid-cols-[64px_minmax(0,1fr)] gap-x-4">
-      <div className="flex flex-col items-start pt-[15px]">
-        <span className="t-small font-medium text-ink-3">{label}</span>
-        {line && <div className="ml-[3px] mt-2 w-px flex-1 bg-hair" />}
+    <div className="flex min-w-0 items-start gap-3">
+      <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-lg [&>svg]:block', changed ? 'bg-accent/10 text-accent' : 'bg-soft text-ink-2')}>
+        <Radar size={14} strokeWidth={1.75} />
+      </span>
+      <div className="t-small min-w-0">
+        <p className="font-medium text-ink">{t.title}{changed && <span className="ml-2 text-accent">Changed</span>}</p>
+        <p className="text-ink-3">{t.text}</p>
+        {fun && <p className="mt-1 text-ink-2">{fun.total} {noun(spec, fun.total)} now</p>}
       </div>
-      <div className="flex min-w-0 flex-wrap items-start gap-y-4 pb-6">{children}</div>
     </div>
   )
 }
 
-/**
- * The wide view reads like a sentence in lanes: WHEN (trigger, then every condition) left to
- * right, THEN (the steps) left to right, ALWAYS (the guard) underneath. Lanes wrap.
- */
-function Lanes({ spec, run, before, ed }: { spec: Spec; run?: Run; before?: Spec; ed: Editor }) {
-  const { guard, trigger, conditions, steps } = nodesFor(spec, run, true, before, ed, 'x')
-  const arrow = <div className="mt-[22px] shrink-0 px-1.5 text-ink-3/45"><Right /></div>
+/** The × on a condition line: small on hover or focus with a pointer, always there on touch. */
+function RemoveLine({ label, onClick }: { label: string; onClick: () => void }) {
   return (
-    <div className="flex flex-col">
-      <Lane label="When" line>
-        {[{ key: 'trigger', node: trigger }, ...conditions].map((it, i) => (
-          <div key={it.key} className="rise flex items-start">{i > 0 && arrow}{it.node}</div>
-        ))}
-      </Lane>
-      <Lane label="Then" line>
-        {steps.map((s, i) => (
-          <div key={s.key} className="flex items-start">
-            {i > 0 && arrow}
-            <div {...s.drag} className={grab(s)}>{s.node}</div>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={`Remove “${label}”`}
+      title="Remove"
+      className={cn(
+        'grid shrink-0 cursor-pointer place-items-center rounded-full text-ink-3 transition-opacity hover:bg-soft hover:text-ink focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-accent',
+        '-my-1.5 h-9 w-9 lg:-my-0.5 lg:h-6 lg:w-6 lg:opacity-0 lg:group-focus-within:opacity-100 lg:group-hover:opacity-100',
+      )}
+    >
+      <X size={13} />
+    </button>
+  )
+}
+
+/**
+ * ONLY IF: every condition as one checklist (all must hold, order does not matter), numbered so
+ * the funnel line can point at one. The count on each line is how many cases are still left.
+ */
+function Conditions({ spec, before, ed, fun }: { spec: Spec; before?: Spec; ed: Editor; fun: Funnel | null }) {
+  const rows: Row<Cond>[] = merge<Cond>(spec.when, before?.when)
+  const repeats = lookAlikeConds(spec.when, condWords)
+  const number = new Map(spec.when.map((c, i) => [c.id, i + 1]))
+  const total = fun?.total ?? 0
+  return (
+    <div className="min-w-0">
+      <ol className="divide-y divide-hair border-y border-hair">
+        {rows.map((row) => {
+          const c = row.item
+          const live = row.mark !== 'removed'
+          const n = number.get(c.id)
+          // Past the line where everything stops, more zeros say nothing: leave them out.
+          const past = !!fun?.stop && (n ?? 0) > fun.stop.index + 1
+          const left = live && !past ? fun?.left.get(c.id) : undefined
+          const stop = fun?.stop?.id === c.id
+          const ringed = row.mark === 'added' || row.mark === 'changed'
+          const repeatOf = live ? repeats.get(c.id) : undefined
+          return (
+            <li
+              key={c.id}
+              className={cn('rise group py-2.5', ringed && '-mx-2 rounded-lg bg-accent/[.04] px-2', !live && 'opacity-60')}
+              title={`${c.field.replace('_', ' ')} ${c.op === 'any_of' ? 'any of' : c.op} ${String(c.value)}`}
+            >
+              <div className="flex items-start gap-3">
+                <span className="t-small w-4 shrink-0 text-right text-ink-3 tabular-nums">{live ? n : ''}</span>
+                <p className={cn('t-small min-w-0 flex-1 text-ink', !live && 'text-ink-3 line-through decoration-ink-3')}>
+                  {row.mark === 'changed' && row.old && condWords(row.old) !== condWords(c) && (
+                    <><span className="text-ink-3 line-through">{condWords(row.old)}</span>{' '}</>
+                  )}
+                  {condWords(c)}
+                </p>
+                {row.mark !== 'same' && MARK_WORD[row.mark] && (
+                  <span className={cn('t-small shrink-0 font-medium', live ? 'text-accent' : 'text-ink-3')}>{MARK_WORD[row.mark]}</span>
+                )}
+                {left !== undefined && (
+                  <span
+                    className={cn('t-small shrink-0 whitespace-nowrap tabular-nums', stop ? 'font-medium text-ink' : 'text-ink-3')}
+                    title={`${left} of ${total} ${noun(spec, total)} left after this line`}
+                  >
+                    {left} left
+                  </span>
+                )}
+                {ed.editable && live && <RemoveLine label={condWords(c)} onClick={() => ed.removeCond(c.id)} />}
+              </div>
+              {repeatOf && (
+                <p className="t-small mt-1 pl-7 text-ink-3">
+                  Says nearly the same as line {number.get(repeatOf)}.
+                  {ed.editable && <> <button type="button" className="uline" onClick={() => ed.removeCond(c.id)}>Keep one</button></>}
+                </p>
+              )}
+            </li>
+          )
+        })}
+      </ol>
+      {fun && <p className="t-small mt-2.5 pl-7 text-ink-2" aria-live="polite">{verdict(spec, fun, number)}</p>}
+    </div>
+  )
+}
+
+/** One sentence on why it would or would not run now. */
+function verdict(spec: Spec, f: Funnel, number: Map<string, number>): string {
+  if (f.total === 0) return `No ${noun(spec, 2)} right now. It waits for the next one.`
+  if (f.pass > 0) return `Right now ${f.pass} of ${f.total} ${noun(spec, f.total)} pass every line.`
+  if (f.stop) {
+    const line = number.get(f.stop.id)
+    return f.stop.index === 0
+      ? `Right now none of the ${f.total} ${noun(spec, f.total)} pass line 1.`
+      : `Right now ${f.stop.reached} of ${f.total} get as far as line ${line}, and none pass it.`
+  }
+  return `Right now none of the ${f.total} ${noun(spec, f.total)} pass every line.`
+}
+
+function Steps({ spec, run, before, ed, c }: { spec: Spec; run?: Run; before?: Spec; ed: Editor; c: Counts | null }) {
+  const rows = merge<Step>(spec.then, before?.then)
+  return (
+    <div className="flex min-w-0 flex-col">
+      {rows.map((row, i) => {
+        const s = row.item
+        const badge = c?.byStep.get(s.id)
+        const live = row.mark !== 'removed'
+        const drag = live ? ed.stepDrag(s.id, 'y') : {}
+        const dragging = ed.drag?.kind === 'step' && ed.drag.id === s.id
+        return (
+          <div key={s.id}>
+            {i > 0 && <ArrowDown />}
+            <div {...drag} className={cn('rise min-w-0', drag.draggable && 'cursor-grab active:cursor-grabbing', dragging && 'opacity-40')}>
+              <Node
+                icon={<StepIcon step={s} size={14} className="" />}
+                person={s.do === 'call'}
+                title={stepTitle(s)}
+                text={s.text}
+                was={row.mark === 'changed' && row.old ? row.old.text : undefined}
+                mark={row.mark}
+                moved={row.moved}
+                badge={badge}
+                active={!!badge && !run?.dry && !badge.endsWith('for your OK')}
+                edge={live ? ed.edgeOf(s.id) : null}
+                axis="y"
+                grip={!!drag.draggable}
+                onRemove={ed.editable && live ? () => ed.removeStep(s.id) : undefined}
+              />
+            </div>
           </div>
-        ))}
-        <AddStep ed={ed} wide />
-      </Lane>
-      <div className="grid grid-cols-[64px_minmax(0,1fr)] gap-x-4">
-        <span className="t-small pt-[15px] font-medium text-ink-3">Always</span>
-        <div className="min-w-0">{guard}</div>
-      </div>
+        )
+      })}
+      {ed.editable && ed.palette.length > 0 && <div className="mt-2.5"><AddStep ed={ed} /></div>}
+    </div>
+  )
+}
+
+/** Between groups only: right on a wide screen, down otherwise. */
+function Arrow({ wide }: { wide?: boolean }) {
+  return (
+    <div className="shrink-0 text-ink-3/45" aria-hidden>
+      <span className={cn('block', wide ? 'lg:hidden' : '')}><div className="ml-[13px] py-2"><Down /></div></span>
+      {wide && <span className="hidden pt-[38px] lg:flex lg:justify-center"><Right /></span>}
     </div>
   )
 }
 
 export function FlowGraph({
-  spec, run, wide, before, onChange, disabled,
+  spec, run, wide, before, onChange, disabled, ctx,
 }: {
   spec: Spec
   run?: Run
-  /** Lanes on a large screen; one vertical path below `lg` either way. */
+  /** Three columns on a large screen; one vertical path below `lg` either way. */
   wide?: boolean
-  /** The version before a change: every node shows what the change does. */
+  /** The version before a change: every line shows what the change does. */
   before?: Spec
   /** Edit in place: remove, reorder, add. Each edit is a new spec for the caller to test. */
   onChange?: (spec: Spec) => void
   disabled?: boolean
+  /** Today's cases, for the "left after this line" counts. */
+  ctx?: State | null
 }) {
   const ed = useEditor(spec, onChange, disabled)
-  const { guard, trigger, conditions, steps } = nodesFor(spec, run, false, before, ed, 'y')
-  const head = (t: string, first?: boolean) => <p className={cn('t-small mb-2 font-medium text-ink-3', !first && 'mt-5')}>{t}</p>
-  const vertical = (
-    <div className="flex flex-col">
-      {head('When', true)}
-      {[{ key: 'trigger', node: trigger }, ...conditions].map((it, i) => (
-        <div key={it.key} className="rise">{i > 0 && <ArrowDown />}{it.node}</div>
-      ))}
-      {head('Then')}
-      {steps.map((s, i) => (
-        <div key={s.key}>
-          {i > 0 && <ArrowDown />}
-          <div {...s.drag} className={grab(s)}>{s.node}</div>
-        </div>
-      ))}
-      {ed.editable && ed.palette.length > 0 && <div className="mt-3"><AddStep ed={ed} /></div>}
-      {head('Always')}
-      {guard}
-    </div>
-  )
-  if (!wide) return vertical
+  const c = count(spec, run)
+  const fun = funnel(spec, ctx)
+  const runs = fun ? `${fun.pass} match now` : c ? `${c.matched} in the last test` : null
   return (
-    <>
-      <div className="hidden lg:block"><Lanes spec={spec} run={run} before={before} ed={ed} /></div>
-      <div className="lg:hidden">{vertical}</div>
-    </>
+    <div className="flex flex-col gap-6">
+      <div className={cn('flex flex-col', wide && 'lg:grid lg:grid-cols-[minmax(0,210px)_36px_minmax(0,1fr)_36px_minmax(0,290px)] lg:items-start')}>
+        <section aria-label="When" className="min-w-0">
+          <h4 className={head}>When</h4>
+          <Trigger spec={spec} before={before} fun={fun} />
+        </section>
+        <Arrow wide={wide} />
+        <section aria-label="Only if" className="min-w-0">
+          <h4 className={head}>Only if all of these hold</h4>
+          <Conditions spec={spec} before={before} ed={ed} fun={fun} />
+        </section>
+        <Arrow wide={wide} />
+        <section aria-label="Then" className="min-w-0">
+          <div className="flex items-baseline justify-between gap-3">
+            <h4 className={head}>Then</h4>
+            {runs && <span className="t-small mb-2.5 text-ink-3">{runs}</span>}
+          </div>
+          <Steps spec={spec} run={run} before={before} ed={ed} c={c} />
+        </section>
+      </div>
+      <Guard badge={c?.guard ? `${c.guard} came to you` : undefined} active={!!c?.guard && !run?.dry} />
+    </div>
   )
 }
 

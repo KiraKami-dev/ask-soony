@@ -201,6 +201,7 @@ export function Routines({ state, onChanged, phone }: { state: State; onChanged:
                 big
                 routine={draft.routine}
                 onChanged={changed}
+                ctx={state}
                 draft={{
                   preview: draft.preview,
                   onTurnOn: turnOn,
@@ -253,6 +254,7 @@ export function Routines({ state, onChanged, phone }: { state: State; onChanged:
                 <RoutineCard
                   routine={cur.routine}
                   onChanged={changed}
+                  ctx={state}
                   draft={{
                     preview: cur.preview,
                     onTurnOn: async (mode) => { await save(cur.routine, mode); hideDraft(id); await load(); onChanged() },
@@ -282,7 +284,7 @@ export function Routines({ state, onChanged, phone }: { state: State; onChanged:
         <div className="mt-6 divide-y divide-hair">
           {list.map((r) => (
             <div key={r.id} id={`routine-${r.id}`} className={cn('scroll-mt-24 py-12 transition-[background-color,box-shadow] duration-700 first:pt-4', target === r.id && 'rounded-2xl bg-soft shadow-[0_0_0_16px_var(--color-soft)]')}>
-              <RoutineCard routine={r} onChanged={changed} />
+              <RoutineCard routine={r} onChanged={changed} ctx={state} />
             </div>
           ))}
         </div>

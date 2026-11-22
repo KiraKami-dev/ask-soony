@@ -1,6 +1,6 @@
 import { Loader2 } from 'lucide-react'
 import { useState, type FormEvent, type ReactNode } from 'react'
-import { fmtTime } from '@/lib/api'
+import { fmtTime, type State } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { TestResult, TrustControl } from './Diagram'
 import { FlowGraph } from './FlowGraph'
@@ -8,9 +8,9 @@ import { setMode, useLive } from './live'
 import { UndoAction } from './Undo'
 import { body, call, lastUndoable, modeOf, summarise, type Mode, type Routine, type Run, type Spec } from './types'
 
-// One routine in the Today style, one view: its name and what it did, the trust ladder (how much
-// it may do on its own), and the When / Then / Always diagram that is also the editor (× to
-// remove, drag to reorder, "Add step"), with "Change it in your words" below. A change is never saved straight
+// One routine in the Today style, one view, top to bottom: its name and what it did, how it works
+// (the When / Only if / Then diagram that is also the editor: × to remove, drag to reorder, "Add
+// step"), how much it may do on its own (the trust ladder), then "Change it in your words". A change is never saved straight
 // away: it is tested on today's inbox first and shown on the diagram as before/after, then the
 // buyer applies it or keeps the old version. The same block shows a suggested routine (draft)
 // before it is on, everywhere: in the sheet, after "Show me how" and from "How it decided".
@@ -42,9 +42,11 @@ const primary = 't-small inline-flex h-10 cursor-pointer items-center justify-ce
 const quiet = 't-small cursor-pointer text-ink-2 hover:text-ink disabled:opacity-60'
 
 export function RoutineCard({
-  routine, draft, onChanged, big,
+  routine, draft, onChanged, big, ctx,
 }: {
   routine: Routine
+  /** Today's cases, for the diagram's "left after this line" counts. */
+  ctx?: State | null
   /** Shown on its own (after "Show me how", from "How it decided"): the name as the headline. */
   big?: boolean
   /** Set for a suggested routine that is not saved yet. */
@@ -129,12 +131,30 @@ export function RoutineCard({
     </div>
   )
 
+  const trust = (
+    <section aria-label="How much it may do on its own" className="mt-10 max-w-[620px]">
+      <p className="t-small mb-3 font-medium text-ink-3">How much it may do on its own</p>
+      <TrustControl
+        value={shownMode}
+        onChange={changeMode}
+        disabled={!!busy}
+        dim={!draft && !routine.enabled}
+        note={
+          draft && shownMode === 'ask' ? 'Every routine starts here. Move it up once you trust what it prepares.'
+          : !draft && !routine.enabled ? 'Off. Switch it on to let it act.'
+          : undefined
+        }
+      />
+    </section>
+  )
+
   let content: ReactNode
   if (!spec) {
     content = (
       <>
         <p className="t-body mt-5 text-ink-2">{routine.description}</p>
         <p className="t-small mt-2 text-ink-3">An earlier routine, written as code. Ask the agent for a new one to see and change it as steps.</p>
+        {trust}
       </>
     )
   } else {
@@ -157,12 +177,9 @@ export function RoutineCard({
             </div>
           </div>
         ) : (
-          <div className="mt-8 flex items-baseline justify-between gap-4">
-            <p className="t-small font-medium text-ink-3">How it works</p>
-            {!busy && <p className="t-small hidden text-ink-3 lg:block">Hover a step to remove it, drag to reorder</p>}
-          </div>
+          <p className="t-small mt-8 font-medium text-ink-3">How it works</p>
         )}
-        <div className={cn('mt-4 transition-opacity', busy === 'preview' && 'opacity-60')}>
+        <div className={cn('mt-5 transition-opacity', busy === 'preview' && 'opacity-60')}>
           <FlowGraph
             wide
             spec={working.spec ?? spec}
@@ -170,6 +187,7 @@ export function RoutineCard({
             run={lastRun}
             onChange={tryEdit}
             disabled={!!busy}
+            ctx={ctx}
           />
         </div>
         {review && review.after.name !== routine.name && (
@@ -180,13 +198,14 @@ export function RoutineCard({
         {busy === 'preview' && <Working text="Testing the change on today's inbox…" />}
         {busy === 'edit' && <Working text="The agent is changing the routine…" />}
 
+        {!review && trust}
         {review ? (
           <div className="mt-6 space-y-3">
             {review.note && <p className="t-small text-ink-2">{review.note}</p>}
             <TestResult run={review.preview} spec={review.after.spec} title="What this version would do on today's inbox" />
           </div>
         ) : (
-          <form onSubmit={askInWords} className="mt-5 flex items-center gap-2 rounded-xl border border-hair bg-white py-1 pl-3.5 pr-1 focus-within:border-ink-3/40">
+          <form onSubmit={askInWords} className="mt-8 flex items-center gap-2 rounded-xl border border-hair bg-white py-1 pl-3.5 pr-1 focus-within:border-ink-3/40">
             <label className="min-w-0 flex-1">
               <span className="sr-only">Change it in your words</span>
               <input
@@ -219,19 +238,6 @@ export function RoutineCard({
             onChange={(on) => act('save', () => call(`/api/routines/${routine.id}/toggle`, { enabled: on }))}
           />
         )}
-      </div>
-      <div className="mt-6 max-w-[620px]">
-        <TrustControl
-          value={shownMode}
-          onChange={changeMode}
-          disabled={!!busy}
-          dim={!draft && !routine.enabled}
-          note={
-            draft && shownMode === 'ask' ? 'Every routine starts here. Move it up once you trust what it prepares.'
-            : !draft && !routine.enabled ? 'Off. Switch it on to let it act.'
-            : undefined
-          }
-        />
       </div>
 
       {content}
