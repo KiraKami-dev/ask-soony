@@ -323,11 +323,11 @@ function Guard({ badge, active }: { badge?: string; active?: boolean }) {
 }
 
 /** The node look every box on the canvas shares. */
-const NODE = 'rounded-xl border border-hair bg-white shadow-[0_1px_2px_rgba(24,24,26,.04),0_6px_16px_-12px_rgba(24,24,26,.16)]'
+export const NODE = 'rounded-xl border border-hair bg-white shadow-[0_1px_2px_rgba(24,24,26,.04),0_6px_16px_-12px_rgba(24,24,26,.16)]'
 const tile = (on?: boolean) => cn('grid h-7 w-7 shrink-0 place-items-center rounded-lg [&>svg]:block', on ? 'bg-accent/10 text-accent' : 'bg-soft text-ink-2')
 
 /** A node's head row: the icon tile, a small kicker and the title. */
-function NodeHead({ icon, kicker, title, accent, right }: { icon: ReactNode; kicker: string; title: string; accent?: boolean; right?: ReactNode }) {
+export function NodeHead({ icon, kicker, title, accent, right }: { icon: ReactNode; kicker: string; title: string; accent?: boolean; right?: ReactNode }) {
   return (
     <div className="flex items-start gap-2.5 px-3.5 pt-3">
       <span className={tile(accent)}>{icon}</span>
@@ -506,7 +506,7 @@ const port = 'h-[7px] w-[7px] shrink-0 rounded-full border border-ink-3/45 bg-wh
  * A connector between two nodes, n8n style: a port dot on the node it leaves, a hairline, and a
  * small head on the node it enters. Across on a wide screen (`across`), down otherwise.
  */
-function Link({ across, dashed }: { across?: boolean; dashed?: boolean }) {
+export function Link({ across, dashed }: { across?: boolean; dashed?: boolean }) {
   const line = dashed ? 'border-dashed border-ink-3/35' : 'border-ink-3/40'
   const down = (
     <div className="ml-[24px] flex h-7 w-[9px] flex-col items-center">

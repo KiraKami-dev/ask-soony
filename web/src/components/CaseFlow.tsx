@@ -1,10 +1,11 @@
-import { ArrowDown, FileInput, Inbox, ScanText, Scale, Send, ShieldCheck, TrendingDown } from 'lucide-react'
+import { FileInput, Inbox, ScanText, Scale, Send, ShieldCheck, TrendingDown } from 'lucide-react'
 import { Fragment, useState, type ReactNode } from 'react'
 import { fmtNum, tidy, type Card, type Evidence, type State } from '@/lib/api'
 import { languageOf, sourceName, splitValue, when } from '@/lib/decisions'
 import { firstNameOf } from '@/lib/role'
 import { plain } from '@/lib/today'
 import { cn } from '@/lib/utils'
+import { Link, NODE, NodeHead } from './routines/FlowGraph'
 
 // "How we got here": the agents' steps behind one case as a small flow, the same canvas and node
 // look as a routine's diagram. Every node is read from the case itself (its trail, evidence,
@@ -85,30 +86,24 @@ function stepsOf(card: Card, state: State, nowMs: number): Step[] {
   return out
 }
 
+/** One step, in the same box as a routine's diagram: icon tile, kicker, title, detail. */
 function Node({ s, nowMs }: { s: Step; nowMs: number }) {
   return (
     <div
       className={cn(
-        'min-w-0 rounded-xl px-3.5 py-2.5',
-        s.tone === 'next'
-          ? 'border border-dashed border-ink-3/40 bg-ground/70'
-          : 'border border-hair bg-white shadow-[0_1px_2px_rgba(24,24,26,.04),0_6px_16px_-12px_rgba(24,24,26,.16)]',
-        s.tone === 'now' && 'border-accent/50 shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-accent)_10%,transparent)]',
+        'min-w-0 pb-3',
+        s.tone === 'next' ? 'rounded-xl border border-dashed border-ink-3/40 bg-ground/70' : NODE,
+        s.tone === 'now' && 'border-accent/45 shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-accent)_9%,transparent)]',
       )}
     >
-      <div className="flex items-center gap-3">
-        <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-lg [&>svg]:block', s.tone === 'now' ? 'bg-accent/10 text-accent' : 'bg-soft text-ink-2')}>{s.icon}</span>
-        <div className="t-small min-w-0 flex-1 leading-tight">
-          <p className="flex items-baseline justify-between gap-3">
-            <span className="min-w-0">
-              <span className="text-ink-3">{s.kicker} · </span>
-              <span className={cn('font-medium', s.tone === 'next' ? 'text-ink-2' : s.late ? 'text-late' : 'text-ink')}>{s.title}</span>
-            </span>
-            {s.at && <span className="shrink-0 tabular-nums text-ink-3">{when(s.at, nowMs)}</span>}
-          </p>
-          {s.text && <p className="mt-0.5 line-clamp-2 text-ink-3">{s.text}</p>}
-        </div>
-      </div>
+      <NodeHead
+        icon={s.icon}
+        kicker={s.kicker}
+        title={s.title}
+        accent={s.tone === 'now'}
+        right={s.at ? <span className="t-small shrink-0 tabular-nums text-ink-3">{when(s.at, nowMs)}</span> : undefined}
+      />
+      {s.text && <p className={cn('t-small mt-1.5 line-clamp-2 pl-[52px] pr-3.5', s.late ? 'text-late' : 'text-ink-3')}>{s.text}</p>}
     </div>
   )
 }
@@ -117,7 +112,6 @@ const CANVAS = {
   backgroundImage: 'radial-gradient(circle, color-mix(in srgb, var(--color-ink-3) 22%, transparent) 1px, transparent 1.2px)',
   backgroundSize: '18px 18px',
 }
-const arrow = 'grid place-items-center text-ink-3/70 [&>svg]:block'
 
 export function CaseFlow({ card, state, nowMs, phone, className }: { card: Card; state: State; nowMs: number; phone?: boolean; className?: string }) {
   const steps = stepsOf(card, state, nowMs)
@@ -139,7 +133,7 @@ export function CaseFlow({ card, state, nowMs, phone, className }: { card: Card;
     <ol className="grid">
       {steps.map((s, i) => (
         <Fragment key={s.key}>
-          {i > 0 && <li aria-hidden="true" className={cn(arrow, 'h-5')}><ArrowDown size={13} /></li>}
+          {i > 0 && <li aria-hidden="true"><Link dashed={s.tone === 'next'} /></li>}
           <li><Node s={s} nowMs={nowMs} /></li>
         </Fragment>
       ))}
