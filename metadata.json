@@ -1,0 +1,46 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M81316FV6GZSHE6SCZ7K38C3",
+  "strategy": "manual-commit",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 1,
+  "files_touched": null,
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt",
+      "assets_manifest": "/0/assets/manifest.json"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 9,
+    "cache_creation_tokens": 5580,
+    "cache_read_tokens": 3023018,
+    "output_tokens": 5355,
+    "api_call_count": 5
+  },
+  "redaction": {
+    "replacements": 2114,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 73,
+      "credentialed_uri": 0,
+      "entropy": 714,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 1303,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1190,
+      "IP": 48,
+      "PHONE": 65
+    }
+  }
+}

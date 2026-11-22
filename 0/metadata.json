@@ -1,0 +1,177 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M81316FV6GZSHE6SCZ7K38C3",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T07:38:09.268153Z",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "bc54fd5b3dbf",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 9,
+    "cache_creation_tokens": 5580,
+    "cache_read_tokens": 3023018,
+    "output_tokens": 5355,
+    "api_call_count": 5
+  },
+  "session_token_usage": {
+    "input_tokens": 2924,
+    "cache_creation_tokens": 2977919,
+    "cache_read_tokens": 635489451,
+    "output_tokens": 1196840,
+    "api_call_count": 1267,
+    "subagent_tokens": {
+      "input_tokens": 3078,
+      "cache_creation_tokens": 6619853,
+      "cache_read_tokens": 228958090,
+      "output_tokens": 1795277,
+      "api_call_count": 1468
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 2114,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 73,
+      "credentialed_uri": 0,
+      "entropy": 714,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 1303,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1190,
+      "IP": 48,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 258
+  },
+  "summary": {
+    "intent": "Win the Lio 'Keep the Line Running' hackathon challenge by analyzing Soony's confidential launch data, then building a general, adaptable product that detects contradictions, acts on them (supplier emails, approvals) and handles new data drops.",
+    "outcome": "Found that Soony's plan hid Collector's Edition shortfalls (overbooked art books, failed statues, stale counts) and built a deployed polling + extraction + recheck + act app with Today/Launch views, routines, an approval loop, a README, and a dry-mode demo instance; most work is committed and pushed, with the hand-in (demo script, video, pitch) still pending.",
+    "learnings": {
+      "repo": [
+        "Portal API has only three endpoints (list files, get file, archive.zip) and no webhooks or notifications; the documented approach is polling the file list and comparing SHA-256 checksums, because files are replaced under the same name.",
+        "Confidential data lives in the gitignored data/ folder; .env holds the portal token and is gitignored, while .env.example is committed.",
+        "The team uses CLAUDE.md and PROGRESS.md for workflow and task claiming; work lives on branch jonas/today-flow and Entire writes checkpoints only when repo files change.",
+        "Prepared routine proposals can go stale when their case is decided elsewhere, so they must expire automatically and be deduped across routines.",
+        "Internal messages and escalations were only recorded, not delivered, until the sign-off loop (signoff.py, /ok/<token> page) added push/Teams delivery; push goes to every subscribed device, not one person.",
+        "ASK_TEAMS_WEBHOOK is empty in .env so Teams delivery is not active; ASK_SIGNOFF_SIMULATE=<seconds> enables a labelled simulated approval for demos.",
+        "A demo instance with dry mail mode (no real supplier emails, resettable) runs on its own hostname via the Cloudflare tunnel."
+      ],
+      "code": [
+        {
+          "path": "src/ask_soony/signoff.py",
+          "finding": "New module implementing one-time approval links, push delivery, approve/decline and simulated approval; basic_auth.py lets valid /ok tokens bypass the dashboard password."
+        },
+        {
+          "path": "web/src/components/Today.tsx",
+          "finding": "Left list selection bug: opening a decided case also marked the first Needs-you case as selected, causing scroll jumps; fixed by not marking Needs-you rows while a decided case is open."
+        },
+        {
+          "path": "web/src/components/routines/FlowGraph.tsx",
+          "finding": "Routine diagram rendered as n8n-style nodes (When, one Only-if node, Then steps) on a dotted canvas."
+        }
+      ],
+      "workflow": [
+        "Subagents are effective for large cross-checks (200 order confirmations and 59 scans) and for parallel builder tasks while the main session writes docs.",
+        "Verify UI fixes in a real browser with screenshots and scroll measurements rather than trusting the type check.",
+        "Shared mailbox sync wrote a stale copy of the action log back and lost records; appending under a shared lock plus a test fixed it, so check for lost-update races in sync jobs.",
+        "Use a dry-mode second instance for demos so rehearsals don't email real suppliers.",
+        "Confirm before pushing or sending outward-facing emails; commit work in small steps with tests (320 tests passing)."
+      ]
+    },
+    "friction": [
+      "The portal token was missing at the start, so data work was blocked until it was added.",
+      "Entire appeared to have not fired because it skips checkpoints when no repo files change; Codex hooks still need approval in /hooks.",
+      "The 07:38 routine failed with 'No matching option' due to a literal 'make po,rev' match, and routines did not run immediately when enabled.",
+      "Four prepared steps failed with 'not an open card' because their cases were already decided by hand.",
+      "Five internal messages and escalations were 'approved' but went nowhere, while the UI claimed the DC site lead had it.",
+      "PackRight got duplicate rev C requests (07:37, 07:42) after already answering.",
+      "The 07:58 art book approval record was lost to the mailbox sync race, though the email did go out; restored from the Sent folder.",
+      "Teams webhook not configured; push is not targeted per person.",
+      "The portal login password appeared in Discord history and may need changing after the hack."
+    ],
+    "open_items": [
+      "Push the latest local commits (README, logo and demo-instance work) and ensure the demo script commit is pushed.",
+      "Write the 3-minute demo script, record the video and prepare pitch slides for the 12:00 hand-in.",
+      "Build the 'What still saves it' section on Launch (latest arrival per blocker, ~900 copies per hour of delay).",
+      "Add Felix's 09:00 office-hours question: who gets container NHSU4471921 to the DC today.",
+      "Delete the duplicate routine 'Ask Hamburg to count book stock'.",
+      "Combine the four count questions into one case (17 folded count cases).",
+      "For Maren's role view, the top bar still counts Felix's list and says 'nothing needs you'.",
+      "Set up Teams webhook (ASK_TEAMS_WEBHOOK) and per-person push targeting if wanted.",
+      "Send a better follow-up to PackRight's Lin Hui (rev C file and change notice) instead of a third identical request.",
+      "Boise EXW/forwarder reply and the Pulse note to Hwaseong and message to Lucas remain pending.",
+      "Undo on an approved internal message does not recall an already sent push."
+    ]
+  }
+}
