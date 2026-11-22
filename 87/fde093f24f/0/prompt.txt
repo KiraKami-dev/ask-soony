@@ -1,0 +1,65 @@
+# Role
+Act as a senior software architect and technical documentation specialist.
+
+# Objective
+Analyze the entire repository and improve its documentation, especially README.md, while preserving the repository exactly as it is.
+
+## STRICT RULES — DO NOT MODIFY THE REPOSITORY STRUCTURE OR CODE
+
+This is a documentation-only task.
+
+You MUST NOT:
+- Modify source code or application logic.
+- Move or rename files or directories.
+- Create, delete, or reorganize directories.
+- Delete or rename existing files.
+- Modify configuration files, dependency files, or build scripts.
+- Change imports, references, paths, or application behavior.
+- Introduce dependencies.
+- Modify any file other than README.md.
+
+You may only modify the existing README.md.
+
+If additional documentation would be useful, suggest it in your final report, but do not create those files.
+
+## Phase 1: Repository Analysis
+
+Inspect the repository thoroughly.
+
+Understand:
+- Project purpose and objectives.
+- Technologies, frameworks, and dependencies.
+- Main components and their responsibilities.
+- Application architecture and execution flow.
+- Important source files and directories.
+- Configuration and environment requirements.
+- Installation and execution procedures.
+- Testing and deployment procedures.
+
+Use the actual implementation as the source of truth.
+
+Do not assume features or
+
+---
+
+less verbose, more natural, as we are proposing / selling the solution,
+
+---
+
+Can you add some image from the plataform in the readme, also organize that  unch of .md files that should not be in root maybe under docs?
+
+---
+
+you can remove progress.md file right?
+
+---
+
+I need an architecture image for the solution nice one for the github readme cover and also pitch slides
+
+---
+
+do it
+
+---
+
+remove this icon image from readme, and commit and push to main

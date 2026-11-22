@@ -1,0 +1,63 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "87fde093f24f",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 6,
+  "files_touched": [
+    "AGENTS.md",
+    "PROGRESS.md",
+    "README.md",
+    "docs/inconsistencies_soony.md",
+    "docs/inconsistencies_suppliers.md",
+    "docs/plan.md",
+    "docs/questions.md",
+    "docs/strategy.md",
+    "inconsistencies_soony.md",
+    "inconsistencies_suppliers.md",
+    "plan.md",
+    "questions.md",
+    "scripts/sync-check.sh",
+    "src/ask_soony/api.py",
+    "strategy.md",
+    "web/globe/README.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/87/fde093f24f/0/metadata.json",
+      "transcript": "/87/fde093f24f/0/full.jsonl",
+      "compact_transcript": "/87/fde093f24f/0/transcript.jsonl",
+      "content_hash": "/87/fde093f24f/0/content_hash.txt",
+      "prompt": "/87/fde093f24f/0/prompt.txt",
+      "assets_manifest": "/87/fde093f24f/0/assets/manifest.json"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 208262,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 6989568,
+    "output_tokens": 32594,
+    "api_call_count": 63
+  },
+  "redaction": {
+    "replacements": 316,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 15,
+      "credentialed_uri": 0,
+      "entropy": 283,
+      "goredact": 0,
+      "key_context": 0,
+      "pii": 18,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 12,
+      "IP": 0,
+      "PHONE": 6
+    }
+  }
+}
