@@ -8,11 +8,13 @@ import io
 import sys
 import time
 import zipfile
+from collections.abc import Callable
 from pathlib import Path
 
 from ask_soony.agent import Analyst
+from ask_soony.changes import summarize
 from ask_soony.notify import Event, Fanout
-from ask_soony.portal import PortalClient
+from ask_soony.portal import PortalClient, RemoteFile
 from ask_soony.store import PollResult, Store, severity_at_least
 
 # Above this many missing files, one archive download beats single requests.
@@ -27,7 +29,49 @@ def poll(store: Store, portal: PortalClient, analyze_baseline: bool = False) -> 
     for f in listing:
         if not store.has_blob(f.sha256):
             store.put_blob(f.sha256, portal.download(f.path))
-    return store.record_listing(listing, analyze_baseline=analyze_baseline)
+    result = store.record_listing(listing, analyze_baseline=analyze_baseline)
+    summarize_changes(store)
+    return result
+
+
+def import_snapshot(store: Store, source: Path, at: str) -> PollResult:
+    """
+    Record an earlier portal state as the baseline: a portal archive.zip (files under one
+    top-level folder) or a folder with the portal's paths. Only for an empty store.
+    """
+    if not store.is_empty():
+        raise ValueError("import-snapshot only seeds an empty store")
+    files: dict[str, bytes] = {}
+    if source.suffix == ".zip":
+        with zipfile.ZipFile(source) as z:
+            names = [n for n in z.namelist() if not n.endswith("/")]
+            prefix = names[0].split("/")[0] + "/" if names and all("/" in n for n in names) else ""
+            if prefix and not all(n.startswith(prefix) for n in names):
+                prefix = ""
+            for n in names:
+                files[n[len(prefix) :]] = z.read(n)
+    else:
+        for f in sorted(source.rglob("*")):
+            if f.is_file():
+                files[f.relative_to(source).as_posix()] = f.read_bytes()
+    listing = []
+    for path, data in files.items():
+        digest = hashlib.sha256(data).hexdigest()
+        store.put_blob(digest, data)
+        listing.append(RemoteFile(path=path, sha256=digest, size=len(data)))
+    return store.record_listing(listing, at=at)
+
+
+def summarize_changes(store: Store) -> int:
+    """Compute a 'what changed' summary for every new or changed version that has none yet."""
+    done = 0
+    for version in store.versions_without_change():
+        prev = store.previous_version(version)
+        old = store.read_blob(prev.sha256) if prev else None
+        summary, diff = summarize(version.path, old, store.read_blob(version.sha256))
+        store.put_change(version.id, summary, diff)
+        done += 1
+    return done
 
 
 def _fill_from_archive(store: Store, portal: PortalClient, wanted: set[str]) -> None:
@@ -124,6 +168,7 @@ def watch(
     interval: int,
     min_severity: str,
     analyze_baseline: bool = False,
+    on_change: Callable[[list[str]], None] | None = None,
 ) -> None:
     while True:
         try:
@@ -131,6 +176,9 @@ def watch(
             event = describe_poll(result)
             if event:
                 notify.send(event)
+            changed = [v.path for v in result.new] + [v.path for v in result.changed]
+            if changed and on_change:
+                on_change(changed)
             if analyst:
                 analyze_pending(store, analyst, notify, min_severity)
         except KeyboardInterrupt:

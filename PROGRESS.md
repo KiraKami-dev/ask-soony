@@ -9,10 +9,11 @@ flowchart LR
 ```
 
 ## Now
-- Akshat (00:59): platform (API, decision inbox, supply map, run loop) moved to branch akshat/platform for review; next: rebase it after Jonas's PR #3 merges
+- Akshat (01:40): branch akshat/integration = platform + integration/verifier + jonas/alert-agent; inbox runs on real pipeline output (art books with Maren, Hwaseong chaser with Felix); next: team decides on merging the draft PR, deploy
 - Farhan: verification: claim extraction from documents + three-way match (PO ↔ confirmation ↔ receipt) — see plan.md §5
 - Lucas: arrival forecast: rules for ETA + road leg, silence detection, news/notice risks, alternatives — see plan.md §5
-- Jonas: watcher (in progress) + criticality agent (call / email / notify) + ElevenLabs calls and supplier emails — see plan.md §5
+- Jonas (00:37): alert agent on branch `jonas/alert-agent` (on top of Akshat's dashboard): voice conversation per card (gpt-realtime), PWA push alerts, send drafted supplier mail after a spoken yes, supplier replies tied back to the card (Hwaseong: remaining 20,000 game cards arrive Tue 24 Nov, too late), phone calls via Twilio; next: auto-escalation critical card → push → call, then merge with Akshat
+
 
 ## Next
 - Sat 21:00 target (overdue): shared shapes in `src/ask_soony/schema.py`, sender addresses registered, office hours booked
@@ -20,6 +21,7 @@ flowchart LR
 - Sun 07:00: UI on real findings; Sun 10:00 freeze + deploy; Sun 11:00 video + deck; **Sun 12:00 submit**
 
 ## Done
+- 2026-11-22: Verifier, predictor and dispatch moved under `src/ask_soony`; watcher routes changes through them and regenerates approval-gated decision cards
 - 2026-11-21: Product direction fixed and work split (plan.md)
 - 2026-11-21: Read all portal files; findings in local `data/UNDERSTANDING.md` (gitignored, ask Akshat)
 - 2026-11-21: Entire session tracking and Brain shared memory set up (see AGENTS.md)
@@ -28,6 +30,7 @@ flowchart LR
 ## Blockers
 - Art books: Nowak rush order must go out tonight to reach the Collector's cell before it runs out (~12:30 Sun) — needs a human decision, plan.md §3
 - Cases: 6,000 in stock vs 38,000 needed for Sunday; 350,000 waiting at CTA Hamburg
+- Predictor needs a launch-date guard: its PackRight notice reading correctly records `effective_from: 2026-12-01` but incorrectly labels it a 22 Nov launch risk; dispatch does not yet turn predictor output into a notify/email/call decision
 
 ## Decisions
 - Coordinate through this file, not a board: zero setup, and agents follow it via AGENTS.md

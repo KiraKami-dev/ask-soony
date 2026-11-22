@@ -185,3 +185,32 @@ def test_mirror_refuses_paths_outside_the_target(tmp_path):
     else:
         raise AssertionError("expected ValueError")
     assert not (tmp_path / "escape.txt").exists()
+
+
+def test_change_summary_for_csv_rows_and_renamed_columns():
+    from ask_soony.changes import summarize
+
+    old = b"id,qty,plan\nA,1,10\nB,2,20\n"
+    new = b"id,qty,plan_units,note\nA,1,10,\nB,3,20,\nC,4,30,x\n"
+    summary, diff = summarize("t.csv", old, new)
+    assert "1 rows added" in summary and "1 rows changed" in summary
+    assert "plan → plan_units" in summary
+    assert "B: qty: 2 → 3" in diff
+
+
+def test_import_snapshot_then_poll_shows_later_drop(tmp_path):
+    import zipfile
+
+    from ask_soony.watcher import import_snapshot
+
+    archive = tmp_path / "archive.zip"
+    with zipfile.ZipFile(archive, "w") as z:
+        z.writestr("portal-data/acme/orders.csv", "po,qty\n1001,500\n")
+    store = Store(tmp_path / "store")
+    first = import_snapshot(store, archive, "2026-01-01T10:00:00+01:00")
+    assert first.baseline and first.stored == 1
+    assert "acme/orders.csv" in store.current()
+
+    portal = FakePortal({"acme/orders.csv": b"po,qty\n1001,500\n", "acme/notice.txt": b"new"})
+    later = poll(store, portal.client())
+    assert [v.path for v in later.new] == ["acme/notice.txt"] and not later.changed

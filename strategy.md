@@ -13,6 +13,18 @@ The truth was in an unread scan, a foreign-language PDF or a confirmation remark
 
 This happens at every company with an ERP and outside suppliers, on every order. A launch only makes the cost visible.
 
+## What Soony told us
+
+Nils Berger (IT & Systems Lead), Saturday:
+1. His dream is an ERP that is clean and 100 % trustworthy.
+2. He wants less human error. Receipts and other bookings are typed in by hand.
+
+Our answer is one engine pointed two ways:
+- **Detect:** find what is already wrong in SAP (step 1, the verifier).
+- **Prevent:** read the delivery note and fill in the booking, so a person only confirms. The S1 error (80,000 typed where the note says 8,000) can't happen.
+
+Prevention comes almost free once step 1 works, because the verifier already pulls out every field a receipt needs.
+
 ## The product
 
 Every number in the plan is a claim. We check each claim against the documents that confirm or contradict it.
@@ -31,8 +43,12 @@ Start narrow, with three claim types where the evidence is clear:
 - **Quantity and date shipped:** shipping advice or confirmation vs. shipment feed (P2, P13)
 - **Quality status:** inspection report vs. stock status (S2)
 
-Add more types only once these three work on new files without code changes. Steps 2 to 4 come later. A small step 2 is probably needed for the demo, because the jury asks whether the agents act or only summarize.
+Add more types only once these three work on new files without code changes.
+
+**Then: prevent.** Prefilled goods receipts from delivery-note scans, confirmed by a person. This is also the agent's first real action, which the jury asks for ("do agents act or only summarize?").
+
+Steps 2 to 4 (price, route, close the loop) come after that.
 
 ## Pitch line
 
-"Soony's numbers are claims. We check them against the paper before the dock does."
+"Soony's numbers are claims. We check them against the paper before the dock does, and once a booking matches the paper, nobody has to type it again."

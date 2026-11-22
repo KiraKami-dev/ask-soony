@@ -6,12 +6,18 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "anthropic>=1.0",
+    "fastapi>=0.165.0",
     "httpx>=0.28",
     "openai>=1.60",
     "openpyxl>=3.1",
+    "pandas>=3.1.1",
     "pillow>=11.0",
     "pypdf>=5.0",
     "pypdfium2>=4.30",
+    "tqdm>=4.70.1",
+    "pywebpush>=2.5.0",
+    "uvicorn[standard]>=0.54.0",
+    "websockets>=17.4",
 ]
 
 [project.scripts]
@@ -34,8 +40,20 @@ line-length = 100
 select = ["E", "F", "I"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "src/ask_soony/verifier"]
+pythonpath = ["src"]
 
 [tool.ruff.lint.per-file-ignores]
 # Long SQL statements read better on one line.
 "src/ask_soony/store.py" = ["E501"]
+"src/ask_soony/api.py" = ["E501"]
+"src/ask_soony/launch.py" = ["E501"]
+"scripts/seed_demo_state.py" = ["E501", "F541"]
+# Test fixtures are CSV rows and file paths; wrapping them hurts readability.
+"src/ask_soony/verifier/**/tests/*.py" = ["E501"]
+# Email templates and the page's CSS read better unwrapped.
+"src/ask_soony/dispatch/decisions/*.py" = ["E501"]
+"src/ask_soony/alerts.py" = ["E501"]
+"src/ask_soony/openai_calls.py" = ["E501"]
+# Inline HTML and CSS templates.
+"src/ask_soony/dashboard.py" = ["E501"]

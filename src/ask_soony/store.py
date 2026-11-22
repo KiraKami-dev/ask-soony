@@ -55,6 +55,12 @@ CREATE TABLE IF NOT EXISTS analyses (
     relevance TEXT NOT NULL,
     raw TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS changes (
+    version_id INTEGER PRIMARY KEY REFERENCES versions(id),
+    summary TEXT NOT NULL,
+    diff TEXT NOT NULL,
+    computed_at TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS findings (
     id INTEGER PRIMARY KEY,
     analysis_id INTEGER NOT NULL REFERENCES analyses(id),
@@ -141,15 +147,15 @@ class Store:
         return {r["path"]: _version(r) for r in rows}
 
     def record_listing(
-        self, listing: list[RemoteFile], analyze_baseline: bool = False
+        self, listing: list[RemoteFile], analyze_baseline: bool = False, at: str | None = None
     ) -> PollResult:
         """
         Compare a portal listing with what we know and record new versions.
 
         On the very first poll every file is a baseline version: stored but not queued for
-        analysis unless analyze_baseline is set.
+        analysis unless analyze_baseline is set. `at` backdates the poll (for imported history).
         """
-        at = now_iso()
+        at = at or now_iso()
         baseline = self.is_empty()
         known = self.current()
         cur = self.db.execute(
@@ -304,6 +310,74 @@ class Store:
             d["evidence"] = json.loads(d["evidence"])
             out.append(d)
         return out
+
+    # --- change summaries and views --------------------------------------------------------
+
+    def put_change(self, version_id: int, summary: str, diff: str) -> None:
+        self.db.execute(
+            "INSERT INTO changes (version_id, summary, diff, computed_at) VALUES (?, ?, ?, ?)"
+            " ON CONFLICT (version_id) DO UPDATE SET summary = excluded.summary, diff = excluded.diff,"
+            " computed_at = excluded.computed_at",
+            (version_id, summary, diff, now_iso()),
+        )
+        self.db.commit()
+
+    def versions_without_change(self) -> list[Version]:
+        rows = self.db.execute(
+            "SELECT v.* FROM versions v LEFT JOIN changes c ON c.version_id = v.id"
+            " WHERE c.version_id IS NULL AND v.change != 'baseline' ORDER BY v.id"
+        ).fetchall()
+        return [_version(r) for r in rows]
+
+    def polls(self, limit: int = 200) -> list[dict]:
+        rows = self.db.execute("SELECT * FROM polls ORDER BY id DESC LIMIT ?", (limit,)).fetchall()
+        return [dict(r) for r in rows]
+
+    def poll_versions(self, poll_id: int) -> list[dict]:
+        rows = self.db.execute(
+            "SELECT v.*, c.summary FROM versions v LEFT JOIN changes c ON c.version_id = v.id"
+            " WHERE v.first_poll = ? AND v.change != 'baseline' ORDER BY v.path",
+            (poll_id,),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+    def poll_removals(self, poll: dict) -> list[str]:
+        rows = self.db.execute(
+            "SELECT path FROM versions v WHERE removed_at = ? AND NOT EXISTS"
+            " (SELECT 1 FROM versions w WHERE w.path = v.path AND w.id > v.id)",
+            (poll["at"],),
+        ).fetchall()
+        return [r["path"] for r in rows]
+
+    def version_detail(self, version_id: int) -> dict | None:
+        row = self.db.execute(
+            "SELECT v.*, c.summary, c.diff FROM versions v LEFT JOIN changes c ON c.version_id = v.id"
+            " WHERE v.id = ?",
+            (version_id,),
+        ).fetchone()
+        return dict(row) if row else None
+
+    def path_history(self, path: str) -> list[dict]:
+        rows = self.db.execute(
+            "SELECT v.*, c.summary FROM versions v LEFT JOIN changes c ON c.version_id = v.id"
+            " WHERE v.path = ? ORDER BY v.id DESC",
+            (path,),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+    def previous_version_dict(self, version_id: int) -> dict | None:
+        row = self.db.execute(
+            "SELECT * FROM versions WHERE path = (SELECT path FROM versions WHERE id = ?) AND id < ?"
+            " ORDER BY id DESC LIMIT 1",
+            (version_id, version_id),
+        ).fetchone()
+        return dict(row) if row else None
+
+    def analysis_for(self, version_id: int) -> dict | None:
+        row = self.db.execute(
+            "SELECT * FROM analyses WHERE version_id = ? ORDER BY id DESC LIMIT 1", (version_id,)
+        ).fetchone()
+        return dict(row) if row else None
 
 
 def severity_at_least(severity: str, minimum: str) -> bool:

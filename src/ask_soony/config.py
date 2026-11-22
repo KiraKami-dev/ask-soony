@@ -47,16 +47,27 @@ class Settings:
     webhook_url: str = ""
     # Findings at or above this severity are pushed to the notifiers.
     notify_min_severity: str = "high"
+    dashboard_password: str = ""
+    dashboard_port: int = 8765
+    alert_policy: Path = Path("data/alert-policy.json")
+    call_provider: str = "dry_run"
+    public_url: str = ""
 
     @classmethod
     def from_env(cls) -> "Settings":
         load_dotenv()
-        provider = _env("ASK_LLM_PROVIDER", "anthropic").lower()
+        # Fall back to OpenAI when only an OpenAI key is configured.
+        only_openai = _env("OPENAI_API_KEY") and not _env("ANTHROPIC_API_KEY")
+        fallback = "openai" if only_openai else "anthropic"
+        provider = _env("ASK_LLM_PROVIDER", fallback).lower()
+        portal_url = _env("SOONY_PORTAL_URL") or _env("URL")
+        if portal_url and "://" not in portal_url:
+            portal_url = "https://" + portal_url
         default_model = {"anthropic": "claude-opus-5-5", "openai": "gpt-5"}.get(provider, "")
         notifiers = [n.strip() for n in _env("ASK_NOTIFIERS", "console").split(",") if n.strip()]
         return cls(
-            portal_url=_env("SOONY_PORTAL_URL").rstrip("/"),
-            portal_token=_env("SOONY_PORTAL_TOKEN"),
+            portal_url=portal_url.rstrip("/"),
+            portal_token=_env("SOONY_PORTAL_TOKEN") or _env("TOKEN"),
             data_dir=Path(_env("ASK_DATA_DIR", "data/store")),
             llm_provider=provider,
             llm_model=_env("ASK_LLM_MODEL", default_model),
@@ -68,4 +79,9 @@ class Settings:
             discord_webhook_url=_env("ASK_DISCORD_WEBHOOK_URL"),
             webhook_url=_env("ASK_WEBHOOK_URL"),
             notify_min_severity=_env("ASK_NOTIFY_MIN_SEVERITY", "high").lower(),
+            dashboard_password=_env("ASK_DASHBOARD_PASSWORD"),
+            dashboard_port=int(_env("ASK_DASHBOARD_PORT", "8765")),
+            alert_policy=Path(_env("ASK_ALERT_POLICY", "data/alert-policy.json")),
+            call_provider=_env("ASK_CALL_PROVIDER", "dry_run").lower(),
+            public_url=_env("ASK_PUBLIC_URL").rstrip("/"),
         )
