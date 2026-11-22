@@ -59,6 +59,7 @@ export default function App() {
 
   const live = useLive()
   const pending = pendingOf(live).length + drafts
+  const readyN = pendingOf(live).length
 
   const load = useCallback(async () => {
     try {
@@ -180,7 +181,9 @@ export default function App() {
         page === 'today'
           ? <button className="cursor-pointer hover:text-ink" onClick={() => { if (page !== 'today' || single) go('/'); setAllReq(Date.now()) }}>{open} {open === 1 ? 'decision' : 'decisions'}</button>
           : `${open} ${open === 1 ? 'decision' : 'decisions'}`
-      ) : done && open === 0 ? 'nothing else due' : open > 0 ? `${open} ${open === 1 ? 'decision needs' : 'decisions need'} you` : phone ? null : 'nothing needs you'}
+      ) : open > 0 ? `${open} ${open === 1 ? 'decision needs' : 'decisions need'} you`
+        : readyN > 0 ? `${readyN} ready for your OK`
+        : done ? 'nothing else due' : phone ? null : 'nothing needs you'}
     </>
   )
   const bar = (

@@ -106,6 +106,9 @@ export function Today(p: Props) {
   const toggleGroup = (g: GroupKey) =>
     setOpenGroups((o) => { const n = new Set(o); if (n.has(g)) n.delete(g); else n.add(g); return n })
   const activeId = p.caseCard?.id ?? (view === 'decide' ? focusCard?.id : null) ?? null
+  const ready = (
+    <ReadyList state={state} onReview={setReview} />
+  )
   const groups = (
     <CaseGroups state={state} nowMs={nowMs} phone={phone} open={openGroups} onToggle={toggleGroup} activeId={activeId} onOpen={p.onOpenCase} onChanged={p.onChanged} />
   )
@@ -145,6 +148,7 @@ export function Today(p: Props) {
                 <p className="t-small text-ink-3">All cases</p>
                 <button onClick={() => setAllCases(false)} className="t-small cursor-pointer text-ink-3 hover:text-ink">hide</button>
               </div>
+              {ready}
               {p.order.length > 0 && <QuietList {...p} onFocus={(id) => { p.onFocus(id); setAllCases(false); window.scrollTo(0, 0) }} />}
               {groups}
             </div>
@@ -163,6 +167,7 @@ export function Today(p: Props) {
     <div className="relative flex-1">
       <div className="mx-auto grid w-full max-w-[1440px] grid-cols-[240px_minmax(0,640px)] gap-x-16 px-12 pb-32 pt-24 xl:grid-cols-[300px_640px] xl:gap-x-[124px] xl:px-24">
         <aside ref={asideRef} aria-label="Cases" className="sticky top-6 -mx-4 max-h-[calc(100vh-48px)] space-y-10 self-start overflow-y-auto px-4 pb-6 [scrollbar-width:thin]">
+          {ready}
           {p.order.length > 0 && <QuietList {...p} card={p.caseCard ? null : p.card} />}
           {groups}
           {!phone && <p className="t-small text-ink-3"><kbd>J</kbd> <kbd>K</kbd> move · <kbd>1</kbd>–<kbd>9</kbd> choose · <kbd>A</kbd> go</p>}
@@ -176,6 +181,43 @@ export function Today(p: Props) {
 }
 
 // ---------------------------------------------------------------- left list
+
+/** Steps routines prepared in "Ask me" mode: they wait for a look, so they lead the list. */
+function ReadyList({ state, onReview }: { state: State; onReview: Review }) {
+  const live = useLive()
+  const pending = pendingOf(live)
+  if (!pending.length) return null
+  const title = (x: (typeof pending)[number]) => {
+    const card = x.card_id ? state.cards.find((c) => c.id === x.card_id) : undefined
+    return card ? shortTitle(card, state) : x.step.text || x.routine_name
+  }
+  return (
+    <div>
+      <p className="t-small mb-3 text-ink-3">
+        Ready for your OK · {pending.length}
+        {pending.length > 1 && (
+          <button onClick={() => onReview(pending)} className="uline ml-2 cursor-pointer">review all</button>
+        )}
+      </p>
+      <ul className="-mx-3.5">
+        {pending.map((x) => (
+          <li key={x.id}>
+            <button
+              onClick={() => onReview([x])}
+              className="t-small grid w-full cursor-pointer grid-cols-[8px_1fr] items-baseline gap-3.5 rounded-[10px] px-3.5 py-3 text-left text-ink-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-accent"
+            >
+              <i className="h-[7px] w-[7px] -translate-y-px rounded-full bg-routine" />
+              <span className="min-w-0">
+                <span className="line-clamp-2">{title(x)}</span>
+                <span className="block text-ink-3">{x.step.text || 'Prepared'} · {x.routine_name}</span>
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
 
 function QuietList({ order, card, onFocus, state, nowMs }: Props) {
   // One line per problem: look-alikes fold into their first card.
@@ -1163,7 +1205,7 @@ function AllClear({
   const pending = pendingOf(live)
   const suggestion = live.suggestions[0] ?? null
   return (
-    <section className="rise pt-[16vh] lg:pt-[10vh]">
+    <section className="rise pt-[16vh] md:pt-0">
       {pending.length > 0 ? (
         // Prepared by routines in "Ask me" mode: nothing goes out without a look, so this is the
         // decision now, not a footnote.
