@@ -70,7 +70,9 @@ def agent_env(tmp_path, monkeypatch):
     monkeypatch.setattr(
         cardtools,
         "_send_mail",
-        lambda to, subject, body: sent.append((to, subject, body)) or "<m1@x>",
+        lambda to, subject, body, cc=None: (
+            sent.append((to, subject, body, *([cc] if cc else []))) or "<m1@x>"
+        ),
     )
     return {"state": state, "client": TestClient(api.app), "sent": sent}
 

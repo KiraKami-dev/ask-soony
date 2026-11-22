@@ -15,7 +15,7 @@ import re
 import smtplib
 import ssl
 from email.message import EmailMessage
-from email.utils import formatdate, make_msgid
+from email.utils import formatdate, make_msgid, parseaddr
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -120,7 +120,7 @@ def supplier_addresses() -> set[str]:
     return found
 
 
-def _send_mail(to: str, subject: str, body: str) -> str:
+def _send_mail(to: str, subject: str, body: str, cc: list[str] | None = None) -> str:
     load_dotenv()
     user = os.environ.get("ASK_MAIL_ADDRESS", "")
     password = os.environ.get("ASK_MAIL_PASSWORD", "").replace(" ", "")
@@ -129,6 +129,8 @@ def _send_mail(to: str, subject: str, body: str) -> str:
         raise HTTPException(503, "mail account not configured")
     msg = EmailMessage()
     msg["From"], msg["To"], msg["Subject"] = user, to, subject
+    if cc:
+        msg["Cc"] = ", ".join(cc)
     msg["Date"] = formatdate(localtime=True)
     msg["Message-ID"] = mid = make_msgid(domain=user.split("@")[-1])
     msg.set_content(body)
@@ -137,6 +139,61 @@ def _send_mail(to: str, subject: str, body: str) -> str:
         s.login(user, password)
         s.send_message(msg)
     return mid
+
+
+def known_addresses() -> set[str]:
+    """
+    Addresses a draft may go to: the supplier profiles plus everyone who has replied to us in a
+    tracked thread (a supplier's logistics colleague, say). Never a typed, unseen address: that
+    guards against typos and against a forged notice that asks us to write somewhere new.
+    """
+    from ask_soony import api
+
+    replied = {
+        parseaddr(str(a.get("from") or ""))[1].lower()
+        for a in api.read_list("actions.json")
+        if a.get("kind") == "reply" and a.get("from")
+    }
+    return supplier_addresses() | {r for r in replied if r}
+
+
+def contacts(card: dict) -> list[dict]:
+    """
+    Who a draft for this card can go to, best first: the supplier's profile contact, then people
+    who have replied for the same supplier, each with where we know them from.
+    """
+    from ask_soony import api
+
+    root = api.portal_root()
+    sid = str(card.get("supplier_id") or "")
+    out: dict[str, dict] = {}
+    if root is not None and sid:
+        for d in (root / "suppliers").glob(f"{sid}*"):
+            for row in api.read_csv(d / "profile.csv"):
+                mail = (row.get("contact_email") or "").strip().lower()
+                if mail:
+                    out[mail] = {
+                        "email": mail,
+                        "name": row.get("contact_name") or "",
+                        "source": "supplier profile",
+                    }
+    state = api.build_state()
+    same = {c["id"] for c in state["cards"] if str(c.get("supplier_id") or "") == sid} | {
+        card.get("id")
+    }
+    for a in reversed(api.read_list("actions.json")):
+        if a.get("kind") != "reply" or a.get("decision_id") not in same:
+            continue
+        name, mail = parseaddr(str(a.get("from") or ""))
+        mail = mail.lower()
+        if mail and mail not in out:
+            out[mail] = {"email": mail, "name": name, "source": f"replied {str(a.get('at'))[:16]}"}
+    known = known_addresses()
+    return [c for c in out.values() if c["email"] in known]
+
+
+def _clean_subject(subject: str | None) -> str:
+    return " ".join(str(subject or "").split())[:200]
 
 
 def _send_mail_in_thread(
@@ -182,7 +239,14 @@ def send_followup(
     return {"message_id": mid, "to": to, "subject": subject, "sent_body": body}
 
 
-def deliver(card: dict, option: dict, text: str | None) -> dict | None:
+def deliver(
+    card: dict,
+    option: dict,
+    text: str | None,
+    subject: str | None = None,
+    to: str | None = None,
+    cc: list[str] | None = None,
+) -> dict | None:
     """Send the approved option if it is an email to a known supplier, or a question to the site
     (channel "floor": Teams and push, see floor.ask); None if nothing was sent."""
     if option.get("channel") == "floor" and card.get("site_question"):
@@ -197,13 +261,25 @@ def deliver(card: dict, option: dict, text: str | None) -> dict | None:
         from ask_soony import tracking
 
         return tracking.send_each(card, option, text, supplier_addresses(), _send_mail)
-    to = (option.get("to") or "").strip().lower()
+    known = known_addresses()
+    if to and to.strip().lower() not in known:
+        raise HTTPException(400, "that address is not a known contact of this supplier")
+    copy = [c.strip().lower() for c in (cc or []) if c and c.strip()]
+    if any(c not in known for c in copy):
+        raise HTTPException(400, "copy only known contacts")
+    to = (to or option.get("to") or "").strip().lower()
     body = (text or option.get("draft") or "").strip()
-    if option.get("channel") != "email" or not body or to not in supplier_addresses():
+    if option.get("channel") != "email" or not body or to not in known:
         return None
-    subject = option.get("subject") or card.get("headline") or "Soony procurement"
-    mid = _send_mail(to, subject, body)
-    return {"message_id": mid, "to": to, "subject": subject, "sent_body": body}
+    subject = (
+        _clean_subject(subject)
+        or option.get("subject")
+        or card.get("headline")
+        or "Soony procurement"
+    )
+    copy = [c for c in dict.fromkeys(copy) if c != to]
+    mid = _send_mail(to, subject, body, copy or None)
+    return {"message_id": mid, "to": to, "cc": copy, "subject": subject, "sent_body": body}
 
 
 class ToolCall(BaseModel):

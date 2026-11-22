@@ -1444,6 +1444,14 @@ def _record(card_id: str, status: str, action: dict) -> dict:
     return action
 
 
+@app.get("/api/cards/{card_id}/contacts")
+def card_contacts(card_id: str) -> dict:
+    """Who this card's email may go to (known contacts only) and the default subject."""
+    from ask_soony.cardtools import contacts
+
+    return {"contacts": contacts(_card(card_id))}
+
+
 @app.post("/api/cards/{card_id}/approve")
 def approve(card_id: str, body: dict = Body(default_factory=dict)) -> dict:
     card = _card(card_id)
@@ -1463,7 +1471,15 @@ def approve(card_id: str, body: dict = Body(default_factory=dict)) -> dict:
     # an email option to a known supplier address goes out now; anything else is only recorded.
     from ask_soony.cardtools import deliver
 
-    sent = deliver(card, opt, body.get("text"))
+    cc = body.get("cc") or []
+    sent = deliver(
+        card,
+        opt,
+        body.get("text"),
+        subject=body.get("subject"),
+        to=body.get("to"),
+        cc=cc if isinstance(cc, list) else [cc],
+    )
     status = "sent" if sent else "approved"
     action = _record(
         card_id,
@@ -1473,7 +1489,8 @@ def approve(card_id: str, body: dict = Body(default_factory=dict)) -> dict:
             "option": idx,
             "action": opt["action"],
             "channel": opt.get("channel"),
-            "to": opt.get("to"),
+            "to": (sent or {}).get("to") or opt.get("to"),
+            **({"cc": sent["cc"]} if sent and sent.get("cc") else {}),
             "draft": body.get("text") or opt.get("draft"),
             "edited": bool(body.get("text") and body.get("text") != opt.get("draft")),
             "trust": "allow_always"

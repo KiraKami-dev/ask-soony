@@ -368,6 +368,7 @@ function Focus(p: Props & {
   // An email to a supplier is shown before it goes out: it cannot be taken back.
   const [review, setReview] = useState(false)
   const [draft, setDraft] = useState('')
+  const [mail, setMail] = useState<MailHead>({ subject: '', to: '', cc: [] })
   const [linesEl, setLinesEl] = useState<HTMLDivElement | null>(null)
   const anchors = useAnchors(card.id)
   const claim = claimOf(card)
@@ -391,12 +392,19 @@ function Focus(p: Props & {
       setError(`That did not go through: ${(e as Error).message}. Nothing was sent.`)
     } finally { setBusy(false); setConfirm(false) }
   }
-  const approve = (text?: string) =>
+  const approve = (text?: string, head?: MailHead) =>
     act(async () => {
       const edited = text != null && text.trim() !== (opt?.draft ?? '').trim()
-      const r = await post<{ action?: { id?: string; status?: string } }>(
+      const changes = head
+        ? {
+            ...(head.subject.trim() && head.subject.trim() !== defaultSubject ? { subject: head.subject.trim() } : {}),
+            ...(head.to && head.to !== (opt?.to ?? '') ? { to: head.to } : {}),
+            ...(head.cc.length ? { cc: head.cc } : {}),
+          }
+        : {}
+      const r = await post<{ action?: { id?: string; status?: string; to?: string } }>(
         `/api/cards/${encodeURIComponent(card.id)}/approve`,
-        edited ? { option: sel, text } : { option: sel },
+        { option: sel, ...(edited ? { text } : {}), ...changes },
       )
       const status = r.action?.status
       const at = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
@@ -404,12 +412,17 @@ function Focus(p: Props & {
       const sub = sent && opt?.channel === 'floor'
         ? `Sent to ${opt.to} at ${at}. Their answer replaces the system's number.`
         : sent
-        ? `Sent to ${shortName(card.supplier_name) || opt?.to} at ${at}. You'll see the reply here.`
+        ? `Sent to ${head?.to && head.to !== opt?.to ? head.to : shortName(card.supplier_name) || opt?.to}${head?.cc.length ? `, copy to ${head.cc.length}` : ''} at ${at}. You'll see the reply here.`
         : opt?.channel === 'notify' && opt.to ? `${opt.to} has it now.` : 'Recorded.'
       // A sent email cannot be undone, so no Undo is offered for it.
       return { text: doneFrom(card, sel, status), sub, actionId: sent ? null : r.action?.id ?? null }
     })
-  const openReview = () => { setDraft(opt?.draft ?? ''); setReview(true) }
+  const defaultSubject = (opt as { subject?: string } | undefined)?.subject || headlineOf(card, state)
+  const openReview = () => {
+    setDraft(opt?.draft ?? '')
+    setMail({ subject: defaultSubject, to: opt?.to ?? '', cc: [] })
+    setReview(true)
+  }
 
   // The voice assistant prepared a decision: show it. An email opens its review sheet.
   const onPrepared = (pr: Prepared | null) => {
@@ -650,16 +663,17 @@ function Focus(p: Props & {
         <EmailReview
           open={review}
           onOpenChange={setReview}
-          to={opt.to ?? ''}
-          toName={card.supplier_name ?? ''}
-          subject={(opt as { subject?: string }).subject || headlineOf(card, state)}
+          cardId={card.id}
+          head={mail}
+          onHead={setMail}
+          supplier={card.supplier_name ?? ''}
           draft={draft}
           onDraft={setDraft}
           cost={money ? costLine(card, sel).replace(/\.$/, '') : null}
           busy={busy}
           error={error}
           voice={emailPrepared}
-          onSend={() => { setReview(false); void approve(draft) }}
+          onSend={() => { setReview(false); void approve(draft, mail) }}
         />
       )}
     </article>
@@ -681,14 +695,39 @@ function HalfDone({ card, state }: { card: Card; state: State }) {
 
 // ---------------------------------------------------------------- email review
 
+/** Recipient, copy and subject of an email under review. */
+interface MailHead { subject: string; to: string; cc: string[] }
+interface Contact { email: string; name: string; source: string }
+
+/** The supplier's known contacts (profile, people who replied): the only addresses a draft may use. */
+function useContacts(cardId: string, open: boolean): Contact[] {
+  const [list, setList] = useState<Contact[]>([])
+  useEffect(() => {
+    if (!open) return
+    let live = true
+    fetch(`/api/cards/${encodeURIComponent(cardId)}/contacts`)
+      .then((r) => (r.ok ? r.json() : { contacts: [] }))
+      .then((j) => live && setList(j.contacts ?? []))
+      .catch(() => {})
+    return () => { live = false }
+  }, [cardId, open])
+  return list
+}
+
 function EmailReview({
-  open, onOpenChange, to, toName, subject, draft, onDraft, cost, busy, error, onSend, voice,
+  open, onOpenChange, cardId, head, onHead, supplier, draft, onDraft, cost, busy, error, onSend, voice,
 }: {
   /** Prepared on a live call: a spoken yes works as well as the button. */
   voice?: boolean
-  open: boolean; onOpenChange: (o: boolean) => void; to: string; toName: string; subject: string
+  open: boolean; onOpenChange: (o: boolean) => void; cardId: string; head: MailHead; onHead: (h: MailHead) => void
+  supplier: string
   draft: string; onDraft: (t: string) => void; cost: string | null; busy: boolean; error: string; onSend: () => void
 }) {
+  const contacts = useContacts(cardId, open)
+  const label = (c: Contact) => (c.name ? `${c.name} · ${c.email}` : c.email)
+  const toContact = contacts.find((c) => c.email === head.to)
+  const others = contacts.filter((c) => c.email !== head.to)
+  const [copying, setCopying] = useState(false)
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -703,12 +742,64 @@ function EmailReview({
         >
           <div className="mx-auto mb-5 h-[5px] w-9 rounded-full bg-hair md:hidden" aria-hidden="true" />
           <Dialog.Title className="t-small font-normal text-ink-3">{voice ? 'Say ‘yes’ or tap Send. Nothing goes out before.' : 'This email goes out when you press Send'}</Dialog.Title>
-          <dl className="t-small mt-4 grid grid-cols-[64px_minmax(0,1fr)] gap-y-2 text-ink-2">
-            <dt className="text-ink-3">To</dt>
-            <dd className="min-w-0 break-words text-ink">{toName ? `${toName} · ` : ''}<span className="text-ink-2">{to}</span></dd>
-            <dt className="text-ink-3">Subject</dt>
-            <dd className="min-w-0 break-words text-ink">{subject}</dd>
-          </dl>
+          <div className="t-small mt-4 grid grid-cols-[64px_minmax(0,1fr)] items-baseline gap-y-3 text-ink-2">
+            <label htmlFor="email-to" className="text-ink-3">To</label>
+            <div className="min-w-0">
+              {contacts.length > 1 ? (
+                <select
+                  id="email-to"
+                  value={head.to}
+                  onChange={(e) => onHead({ ...head, to: e.target.value, cc: head.cc.filter((c) => c !== e.target.value) })}
+                  className="w-full max-w-full cursor-pointer truncate rounded-lg bg-soft px-2 py-1.5 text-ink focus:outline-2 focus:outline-accent"
+                >
+                  {contacts.map((c) => <option key={c.email} value={c.email}>{label(c)}</option>)}
+                </select>
+              ) : (
+                <span id="email-to" className="break-words text-ink">
+                  {toContact?.name || supplier ? `${toContact?.name || supplier} · ` : ''}<span className="text-ink-2">{head.to}</span>
+                </span>
+              )}
+              {toContact && <span className="mt-0.5 block text-ink-3">Known from the {toContact.source}</span>}
+            </div>
+            {(head.cc.length > 0 || copying) && (
+              <>
+                <span className="text-ink-3">Copy</span>
+                <div className="flex min-w-0 flex-wrap gap-2">
+                  {others.map((c) => {
+                    const on = head.cc.includes(c.email)
+                    return (
+                      <button
+                        key={c.email}
+                        type="button"
+                        aria-pressed={on}
+                        onClick={() => onHead({ ...head, cc: on ? head.cc.filter((x) => x !== c.email) : [...head.cc, c.email] })}
+                        className={cn('cursor-pointer rounded-full px-3 py-1', on ? 'bg-ink text-white' : 'bg-soft text-ink-2 hover:text-ink')}
+                        title={`Known from the ${c.source}`}
+                      >
+                        {c.name || c.email}
+                      </button>
+                    )
+                  })}
+                </div>
+              </>
+            )}
+            <label htmlFor="email-subject" className="text-ink-3">Subject</label>
+            <input
+              id="email-subject"
+              value={head.subject}
+              onChange={(e) => onHead({ ...head, subject: e.target.value })}
+              className="w-full min-w-0 rounded-lg bg-soft px-2 py-1.5 text-ink focus:outline-2 focus:outline-accent"
+            />
+          </div>
+          {!copying && head.cc.length === 0 && (
+            <p className="t-small mt-2 pl-[64px] text-ink-3">
+              {others.length > 0 ? (
+                <button type="button" className="uline cursor-pointer" onClick={() => setCopying(true)}>Add a copy</button>
+              ) : (
+                'Only known contacts of this supplier can receive it.'
+              )}
+            </p>
+          )}
           <label htmlFor="email-draft" className="sr-only">Email text</label>
           <textarea
             id="email-draft"
