@@ -89,7 +89,8 @@ export function Today(p: Props) {
 
   // The folded groups below "Needs you": which are open. Phone: all of them sit behind "All cases".
   const [openGroups, setOpenGroups] = useState<Set<GroupKey>>(new Set())
-  const [allCases, setAllCases] = useState(false)
+  // Phone: the list of cases shows under the decision straight away; "hide" folds it.
+  const [allCases, setAllCases] = useState(true)
   const allRef = useRef<HTMLDivElement>(null)
   const reveal = (g?: GroupKey) => {
     if (g) setOpenGroups((o) => new Set(o).add(g))
