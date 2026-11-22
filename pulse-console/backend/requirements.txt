@@ -1,0 +1,10 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+httpx>=0.28
+anthropic>=1.0
+openai>=1.60
+pandas>=3.1.1
+openpyxl>=3.1
+pillow>=11.0
+pypdf>=5.0
+pypdfium2>=4.30

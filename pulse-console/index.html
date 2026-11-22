@@ -12,24 +12,24 @@
   <body>
     <main class="app-shell">
       <section class="workflow-pane" aria-label="Workflow builder">
-        <header class="pane-header">
-          <a class="brand" href="/"><span>✦</span> pulse</a>
-          <div class="workflow-name"><p>WORKFLOW</p><h1 id="workflow-title">Launch risk monitor</h1></div>
-          <span id="run-state" class="run-state ready">READY</span>
-        </header>
-        <div class="canvas-wrap"><div id="canvas" class="canvas" aria-live="polite"></div><section id="outcomes" class="outcomes" aria-live="polite"></section></div>
-        <footer class="run-footer"><div><span class="live-dot"></span><span id="run-summary">Ask Pulse to build and run a workflow.</span></div><button id="activity-button" type="button">Run activity <span>→</span></button></footer>
+        <nav class="workspace-tabs" aria-label="Operations workspace"><button class="workspace-tab active" data-workspace="inbox" type="button">Inbox <span id="inbox-count"></span></button><button class="workspace-tab" data-workspace="pipeline" type="button">Pipeline</button></nav>
+        <section id="inbox-panel" class="workspace-panel inbox-panel" aria-label="Inbox"><div id="inbox" class="inbox"></div></section>
+        <section id="pipeline-panel" class="workspace-panel pipeline-panel" aria-label="Pipeline" hidden><div class="canvas-wrap"><div id="canvas" class="canvas" aria-live="polite"></div></div></section>
+		<footer class="run-footer"><span><i class="live-dot"></i><span id="run-summary">Checking live procurement data…</span></span><button id="activity-button" type="button">Run activity</button></footer>
       </section>
       <section class="chat-pane" aria-label="Pulse agent">
-        <header class="chat-header"><div><p>PROCUREMENT AGENT</p><h2>Pulse</h2></div><div class="agent-controls"><select id="model-select" aria-label="Claude model" disabled><option>Loading models…</option></select><span id="source-status"><i></i> Checking source</span></div></header>
+		<header class="chat-status"><span id="source-status" class="connection-dot" aria-label="Checking live portal connection"></span></header>
         <div id="messages" class="messages"><article class="message assistant"><span class="message-icon">✦</span><div><p>I’m connected to Soony’s procurement workspace.</p><p>Tell me what should happen and I’ll build the workflow on the canvas, then run it.</p></div></article></div>
-        <div class="quick-prompts"><button data-prompt="Monitor open shipments, chase any that are stale, and raise an approval if the Sunday launch is at risk.">Monitor shipment risk</button><button data-prompt="Verify Haneul Print’s bank-detail change against the supplier contract before any payment is released.">Verify bank change</button></div>
+        <div class="quick-prompts"><button data-prompt="Monitor open shipments, chase any that are stale, and raise an approval if the Sunday launch is at risk.">Monitor shipment risk</button><button data-prompt="Watch the procurement data for changes. When a purchase order changes, analyse its impact and propose a live voice review for approval.">Watch PO changes</button><button data-prompt="Verify Haneul Print’s bank-detail change against the supplier contract before any payment is released.">Verify bank change</button></div>
         <form id="prompt-form" class="composer"><textarea id="prompt" rows="1" placeholder="Describe the workflow you need…"></textarea><div><span>↵ to send</span><button id="send" type="submit" aria-label="Build workflow">↑</button></div></form>
       </section>
     </main>
+    <div hidden><h1 id="workflow-title">Procurement workflow</h1><span id="run-state"></span></div>
     <dialog id="activity-dialog"><button class="close-dialog" aria-label="Close">×</button><p>PIPELINE RUN</p><h2 id="activity-title">No workflow run yet</h2><div id="activity-list"></div></dialog>
+    <dialog id="document-dialog" class="document-dialog"><button class="close-document-dialog" aria-label="Close">×</button><p>LIVE DOCUMENT</p><h2 id="document-title">Document</h2><pre id="document-body"></pre></dialog>
+    <dialog id="email-dialog" class="email-dialog"><button class="close-email-dialog" aria-label="Close">×</button><header class="email-draft-header"><p>EMAIL DRAFT</p><h2>Review before sending</h2><span>Editable draft · sent only after confirmation</span></header><div class="email-fields"><label><span>TO</span><select id="email-recipient"></select></label><label><span>SUBJECT</span><input id="email-subject" type="text" /></label><label><span>MESSAGE</span><textarea id="email-body" rows="10"></textarea></label></div><footer class="email-controls"><span>Uses your configured mailbox</span><button id="email-send" type="button">Send email <b>→</b></button></footer></dialog>
     <template id="user-message"><article class="message user"><div></div></article></template>
-    <template id="assistant-message"><article class="message assistant"><span class="message-icon">✦</span><div><p class="assistant-copy"></p><small class="assistant-meta"></small></div></article></template>
+    <template id="assistant-message"><article class="message assistant"><span class="message-icon">✦</span><div><p class="assistant-copy"></p></div></article></template>
     <script src="/app.js"></script>
   </body>
 </html>
