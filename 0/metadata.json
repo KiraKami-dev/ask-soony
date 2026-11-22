@@ -1,0 +1,191 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M81B7J5GNTT7HREXFCCJYV9K",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T10:01:25.055501Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "12b3c81d3f99",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 28,
+    "cache_creation_tokens": 14084,
+    "cache_read_tokens": 1921691,
+    "output_tokens": 6719,
+    "api_call_count": 12
+  },
+  "session_token_usage": {
+    "input_tokens": 3397,
+    "cache_creation_tokens": 3290370,
+    "cache_read_tokens": 743846287,
+    "output_tokens": 1339087,
+    "api_call_count": 1475,
+    "subagent_tokens": {
+      "input_tokens": 3280,
+      "cache_creation_tokens": 7006960,
+      "cache_read_tokens": 240487983,
+      "output_tokens": 1893026,
+      "api_call_count": 1569
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 2395,
+    "layers": {
+      "betterleaks": 34,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 94,
+      "credentialed_uri": 0,
+      "entropy": 859,
+      "goredact": 8,
+      "key_context": 0,
+      "pii": 1414,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1277,
+      "IP": 72,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-22T09:30:29.207868Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "6e096d3ead7c",
+      "timestamp": "2026-11-22T09:30:29.207868Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 292
+  },
+  "summary": {
+    "intent": "Win the Lio 'Keep the Line Running' challenge at START Hack Munich by building a recheck-and-act procurement agent product (ask-soony) for Soony's launch, covering data analysis, product UX, supplier actions, phone alerts and demo readiness before the Sun 12:00 hand-in.",
+    "outcome": "Built and demoed a full product (Today/Launch/Routines/History pages, verifier, outbox, phone bridge) with all three demo stories rehearsed, merged PR #7 and #8, and split Felix/Maren sign-in and views; deck and video for the hand-in were still open and the heartbeat-gating fix was mid-way.",
+    "learnings": {
+      "repo": [
+        "Portal API has only /files, /files/{path} and /archive.zip; no webhooks, so change detection means polling and comparing SHA-256 (files get replaced under the same name).",
+        "Portal data is confidential and must stay gitignored under data/, yet the llm-task-update branch and PR #8 brought 335 data/portal files into main; they must be removed with git rm -r --cached data/portal (history keeps them).",
+        "Approving cards on live data sends real supplier emails, so tests and experiments must run on state copies or the demo instance (ASK_MAIL_DRY=on).",
+        "Live server on :8000 and demo on :8001 run from the main folder; switching branches there would swap code underneath them, so other branches go in a git worktree (../ask-soony-llm-task-update).",
+        "CSV exports can be cp1252 with ; delimiters (German PO export); read_csv and verifier adapters now fall back to cp1252 and sniff delimiters.",
+        "Outbox sync must append under api._lock or it overwrites concurrent actions; replies to side emails must default to status open.",
+        "Entire only checkpoints when repo files change, and the repo requires entire status and entire brain status checks before pushing."
+      ],
+      "code": [
+        {
+          "path": "src/ask_soony/api.py",
+          "finding": "read_csv decodes utf-8-sig with cp1252 fallback; approve has a 409 duplicate guard; activity items now record who decided and keep up to 200 entries."
+        },
+        {
+          "path": "src/ask_soony/routines.py",
+          "finding": "pick() must split comma words and treat 'supplier' as an email option; expire_stale proposals avoid 'not an open card' failures."
+        },
+        {
+          "path": "src/ask_soony/openai_calls.py",
+          "finding": "Realtime calls use semantic VAD, avoid concurrent responses and reconnect the sideband twice."
+        }
+      ],
+      "workflow": [
+        "Check the files in data first: the subagent cross-check of 200 order confirmations and 59 scans found the real discrepancies (80,000 vs 8,000 art books, failed statue lot).",
+        "Keep specific questions for credibility but lead office hours with pain and product questions.",
+        "Use a git worktree to pull a teammate's branch without disturbing running servers.",
+        "Never open PRs or push without being asked; user-run pushes happen separately."
+      ]
+    },
+    "friction": [
+      "The demo background loop does not auto-raise call alerts; card_alerts.tick must be run manually.",
+      "Realtime phone call cut off due to background noise, concurrent response errors and a sideband ConnectionClosed.",
+      "Outbox sync race lost the 07:58 art book approval twice.",
+      "Paper check crashed on the cp1252 German PO export.",
+      "PR #8 had a test-file conflict and 936 changed files because the branch was based on an older main; it was merged with data included.",
+      "Heartbeat showed 'Not checked since 08:30' on a server where polling was not enabled, requiring a flag gating fix.",
+      "Demo DNS CNAME initially pointed to the wrong tunnel."
+    ],
+    "open_items": [
+      "Remove 335 portal data files from main (git rm -r --cached data/portal) and decide on the stored readings and golden.json.",
+      "Restart live :8000 and demo servers to pick up Farhan's reading baseline and the new sign-in split, and push main commits 08c0d12 and 02ce204 (awaiting user OK).",
+      "Finish heartbeat gating on the polling flag, rebuild and verify; new pages not yet viewed in a browser.",
+      "Build the 6-slide deck and record the 3-minute video for the 12:00 hand-in.",
+      "Fix demo background loop not auto-raising call alerts; switch OpenAI webhook back to https://ask-soony.stenglein.dev/hooks/openai after the demo.",
+      "Delete duplicate routine 'Ask Hamburg to count book stock' on live; optional notes to Hwaseong and Lucas."
+    ]
+  }
+}
