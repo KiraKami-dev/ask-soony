@@ -2,7 +2,7 @@ import { Menu } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
-export type Page = 'today' | 'plan' | 'suppliers'
+export type Page = 'today' | 'plan' | 'suppliers' | 'routines'
 
 export function Mark({ size = 20 }: { size?: number }) {
   return (
@@ -30,7 +30,7 @@ const LINKS: { page: Page; label: string; path: string }[] = [
 ]
 
 // One quiet line: the mark, where the launch stands, and where to go.
-export function TopBar({ page, go, onRoutines, status, bell, phone, routinesBadge = 0 }: Props) {
+export function TopBar({ page, go, status, bell, phone, routinesBadge = 0 }: Props) {
   const link = (on: boolean, label: ReactNode, onClick: () => void, key: string) => (
     <button
       key={key}
@@ -58,11 +58,11 @@ export function TopBar({ page, go, onRoutines, status, bell, phone, routinesBadg
       <p className={cn('min-w-0 truncate text-center', phone && 'max-w-[calc(100%-88px)]')} aria-live="polite">{status}</p>
       <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-3 lg:right-6">
         {phone ? (
-          <PhoneMenu page={page} go={go} onRoutines={onRoutines} bell={bell} badge={routinesBadge} />
+          <PhoneMenu page={page} go={go} bell={bell} badge={routinesBadge} />
         ) : (
           <nav className="flex items-center gap-4" aria-label="Views">
             {LINKS.map((l) => link(page === l.page, l.label, () => go(l.path), l.page))}
-            {link(false, <>Routines{routinesBadge > 0 && <span className="ml-1 text-routine">· {routinesBadge}</span>}</>, onRoutines, 'routines')}
+            {link(page === 'routines', <>Routines{routinesBadge > 0 && <span className="ml-1 text-routine">· {routinesBadge}</span>}</>, () => go('/routines'), 'routines')}
             {link(page === 'suppliers', 'Suppliers', () => go('/suppliers'), 'suppliers')}
             {bell}
           </nav>
@@ -72,7 +72,7 @@ export function TopBar({ page, go, onRoutines, status, bell, phone, routinesBadg
   )
 }
 
-function PhoneMenu({ page, go, onRoutines, bell, badge }: { page: Page | null; go: (p: string) => void; onRoutines: () => void; bell: ReactNode; badge: number }) {
+function PhoneMenu({ page, go, bell, badge }: { page: Page | null; go: (p: string) => void; bell: ReactNode; badge: number }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -106,7 +106,7 @@ function PhoneMenu({ page, go, onRoutines, bell, badge }: { page: Page | null; g
       <div className={cn('absolute right-0 top-12 z-30 w-56 rounded-2xl bg-ground p-1.5 shadow-[0_12px_40px_-12px_rgba(0,0,0,.28)]', !open && 'hidden')}>
         {item(page === 'today', 'Today', () => go('/'))}
         {item(page === 'plan', 'Plan', () => go('/plan'))}
-        {item(false, <>Routines{badge > 0 && <span className="ml-1.5 text-routine">· {badge}</span>}</>, onRoutines)}
+        {item(page === 'routines', <>Routines{badge > 0 && <span className="ml-1.5 text-routine">· {badge}</span>}</>, () => go('/routines'))}
         {item(page === 'suppliers', 'Suppliers', () => go('/suppliers'))}
         <div className="flex items-center justify-between px-3 pb-1 pt-2 text-[13px] text-ink-3">
           Launch alerts {bell}

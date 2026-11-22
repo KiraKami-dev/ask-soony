@@ -1,18 +1,20 @@
-import { Check, FlaskConical, Loader2, Maximize2, Play, Sparkles, Trash2, Wand2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { useState, type FormEvent, type ReactNode } from 'react'
-import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
 import { fmtTime } from '@/lib/api'
 import { cn } from '@/lib/utils'
+import { TestResult, TrustControl } from './Diagram'
 import { FlowGraph } from './FlowGraph'
-import { ChannelIcon, RoutineFlow, StepIcon } from './RoutineFlow'
 import { setMode } from './live'
-import { MODES, body, call, didLines, modeOf, summarise, type Mode, type Routine, type Run, type Spec } from './types'
+import { MODES, body, call, modeOf, summarise, type Mode, type Routine, type Run, type Spec } from './types'
 
-// One routine: header with its switch and last-run line, the flow graph or the editable block
-// list, and the change-and-review loop. A change (in words or by hand) is never saved straight
-// away: it is tested on today's inbox first and the buyer applies it or keeps the old version.
-// The same card shows a suggested routine (draft) before it is turned on.
+// One routine in the Today style, one view: its name and last run, how much it may do on its
+// own, and the When / Then / Always diagram that is also the editor (× to remove, drag to
+// reorder, "+ add"), with "Change it in your words" below. A change is never saved straight
+// away: it is tested on today's inbox first and shown on the diagram as before/after, then the
+// buyer applies it or keeps the old version. The same block shows a suggested routine (draft)
+// before it is on, everywhere: in the sheet, after "Show me how" and from "How it decided".
+
+export { TestResult, TrustControl }
 
 interface Review { after: Routine; preview: Run; note: string }
 
@@ -25,115 +27,40 @@ export function Switch({ on, onChange, label }: { on: boolean; onChange: (on: bo
       aria-label={label}
       title={on ? 'On: runs on every check' : 'Off'}
       onClick={() => onChange(!on)}
-      className={cn('relative h-5 w-9 shrink-0 cursor-pointer rounded-full transition-colors', on ? 'bg-ok' : 'bg-line')}
+      className="t-small inline-flex shrink-0 cursor-pointer items-center gap-2 text-ink-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
     >
-      <span className={cn('absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-[left]', on ? 'left-[18px]' : 'left-0.5')} />
+      {on ? 'On' : 'Off'}
+      <span className={cn('relative h-[22px] w-[38px] rounded-full transition-colors', on ? 'bg-ink' : 'bg-hair')}>
+        <span className={cn('absolute top-[3px] h-4 w-4 rounded-full bg-white shadow-sm transition-[left]', on ? 'left-[19px]' : 'left-[3px]')} />
+      </span>
     </button>
   )
 }
 
-export function TestResult({ run, spec, title = "Test on today's inbox" }: { run: Run; spec?: Spec | null; title?: string }) {
-  const lines = didLines(run, spec)
-  return (
-    <div className="rounded-lg bg-white p-3 text-sm ring-1 ring-line">
-      <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-3">
-        <FlaskConical size={13} /> {title}
-      </div>
-      {!run.ok ? (
-        <div className="mt-1.5">
-          <p className="font-semibold text-stop">The test failed, so this version cannot be used.</p>
-          <pre className="mt-1 max-h-32 overflow-auto whitespace-pre-wrap text-[12px] text-stop/90">{run.error}</pre>
-        </div>
-      ) : lines.length === 0 ? (
-        <p className="mt-1.5 text-ink-2">Nothing in today's inbox matches. It waits for the next card like this.</p>
-      ) : (
-        <ul className="mt-1.5 space-y-1">
-          {lines.map((l, i) => (
-            <li key={i} className="flex items-start gap-2 text-ink">
-              <span className="mt-0.5 shrink-0">
-                {l.kind === 'send' ? <StepIcon step={{ do: 'carry_out' }} size={14} />
-                  : l.kind === 'note' ? <StepIcon step={{ do: 'log' }} size={14} />
-                  : l.kind === 'tell' ? <ChannelIcon channel={l.channel} size={14} />
-                  : <StepIcon step={{ do: l.kind }} size={14} />}
-              </span>
-              <span className="min-w-0">{l.text}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  )
-}
-
-/** "Ask me · Do it and tell me · Do it quietly": how much the routine may do on its own. */
-export function TrustControl({
-  value, onChange, disabled, dim,
-}: { value: Mode; onChange: (m: Mode) => void; disabled?: boolean; dim?: boolean }) {
-  return (
-    <div role="radiogroup" aria-label="How it acts" className={cn('inline-flex max-w-full rounded-lg bg-panel p-0.5 ring-1 ring-line', dim && 'opacity-60')}>
-      {MODES.map((m) => (
-        <button
-          key={m.key}
-          type="button"
-          role="radio"
-          aria-checked={value === m.key}
-          disabled={disabled}
-          title={m.hint}
-          onClick={() => value !== m.key && onChange(m.key)}
-          className={cn(
-            'cursor-pointer whitespace-nowrap rounded-md px-2 py-1 text-[12.5px] font-semibold disabled:cursor-default',
-            value === m.key ? 'bg-white text-routine shadow-sm ring-1 ring-routine/30' : 'text-ink-3 hover:text-ink',
-          )}
-        >
-          {m.label}
-        </button>
-      ))}
-    </div>
-  )
-}
-
-function Segmented({ value, onChange }: { value: 'flow' | 'steps'; onChange: (v: 'flow' | 'steps') => void }) {
-  return (
-    <div role="tablist" aria-label="View" className="inline-flex rounded-lg bg-panel p-0.5 ring-1 ring-line">
-      {(['flow', 'steps'] as const).map((v) => (
-        <button
-          key={v}
-          role="tab"
-          type="button"
-          aria-selected={value === v}
-          onClick={() => onChange(v)}
-          className={cn(
-            'cursor-pointer rounded-md px-2.5 py-0.5 text-[13px] font-semibold',
-            value === v ? 'bg-white text-ink shadow-sm ring-1 ring-line' : 'text-ink-3 hover:text-ink',
-          )}
-        >
-          {v === 'flow' ? 'Flow' : 'Steps'}
-        </button>
-      ))}
-    </div>
-  )
-}
+const primary = 't-small inline-flex h-10 cursor-pointer items-center justify-center rounded-xl bg-accent px-5 font-medium text-white shadow-[0_1px_2px_rgba(35,72,208,.25)] hover:bg-[#1d3db5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-60'
+const quiet = 't-small cursor-pointer text-ink-2 hover:text-ink disabled:opacity-60'
 
 export function RoutineCard({
-  routine, draft, onChanged,
+  routine, draft, onChanged, big,
 }: {
   routine: Routine
+  /** Shown on its own (after "Show me how", from "How it decided"): the name as the headline. */
+  big?: boolean
   /** Set for a suggested routine that is not saved yet. */
-  draft?: { preview: Run; onTurnOn: () => Promise<void>; onDiscard: () => void; onReplace: (r: Routine, preview: Run) => void }
+  draft?: { preview: Run; onTurnOn: (mode: Mode) => Promise<void>; onDiscard: () => void; onReplace: (r: Routine, preview: Run) => void }
   onChanged: () => void
 }) {
-  const [view, setView] = useState<'flow' | 'steps'>('flow')
   const [review, setReview] = useState<Review | null>(null)
   const [busy, setBusy] = useState<'edit' | 'preview' | 'apply' | 'run' | 'delete' | 'save' | null>(null)
   const [error, setError] = useState('')
   const [words, setWords] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const [expanded, setExpanded] = useState(false)
-  // Shown right away; the server's answer (or a failure) settles it.
-  const [mode, setModeLocal] = useState<Mode | null>(null)
+  // Shown right away; the server's answer (or a failure) settles it. A draft starts by asking.
+  const [mode, setModeLocal] = useState<Mode | null>(draft ? 'ask' : null)
   const shownMode = mode ?? modeOf(routine)
   async function changeMode(m: Mode) {
     setModeLocal(m); setError('')
+    if (draft) return
     try { await setMode(routine.id, m); onChanged() } catch (e) {
       setModeLocal(null)
       const why = (e as Error).message
@@ -143,7 +70,6 @@ export function RoutineCard({
 
   const spec = routine.spec
   const working = review?.after ?? routine
-  const shownView = review ? 'steps' : view
   const lastRun = review?.preview ?? draft?.preview ?? routine.runs?.[0]
 
   async function tryEdit(next: Spec) {
@@ -185,13 +111,11 @@ export function RoutineCard({
   }
 
   const stats = (
-    <p className="mt-0.5 text-sm text-ink-3">
-      {routine.handled ? `Handled ${routine.handled} card${routine.handled === 1 ? '' : 's'}` : 'No cards handled yet'}
+    <p className="t-small mt-1 text-ink-3">
+      {routine.handled ? <span className="text-routine">Handled {routine.handled} case{routine.handled === 1 ? '' : 's'}</span> : 'Nothing handled yet'}
       {' · '}
       {lastRun ? (
-        <>
-          Last ran {fmtTime(lastRun.at)} · <span className={cn(!lastRun.ok && 'font-semibold text-stop')}>{summarise(lastRun)}</span>
-        </>
+        <>Last ran {fmtTime(lastRun.at)} · <span className={cn(!lastRun.ok && 'text-ink')}>{summarise(lastRun)}</span></>
       ) : 'Not run yet'}
     </p>
   )
@@ -200,70 +124,58 @@ export function RoutineCard({
   if (!spec) {
     content = (
       <>
-        <p className="mt-2 text-[15px] text-ink-2">{routine.description}</p>
-        <p className="mt-2 text-sm text-ink-3">An earlier routine, written as code. Ask the agent for a new one to see and change it as steps.</p>
+        <p className="t-body mt-5 text-ink-2">{routine.description}</p>
+        <p className="t-small mt-2 text-ink-3">An earlier routine, written as code. Ask the agent for a new one to see and change it as steps.</p>
       </>
     )
   } else {
     content = (
       <>
-        <div className="mt-3 flex items-center justify-between gap-2">
-          {review ? (
-            <div className="text-xs font-semibold uppercase tracking-wide text-ok">Your change, before you apply it</div>
-          ) : (
-            <Segmented value={view} onChange={setView} />
-          )}
-          {shownView === 'flow' && (
-            <Button size="sm" variant="ghost" className="h-7 px-2 text-[13px]" onClick={() => setExpanded(true)}>
-              <Maximize2 size={13} /> Expand
-            </Button>
-          )}
-        </div>
-        <div className="mt-2">
-          {shownView === 'flow' ? (
-            <FlowGraph spec={spec} run={lastRun} />
-          ) : (
-            <RoutineFlow
-              spec={working.spec ?? spec}
-              before={review ? spec : undefined}
-              onChange={tryEdit}
-              disabled={!!busy}
-            />
-          )}
+        <p className="t-small mt-7 text-ink-3">
+          {review ? 'Your change, before you apply it' : 'Change it right here: × removes a step, drag to reorder, + add at the end.'}
+        </p>
+        <div className="mt-4">
+          <FlowGraph
+            wide
+            spec={working.spec ?? spec}
+            before={review ? spec : undefined}
+            run={lastRun}
+            onChange={tryEdit}
+            disabled={!!busy}
+          />
         </div>
         {review && review.after.name !== routine.name && (
-          <p className="mt-2 text-sm text-ink-2">
-            New name: <span className="text-ink-3 line-through">{routine.name}</span> {review.after.name}
+          <p className="t-small mt-3 text-ink-2">
+            New name: <span className="text-ink-3 line-through">{routine.name}</span> <span className="text-ink">{review.after.name}</span>
           </p>
         )}
         {busy === 'preview' && <Working text="Testing the change on today's inbox…" />}
         {busy === 'edit' && <Working text="The agent is changing the routine…" />}
 
         {review ? (
-          <div className="mt-3 space-y-3">
-            {review.note && <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900 ring-1 ring-amber-200">{review.note}</p>}
+          <div className="mt-6 space-y-6">
+            {review.note && <p className="t-small text-ink-2">{review.note}</p>}
             <TestResult run={review.preview} spec={review.after.spec} />
-            <div className="flex flex-wrap gap-2">
-              <Button size="sm" disabled={!review.preview.ok || !!busy} onClick={apply}>
-                <Check size={14} /> {busy === 'apply' ? 'Applying…' : 'Apply change'}
-              </Button>
-              <Button size="sm" variant="ghost" disabled={!!busy} onClick={() => { setReview(null); setError('') }}>Keep as is</Button>
+            <div className="flex flex-wrap items-center gap-6">
+              <button className={primary} disabled={!review.preview.ok || !!busy} onClick={apply}>
+                {busy === 'apply' ? 'Applying…' : 'Apply change'}
+              </button>
+              <button className={quiet} disabled={!!busy} onClick={() => { setReview(null); setError('') }}>Keep as is</button>
             </div>
           </div>
         ) : (
-          <form onSubmit={askInWords} className="mt-3 flex gap-2">
-            <label className="relative min-w-0 flex-1">
+          <form onSubmit={askInWords} className="mt-5 flex items-center gap-4">
+            <label className="min-w-0 flex-1">
               <span className="sr-only">Change it in your words</span>
-              <Wand2 size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
               <input
                 value={words}
                 onChange={(e) => setWords(e.target.value)}
                 disabled={!!busy}
-                placeholder="Change it in your words, e.g. “also tell me on Teams”"
-                className="h-9 w-full rounded-lg border border-line bg-white pl-8 pr-3 text-sm text-ink placeholder:text-ink-3 focus:border-ok focus:outline-none focus:ring-2 focus:ring-ok/20 disabled:opacity-60"
+                placeholder="Change it in your words: “also tell me on Teams”"
+                className="t-small h-10 w-full rounded-xl bg-soft px-3.5 text-ink placeholder:text-ink-3 focus:outline-2 focus:outline-accent disabled:opacity-60"
               />
             </label>
-            <Button size="sm" variant="outline" type="submit" disabled={!words.trim() || !!busy}>Change</Button>
+            <button type="submit" disabled={!words.trim() || !!busy} className="t-small shrink-0 cursor-pointer font-medium text-accent hover:underline disabled:cursor-default disabled:text-ink-3 disabled:no-underline">Change</button>
           </form>
         )}
       </>
@@ -271,21 +183,12 @@ export function RoutineCard({
   }
 
   return (
-    <section
-      className={cn(
-        'rounded-xl p-4',
-        draft ? 'border-2 border-ok/50 bg-ok/5' : 'border border-line bg-white',
-      )}
-    >
-      {draft && (
-        <div className="mb-1 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-ok">
-          <Sparkles size={13} /> Suggested routine
-        </div>
-      )}
-      <div className="flex items-start justify-between gap-3">
+    <section aria-label={routine.name}>
+      {draft && <p className="t-small mb-1.5 text-ink-3">Suggested routine, not on yet</p>}
+      <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <div className="text-[16px] font-bold leading-snug text-ink">{routine.name}</div>
-          {draft ? <p className="mt-1 text-[15px] text-ink-2">{routine.description}</p> : stats}
+          {big ? <h2 className="t-big text-ink">{routine.name}</h2> : <h3 className="t-body font-medium text-ink">{routine.name}</h3>}
+          {draft ? <p className={cn('mt-1 text-ink-2', big ? 't-body mt-3' : 't-small')}>{routine.description}</p> : stats}
         </div>
         {!draft && (
           <Switch
@@ -295,76 +198,63 @@ export function RoutineCard({
           />
         )}
       </div>
-      {!draft && (
-        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-          <TrustControl value={shownMode} onChange={changeMode} disabled={!!busy} dim={!routine.enabled} />
-          <span className="text-[13px] text-ink-3">
-            {routine.enabled ? MODES.find((m) => m.key === shownMode)?.hint : 'Off. Switch it on to let it act.'}
-          </span>
-        </div>
-      )}
+      <div className="mt-4">
+        <TrustControl value={shownMode} onChange={changeMode} disabled={!!busy} dim={!draft && !routine.enabled} />
+        <p className="t-small mt-1 text-ink-3">
+          {draft
+            ? shownMode === 'ask' ? 'It starts by asking: it prepares them, you send with one tap.' : MODES.find((m) => m.key === shownMode)?.hint + '.'
+            : routine.enabled ? MODES.find((m) => m.key === shownMode)?.hint + '.' : 'Off. Switch it on to let it act.'}
+        </p>
+      </div>
 
       {content}
-      {error && <p className="mt-3 rounded-lg bg-stop/10 p-3 text-sm text-stop">{error}</p>}
+      {error && <p className="t-small mt-3 text-late" role="alert">{error}</p>}
 
       {draft && !review && (
-        <div className="mt-3 space-y-3">
+        <div className="mt-6 space-y-6">
           <TestResult run={draft.preview} spec={routine.spec} title="Test run on today's inbox" />
-          <div className="flex flex-wrap gap-2">
-            <Button size="sm" disabled={!draft.preview.ok || !!busy} onClick={() => act('save', draft.onTurnOn)}>
-              {busy === 'save' ? 'Turning on…' : 'Turn on'}
-            </Button>
-            <Button size="sm" variant="ghost" disabled={!!busy} onClick={draft.onDiscard}>Not now</Button>
+          <div className="flex flex-wrap items-center gap-6">
+            <button className={primary} disabled={!draft.preview.ok || !!busy} onClick={() => act('save', () => draft.onTurnOn(shownMode))}>
+              {busy === 'save' ? 'Turning on…' : shownMode === 'ask' ? 'Turn on, ask me first' : 'Turn on'}
+            </button>
+            <button className={quiet} disabled={!!busy} onClick={draft.onDiscard}>Not now</button>
           </div>
         </div>
       )}
 
-      {!draft && !review && (
-        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line pt-3">
-          <Button size="sm" variant="outline" disabled={!!busy} onClick={() => act('run', () => call(`/api/routines/${routine.id}/run`))} title="Run it on the inbox now">
-            {busy === 'run' ? <Loader2 size={14} className="animate-spin" /> : <Play size={14} />} Run now
-          </Button>
-          {confirmDelete ? (
-            <span className="inline-flex items-center gap-1.5 text-sm text-ink-2">
-              Delete this routine?
-              <Button size="sm" variant="ghost" className="text-stop hover:text-stop" disabled={!!busy} onClick={() => act('delete', () => call(`/api/routines/${routine.id}`, {}, 'DELETE'))}>Delete</Button>
-              <Button size="sm" variant="ghost" onClick={() => setConfirmDelete(false)}>Cancel</Button>
-            </span>
-          ) : (
-            <Button size="sm" variant="ghost" onClick={() => setConfirmDelete(true)}><Trash2 size={14} /> Delete</Button>
-          )}
-        </div>
-      )}
-
-      <details className="mt-2">
-        <summary className="cursor-pointer text-sm text-ink-3 hover:text-ink-2">Show the code</summary>
-        <p className="mt-1 text-xs text-ink-3">What runs in the closed sandbox. It can only use the building blocks above.</p>
-        <pre className="mt-2 max-h-72 overflow-auto rounded-lg bg-panel p-3 text-[12px] leading-snug ring-1 ring-line">{working.code}</pre>
-      </details>
-
-      {spec && (
-        <Sheet open={expanded} onOpenChange={setExpanded}>
-          <SheetContent className="max-w-[min(1280px,100vw)]">
-            <div className="border-b border-line px-6 pb-4 pt-6 pr-14">
-              <div className="text-xs font-semibold uppercase tracking-wide text-ink-3">{draft ? 'Suggested routine' : 'Routine'}</div>
-              <SheetTitle className="mt-1 text-xl font-bold leading-snug">{routine.name}</SheetTitle>
-              <SheetDescription className="mt-1 text-sm text-ink-2">{routine.description}</SheetDescription>
-            </div>
-            <div className="flex-1 overflow-auto px-6 py-6">
-              <FlowGraph spec={spec} run={lastRun} wide />
-              {lastRun && <div className="mt-6 max-w-[640px]"><TestResult run={lastRun} spec={spec} title={lastRun.dry ? "Test run on today's inbox" : `Last run at ${fmtTime(lastRun.at)}`} /></div>}
-            </div>
-          </SheetContent>
-        </Sheet>
-      )}
+      <div className="t-small mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-ink-3">
+        {!draft && !review && (
+          <>
+            <button className={quiet} disabled={!!busy} onClick={() => act('run', () => call(`/api/routines/${routine.id}/run`))} title="Run it on the inbox now">
+              {busy === 'run' ? 'Running…' : 'Run now'}
+            </button>
+            {confirmDelete ? (
+              <span className="inline-flex items-center gap-3">
+                <span className="text-ink-2">Delete this routine?</span>
+                <button className="cursor-pointer font-medium text-ink hover:underline" disabled={!!busy} onClick={() => act('delete', () => call(`/api/routines/${routine.id}`, {}, 'DELETE'))}>Delete</button>
+                <button className={quiet} onClick={() => setConfirmDelete(false)}>Cancel</button>
+              </span>
+            ) : (
+              <button className={quiet} onClick={() => setConfirmDelete(true)}>Delete</button>
+            )}
+          </>
+        )}
+        <details className="group basis-full">
+          <summary className="w-fit cursor-pointer list-none text-ink-3 hover:text-ink-2">
+            <span className="group-open:hidden">Show the code</span><span className="hidden group-open:inline">Hide the code</span>
+          </summary>
+          <p className="mt-2 text-ink-3">What runs in the closed sandbox. It can only use the building blocks above.</p>
+          <pre className="mt-2 max-h-72 overflow-auto rounded-xl bg-soft p-4 text-[12px] leading-snug text-ink-2">{working.code}</pre>
+        </details>
+      </div>
     </section>
   )
 }
 
 function Working({ text }: { text: string }) {
   return (
-    <p className="mt-2 flex items-center gap-2 text-sm font-medium text-ok">
-      <Loader2 size={14} className="animate-spin" /> {text}
+    <p className="t-small mt-3 flex items-center gap-2 text-ink-2">
+      <Loader2 size={14} className="animate-spin text-ink-3" /> {text}
     </p>
   )
 }

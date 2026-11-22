@@ -2,8 +2,10 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { Check, Database, FileText } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { AnchorCrop, NUM_OR_ID, fileUrl, normTok, useAnchors, type Anchor } from '@/components/SourceAnchors'
-import { VoiceCall } from '@/components/VoiceCall'
-import { undoAction, useLive } from '@/components/routines/live'
+import { VoiceCall, type Prepared, type ScreenWhat } from '@/components/VoiceCall'
+import { pendingOf, undoAction, useLive } from '@/components/routines/live'
+import { ProposalLines, ProposalSheet, RoutineLine, WouldLine, groupProposals } from '@/components/routines/Proposals'
+import type { Proposal } from '@/components/routines/types'
 import { post, tidy, type Card, type Evidence, type State } from '@/lib/api'
 import { languageOf, splitValue, when } from '@/lib/decisions'
 import {
@@ -39,9 +41,12 @@ interface Props {
   go: (path: string) => void
   ringing?: boolean
   onRingingDone?: () => void
-  /** Routine proposals waiting for an OK plus drafts from calls. */
+  /** Routine proposals waiting for an OK plus drafts from calls (the live store is read here). */
   pending: number
 }
+
+/** Opens the review sheet for what routines prepared. */
+type Review = (items: Proposal[]) => void
 
 const typing = (t: EventTarget | null) =>
   t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))
@@ -49,26 +54,40 @@ const typing = (t: EventTarget | null) =>
 export function Today(p: Props) {
   const { state, nowMs, phone, card, done } = p
   const handled = routineCount(state, nowMs)
-  const view = done ? 'done' : card ? 'decide' : 'clear'
+  const [review, setReview] = useState<Proposal[] | null>(null)
+  // A live call holds its decision on screen: Done shows after the call ends, not mid-sentence.
+  const [call, setCall] = useState<Card | null>(null)
+  const callCard = call ? state.cards.find((c) => c.id === call.id) ?? call : null
+  const focusCard = callCard ?? card
+  const view = callCard ? 'decide' : done ? 'done' : card ? 'decide' : 'clear'
 
-  const foot = (
-    <FootLines state={state} handled={handled} pending={p.pending} onRoutines={() => p.onRoutines()} go={p.go} nowMs={nowMs} center={!phone} />
-  )
+  const foot = <FootLines handled={handled} onRoutines={() => p.onRoutines()} nowMs={nowMs} center={!phone} />
 
   const body =
     view === 'done' ? (
       <DoneView key={`done-${done!.k}`} {...p} done={done!} />
     ) : view === 'decide' ? (
-      <Focus key={card!.id} {...p} card={card!} />
+      <Focus
+        key={focusCard!.id}
+        {...p}
+        card={focusCard!}
+        onReview={setReview}
+        onCall={(live) => setCall(live ? focusCard : null)}
+        doneText={done && done.card.id === focusCard!.id ? done.text : undefined}
+      />
     ) : (
-      <AllClear state={state} nowMs={nowMs} handled={handled} pending={p.pending} onRoutines={p.onRoutines} go={p.go} />
+      <AllClear state={state} nowMs={nowMs} handled={handled} onRoutines={p.onRoutines} onReview={setReview} onChanged={p.onChanged} go={p.go} />
     )
+  const sheet = (
+    <ProposalSheet items={review} ctx={state} onClose={() => setReview(null)} onChanged={p.onChanged} />
+  )
 
   if (phone) {
     return (
       <main className="mx-auto w-full max-w-[560px] px-7 pb-[220px] pt-5">
         {body}
-        {view === 'decide' && (handled > 0 || p.pending > 0) && <div className="mt-14">{foot}</div>}
+        {view === 'decide' && handled > 0 && <div className="mt-14">{foot}</div>}
+        {sheet}
       </main>
     )
   }
@@ -82,6 +101,7 @@ export function Today(p: Props) {
         <main className="min-w-0">{body}</main>
       </div>
       {view !== 'clear' && <div className="fixed inset-x-0 bottom-8 z-10 flex justify-center">{foot}</div>}
+      {sheet}
     </div>
   )
 }
@@ -102,7 +122,7 @@ function QuietList({ order, card, onFocus, state, nowMs }: Props) {
   const more = rows.slice(5).reduce((n, r) => n + r.n, 0)
   return (
     <div>
-      <p className="t-small mb-3 text-ink-3">Needs you</p>
+      <p className="t-small mb-3 text-ink-3">Needs you · {plural(order.length, 'decision')}</p>
       <ul className="-mx-3.5">
         {shown.map(({ c, n }) => {
           const on = card?.id === c.id
@@ -117,7 +137,10 @@ function QuietList({ order, card, onFocus, state, nowMs }: Props) {
                 )}
               >
                 <i className={cn('h-[7px] w-[7px] -translate-y-px rounded-full', on ? 'bg-accent' : 'bg-ink-3')} />
-                <span className="truncate">{shortTitle(c, state)}{n > 1 && <span className="font-normal text-ink-3"> · {n}</span>}</span>
+                <span className="min-w-0">
+                  <span className="line-clamp-2">{shortTitle(c, state)}</span>
+                  {n > 1 && <span className="block font-normal text-ink-3">{n} like this, one decision each</span>}
+                </span>
                 <span className="font-normal text-ink-3">{c.deadline ? when(c.deadline, nowMs) : ''}</span>
               </button>
             </li>
@@ -132,7 +155,14 @@ function QuietList({ order, card, onFocus, state, nowMs }: Props) {
 
 // ---------------------------------------------------------------- one decision
 
-function Focus(p: Props & { card: Card }) {
+function Focus(p: Props & {
+  card: Card
+  onReview: Review
+  /** A call started or ended on this decision. */
+  onCall: (live: boolean) => void
+  /** Decided while a call is still live: shown in place of the buttons. */
+  doneText?: string
+}) {
   const { card, state, nowMs, phone } = p
   const [sel, setSel] = useState(() => recommendedIndex(card))
   const [confirm, setConfirm] = useState(false)
@@ -142,6 +172,10 @@ function Focus(p: Props & { card: Card }) {
   const [passOn, setPassOn] = useState(false)
   const [note, setNote] = useState('')
   const [source, setSource] = useState<number | null>(null)
+  // What the voice assistant prepared and reads out; "yes" or a tap confirms it.
+  const [prepared, setPrepared] = useState<Prepared | null>(null)
+  const [screenEvent, setScreenEvent] = useState<{ k: number; text: string } | null>(null)
+  const [onCall, setOnCall] = useState(false)
   // An email to a supplier is shown before it goes out: it cannot be taken back.
   const [review, setReview] = useState(false)
   const [draft, setDraft] = useState('')
@@ -161,6 +195,9 @@ function Focus(p: Props & { card: Card }) {
       const out = await fn()
       p.onDone({ card, ...out })
       p.onChanged()
+      setPrepared(null)
+      // Decided with a tap while the assistant is on the line: tell it, so it does not decide again.
+      if (onCall) setScreenEvent({ k: Date.now(), text: `The person decided on screen: ${out.text} It is done; do not call decide. Confirm in one short sentence and say goodbye.` })
     } catch (e) {
       setError(`That did not go through: ${(e as Error).message}. Nothing was sent.`)
     } finally { setBusy(false); setConfirm(false) }
@@ -182,6 +219,32 @@ function Focus(p: Props & { card: Card }) {
       return { text: doneFrom(card, sel, status), sub, actionId: sent ? null : r.action?.id ?? null }
     })
   const openReview = () => { setDraft(opt?.draft ?? ''); setReview(true) }
+
+  // The voice assistant prepared a decision: show it. An email opens its review sheet.
+  const onPrepared = (pr: Prepared | null) => {
+    setPrepared(pr)
+    if (!pr) { setReview(false); return }
+    const o = pr.decision === 'approve' ? card.options[pr.option_index] : undefined
+    if (!o) return
+    setSel(pr.option_index); setOthers(false); setConfirm(false)
+    if (o.channel === 'email' && /@/.test(o.to ?? '')) { setSource(null); setDraft(o.draft ?? ''); setReview(true) }
+  }
+  // show_on_screen from the assistant: the source side, the options or the email.
+  const onScreen = (what: ScreenWhat): boolean => {
+    if (what === 'options') { setSource(null); setReview(false); setOthers(true); return true }
+    if (what === 'email') {
+      if (!emails) return false
+      setSource(null); openReview(); return true
+    }
+    const isSys = (e: Evidence) => SYS.test(e.source ?? '')
+    const i = claim
+      ? (what === 'system' ? claim.sys.index : claim.doc.index)
+      : card.evidence.findIndex((e) => (what === 'system' ? isSys(e) : !isSys(e)))
+    if (i < 0) return false
+    setReview(false); setSource(i); return true
+  }
+  const voicePrepared = !!prepared && !p.doneText
+  const emailPrepared = voicePrepared && prepared!.decision === 'approve' && emails && sel === prepared!.option_index
   const escalate = () =>
     act(async () => {
       const r = await post<{ id?: string }>(`/api/cards/${encodeURIComponent(card.id)}/escalate`, { note })
@@ -233,7 +296,9 @@ function Focus(p: Props & { card: Card }) {
         )}
         {error && <p className="t-small mb-3 text-late" role="alert">{error}</p>}
         <div className={cn(phone ? 'grid justify-items-center gap-3.5' : 'flex flex-wrap items-center gap-6', p.ringing && phone && 'gap-5')}>
-          <button
+          {p.doneText ? (
+            <p className="t-body text-ink" role="status"><Check size={18} strokeWidth={1.75} className="mr-2 inline -translate-y-px" />Done. {p.doneText}</p>
+          ) : <button
             onClick={confirm ? () => approve() : onApprove}
             disabled={busy}
             className={cn(
@@ -244,10 +309,21 @@ function Focus(p: Props & { card: Card }) {
             )}
           >
             {busy ? 'Sending…' : confirm ? 'Yes, approve' : emails ? 'Review email' : 'Approve'}
-          </button>
+          </button>}
           <div className={cn('flex items-center', phone ? 't-small gap-7' : 't-body gap-6', p.ringing && 'order-first w-full flex-col gap-4 pb-2 lg:items-start')}>
-            <VoiceCall card={card} onChanged={p.onChanged} ringing={p.ringing} onRingingDone={p.onRingingDone} quiet linesEl={linesEl} />
-            {confirm ? (
+            <VoiceCall
+              card={card}
+              onChanged={p.onChanged}
+              ringing={p.ringing}
+              onRingingDone={p.onRingingDone}
+              quiet
+              linesEl={linesEl}
+              onLive={(l) => { setOnCall(l); p.onCall(l) }}
+              onPrepared={onPrepared}
+              onScreen={onScreen}
+              screenEvent={screenEvent}
+            />
+            {p.doneText ? null : confirm ? (
               <button onClick={() => setConfirm(false)} className="cursor-pointer text-ink-2 hover:text-ink">Cancel</button>
             ) : (
               <button onClick={() => setOthers(!others)} aria-expanded={others} className="cursor-pointer text-ink-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
@@ -330,8 +406,17 @@ function Focus(p: Props & { card: Card }) {
         </div>
       )}
 
+      {voicePrepared && !emailPrepared && (
+        <div className="fade mt-10" role="status">
+          <p className="t-small text-ink-3">On the call</p>
+          <p className="t-body mt-1 text-ink">{prepared!.summary}</p>
+          <p className="t-small mt-1 text-ink-2">Say ‘yes’ to go ahead{prepared!.decision === 'approve' && opt ? <>, or <button className="uline" onClick={onApprove}>approve here</button></> : null}.</p>
+        </div>
+      )}
       <div ref={setLinesEl} />
+      {phone && <Automation state={state} card={card} onRoutines={p.onRoutines} onReview={p.onReview} onChanged={p.onChanged} className="mt-10" />}
       {actions}
+      {!phone && <Automation state={state} card={card} onRoutines={p.onRoutines} onReview={p.onReview} onChanged={p.onChanged} className="mt-12" />}
 
       <SourceSheet card={card} claim={claim} index={source} anchors={anchors.items} ready={anchors.ready} onIndex={setSource} />
       {opt && (
@@ -346,6 +431,7 @@ function Focus(p: Props & { card: Card }) {
           cost={money ? costLine(card, sel).replace(/\.$/, '') : null}
           busy={busy}
           error={error}
+          voice={emailPrepared}
           onSend={() => { setReview(false); void approve(draft) }}
         />
       )}
@@ -356,8 +442,10 @@ function Focus(p: Props & { card: Card }) {
 // ---------------------------------------------------------------- email review
 
 function EmailReview({
-  open, onOpenChange, to, toName, subject, draft, onDraft, cost, busy, error, onSend,
+  open, onOpenChange, to, toName, subject, draft, onDraft, cost, busy, error, onSend, voice,
 }: {
+  /** Prepared on a live call: a spoken yes works as well as the button. */
+  voice?: boolean
   open: boolean; onOpenChange: (o: boolean) => void; to: string; toName: string; subject: string
   draft: string; onDraft: (t: string) => void; cost: string | null; busy: boolean; error: string; onSend: () => void
 }) {
@@ -374,7 +462,7 @@ function EmailReview({
           )}
         >
           <div className="mx-auto mb-5 h-[5px] w-9 rounded-full bg-hair md:hidden" aria-hidden="true" />
-          <Dialog.Title className="t-small font-normal text-ink-3">This email goes out when you press Send</Dialog.Title>
+          <Dialog.Title className="t-small font-normal text-ink-3">{voice ? 'Say ‘yes’ or tap Send. Nothing goes out before.' : 'This email goes out when you press Send'}</Dialog.Title>
           <dl className="t-small mt-4 grid grid-cols-[64px_minmax(0,1fr)] gap-y-2 text-ink-2">
             <dt className="text-ink-3">To</dt>
             <dd className="min-w-0 break-words text-ink">{toName ? `${toName} · ` : ''}<span className="text-ink-2">{to}</span></dd>
@@ -590,7 +678,7 @@ function DoneView(p: Props & { done: DoneInfo }) {
   }
 
   const primary = offer
-    ? { label: 'Show me how', onClick: () => { p.onRoutines({ cardId: done.card.id, k: Date.now() }); p.onClearDone() } }
+    ? { label: 'Show me how', onClick: () => { p.onClearDone(); p.onRoutines({ cardId: done.card.id, k: Date.now() }) } }
     : next
       ? { label: 'Next decision', onClick: () => { p.onFocus(next.id); p.onClearDone() } }
       : null
@@ -614,7 +702,7 @@ function DoneView(p: Props & { done: DoneInfo }) {
           <p className="t-body text-ink">
             {plural(done.offer, 'more like this', 'more like this')}{who ? ` from ${who}` : ''}. Handle them the same way?
           </p>
-          <p className="t-small dot-routine mt-7 text-routine">You'll see a test run first. Anything that costs money still comes to you.</p>
+          <p className="t-small dot-routine mt-7 text-routine">You'll see a test run first. It starts by asking: it prepares them, you send with one tap.</p>
         </div>
       ) : next ? (
         <p className="t-body text-ink-2">Next: <span className="text-ink">{headlineOf(next, state)}</span></p>
@@ -650,9 +738,11 @@ function DoneView(p: Props & { done: DoneInfo }) {
 // ---------------------------------------------------------------- all clear
 
 function AllClear({
-  state, nowMs, handled, pending, onRoutines, go,
-}: { state: State; nowMs: number; handled: number; pending: number; onRoutines: (r?: { cardId: string; k: number }) => void; go: (p: string) => void }) {
+  state, nowMs, handled, onRoutines, onReview, onChanged, go,
+}: { state: State; nowMs: number; handled: number; onRoutines: (r?: { cardId: string; k: number }) => void; onReview: Review; onChanged: () => void; go: (p: string) => void }) {
   const waiting = state.cards.filter((c) => (c.status === 'open' && c.routed_to_other) || c.status === 'escalated').length
+  const live = useLive()
+  const pending = pendingOf(live)
   return (
     <section className="rise pt-[16vh] lg:pt-[10vh]">
       <h1 className="t-big text-ink">Nothing needs you.</h1>
@@ -661,35 +751,64 @@ function AllClear({
         <span>Watching {plural(state.shipments.length, 'shipment')}<button className="uline ml-1.5" onClick={() => go('/suppliers')}>see</button></span>
         {waiting > 0 && <span>{plural(waiting, 'decision')} with others<button className="uline ml-1.5" onClick={() => go('/plan')}>see</button></span>}
         {handled > 0 && (
-          <span className="dot-routine text-routine">
+          <RoutineLine links={[{ label: 'see', onClick: () => onRoutines() }, { label: 'undo', onClick: () => go('/plan#handled') }]}>
             {handled} handled by your routines {new Date(nowMs).getHours() < 11 ? 'overnight' : 'today'}
-            <button className="uline ml-1.5" onClick={() => onRoutines()}>see</button>
-            <button className="uline ml-1.5" onClick={() => go('/plan#handled')}>undo</button>
-          </span>
+          </RoutineLine>
         )}
-        {pending > 0 && (
-          <span className="dot-routine text-routine">
-            Your routines want to do {plural(pending, 'thing')}<button className="uline ml-1.5" onClick={() => onRoutines()}>review</button>
-          </span>
+        {/* One routine waiting: its own line below names it. Several: one count. */}
+        {pending.length > 0 && new Set(pending.map((x) => x.routine_id)).size > 1 && (
+          <RoutineLine links={[{ label: 'review', onClick: () => onReview(pending) }]}>{pending.length} waiting for your OK</RoutineLine>
         )}
+        <Automation state={state} onRoutines={onRoutines} onReview={onReview} onChanged={onChanged} className="grid gap-3.5" />
       </div>
       {state.last_check_at && <p className="t-small mt-16 text-ink-3">Last checked the portal at {when(state.last_check_at, nowMs)}.</p>}
     </section>
   )
 }
 
-function FootLines({
-  handled, pending, onRoutines, nowMs, center,
-}: { state: State; handled: number; pending: number; onRoutines: () => void; go: (p: string) => void; nowMs: number; center: boolean }) {
-  if (!handled && !pending) return null
+/**
+ * Automation where the decision happens, one quiet line each: what a routine would do with the
+ * focused decision, what routines prepared and wait to send, and routines drafted on a call.
+ */
+function Automation({
+  state, card, onRoutines, onReview, onChanged, className,
+}: { state: State; card?: Card; onRoutines: (r?: { cardId: string; k: number }) => void; onReview: Review; onChanged: () => void; className?: string }) {
+  const live = useLive()
+  const pending = pendingOf(live)
+  const mine = card ? pending.filter((x) => x.card_id === card.id) : []
+  const others = card ? pending.filter((x) => x.card_id !== card.id) : []
+  const asking = new Set(mine.map((x) => x.routine_id))
+  const would = card && card.status === 'open' ? (live.would[card.id] ?? []).filter((w) => !asking.has(w.routine_id)) : []
+  const drafts = live.drafts
+  // On All clear several routines fold into the count line above; a single one is named here.
+  const all = groupProposals(card ? others : pending, state)
+  const groups = !card && all.length > 1 ? [] : all
+  if (!mine.length && !would.length && !groups.length && !drafts.length) return null
   return (
-    <p className={cn('t-small flex flex-wrap gap-x-5 gap-y-2 text-ink-3', center && 'justify-center')}>
-      {handled > 0 && (
-        <span><span className="dot-routine text-routine">{handled} handled by your routines {new Date(nowMs).getHours() < 11 ? 'overnight' : 'today'}</span> ·<button className="uline ml-1" onClick={onRoutines}>see</button></span>
+    <div className={cn('grid gap-3', className)}>
+      {mine.length > 0 && (
+        <RoutineLine links={[{ label: 'review', onClick: () => onReview(mine) }]}>
+          Your routine ‘{mine[0].routine_name}’ prepared {mine.length === 1 ? 'this for you' : `${mine.length} steps for this`}
+        </RoutineLine>
       )}
-      {pending > 0 && (
-        <span><span className="dot-routine text-routine">Your routines want to do {plural(pending, 'thing')}</span> ·<button className="uline ml-1" onClick={onRoutines}>review</button></span>
+      {would.slice(0, 1).map((w) => <WouldLine key={w.routine_id} w={w} onChanged={onChanged} />)}
+      <ProposalLines groups={groups} onReview={onReview} max={card ? 1 : 2} />
+      {drafts.length > 0 && (
+        <RoutineLine links={[{ label: 'review', onClick: () => onRoutines() }]}>
+          {drafts.length === 1 ? <>Drafted from your call: ‘{drafts[0].routine.name}’</> : <>{drafts.length} routines drafted from your calls</>}
+        </RoutineLine>
       )}
-    </p>
+    </div>
+  )
+}
+
+function FootLines({ handled, onRoutines, nowMs, center }: { handled: number; onRoutines: () => void; nowMs: number; center: boolean }) {
+  if (!handled) return null
+  return (
+    <div className={cn('flex', center && 'justify-center')}>
+      <RoutineLine links={[{ label: 'see', onClick: onRoutines }]}>
+        {handled} handled by your routines {new Date(nowMs).getHours() < 11 ? 'overnight' : 'today'}
+      </RoutineLine>
+    </div>
   )
 }

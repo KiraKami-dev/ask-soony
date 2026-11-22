@@ -1,13 +1,18 @@
 import { useSyncExternalStore } from 'react'
-import { call, type Mode, type Proposal, type WouldHandle } from './types'
+import { call, type Mode, type Proposal, type Routine, type Run, type WouldHandle } from './types'
 
 // What the routines prepared for the buyer, shared by the Routines sheet, the decision pane and
 // the inbox list: proposals waiting for an OK, routines that would handle a card, and actions
 // undone on this screen. Refreshed on the app's own refresh (see `refreshLive`), never on its
 // own timer. Endpoints that are not there yet (404) simply count as empty.
 
+/** A routine the voice assistant drafted during a call (GET /api/routines/drafts). */
+export interface VoiceDraft { card_id: string; instruction?: string; at?: string; via?: string; routine: Routine; preview?: Run }
+
 interface Live {
   proposals: Proposal[]
+  /** Voice drafts not hidden on this device and not saved as a routine yet. */
+  drafts: VoiceDraft[]
   would: Record<string, WouldHandle[]>
   /** Action id -> "undone" or the reason it could not be undone. */
   undo: Record<string, { ok: boolean; reason?: string }>
@@ -15,7 +20,15 @@ interface Live {
   settled: Set<string>
 }
 
-let live: Live = { proposals: [], would: {}, undo: {}, settled: new Set() }
+const HIDDEN_KEY = 'ask-soony.hidden-routine-drafts'
+function readHidden(): Set<string> {
+  try { return new Set(JSON.parse(localStorage.getItem(HIDDEN_KEY) ?? '[]') as string[]) } catch { return new Set() }
+}
+let hidden = readHidden()
+let allDrafts: VoiceDraft[] = []
+const visibleDrafts = () => allDrafts.filter((d) => !hidden.has(d.routine.id))
+
+let live: Live = { proposals: [], drafts: [], would: {}, undo: {}, settled: new Set() }
 const subs = new Set<() => void>()
 const set = (next: Partial<Live>) => { live = { ...live, ...next }; subs.forEach((f) => f()) }
 const subscribe = (f: () => void) => { subs.add(f); return () => { subs.delete(f) } }
@@ -35,17 +48,19 @@ export function refreshLive(minMs = 4000): Promise<void> {
   if (Date.now() - lastAt < minMs) return Promise.resolve()
   lastAt = Date.now()
   inflight = (async () => {
-    const [p, w] = await Promise.all([
+    const [p, w, d] = await Promise.all([
       getJson<{ proposals?: Proposal[] }>('/api/routines/proposals'),
       getJson<Record<string, WouldHandle[]>>('/api/routines/would-handle'),
+      getJson<{ drafts?: VoiceDraft[] }>('/api/routines/drafts'),
     ])
+    if (d) allDrafts = (d.drafts ?? []).filter((x) => x?.routine?.id)
     const proposals = Array.isArray(p?.proposals) ? p.proposals.filter((x) => x && x.id) : []
     const would: Record<string, WouldHandle[]> = {}
     for (const [k, v] of Object.entries(w ?? {})) if (Array.isArray(v) && v.length) would[k] = v
     // Forget settled ids the server no longer lists as pending.
     const pending = new Set(proposals.filter((x) => x.status === 'pending').map((x) => x.id))
     const settled = new Set([...live.settled].filter((id) => pending.has(id)))
-    set({ proposals, would, settled })
+    set({ proposals, would, settled, drafts: visibleDrafts() })
   })().finally(() => { inflight = null })
   return inflight
 }
@@ -61,8 +76,23 @@ export function pendingOf(l: Live, cardId?: string): Proposal[] {
   )
 }
 
+/** Hide a voice draft on this device (turned on, or "Not now"). */
+export function hideDraft(routineId: string) {
+  hidden = new Set(hidden).add(routineId)
+  try { localStorage.setItem(HIDDEN_KEY, JSON.stringify([...hidden])) } catch { /* private mode */ }
+  set({ drafts: visibleDrafts() })
+}
+
+/** Ask the server again right away (after a change on this screen). */
+export function refreshNow(): Promise<void> {
+  lastAt = 0
+  return refreshLive(0)
+}
+
 export async function answerProposal(id: string, how: 'accept' | 'skip'): Promise<void> {
-  await call(`/api/routines/proposals/${encodeURIComponent(id)}/${how}`)
+  const r = await call<{ ok?: boolean; result?: { error?: string } }>(`/api/routines/proposals/${encodeURIComponent(id)}/${how}`)
+  // Accept answers 200 with ok: false when the step itself did not go through.
+  if (r && r.ok === false) throw new Error(r.result?.error || 'it did not go through')
   // An accepted one stays a moment so its "Done" shows.
   window.setTimeout(() => {
     set({ settled: new Set(live.settled).add(id) })
@@ -95,4 +125,11 @@ export async function setEnabled(routineId: string, enabled: boolean): Promise<v
   await call(`/api/routines/${encodeURIComponent(routineId)}/toggle`, { enabled })
   lastAt = 0
   void refreshLive()
+}
+
+/** Navigate inside the app from anywhere (the app listens to popstate). */
+export function goTo(path: string) {
+  window.history.pushState(null, '', path)
+  window.dispatchEvent(new PopStateEvent('popstate'))
+  window.scrollTo(0, 0)
 }

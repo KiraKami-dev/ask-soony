@@ -4,12 +4,12 @@ import { DecisionList, visibleOrder } from '@/components/DecisionList'
 import { DecisionPane, type Offer } from '@/components/DecisionPane'
 import { EvidenceDrawer, type DrawerView } from '@/components/EvidenceDrawer'
 import { LaunchTimeline } from '@/components/LaunchTimeline'
-import { Routines } from '@/components/Routines'
+import { Routines, RoutinesLive } from '@/components/Routines'
 import { pendingOf, useLive } from '@/components/routines/live'
-import { SupplyMap, type MapSelection } from '@/components/SupplyMap'
+import { MapLegend, SupplierList, SupplyMap, type MapSelection } from '@/components/SupplyMap'
 import { Today, type DoneInfo } from '@/components/Today'
 import { TopBar, type Page } from '@/components/TopBar'
-import { COLORS, DECIDED, DONE_WORD, fetchState, tidy, viaOf, type Card, type State } from '@/lib/api'
+import { DECIDED, DONE_WORD, fetchState, tidy, viaOf, type Card, type State } from '@/lib/api'
 import { actionIdOf, groupKey, sections } from '@/lib/decisions'
 import { lookAlikes, todayOrder, trucksLeave } from '@/lib/today'
 
@@ -33,8 +33,6 @@ export default function App() {
   const [path, setPath] = useState(window.location.pathname)
   const [toast, setToast] = useState<string | null>(null)
   const [pulseNode, setPulseNode] = useState<string | null>(null)
-  const [routinesOpen, setRoutinesOpen] = useState(false)
-  const [automate, setAutomate] = useState<{ cardId: string; k: number } | null>(null)
   const [drafts, setDrafts] = useState(0)
   // Today: the decision in focus, and the "Done" screen after one.
   const [focusId, setFocusId] = useState<string | null>(null)
@@ -156,16 +154,42 @@ export default function App() {
   const order = useMemo(() => (sec ? visibleOrder(sec, expanded) : []), [sec, expanded])
   const today = useMemo(() => (state ? todayOrder(state) : []), [state])
 
+  // Plan (desk): j / k / arrows walk the list, the pane follows.
+  const onPlan = path.startsWith('/plan')
+  useEffect(() => {
+    if (narrow || !onPlan || !sec) return
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target
+      if (t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return
+      if (e.metaKey || e.ctrlKey || e.altKey || drawer) return
+      const k = e.key
+      const down = k === 'j' || k === 'J' || k === 'ArrowDown'
+      const up = k === 'k' || k === 'K' || k === 'ArrowUp'
+      if (!down && !up) return
+      e.preventDefault()
+      const cur = selectedId ?? order[0] ?? null
+      const i = cur ? order.indexOf(cur) : -1
+      const n = i < 0 ? 0 : Math.min(order.length - 1, Math.max(0, i + (down ? 1 : -1)))
+      const id = order[n]
+      if (!id) return
+      setSelectedId(id)
+      const g = sec.needs.find((x) => x.cards.length > 1 && x.lead.id !== id && x.cards.some((c) => c.id === id))
+      if (g) setExpanded((ex) => new Set([...ex, g.key]))
+      document.getElementById(`row-${id}`)?.scrollIntoView({ block: 'nearest' })
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [narrow, onPlan, sec, order, selectedId, drawer])
+
   if (!state || !sec) {
     return <div className="grid h-full place-items-center text-[15px] text-ink-3">{error ? 'Cannot reach the server.' : 'Loading…'}</div>
   }
 
   const single = path.match(/^\/d\/(.+)$/)
-  const page: Page | null = single || path === '/' ? 'today' : path.startsWith('/plan') ? 'plan' : path.startsWith('/suppliers') ? 'suppliers' : 'today'
-  const openRoutines = (request?: { cardId: string; k: number }) => {
-    if (request) setAutomate(request)
-    setRoutinesOpen(true)
-  }
+  const page: Page | null = single || path === '/' ? 'today' : path.startsWith('/plan') ? 'plan' : path.startsWith('/suppliers') ? 'suppliers' : path.startsWith('/routines') ? 'routines' : 'today'
+  // Routines is its own page; "Show me how" lands there drafting from the decision.
+  const openRoutines = (request?: { cardId: string; k: number }) =>
+    go(request ? `/routines?draft=${encodeURIComponent(request.cardId)}` : '/routines')
   const truck = trucksLeave(state, nowMs)
   const open = today.length
   const status = (
@@ -190,9 +214,7 @@ export default function App() {
       routinesBadge={pending}
     />
   )
-  const routines = (
-    <Routines state={state} onChanged={load} request={automate} open={routinesOpen} onOpenChange={setRoutinesOpen} hideTrigger />
-  )
+  const routines = <RoutinesLive state={state} />
   const overlays = (
     <>
       {toast && (
@@ -237,15 +259,47 @@ export default function App() {
     )
   }
 
+  // ------------------------------------------------------------ Routines
+  if (page === 'routines') {
+    return (
+      <div className="flex min-h-full flex-col bg-ground">
+        {bar}
+        <Routines state={state} onChanged={load} phone={narrow} />
+        {overlays}
+      </div>
+    )
+  }
+
   // ------------------------------------------------------------ Suppliers
   if (page === 'suppliers') {
+    const list = (
+      <SupplierList state={state} nowMs={nowMs} selection={mapSel} onSelect={setMapSel} onOpen={(id) => go(`/plan?card=${encodeURIComponent(id)}`)} />
+    )
+    if (narrow) {
+      return (
+        <div className="flex min-h-full flex-col bg-ground">
+          {bar}
+          <div className="relative h-[300px] shrink-0">
+            <SupplyMap state={state} hoverRoutes={[]} selection={mapSel} onSelect={setMapSel} pulseNode={pulseNode} />
+          </div>
+          <MapLegend className="px-6 pt-3" />
+          <div className="px-6 pb-16 pt-8">{list}</div>
+          {overlays}
+        </div>
+      )
+    }
     return (
       <div className="flex h-full flex-col bg-ground">
         {bar}
-        <div className="relative min-h-[420px] flex-1">
-          <SupplyMap state={state} hoverRoutes={[]} selection={mapSel} onSelect={setMapSel} pulseNode={pulseNode} />
+        <div className="flex min-h-0 flex-1">
+          <div className="flex min-w-0 flex-1 flex-col pb-6 pl-6">
+            <div className="relative min-h-[420px] flex-1">
+              <SupplyMap state={state} hoverRoutes={[]} selection={mapSel} onSelect={setMapSel} pulseNode={pulseNode} />
+            </div>
+            <MapLegend className="pt-3" />
+          </div>
+          <aside className="scroll-thin w-[380px] shrink-0 overflow-y-auto px-10 pb-16 pt-6 xl:w-[420px]" aria-label="Suppliers">{list}</aside>
         </div>
-        <Legend />
         {overlays}
       </div>
     )
@@ -280,7 +334,7 @@ export default function App() {
       state={state}
       nowMs={nowMs}
       sec={sec}
-      selectedId={narrow ? null : selectedId}
+      selectedId={narrow ? null : selectedId ?? order[0] ?? null}
       onSelect={narrow ? openOnPhone : select}
       expanded={expanded}
       onToggle={toggle}
@@ -292,8 +346,8 @@ export default function App() {
     return (
       <div className="flex min-h-full flex-col bg-ground">
         {bar}
-        <div className="border-b border-hair px-3">{timeline}</div>
-        <div className="px-1">{list}</div>
+        <div className="border-b border-hair px-6 pb-2 pt-2">{timeline}</div>
+        <div className="px-3">{list}</div>
         {overlays}
       </div>
     )
@@ -303,11 +357,11 @@ export default function App() {
   return (
     <div className="flex h-full flex-col bg-ground">
       {bar}
-      <div className="shrink-0 border-b border-hair px-6">{timeline}</div>
+      <div className="shrink-0 border-b border-hair px-8 pb-4 xl:px-12">{timeline}</div>
       <div className="flex min-h-0 flex-1">
-        <aside className="scroll-thin w-[372px] shrink-0 overflow-y-auto border-r border-hair px-2" aria-label="All decisions">{list}</aside>
+        <aside className="scroll-thin w-[340px] shrink-0 overflow-y-auto pl-5 pr-3 xl:w-[380px] xl:pl-9" aria-label="All decisions">{list}</aside>
         <main className="scroll-thin min-w-0 flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-[860px] px-8 py-8 xl:px-12">
+          <div className="max-w-[720px] px-10 pb-24 pt-10 xl:ml-[4vw] xl:px-12">
             {shown ? (
               <DecisionPane
                 key={shown.id}
@@ -318,9 +372,10 @@ export default function App() {
                 onChanged={load}
                 onDrawer={(card, tab) => setDrawer({ card, tab })}
                 offer={offerFor(shown)}
+                keys
               />
             ) : (
-              <p className="t-body pt-24 text-center text-ink-2">Nothing here yet.</p>
+              <p className="t-body pt-24 text-ink-2">Nothing here yet.</p>
             )}
           </div>
         </main>
@@ -342,27 +397,4 @@ async function hasRoutine(cardId: string): Promise<boolean> {
   } catch {
     return false
   }
-}
-
-function Legend() {
-  const sw = (c: string, label: string) => (
-    <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full" style={{ background: c }} />{label}</span>
-  )
-  const line = (dash: boolean, label: string) => (
-    <span className="inline-flex items-center gap-1.5">
-      <svg width="26" height="6"><line x1="1" y1="3" x2="25" y2="3" stroke="#5d5d63" strokeWidth="2.5" strokeDasharray={dash ? '6 4' : undefined} strokeLinecap="round" /></svg>
-      {label}
-    </span>
-  )
-  return (
-    <div className="t-small flex flex-wrap items-center gap-x-5 gap-y-1 px-5 py-3 text-ink-2">
-      {line(false, 'Air / truck')}
-      {line(true, 'Sea')}
-      <span className="h-4 w-px bg-line" />
-      {sw(COLORS.blue, 'On track')}
-      {sw(COLORS.amber, 'At risk')}
-      {sw(COLORS.red, 'Stops a line')}
-      {sw(COLORS.grey, 'Silent')}
-    </div>
-  )
 }

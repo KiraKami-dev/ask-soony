@@ -111,9 +111,9 @@ export const newId = (prefix: string) => `${prefix}${Math.random().toString(36).
 export const PALETTE: { key: string; label: string; make: () => Step }[] = [
   { key: 'phone', label: 'Tell me on my phone', make: () => ({ id: newId('s'), do: 'notify', channel: 'phone', message: '{headline}', text: 'Tell me on my phone' }) },
   { key: 'teams', label: 'Tell me on Teams', make: () => ({ id: newId('s'), do: 'notify', channel: 'teams', message: '{headline}', text: 'Tell me on Teams' }) },
-  { key: 'log', label: 'Note it in the history', make: () => ({ id: newId('s'), do: 'log', message: 'Handled by a routine: {headline}', text: 'Note it in the history' }) },
-  { key: 'chase', label: 'Chase once if no answer', make: () => ({ id: newId('s'), do: 'chase', text: 'Chase once in the same thread if there is no answer' }) },
   { key: 'call', label: 'Call me', make: () => ({ id: newId('s'), do: 'call', text: 'Call me' }) },
+  { key: 'chase', label: 'Chase once if no answer', make: () => ({ id: newId('s'), do: 'chase', text: 'Chase once in the same thread if there is no answer' }) },
+  { key: 'log', label: 'Note it in the history', make: () => ({ id: newId('s'), do: 'log', message: 'Handled by a routine: {headline}', text: 'Note it in the history' }) },
   { key: 'ask_status', label: 'Ask for a status', make: () => ({ id: newId('s'), do: 'ask_status', text: 'Ask the supplier for the shipment status' }) },
 ]
 
