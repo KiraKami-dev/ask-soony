@@ -77,7 +77,12 @@ function countBits(state: State, nowMs: number): Bit[] {
 }
 
 /** One sentence per edition, in the order the editions stop. */
-function verdictBits(state: State, nowMs: number): Bit[] {
+function verdictBits(state: State, nowMs: number, role: Role | null = null): Bit[] {
+  // Said from where the reader sits: the approver reads "with you" and "Felix's decisions".
+  const approverFirst = firstName(state.launch?.money?.approver ?? '')
+  const buyerFirst = firstName(state.launch?.money?.viewer ?? state.viewer ?? '')
+  const iSign = role === 'approver'
+  const nameOf = (n: string) => (iSign && n && n === approverFirst ? 'you' : n)
   if (!state.strip.length) return [{ text: 'No packing plan yet, so whether we make the trucks is unknown.' }]
   const order = [...state.strip].sort((a, b) => (t(a.stops_at) || Infinity) - (t(b.stops_at) || Infinity))
   const out: Bit[] = countBits(state, nowMs)
@@ -97,7 +102,9 @@ function verdictBits(state: State, nowMs: number): Bit[] {
         const fixes = fixesFor(state, s)
         const theirs = fixes.filter((c) => c.status === 'escalated' || c.routed_to_other)
         const mine = fixes.length - theirs.length
-        const who = [...new Set(theirs.map((c) => firstName(c.approver ?? c.signoff ?? '') || 'someone'))]
+        const who = [...new Set(theirs.map((c) => nameOf(firstName(c.approver ?? c.signoff ?? '')) || 'someone'))]
+        const mineWords = iSign && buyerFirst ? `${buyerFirst}'s` : 'your'
+        const approves = who.length === 1 && who[0] !== 'you' && theirs.length === 1 ? 'approves the decision' : 'approve'
         const since = theirs[0]?.ui?.at ? ` since ${when(theirs[0].ui.at, nowMs)}` : ''
         const first = fixes.find((c) => !(c.status === 'escalated' || c.routed_to_other)) ?? fixes[0]
         out.push({ text: ', ' })
@@ -106,8 +113,8 @@ function verdictBits(state: State, nowMs: number): Bit[] {
           text: mine > 0 && theirs.length === 0
             ? `unless ${mine} ${mine === 1 ? 'decision goes' : 'decisions go'} through`
             : mine === 0
-              ? `unless ${who.join(' and ')} ${who.length === 1 && theirs.length === 1 ? 'approves the decision' : 'approve'} (waiting${since})`
-              : `unless ${mine} of your decisions and ${theirs.length} with ${who.join(' and ')} go through`,
+              ? `unless ${who.join(' and ')} ${approves}${who[0] === 'you' && theirs.length === 1 ? ' the decision' : ''} (waiting${since})`
+              : `unless ${mine} of ${mineWords} decisions and ${theirs.length} with ${who.join(' and ')} go through`,
         })
         out.push({ text: '.' })
       }
@@ -141,7 +148,7 @@ export function Launch({ state, nowMs, phone, onOpen, role = null, onHistory }: 
   const health = useDataHealth(state)
   const gaps = (health?.issues ?? []).filter((i) => i.kind !== 'unused')
   const unused = (health?.issues ?? []).filter((i) => i.kind === 'unused')
-  const bits = verdictBits(state, nowMs)
+  const bits = verdictBits(state, nowMs, role)
   const launch = launchAt(state)
   return (
     <div className="flex-1">
