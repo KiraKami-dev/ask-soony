@@ -1,0 +1,182 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M80PX6SJP07H95KVKPWK54F5",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T04:06:14.659263Z",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 4,
+  "save_step_count": 4,
+  "files_touched": [
+    "tests/test_demo_tools.py"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "3482407b5a30",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 34,
+    "cache_creation_tokens": 20085,
+    "cache_read_tokens": 13615055,
+    "output_tokens": 12578,
+    "api_call_count": 15,
+    "subagent_tokens": {
+      "input_tokens": 128,
+      "cache_creation_tokens": 166302,
+      "cache_read_tokens": 11691899,
+      "output_tokens": 122385,
+      "api_call_count": 62
+    },
+    "subagent_tokens_complete": true
+  },
+  "session_token_usage": {
+    "input_tokens": 2128,
+    "cache_creation_tokens": 2366708,
+    "cache_read_tokens": 488906579,
+    "output_tokens": 907483,
+    "api_call_count": 909,
+    "subagent_tokens": {
+      "input_tokens": 1424,
+      "cache_creation_tokens": 3841111,
+      "cache_read_tokens": 88018392,
+      "output_tokens": 993459,
+      "api_call_count": 684
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 1441,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 66,
+      "credentialed_uri": 0,
+      "entropy": 420,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 931,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 834,
+      "IP": 32,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 205
+  },
+  "summary": {
+    "intent": "Win the Lio 'Keep the Line Running' hackathon challenge for Soony: analyze the confidential supply-chain data drop, then build an agent product that detects launch risks, drafts and takes supplier actions, and copes with new data drops.",
+    "outcome": "Found that the Collector's Edition misses Sunday despite an 'all ok' plan (overbooked art books, failed statues, packing speed) and that new drops shifted risks. Built and pushed a poller/extractor/recheck/act platform with routines and a calm 'Today' UI on branch jonas/today-flow; verifier game-card gap fixed from 34,800 to 6,800. A voice two-step confirmation fix was in progress, and a restyle plus routine single-view work was still running.",
+    "learnings": {
+      "repo": [
+        "Portal API has only three endpoints (files list, single file, archive.zip) and no webhook or notification, so new drops must be detected by polling the file list and comparing SHA-256 checksums; files can be replaced under the same name.",
+        "Confidential portal data lives in the gitignored data/ folder; .env holds SOONY_PORTAL_TOKEN and only .env.example is committed.",
+        "Team workflow lives in CLAUDE.md and PROGRESS.md (claim work with a 'Now' line); Entire checkpoints are only written when repo files change and are pushed with git push.",
+        "Verifier shortfall counts inbound only when a supplier document confirms it; unread shipping documents are conservatively not counted. The recognizer put part numbers in the 'item' field rather than 'material_id', requiring a fallback when mapping doc lines.",
+        "Legacy routines written as code have no recipe and cannot render the When/Then/Always diagram; new routines are recipes, and the default mode is now 'ask' (existing routines keep theirs).",
+        "Sent emails cannot be undone, so the UI now shows an email review dialog before sending and omits Undo for sent mail; internal steps keep Undo.",
+        "Voice decisions now use a two-step prepare-then-decide flow with a one-time token, so tests call a conftest helper instead of decide directly."
+      ],
+      "code": [
+        {
+          "path": "src/ask_soony/verifier/impact/shortfall.py",
+          "finding": "Parts now carry 'arriving' and 'not_counted' lists, and gap = needed - usable - arriving; arrivals count only if ETA is on or before launch, not cancelled, not already received, not overdue, and the supplier doc does not say less."
+        },
+        {
+          "path": "web/src/components/routines/FlowGraph.tsx",
+          "finding": "Wide view rewritten as When/Then/Always lanes that wrap; the narrow vertical view is kept for the panel and phone."
+        },
+        {
+          "path": "web/src/lib/today.ts",
+          "finding": "Holds all Today-screen wording built from card fields with nothing hardcoded."
+        }
+      ],
+      "workflow": [
+        "Delegating parallel builders to separate file sets avoids edit conflicts; verify subagent output with screenshots and tests before committing.",
+        "Check for outside edits to a shared doc before updating it, and use mocked Playwright state so UI checks never send real supplier emails.",
+        "Ask before paid API calls and before pushing; a branch push was approved explicitly, so later pushes to it were announced as covered.",
+        "Do not put real data or the user's personal details in external services or shared docs; the portal login pasted in Discord should be rotated after the hack."
+      ]
+    },
+    "friction": [
+      "Portal token was empty at the start, blocking all data work until it was supplied.",
+      "The dashboard showed 34,800 game cards short because the verifier ignored deliveries before packing end; no local shipping-advice reading existed until a paid OpenAI run was approved.",
+      "The UI offered Undo for already-sent emails, and phone Approve with no cost sends a real supplier email immediately.",
+      "Voice assistant said it would outline the plan but proceeded straight to done, skipping confirmation.",
+      "Legacy code-only routines failed and showed no diagram, and the routine UI had three redundant views (Flow, Steps, Expanded).",
+      "Teams header emoji replacement missed a multi-line match and needed a manual fix.",
+      "The early data check found five new drops within 37 minutes of the first download, and the sleep-deprived teammate Farhan was unavailable, so the verifier had to be fixed locally."
+    ],
+    "open_items": [
+      "Open a merge request from jonas/today-flow into main and close PR #5 (or let Akshat merge).",
+      "Finish the voice two-step decision change: tests were being updated to use the prepare-then-decide helper and the new safety-rule test was not yet confirmed passing.",
+      "Wait for builders to finish automation inside Today and the restyle of Plan, Suppliers, evidence, login, PWA icon and Teams card, then check screenshots, run tests, commit and push.",
+      "Collapse the routine card into a single editable diagram view with 'Change it in your words' and a collapsed 'Show the code'.",
+      "Farhan's note: the allocate card's 'runs dry' time still ignores arrivals, and impact/__main__.py doesn't print the arriving list.",
+      "Send the Karton Nowak art-book order and the Boise reply once a sender address is registered in the portal Settings.",
+      "Hand-in by Sunday 12:00: README section, demo script, 3-minute video and deck.",
+      "Delete data/state.json and other portal-data snapshots after the hack; decide whether to delete the earlier Claude doc, and rotate the leaked portal password.",
+      "Show the Standard 'runs out' risk as amber 'fixable by collecting' instead of red if the demo should look less drastic, and calm the Plan layout further."
+    ]
+  }
+}
