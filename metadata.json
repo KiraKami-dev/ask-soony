@@ -1,0 +1,73 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M80VS7HC4E4CYXCSYHPYG60E",
+  "strategy": "manual-commit",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 3,
+  "files_touched": [
+    "src/ask_soony/api.py",
+    "src/ask_soony/basic_auth.py",
+    "src/ask_soony/cardtools.py",
+    "src/ask_soony/floor.py",
+    "src/ask_soony/launch.py",
+    "src/ask_soony/launch_view.py",
+    "src/ask_soony/push.py",
+    "src/ask_soony/routines.py",
+    "src/ask_soony/teams.py",
+    "tests/test_api_cost.py",
+    "tests/test_floor.py",
+    "web/public/sw.js",
+    "web/src/components/CountPage.tsx",
+    "web/src/components/Launch.tsx",
+    "web/src/components/Today.tsx",
+    "web/src/lib/api.ts",
+    "web/src/lib/decisions.ts",
+    "web/src/main.tsx"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt",
+      "assets_manifest": "/0/assets/manifest.json"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 64,
+    "cache_creation_tokens": 38282,
+    "cache_read_tokens": 7716068,
+    "output_tokens": 21215,
+    "api_call_count": 31,
+    "subagent_tokens": {
+      "input_tokens": 188,
+      "cache_creation_tokens": 242744,
+      "cache_read_tokens": 21837439,
+      "output_tokens": 82134,
+      "api_call_count": 90
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 1622,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 66,
+      "credentialed_uri": 0,
+      "entropy": 544,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 988,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 891,
+      "IP": 32,
+      "PHONE": 65
+    }
+  }
+}
