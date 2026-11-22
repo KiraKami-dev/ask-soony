@@ -1,0 +1,19 @@
+{
+  "tool_use_id": "toolu_011ZS2CnYDVNurtrKm1wFqij",
+  "agent_id": "ad743930efe09b3d8",
+  "subagent_type": "general-purpose",
+  "task_description": "Flexible column mapping for exports",
+  "files": [
+    "src/ask_soony/columns.py",
+    "tests/test_columns.py"
+  ],
+  "token_usage": {
+    "input_tokens": 98,
+    "cache_creation_tokens": 166939,
+    "cache_read_tokens": 6129125,
+    "output_tokens": 57295,
+    "api_call_count": 49
+  },
+  "started_at": "2026-11-22T10:05:36.144319+01:00",
+  "completed_at": "2026-11-22T10:16:42.126397+01:00"
+}
