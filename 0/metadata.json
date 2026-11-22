@@ -1,0 +1,194 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M810PGH0F6KYP4N2GTSKTCWW",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T06:57:24.313238Z",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "373d7d1ad64a",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 17,
+    "cache_creation_tokens": 13197,
+    "cache_read_tokens": 4362412,
+    "output_tokens": 4472,
+    "api_call_count": 8
+  },
+  "session_token_usage": {
+    "input_tokens": 2830,
+    "cache_creation_tokens": 2924546,
+    "cache_read_tokens": 611140565,
+    "output_tokens": 1157038,
+    "api_call_count": 1225,
+    "subagent_tokens": {
+      "input_tokens": 2868,
+      "cache_creation_tokens": 6251901,
+      "cache_read_tokens": 214524142,
+      "output_tokens": 1704417,
+      "api_call_count": 1365
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 2016,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 68,
+      "credentialed_uri": 0,
+      "entropy": 668,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 1256,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1143,
+      "IP": 48,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 250
+  },
+  "summary": {
+    "intent": "Take on the Lio 'Keep the Line Running' hackathon challenge for Soony: analyze the confidential supplier/launch data, then build a general recheck-and-act agent product (poller, extraction, recompute, supplier actions, Today/Launch/Routines UI) before the Sunday 12:00 hand-in.",
+    "outcome": "Found that Soony's plan hid real shortfalls (art books overbooked 80,000 vs 8,000, failed statue lot, frozen tracker, clear cases, card shortfall) and built a working app with a versioned poller, case cards, supplier email actions, routines, a drop drill and many UX fixes. Art book order was confirmed by Karton; hand-in material (README, demo script, video, pitch) and the push remain.",
+    "learnings": {
+      "repo": [
+        "Confidential portal data lives in the gitignored data/ folder; .env holds SOONY_PORTAL_TOKEN and is gitignored, .env.example is committed.",
+        "The portal API has only GET /api/v1/files, /files/{path} and /archive.zip, with no webhook or notifications. Drops must be detected by polling and comparing SHA-256, and existing files get replaced under the same name.",
+        "Team workflow is in CLAUDE.md and PROGRESS.md; work is on branch jonas/today-flow with many unpushed commits.",
+        "Entire only writes a checkpoint when repo files changed; with no changes its turn-end logs 'no files modified during session, skipping checkpoint'.",
+        "Safe rehearsal pattern: run a second server on a copy of data/portal, state and store with ASK_REPLY_POLL=off, ASK_TEAMS=off, ASK_LLM_PROVIDER=none so nothing polls, mails or calls for real.",
+        "Supplier profile addresses must not be trusted as send targets until a person confirms a new contact (supplier_addresses and supplier_email follow this rule).",
+        "Prepared routine proposals must expire when their case is decided, and the same step for the same case is deduplicated across routines.",
+        "ASK_TEAMS_WEBHOOK is empty, so Hamburg questions went out only as push notifications; internal messages and escalations are only recorded, with no delivery channel."
+      ],
+      "code": [
+        {
+          "path": "web/src/components/routines/FlowGraph.tsx",
+          "finding": "Routine diagram was rewritten to three groups (When, one 'Only if' node with numbered checklist and funnel counts, Then steps) with n8n-style node cards and connectors only between groups."
+        },
+        {
+          "path": "web/src/components/routines/funnel.ts",
+          "finding": "Computes per-condition remaining counts in the browser by copying routines.py matching logic, so counts can drift from the server and are approximate for waiting/replies triggers."
+        },
+        {
+          "path": "src/ask_soony/papercheck.py",
+          "finding": "Delay notices with a new date now count as late, and papercheck no longer auto-resolves cards while an input it used to read is unreadable (tracked in papercheck_reads.json)."
+        },
+        {
+          "path": "src/ask_soony/supplier_master.py",
+          "finding": "New module comparing newer supplier profiles with profile.csv (status, qualification, expiry, contact) to raise cards; wired into the state build in api.py."
+        },
+        {
+          "path": "src/ask_soony/tracking.py",
+          "finding": "Tracker file choice now takes the highest version, then the newest file, instead of first in sort order."
+        },
+        {
+          "path": "src/ask_soony/routines.py",
+          "finding": "Option matching searched a literal 'make po,rev' string instead of 'make po' and 'rev', so a routine found its case but sent nothing; fixed and tested."
+        }
+      ],
+      "workflow": [
+        "Put the first thin version of the act step in the product rather than hand-replying to suppliers, since judges score agents that take real actions.",
+        "Use subagents for long cross-checks (200 order confirmations, 59 scans) and UX redesigns, then verify screenshots and commit the results.",
+        "Check the browser (screenshots, simulated J key presses) before committing UI fixes.",
+        "Avoid committing partial work: a commit that picked up api.py changes without the new supplier_master.py module would not start, so commit topic by topic and run tests.",
+        "Replies to side emails should not close the case they are logged on; they add information but do not decide anything."
+      ]
+    },
+    "friction": [
+      "Portal token was initially empty, so the API returned 401 and blocked data work until it was set.",
+      "Data drops arrive without notice (five files within 37 minutes), so the 14:00 analysis went stale quickly.",
+      "A commit accidentally included api.py changes without supplier_master.py, so that commit alone would not start.",
+      "Replies to manual tracking questions wrongly marked three cases as sent and removed them from 'Needs you'; they had to be reopened.",
+      "The routine option-matching bug meant an enabled routine did nothing, and routines showed 'not run yet' after being switched on.",
+      "Stale prepared proposals ('Do all 4') failed with 'not an open card', and a duplicate routine produced duplicate steps.",
+      "The left list did not scroll, and selecting a decided case jumped the list back to the top.",
+      "Launch said 'Decide by' even when the case was with Maren.",
+      "PackRight received extra rev C requests after already answering, and the Pulse email to a non-existent address bounced.",
+      "Unknown whether portal data and actions are the same across teams; this was not documented."
+    ],
+    "open_items": [
+      "Push the unpushed commits on jonas/today-flow (about 25) once the user approves.",
+      "Write the README, 3-minute demo script, video and pitch for the 12:00 hand-in.",
+      "Decide whether to merge the four 'Are there really…' count questions into one case; 17 cases in 'Needs you' is a lot.",
+      "Route internal messages and escalations through push and Teams, and make the UI say honestly where they went.",
+      "Set up the Teams incoming webhook and put ASK_TEAMS_WEBHOOK in .env (user must do this).",
+      "Delete the duplicate routine 'Ask Hamburg to count book stock'.",
+      "Send the note to Hwaseong and the message to Lucas about the Pulse emails.",
+      "Register sender email addresses in portal Settings and decide on a team inbox for sending and replies.",
+      "Decide whether to delete the earlier Claude doc now that the page exists.",
+      "Change the Today header to show the next decision deadline (e.g. 'next decision by 09:00').",
+      "The art book truck is estimated to arrive after the cell runs dry (~11:16); a follow-up case for a direct van, split load or pickup is needed.",
+      "A real predictor (news impact) run was untested, and the memo's 'Quality last word' and 'air/rush to CPO within the hour' rules are not yet used for routing.",
+      "Next PackRight email should send the rev C file and change notice and ask how much of the order is unprinted, rather than repeating the revision request.",
+      "Ask the Lio engineers whether portal data is identical across teams and whether supplier replies create portal files."
+    ]
+  }
+}
