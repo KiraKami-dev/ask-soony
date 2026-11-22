@@ -475,6 +475,7 @@ function Focus(p: Props & {
     ...card.options.flatMap((o, i): Choice[] => (o.done ? [] : [{ kind: 'option', i }])),
     { kind: 'escalate' }, { kind: 'dismiss' },
   ]
+  const chosenKey = Math.max(0, choices.findIndex((c) => sameChoice(c, choice)))
 
   // Keyboard (desktop): j/k walk, a asks, Enter approves, Esc cancels.
   const ref = useRef({ approve, confirm, busy, emails, openReview, go, choose, choices, choice })
@@ -596,12 +597,23 @@ function Focus(p: Props & {
             )}
           </p>
           {opt ? (
-            <>
-              <p className="t-body text-ink">{actionText(card, sel)}{phone && <span className="text-ink-2"> {costLine(card, sel)}</span>}</p>
-              {!phone && (
-                <p className="t-body text-ink-2">{costLine(card, sel)}{opt.effect ? ` ${cap(tidy(opt.effect))}.`.replace(/\.\.$/, '.') : ''}</p>
-              )}
-            </>
+            // The chosen option is itself clickable (same as the button) and shows its key, so the
+            // numbers 1-9 line up with the options below.
+            <button
+              onClick={go}
+              disabled={busy}
+              className="group grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-4 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+            >
+              <span>
+                <span className="t-body block text-ink group-hover:underline group-hover:decoration-hair group-hover:underline-offset-4">
+                  {actionText(card, sel)}{phone && <span className="text-ink-2"> {costLine(card, sel)}</span>}
+                </span>
+                {!phone && (
+                  <span className="t-body block text-ink-2">{costLine(card, sel)}{opt.effect ? ` ${cap(tidy(opt.effect))}.`.replace(/\.\.$/, '.') : ''}</span>
+                )}
+              </span>
+              {!phone && choices.length > 1 && chosenKey < 9 && <kbd className="t-small">{chosenKey + 1}</kbd>}
+            </button>
           ) : choice.kind === 'escalate' ? (
             <>
               <p className="t-body text-ink">Pass it on to {card.approver || 'the approver'}.</p>
