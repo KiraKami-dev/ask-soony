@@ -24,9 +24,19 @@ const DECIDED: Record<string, string> = {
 }
 
 export function Routines({
-  state, onChanged, request,
-}: { state: State; onChanged: () => void; request?: { cardId: string; k: number } | null }) {
-  const [open, setOpen] = useState(false)
+  state, onChanged, request, open: openProp, onOpenChange, hideTrigger,
+}: {
+  state: State
+  onChanged: () => void
+  request?: { cardId: string; k: number } | null
+  /** Controlled from the top bar; the sheet keeps its own state otherwise. */
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  hideTrigger?: boolean
+}) {
+  const [openOwn, setOpenOwn] = useState(false)
+  const open = openProp ?? openOwn
+  const setOpen = (v: boolean) => { setOpenOwn(v); onOpenChange?.(v) }
   const [items, setItems] = useState<Routine[]>([])
   const [draft, setDraft] = useState<{ routine: Routine; preview: Run } | null>(null)
   const [writing, setWriting] = useState<string | null>(null)
@@ -112,7 +122,7 @@ export function Routines({
 
   return (
     <>
-      <button
+      {!hideTrigger && <button
         onClick={() => setOpen(true)}
         title={
           proposals.length ? `Routines: ${proposals.length} waiting for your OK`
@@ -129,7 +139,7 @@ export function Routines({
         ) : active > 0 && (
           <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-white px-1 text-[10px] font-bold text-ok ring-1 ring-ok/40">{active}</span>
         )}
-      </button>
+      </button>}
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent className="sm:max-w-[560px]">
           <div className="border-b border-line px-6 pb-4 pt-6 pr-14">

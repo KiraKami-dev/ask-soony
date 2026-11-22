@@ -1,5 +1,6 @@
 import { Mic, Phone, PhoneOff } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { Button } from '@/components/ui/button'
 import type { Card } from '@/lib/api'
 import { cn } from '@/lib/utils'
@@ -16,9 +17,12 @@ interface Props {
   onChanged: () => void
   ringing?: boolean
   onRingingDone?: () => void
+  /** Today screen: a quiet text button, the transcript rendered into `linesEl`. */
+  quiet?: boolean
+  linesEl?: HTMLElement | null
 }
 
-export function VoiceCall({ card, onChanged, ringing = false, onRingingDone }: Props) {
+export function VoiceCall({ card, onChanged, ringing = false, onRingingDone, quiet, linesEl }: Props) {
   const [status, setStatus] = useState<'idle' | 'connecting' | 'live' | 'ended' | 'error'>('idle')
   const [lines, setLines] = useState<Line[]>([])
   const pc = useRef<RTCPeerConnection | null>(null)
@@ -154,6 +158,44 @@ export function VoiceCall({ card, onChanged, ringing = false, onRingingDone }: P
       setStatus('error')
       pc.current?.close()
     }
+  }
+
+  if (quiet) {
+    const transcript: ReactNode = lines.length > 0 && (
+      <ul className="mt-6 space-y-2 text-[15px] leading-relaxed" aria-live="polite">
+        {lines.map((l, i) => (
+          <li key={l.id ?? i} className={cn('break-words', l.who === 'you' ? 'text-ink-2' : l.who === 'system' ? 'text-[13.5px] text-ink-3' : 'text-ink')}>
+            {l.who === 'you' && <span className="text-ink-3">You: </span>}
+            {l.text}
+          </li>
+        ))}
+      </ul>
+    )
+    if (ringing && !live) {
+      return (
+        <div className="w-full text-center lg:text-left" role="alert">
+          <p className="text-[length:var(--body)] text-ink">Incoming launch alert. Talk it through?</p>
+          <div className="mt-3 flex items-center justify-center gap-6 lg:justify-start">
+            <button onClick={start} className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-xl bg-accent px-6 font-medium text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+              <Phone size={17} /> Answer
+            </button>
+            <button onClick={onRingingDone} className="cursor-pointer text-ink-2 hover:text-ink">Later</button>
+          </div>
+        </div>
+      )
+    }
+    return (
+      <>
+        <button
+          onClick={live ? hangUp : start}
+          className="inline-flex cursor-pointer items-center gap-1.5 text-ink-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        >
+          {live ? <PhoneOff size={15} /> : <Mic size={15} />}
+          {status === 'connecting' ? 'Connecting…' : status === 'live' ? 'Hang up' : 'Talk it through'}
+        </button>
+        {linesEl ? createPortal(transcript, linesEl) : transcript}
+      </>
+    )
   }
 
   if (ringing && !live) {

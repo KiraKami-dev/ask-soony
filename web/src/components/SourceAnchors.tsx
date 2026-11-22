@@ -48,7 +48,7 @@ export function useAnchors(cardId: string): { items: Items | null; ready: boolea
 }
 
 const name = (doc: string) => doc.split('/').pop() ?? doc
-const fileUrl = (a: Anchor) =>
+export const fileUrl = (a: Anchor) =>
   `/api/file?path=${encodeURIComponent(a.doc)}${a.kind === 'pdf' && a.page ? `#page=${a.page}` : ''}`
 
 export function AnchorList({
@@ -86,6 +86,11 @@ export function AnchorList({
       {open != null && anchors[open] && <AnchorView anchor={anchors[open]} />}
     </div>
   )
+}
+
+/** Just the highlighted crop (page, scan, table row or text), no links: for the source sheet. */
+export function AnchorCrop({ anchor: a }: { anchor: Anchor }) {
+  return a.kind === 'table' ? <TableView a={a} /> : a.kind === 'text' ? <TextView a={a} /> : <PageView a={a} />
 }
 
 function AnchorView({ anchor: a }: { anchor: Anchor }) {
@@ -140,7 +145,7 @@ function PageView({ a }: { a: Anchor }) {
             boxes.map(([x0, y0, x1, y1], i) => (
               <div
                 key={i}
-                className="absolute rounded-sm bg-yellow-300/40 ring-2 ring-amber-500"
+                className="absolute rounded-[2px] bg-mark/60 mix-blend-multiply"
                 style={{
                   left: `${x0 * 100 - 0.3}%`,
                   top: `${y0 * 100 - 0.25}%`,
@@ -152,7 +157,7 @@ function PageView({ a }: { a: Anchor }) {
         </div>
       </div>
       {boxes.length > 0 && (
-        <button className="mt-1 cursor-pointer px-1 text-sm font-semibold text-ink-2 hover:text-ink" onClick={() => setFull(!full)}>
+        <button className="mt-2 cursor-pointer px-1 text-[13px] text-ink-3 hover:text-ink" onClick={() => setFull(!full)}>
           {full ? 'Zoom to the values' : 'Show full page'}
         </button>
       )}
@@ -184,13 +189,13 @@ function TableView({ a }: { a: Anchor }) {
         </thead>
         <tbody>
           {data.rows.map((r) => (
-            <tr key={r.row} ref={r.hit ? hit : undefined} className={r.hit ? 'bg-yellow-100' : ''}>
+            <tr key={r.row} ref={r.hit ? hit : undefined} className={r.hit ? 'bg-mark/25' : ''}>
               {r.cells.map((c, i) => (
                 <td
                   key={i}
                   className={cn(
                     'whitespace-nowrap border-b border-line px-2 py-1',
-                    r.hit && [...wanted].some((w) => norm(c).includes(w)) && 'bg-yellow-300/70 font-bold',
+                    r.hit && [...wanted].some((w) => norm(c).includes(w)) && 'bg-mark font-semibold text-ink',
                   )}
                 >
                   {c}
@@ -205,13 +210,13 @@ function TableView({ a }: { a: Anchor }) {
 }
 
 function TextView({ a }: { a: Anchor }) {
-  return <p className="whitespace-pre-wrap break-words rounded bg-yellow-100 p-2 font-mono text-[13px]">{a.snippet}</p>
+  return <p className="whitespace-pre-wrap break-words rounded bg-mark/30 p-2 font-mono text-[13px]">{a.snippet}</p>
 }
 
 // ---------------------------------------------------------------- inline citations
 
-const NUM_OR_ID = /[A-Za-z]*\d[\d,.' ]*\d(?:[-_/][A-Za-z0-9]+)*|[A-Za-z]+[-_]?\d{3,}[A-Za-z0-9-]*/g
-const normTok = (s: string) => s.replace(/(?<=\d)[,.'  ](?=\d{3}(?!\d))/g, '').toUpperCase()
+export const NUM_OR_ID = /[A-Za-z]*\d[\d,.' ]*\d(?:[-_/][A-Za-z0-9]+)*|[A-Za-z]+[-_]?\d{3,}[A-Za-z0-9-]*/g
+export const normTok = (s: string) => s.replace(/(?<=\d)[,.'  ](?=\d{3}(?!\d))/g, '').toUpperCase()
 
 // 'purchase_orders_2025H2-2026.csv' -> 'purchase orders': the words of the file name, no ids or dates
 const label = (doc: string) =>

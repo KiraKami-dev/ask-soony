@@ -2,6 +2,7 @@ import { Check, ChevronDown, ChevronRight, Eye, Workflow } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { DONE_WORD, ago, fmtNum, partName, tidy, until, type Card, type Level, type State } from '@/lib/api'
 import { sameIssueOn, when, type Group, type Sections } from '@/lib/decisions'
+import { plain } from '@/lib/today'
 import { cn } from '@/lib/utils'
 import { UndoAction } from './routines/Undo'
 
@@ -177,7 +178,7 @@ function Row({
       <span className={cn('absolute inset-y-2 left-0 w-[3px] rounded-full', muted ? 'bg-line' : BAR[card.level])} />
       <span className="flex items-start gap-3">
         <span className="min-w-0 flex-1">
-          <span className={cn('line-clamp-2 text-[14px] font-semibold leading-snug', muted ? 'text-ink-2' : 'text-ink')}>{tidy(card.headline)}</span>
+          <span className={cn('line-clamp-2 text-[14px] font-semibold leading-snug', muted ? 'text-ink-2' : 'text-ink')}>{plain(card.headline, card.part_name)}</span>
           <span className="mt-1 flex min-w-0 items-center gap-2 text-xs text-ink-3">
             <span className="truncate">{sub ?? (card.supplier_name || part)}</span>
             {chip}

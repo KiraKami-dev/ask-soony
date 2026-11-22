@@ -1,0 +1,610 @@
+import * as Dialog from '@radix-ui/react-dialog'
+import { Check, Database, FileText } from 'lucide-react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { AnchorCrop, NUM_OR_ID, fileUrl, normTok, useAnchors, type Anchor } from '@/components/SourceAnchors'
+import { VoiceCall } from '@/components/VoiceCall'
+import { undoAction, useLive } from '@/components/routines/live'
+import { post, tidy, type Card, type Evidence, type State } from '@/lib/api'
+import { languageOf, splitValue, when } from '@/lib/decisions'
+import {
+  actionText, claimOf, costLine, costsMoney, docKind, forToday, headlineOf, launchStatus, plural,
+  recommendedIndex, routineCount, shortName, shortTitle, summaryLine, type Claim,
+} from '@/lib/today'
+import { cn } from '@/lib/utils'
+
+// The Sunday flow: one decision at a time, the source one tap away, then "Done" and what's next.
+
+export interface DoneInfo {
+  card: Card
+  text: string
+  sub: string
+  actionId: string | null
+  /** Open look-alikes to offer a routine for; 0 when none (or a routine exists). */
+  offer: number
+  k: number
+}
+
+interface Props {
+  state: State
+  nowMs: number
+  phone: boolean
+  card: Card | null
+  order: Card[]
+  onFocus: (id: string) => void
+  done: DoneInfo | null
+  onDone: (d: { card: Card; text: string; sub: string; actionId: string | null }) => void
+  onClearDone: () => void
+  onChanged: () => void
+  onRoutines: (request?: { cardId: string; k: number }) => void
+  go: (path: string) => void
+  ringing?: boolean
+  onRingingDone?: () => void
+  /** Routine proposals waiting for an OK plus drafts from calls. */
+  pending: number
+}
+
+const typing = (t: EventTarget | null) =>
+  t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))
+
+export function Today(p: Props) {
+  const { state, nowMs, phone, card, done } = p
+  const handled = routineCount(state, nowMs)
+  const view = done ? 'done' : card ? 'decide' : 'clear'
+
+  const foot = (
+    <FootLines state={state} handled={handled} pending={p.pending} onRoutines={() => p.onRoutines()} go={p.go} nowMs={nowMs} center={!phone} />
+  )
+
+  const body =
+    view === 'done' ? (
+      <DoneView key={`done-${done!.k}`} {...p} done={done!} />
+    ) : view === 'decide' ? (
+      <Focus key={card!.id} {...p} card={card!} />
+    ) : (
+      <AllClear state={state} nowMs={nowMs} handled={handled} pending={p.pending} onRoutines={p.onRoutines} go={p.go} />
+    )
+
+  if (phone) {
+    return (
+      <main className="mx-auto w-full max-w-[560px] px-7 pb-[220px] pt-5">
+        {body}
+        {view === 'decide' && (handled > 0 || p.pending > 0) && <div className="mt-14">{foot}</div>}
+      </main>
+    )
+  }
+  // Desktop: a very quiet list on the left, the decision in a 640 px column.
+  return (
+    <div className="relative flex-1">
+      <div className="mx-auto grid w-full max-w-[1440px] grid-cols-[240px_minmax(0,640px)] gap-x-16 px-12 pb-32 pt-24 xl:grid-cols-[300px_640px] xl:gap-x-[124px] xl:px-24">
+        <aside aria-label="Needs you">
+          {p.order.length > 0 && <QuietList {...p} />}
+        </aside>
+        <main className="min-w-0">{body}</main>
+      </div>
+      {view !== 'clear' && <div className="fixed inset-x-0 bottom-8 z-10 flex justify-center">{foot}</div>}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------- left list
+
+function QuietList({ order, card, onFocus, state, nowMs }: Props) {
+  // One line per problem: look-alikes fold into their first card.
+  const seen = new Map<string, { c: Card; n: number }>()
+  for (const c of order) {
+    const k = `${c.supplier_id ?? c.supplier_name}|${c.kind}|${shortTitle(c, state).replace(/\d[\d,.]*/g, '#')}`
+    const e = seen.get(k)
+    if (e) e.n += 1
+    else seen.set(k, { c, n: 1 })
+  }
+  const rows = [...seen.values()]
+  const shown = rows.slice(0, 5)
+  const more = rows.slice(5).reduce((n, r) => n + r.n, 0)
+  return (
+    <div>
+      <p className="t-small mb-3 text-ink-3">Needs you</p>
+      <ul className="-mx-3.5">
+        {shown.map(({ c, n }) => {
+          const on = card?.id === c.id
+          return (
+            <li key={c.id}>
+              <button
+                onClick={() => onFocus(c.id)}
+                aria-current={on ? 'true' : undefined}
+                className={cn(
+                  't-small grid w-full cursor-pointer grid-cols-[8px_1fr_auto] items-baseline gap-3.5 rounded-[10px] px-3.5 py-3 text-left focus-visible:outline-2 focus-visible:outline-accent',
+                  on ? 'bg-soft font-medium text-ink' : 'text-ink-2 hover:text-ink',
+                )}
+              >
+                <i className={cn('h-[7px] w-[7px] -translate-y-px rounded-full', on ? 'bg-accent' : 'bg-ink-3')} />
+                <span className="truncate">{shortTitle(c, state)}{n > 1 && <span className="font-normal text-ink-3"> · {n}</span>}</span>
+                <span className="font-normal text-ink-3">{c.deadline ? when(c.deadline, nowMs) : ''}</span>
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+      {more > 0 && <p className="t-small mt-2 text-ink-3">+{more} more</p>}
+      <p className="t-small mt-6 text-ink-3"><kbd>J</kbd> <kbd>K</kbd> to move, <kbd>A</kbd> to approve</p>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------- one decision
+
+function Focus(p: Props & { card: Card }) {
+  const { card, state, nowMs, phone } = p
+  const [sel, setSel] = useState(() => recommendedIndex(card))
+  const [confirm, setConfirm] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const [others, setOthers] = useState(false)
+  const [passOn, setPassOn] = useState(false)
+  const [note, setNote] = useState('')
+  const [source, setSource] = useState<number | null>(null)
+  const [linesEl, setLinesEl] = useState<HTMLDivElement | null>(null)
+  const anchors = useAnchors(card.id)
+  const claim = claimOf(card)
+  const today = forToday(card, state, nowMs)
+  const opt = card.options[sel]
+  const recommended = sel === recommendedIndex(card)
+  const money = opt ? costsMoney(card, sel) : false
+  const late = card.level === 'red'
+
+  async function act(fn: () => Promise<{ text: string; sub: string; actionId: string | null }>) {
+    setBusy(true); setError('')
+    try {
+      const out = await fn()
+      p.onDone({ card, ...out })
+      p.onChanged()
+    } catch (e) {
+      setError(`That did not go through: ${(e as Error).message}. Nothing was sent.`)
+    } finally { setBusy(false); setConfirm(false) }
+  }
+  const approve = () =>
+    act(async () => {
+      const r = await post<{ action?: { id?: string; status?: string } }>(`/api/cards/${encodeURIComponent(card.id)}/approve`, { option: sel })
+      const status = r.action?.status
+      const sub = status === 'sent'
+        ? "The email is out. You'll see the reply here."
+        : opt?.channel === 'notify' && opt.to ? `${opt.to} has it now.` : 'Recorded.'
+      return { text: doneFrom(card, sel, status), sub, actionId: r.action?.id ?? null }
+    })
+  const escalate = () =>
+    act(async () => {
+      const r = await post<{ id?: string }>(`/api/cards/${encodeURIComponent(card.id)}/escalate`, { note })
+      return { text: `Passed on to ${card.approver || 'the approver'}.`, sub: 'You will see their answer here.', actionId: r?.id ?? null }
+    })
+  const dismiss = () =>
+    act(async () => {
+      const r = await post<{ id?: string }>(`/api/cards/${encodeURIComponent(card.id)}/dismiss`)
+      return { text: 'Taken off the list.', sub: 'Nothing was sent.', actionId: r?.id ?? null }
+    })
+  const onApprove = () => (money ? setConfirm(true) : void approve())
+
+  // Keyboard (desktop): j/k walk, a asks, Enter approves, Esc cancels.
+  const ref = useRef({ approve, confirm, busy })
+  ref.current = { approve, confirm, busy }
+  useEffect(() => {
+    if (phone) return
+    const onKey = (e: KeyboardEvent) => {
+      if (typing(e.target) || e.metaKey || e.ctrlKey || e.altKey || source != null) return
+      const k = e.key
+      if (ref.current.confirm && k === 'Enter') { e.preventDefault(); void ref.current.approve() }
+      else if (k === 'Escape') { setConfirm(false); setOthers(false) }
+      else if ((k === 'a' || k === 'A') && opt && !ref.current.busy) { e.preventDefault(); setConfirm(true) }
+      else if (k === 'j' || k === 'k' || k === 'ArrowDown' || k === 'ArrowUp') {
+        const i = p.order.findIndex((c) => c.id === card.id)
+        const n = p.order[Math.min(p.order.length - 1, Math.max(0, i + (k === 'j' || k === 'ArrowDown' ? 1 : -1)))]
+        if (n && n.id !== card.id) { e.preventDefault(); p.onFocus(n.id) }
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [phone, source, opt, card.id, p])
+
+  const decideBy = card.deadline ? (new Date(card.deadline).getTime() <= nowMs ? 'decide now' : `decide by ${when(card.deadline, nowMs)}`) : ''
+  const meta = [card.supplier_name || card.part_name, decideBy].filter(Boolean).join(' · ')
+
+  const actions = opt && (
+    <div className={cn(phone ? 'fixed inset-x-0 bottom-0 z-20 bg-gradient-to-t from-ground from-70% to-ground/0 px-6 pb-[max(28px,env(safe-area-inset-bottom))] pt-8' : 'mt-8')}>
+      <div className={cn(phone && 'mx-auto max-w-[520px]')}>
+        {confirm && (
+          <p className={cn('t-small mb-3 text-ink-2', phone && 'text-center')} role="alert">
+            Approve: <span className="text-ink">{actionText(card, sel).replace(/\.$/, '')}</span> ({costLine(card, sel).replace(/\.$/, '')})
+            {!phone && <span className="text-ink-3"> · <kbd>Enter</kbd> confirms</span>}
+          </p>
+        )}
+        {error && <p className="t-small mb-3 text-late" role="alert">{error}</p>}
+        <div className={cn(phone ? 'grid justify-items-center gap-3.5' : 'flex flex-wrap items-center gap-6', p.ringing && phone && 'gap-5')}>
+          <button
+            onClick={confirm ? approve : onApprove}
+            disabled={busy}
+            className={cn(
+              'inline-flex cursor-pointer items-center justify-center rounded-xl font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-60 t-body',
+              // While the alert rings, Answer is the one blue button.
+              p.ringing ? 'bg-soft text-ink hover:bg-hair' : 'bg-accent text-white shadow-[0_1px_2px_rgba(35,72,208,.25)] hover:bg-[#1d3db5]',
+              phone ? 'h-[54px] w-full rounded-[14px]' : 'h-12 px-7',
+            )}
+          >
+            {busy ? 'Sending…' : confirm ? 'Yes, approve' : 'Approve'}
+          </button>
+          <div className={cn('flex items-center', phone ? 't-small gap-7' : 't-body gap-6', p.ringing && 'order-first w-full flex-col gap-4 pb-2 lg:items-start')}>
+            <VoiceCall card={card} onChanged={p.onChanged} ringing={p.ringing} onRingingDone={p.onRingingDone} quiet linesEl={linesEl} />
+            {confirm ? (
+              <button onClick={() => setConfirm(false)} className="cursor-pointer text-ink-2 hover:text-ink">Cancel</button>
+            ) : (
+              <button onClick={() => setOthers(!others)} aria-expanded={others} className="cursor-pointer text-ink-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
+                {others ? 'Fewer options' : 'Other options'}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  return (
+    <article className="rise" aria-label={headlineOf(card, state)}>
+      <p className="t-small mb-4 text-ink-3">{meta}</p>
+      <h1 className="t-big text-ink">{headlineOf(card, state)}</h1>
+
+      <p className="t-body mt-6 text-ink-2">
+        {claim ? (
+          <ClaimLine claim={claim} late={late} open={source} onOpen={setSource} />
+        ) : (
+          <Cited text={summaryLine(card)} anchors={anchors.items} onOpen={setSource} open={source} />
+        )}
+      </p>
+      {today && (
+        <p className="t-body mt-4 text-ink-2">For today: <span className="font-medium text-ink">{today.bold}</span>{today.rest}</p>
+      )}
+
+      {opt && (
+        <div className={cn(phone ? 'mt-9' : 'mt-12')}>
+          <p className="t-small mb-1.5 text-ink-3">{recommended ? 'We recommend' : 'Your choice'}</p>
+          <p className="t-body text-ink">{actionText(card, sel)}{phone && <span className="text-ink-2"> {costLine(card, sel)}</span>}</p>
+          {!phone && (
+            <p className="t-body text-ink-2">{costLine(card, sel)}{opt.effect ? ` ${cap(tidy(opt.effect))}.`.replace(/\.\.$/, '.') : ''}</p>
+          )}
+        </div>
+      )}
+
+      {others && (
+        <div className="fade mt-8 space-y-1" aria-label="Other options">
+          {card.options.map((_, i) =>
+            i === sel ? null : (
+              <button
+                key={i}
+                onClick={() => { setSel(i); setOthers(false); setConfirm(false) }}
+                className="t-body block w-full cursor-pointer py-2 text-left text-ink-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-accent"
+              >
+                <span className="text-ink-3">Or </span>{actionText(card, i).replace(/^./, (c) => c.toLowerCase())}{' '}
+                <span className="t-small text-ink-3">{costLine(card, i)}</span>
+              </button>
+            ),
+          )}
+          {!passOn ? (
+            <button onClick={() => setPassOn(true)} className="t-body block w-full cursor-pointer py-2 text-left text-ink-2 hover:text-ink">
+              <span className="text-ink-3">Or </span>pass it on to {card.approver || 'the approver'}
+            </button>
+          ) : (
+            <div className="py-2">
+              <p className="t-small text-ink-3">They get this brief:</p>
+              <p className="t-small mt-1 text-ink-2">{tidy(card.escalation_brief)}</p>
+              <div className="mt-3 flex flex-wrap items-center gap-4">
+                <input
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Add one line (optional)"
+                  className="t-small h-10 min-w-0 flex-1 rounded-lg bg-soft px-3 focus:outline-2 focus:outline-accent"
+                  aria-label="Note for the approver"
+                />
+                <button disabled={busy} onClick={escalate} className="t-small cursor-pointer font-medium text-accent hover:underline">Send</button>
+                <button onClick={() => setPassOn(false)} className="t-small cursor-pointer text-ink-3 hover:text-ink">Cancel</button>
+              </div>
+            </div>
+          )}
+          <button disabled={busy} onClick={dismiss} className="t-body block w-full cursor-pointer py-2 text-left text-ink-2 hover:text-ink">
+            <span className="text-ink-3">Or </span>dismiss: nothing to do
+          </button>
+          <button onClick={() => p.go(`/plan?card=${encodeURIComponent(card.id)}`)} className="t-small block cursor-pointer pt-2 text-left text-ink-3 hover:text-ink">
+            Edit the message, all evidence and the trail in Plan
+          </button>
+        </div>
+      )}
+
+      <div ref={setLinesEl} />
+      {actions}
+
+      <SourceSheet card={card} claim={claim} index={source} anchors={anchors.items} ready={anchors.ready} onIndex={setSource} />
+    </article>
+  )
+}
+
+const cap = (t: string) => (t ? t[0].toUpperCase() + t.slice(1) : t)
+
+function doneFrom(card: Card, i: number, status?: string): string {
+  const a = actionText(card, i)
+  const m = a.match(/^(\w+)\s+(.*)$/)
+  const PAST: Record<string, string> = {
+    ask: 'Asked', tell: 'Told', order: 'Ordered', send: 'Sent', book: 'Booked', collect: 'Collected', call: 'Called',
+    move: 'Moved', release: 'Released', request: 'Requested', confirm: 'Confirmed', correct: 'Corrected', pay: 'Paid',
+    accept: 'Accepted', cancel: 'Cancelled', expedite: 'Expedited', reserve: 'Reserved', notify: 'Notified', fly: 'Flew',
+  }
+  const past = m && PAST[m[1].toLowerCase()]
+  // Short names and no order numbers: "Asked PackRight to make the order to rev C."
+  const calm = (t: string) =>
+    (card.supplier_name ? t.split(card.supplier_name).join(shortName(card.supplier_name)) : t).replace(/\bPO \d{6,}/g, 'the order')
+  if (past) return calm(`${past} ${m![2]}`)
+  return calm(status === 'sent' ? `Sent: ${a}` : `Approved: ${a}`)
+}
+
+const DbIcon = () => <Database aria-hidden="true" />
+const DocIcon = () => <FileText aria-hidden="true" />
+
+function ClaimLine({ claim, late, open, onOpen }: { claim: Claim; late: boolean; open: number | null; onOpen: (i: number) => void }) {
+  return (
+    <>
+      {claim.pre}
+      <button className="cite" aria-expanded={open === claim.sys.index} aria-haspopup="dialog" onClick={() => onOpen(claim.sys.index)}>
+        {claim.sys.value}<DbIcon />
+      </button>
+      {claim.mid}
+      <button className={cn('cite', late && 'late')} aria-expanded={open === claim.doc.index} aria-haspopup="dialog" onClick={() => onOpen(claim.doc.index)}>
+        {claim.doc.value}<DocIcon />
+      </button>
+      {claim.post}
+    </>
+  )
+}
+
+/** A sentence whose numbers, when found in a source, open that source. */
+function Cited({ text, anchors, onOpen, open }: { text: string; anchors: Record<number, Anchor[]> | null; onOpen: (i: number) => void; open: number | null }) {
+  if (!text) return null
+  const flat = Object.entries(anchors ?? {}).flatMap(([i, as]) => as.map((a) => ({ i: Number(i), a })))
+  const parts: ReactNode[] = []
+  let last = 0
+  for (const m of text.matchAll(NUM_OR_ID)) {
+    const hit = flat.find((x) => x.a.matched.includes(normTok(m[0])))
+    if (!hit || !/\d/.test(m[0])) continue
+    parts.push(text.slice(last, m.index))
+    parts.push(
+      <button key={m.index} className="cite" aria-expanded={open === hit.i} aria-haspopup="dialog" onClick={() => onOpen(hit.i)}>
+        {m[0]}
+      </button>,
+    )
+    last = (m.index ?? 0) + m[0].length
+  }
+  parts.push(text.slice(last))
+  return <>{parts}</>
+}
+
+// ---------------------------------------------------------------- the source sheet
+
+const SYS = /system|sap|erp/i
+function sideLabel(card: Card, ev: Evidence): { who: string; isSys: boolean } {
+  const isSys = SYS.test(ev.source ?? '')
+  if (isSys) return { who: /\bSAP\b/.test(ev.source ?? '') ? 'SAP says' : 'The system says', isSys }
+  const kind = docKind(ev.source) || 'the document'
+  const owner = ev.doc?.startsWith('suppliers/') && card.supplier_name ? `${shortName(card.supplier_name)}'s ` : 'The '
+  return { who: `${owner}${kind} says`.replace(/^The the/, 'The'), isSys }
+}
+const where = (a?: Anchor, ev?: Evidence) =>
+  a ? (a.kind === 'table' || a.kind === 'text' ? `row ${(a.row ?? 0) + 1}` : `page ${a.page ?? 1}`) : ev?.page ? `page ${ev.page}` : ''
+
+function SourceSheet({
+  card, claim, index, anchors, ready, onIndex,
+}: { card: Card; claim: Claim | null; index: number | null; anchors: Record<number, Anchor[]> | null; ready: boolean; onIndex: (i: number | null) => void }) {
+  const ev = index != null ? card.evidence[index] : null
+  const a = index != null ? anchors?.[index]?.[0] : undefined
+  const otherIndex = claim && index != null ? (index === claim.sys.index ? claim.doc.index : index === claim.doc.index ? claim.sys.index : null) : null
+  const other = otherIndex != null ? card.evidence[otherIndex] : null
+  const otherA = otherIndex != null ? anchors?.[otherIndex]?.[0] : undefined
+  const label = ev ? sideLabel(card, ev) : null
+  const lang = ev ? languageOf(ev.source, ev.language) : null
+  const head = ev
+    ? [label!.isSys ? (/\bSAP\b/.test(ev.source ?? '') ? 'SAP' : 'System') : card.supplier_name, [docKind(ev.source), where(a, ev)].filter(Boolean).join(', '), lang]
+        .filter(Boolean).join(' · ')
+    : ''
+  const english = ev?.translation ? ev.translation.split(' = ').pop() : null
+  const original = a ? fileUrl(a) : ev?.doc ? `/api/file?path=${encodeURIComponent(ev.doc)}${ev.page ? `#page=${ev.page}` : ''}` : null
+
+  return (
+    <Dialog.Root open={index != null} onOpenChange={(o) => !o && onIndex(null)}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fade fixed inset-0 z-40 bg-[rgba(24,24,26,.28)]" />
+        <Dialog.Content
+          aria-describedby={undefined}
+          className={cn(
+            'sheet-up fixed z-50 overflow-y-auto bg-ground focus:outline-none',
+            'inset-x-0 bottom-0 max-h-[88vh] rounded-t-[22px] px-6 pb-[max(36px,env(safe-area-inset-bottom))] pt-3 shadow-[0_-10px_40px_-16px_rgba(0,0,0,.25)]',
+            'md:inset-x-auto md:bottom-auto md:left-1/2 md:top-[8vh] md:max-h-[84vh] md:w-[640px] md:-translate-x-1/2 md:rounded-2xl md:px-8 md:pb-8 md:pt-7 md:shadow-[0_20px_60px_-20px_rgba(0,0,0,.3)]',
+          )}
+        >
+          <div className="mx-auto mb-5 h-[5px] w-9 rounded-full bg-hair md:hidden" aria-hidden="true" />
+          {ev && (
+            <>
+              <Dialog.Title className="t-small font-normal text-ink-3">{head}</Dialog.Title>
+              <div className="mt-3 overflow-hidden rounded-xl bg-soft p-3">
+                {a ? (
+                  <AnchorCrop key={`${index}-${a.doc}`} anchor={a} />
+                ) : !ready ? (
+                  <p className="t-small p-2 text-ink-3">Finding it in the documents…</p>
+                ) : (
+                  <p className="t-small whitespace-pre-wrap p-2 leading-[1.9] text-ink-2"><Marked text={tidy(ev.quote) || String(ev.value ?? '')} value={String(ev.value ?? '')} /></p>
+                )}
+              </div>
+              {english ? (
+                <p className="t-body mt-4 text-ink">{english}</p>
+              ) : a && ev.quote ? (
+                <p className="t-small mt-3 text-ink-3">{tidy(ev.quote)}</p>
+              ) : null}
+
+              {other && (
+                <button
+                  onClick={() => onIndex(otherIndex)}
+                  className="t-body mt-7 grid w-full cursor-pointer grid-cols-[20px_1fr] gap-x-2.5 text-left text-ink-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-accent"
+                >
+                  <span className="mt-1 text-ink-3">{sideLabel(card, other).isSys ? <Database size={16} /> : <FileText size={16} />}</span>
+                  <span>
+                    <span className="font-medium text-ink">{sideLabel(card, other).who} {splitValue(other.value).big}</span>{' '}
+                    {splitValue(other.value).rest}
+                  </span>
+                  <span className="t-small col-start-2 text-ink-3">{cap([docKind(other.source), where(otherA, other)].filter(Boolean).join(', '))}</span>
+                </button>
+              )}
+
+              <div className="mt-7 flex items-center gap-4">
+                {original && (
+                  <a href={original} target="_blank" rel="noreferrer" className="t-small shrink-0 text-accent hover:underline">Open original</a>
+                )}
+                <Dialog.Close className="t-body h-[52px] flex-1 cursor-pointer rounded-[14px] bg-soft font-medium text-ink hover:bg-hair focus-visible:outline-2 focus-visible:outline-accent">
+                  Back
+                </Dialog.Close>
+              </div>
+            </>
+          )}
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  )
+}
+
+/** The quote with the value's numbers highlighted (when no page or row was found). */
+function Marked({ text, value }: { text: string; value: string }) {
+  const nums = new Set((value.match(/\d[\d,.]*\d|\d/g) ?? []).map(normTok))
+  const parts: ReactNode[] = []
+  let last = 0
+  for (const m of text.matchAll(/\d[\d,.]*\d|\d/g)) {
+    if (!nums.has(normTok(m[0]))) continue
+    parts.push(text.slice(last, m.index), <mark key={m.index} className="rounded-[3px] bg-mark px-1 font-semibold text-[#111]">{m[0]}</mark>)
+    last = (m.index ?? 0) + m[0].length
+  }
+  parts.push(text.slice(last))
+  return <>{parts}</>
+}
+
+// ---------------------------------------------------------------- done
+
+function DoneView(p: Props & { done: DoneInfo }) {
+  const { done, state, phone } = p
+  const live = useLive()
+  const outcome = done.actionId ? live.undo[done.actionId] : undefined
+  const [undoing, setUndoing] = useState(false)
+  const next = p.order.find((c) => c.id !== done.card.id) ?? null
+  const offer = done.offer > 0 && !outcome?.ok
+  const who = shortName(done.card.supplier_name)
+
+  const undo = async () => {
+    if (!done.actionId) return
+    setUndoing(true)
+    const r = await undoAction(done.actionId)
+    setUndoing(false)
+    if (r.ok) p.onChanged()
+  }
+
+  const primary = offer
+    ? { label: 'Show me how', onClick: () => { p.onRoutines({ cardId: done.card.id, k: Date.now() }); p.onClearDone() } }
+    : next
+      ? { label: 'Next decision', onClick: () => { p.onFocus(next.id); p.onClearDone() } }
+      : null
+  const quiet = offer ? { label: 'Not now', onClick: p.onClearDone } : null
+
+  return (
+    <section className="rise" aria-live="polite">
+      <div className="mb-6 grid h-10 w-10 place-items-center rounded-full bg-soft text-ink"><Check size={20} strokeWidth={1.75} /></div>
+      <h1 className="t-big text-ink">{outcome?.ok ? 'Undone.' : `Done. ${done.text}`}</h1>
+      <p className="t-body mt-6 text-ink-2">
+        {outcome?.ok ? 'It is back on your list.' : done.sub}{' '}
+        {done.actionId && !outcome && (
+          <button onClick={undo} disabled={undoing} className="uline">{undoing ? 'Undoing…' : 'Undo'}</button>
+        )}
+        {outcome && !outcome.ok && <span className="t-small block pt-2 text-ink-3">Undo: {outcome.reason}</span>}
+      </p>
+
+      <div className="h-14" />
+      {offer ? (
+        <div>
+          <p className="t-body text-ink">
+            {plural(done.offer, 'more like this', 'more like this')}{who ? ` from ${who}` : ''}. Handle them the same way?
+          </p>
+          <p className="t-small dot-routine mt-7 text-routine">You'll see a test run first. Anything that costs money still comes to you.</p>
+        </div>
+      ) : next ? (
+        <p className="t-body text-ink-2">Next: <span className="text-ink">{headlineOf(next, state)}</span></p>
+      ) : (
+        <p className="t-body text-ink-2">Nothing else needs you. <button className="uline" onClick={p.onClearDone}>See the day</button></p>
+      )}
+
+      {(primary || quiet) && (
+        <div className={cn(phone ? 'fixed inset-x-0 bottom-0 z-20 bg-gradient-to-t from-ground from-70% to-ground/0 px-6 pb-[max(28px,env(safe-area-inset-bottom))] pt-8' : 'mt-10')}>
+          <div className={cn(phone ? 'mx-auto grid max-w-[520px] justify-items-center gap-3.5' : 'flex items-center gap-6')}>
+            {primary && (
+              <button
+                onClick={primary.onClick}
+                autoFocus={!phone}
+                className={cn(
+                  't-body inline-flex cursor-pointer items-center justify-center rounded-xl bg-accent font-medium text-white shadow-[0_1px_2px_rgba(35,72,208,.25)] hover:bg-[#1d3db5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
+                  phone ? 'h-[54px] w-full rounded-[14px]' : 'h-12 px-7',
+                )}
+              >
+                {primary.label}
+              </button>
+            )}
+            {quiet && (
+              <button onClick={quiet.onClick} className={cn('cursor-pointer text-ink-2 hover:text-ink', phone ? 't-small' : 't-body')}>{quiet.label}</button>
+            )}
+          </div>
+        </div>
+      )}
+    </section>
+  )
+}
+
+// ---------------------------------------------------------------- all clear
+
+function AllClear({
+  state, nowMs, handled, pending, onRoutines, go,
+}: { state: State; nowMs: number; handled: number; pending: number; onRoutines: (r?: { cardId: string; k: number }) => void; go: (p: string) => void }) {
+  const waiting = state.cards.filter((c) => (c.status === 'open' && c.routed_to_other) || c.status === 'escalated').length
+  return (
+    <section className="rise pt-[16vh] lg:pt-[10vh]">
+      <h1 className="t-big text-ink">Nothing needs you.</h1>
+      <p className="t-body mt-6 text-ink-2">{launchStatus(state, nowMs)}</p>
+      <div className="t-small mt-10 grid gap-3.5 text-ink-2">
+        <span>Watching {plural(state.shipments.length, 'shipment')}<button className="uline ml-1.5" onClick={() => go('/suppliers')}>see</button></span>
+        {waiting > 0 && <span>{plural(waiting, 'decision')} with others<button className="uline ml-1.5" onClick={() => go('/plan')}>see</button></span>}
+        {handled > 0 && (
+          <span className="dot-routine text-routine">
+            {handled} handled by your routines {new Date(nowMs).getHours() < 11 ? 'overnight' : 'today'}
+            <button className="uline ml-1.5" onClick={() => onRoutines()}>see</button>
+            <button className="uline ml-1.5" onClick={() => go('/plan#handled')}>undo</button>
+          </span>
+        )}
+        {pending > 0 && (
+          <span className="dot-routine text-routine">
+            Your routines want to do {plural(pending, 'thing')}<button className="uline ml-1.5" onClick={() => onRoutines()}>review</button>
+          </span>
+        )}
+      </div>
+      {state.last_check_at && <p className="t-small mt-16 text-ink-3">Last checked the portal at {when(state.last_check_at, nowMs)}.</p>}
+    </section>
+  )
+}
+
+function FootLines({
+  handled, pending, onRoutines, nowMs, center,
+}: { state: State; handled: number; pending: number; onRoutines: () => void; go: (p: string) => void; nowMs: number; center: boolean }) {
+  if (!handled && !pending) return null
+  return (
+    <p className={cn('t-small flex flex-wrap gap-x-5 gap-y-2 text-ink-3', center && 'justify-center')}>
+      {handled > 0 && (
+        <span><span className="dot-routine text-routine">{handled} handled by your routines {new Date(nowMs).getHours() < 11 ? 'overnight' : 'today'}</span> ·<button className="uline ml-1" onClick={onRoutines}>see</button></span>
+      )}
+      {pending > 0 && (
+        <span><span className="dot-routine text-routine">Your routines want to do {plural(pending, 'thing')}</span> ·<button className="uline ml-1" onClick={onRoutines}>review</button></span>
+      )}
+    </p>
+  )
+}
