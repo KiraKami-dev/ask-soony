@@ -14,6 +14,7 @@ import {
   recommendedIndex, routineCount, shortName, shortTitle, summaryLine, type Claim,
 } from '@/lib/today'
 import { resendSignoff, sentSub, signoffLine, signoffOpen } from '@/lib/signoff'
+import { CaseFlow } from '@/components/CaseFlow'
 import { savedRole } from '@/lib/role'
 import { cn } from '@/lib/utils'
 
@@ -121,16 +122,22 @@ export function Today(p: Props) {
     view === 'done' ? (
       <DoneView key={`done-${done!.k}`} {...p} done={done!} />
     ) : view === 'case' ? (
-      <CaseView key={`case-${p.caseCard!.id}`} card={p.caseCard!} state={state} nowMs={nowMs} onChanged={p.onChanged} onDrawer={p.onDrawer} />
+      <>
+        <CaseView key={`case-${p.caseCard!.id}`} card={p.caseCard!} state={state} nowMs={nowMs} onChanged={p.onChanged} onDrawer={p.onDrawer} />
+        <CaseFlow card={p.caseCard!} state={state} nowMs={nowMs} phone={phone} className="mt-14" />
+      </>
     ) : view === 'decide' ? (
-      <Focus
-        key={focusCard!.id}
-        {...p}
-        card={focusCard!}
-        onReview={setReview}
-        onCall={(live) => setCall(live ? focusCard : null)}
-        doneText={done && done.card.id === focusCard!.id ? done.text : undefined}
-      />
+      <>
+        <Focus
+          key={focusCard!.id}
+          {...p}
+          card={focusCard!}
+          onReview={setReview}
+          onCall={(live) => setCall(live ? focusCard : null)}
+          doneText={done && done.card.id === focusCard!.id ? done.text : undefined}
+        />
+        <CaseFlow key={`flow-${focusCard!.id}`} card={focusCard!} state={state} nowMs={nowMs} phone={phone} className="mt-14" />
+      </>
     ) : (
       <AllClear state={state} nowMs={nowMs} handled={handled} onRoutines={p.onRoutines} onReview={setReview} onChanged={p.onChanged} go={p.go} onReveal={reveal} />
     )
