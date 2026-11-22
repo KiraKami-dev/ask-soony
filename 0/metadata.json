@@ -1,0 +1,191 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M81ESWHEGK260H94CQPJS44M",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T11:03:56.800624Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "dd7cf2b9ffd8",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 10,
+    "cache_creation_tokens": 2214,
+    "cache_read_tokens": 1845146,
+    "output_tokens": 1531,
+    "api_call_count": 4
+  },
+  "session_token_usage": {
+    "input_tokens": 3975,
+    "cache_creation_tokens": 3586849,
+    "cache_read_tokens": 825881119,
+    "output_tokens": 1486866,
+    "api_call_count": 1731,
+    "subagent_tokens": {
+      "input_tokens": 3302,
+      "cache_creation_tokens": 7085365,
+      "cache_read_tokens": 241160760,
+      "output_tokens": 1905683,
+      "api_call_count": 1580
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 2614,
+    "layers": {
+      "betterleaks": 40,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 130,
+      "credentialed_uri": 0,
+      "entropy": 928,
+      "goredact": 8,
+      "key_context": 0,
+      "pii": 1522,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1385,
+      "IP": 72,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-22T09:30:29.207868Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "6e096d3ead7c",
+      "timestamp": "2026-11-22T09:30:29.207868Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 319
+  },
+  "summary": {
+    "intent": "Win the Lio 'Keep the Line Running' hackathon challenge for Soony by analysing the confidential data drops, then building a product (poller, extraction/recheck agents, supplier communication, approver UI) and polishing it before the hand-in.",
+    "outcome": "Found that Soony's launch plan hides real shortfalls (overbooked 80,000 art-book receipt, 5,600 failed statues, late game cards) and built the Lighthouse product with a versioned poller, agents, decision UI, Routines page and a 'How we got here' case flow. Many UI fixes are committed on `main` (about 19 commits ahead of origin, unpushed); the hand-in has moved to 12:45 and the last 'show 1 only with more options' tweak was still in progress.",
+    "learnings": {
+      "repo": [
+        "The portal API has only three endpoints (list files, get file, archive.zip) and no webhooks or change feed. Detecting drops means polling the file list and comparing SHA-256, because files are replaced under the same name.",
+        "Data in `data/`, `.env` and scans must stay gitignored because it is confidential. `.env.example` is committed with an empty token.",
+        "Team workflow lives in `CLAUDE.md` and `PROGRESS.md`; tasks are claimed with a 'Now' line in `PROGRESS.md`.",
+        "Routine steps like 'Chase once if no answer' and 'Ask for a status' are valid only for certain watched kinds (waiting messages, shipments). The server rejects them elsewhere with 'step N cannot be done on open decisions'.",
+        "The API does not load `.env` on import. Settings such as `ASK_VIEWER_TITLE` must be read through a helper that loads `.env` first or they are missing after restart.",
+        "Number keys 1-9 only choose an option; ⌘↵ carries out the chosen one. Option 1 is the recommendation and is pre-selected, so a '1' badge is redundant unless more options are shown.",
+        "The routine diagram's connector and node components are exported from `FlowGraph.tsx` and reused by `CaseFlow.tsx`, so the two views stay visually consistent.",
+        "Routines code calls Claude (`claude-opus-5-5`) with the key from `.env`, independent of `ASK_LLM_PROVIDER`."
+      ],
+      "code": [
+        {
+          "path": "web/src/components/CaseFlow.tsx",
+          "finding": "New 'How we got here' flow built from each case's own data (agent steps, evidence, prediction, approval rule, options); missing steps are omitted, never invented. Reuses the connector and box from FlowGraph.tsx. Full view is the default, with a compact 'Less' mode."
+        }
+      ],
+      "workflow": [
+        "The Entire hooks only checkpoint when repo files change; a session that only reads files logs 'no files modified, skipping checkpoint', which is not a failure.",
+        "Subagents worked well for bulk cross-checking (200 order confirmations plus 59 scans) and for drawing logo variants without touching the repo.",
+        "Experimental UI work goes on separate branches with desktop and phone screenshots before merging. A premature merge of the chat UI had to be undone because it misread what the team wanted.",
+        "Checking the interview notes and team memory before building would have avoided building the wrong Pulse feature (a chat instead of the flow view).",
+        "The user's deadline changed (12:00 to 12:45) without the assistant knowing, so deadline reminders were wrong for a while."
+      ]
+    },
+    "friction": [
+      "The portal token was empty at the start, which blocked any data work until the user supplied it.",
+      "The assistant misread what the team liked in Pulse and built a duplicate chat UI with mismatched colours, then had to revert the merge.",
+      "The first two-column snake layout of the case flow read right to left and confused the user; it was replaced by a single column.",
+      "The flow's compact and full views went through several iterations (phone empty gaps, 'Details' looking identical, page auto-scrolling on load) and an edit was interrupted mid-way, leaving unclear uncommitted state.",
+      "The top bar was crowded after adding the role chip and status; it needed a three-column grid and the heartbeat moved.",
+      "'Chase once if no answer' appeared to be broken but was only invalid for the routine kind; the menu offered it everywhere.",
+      "The 'Ask Maren to approve' button jumping could not be reproduced.",
+      "Whether portal data is identical across teams and whether sent emails create portal files is undocumented."
+    ],
+    "open_items": [
+      "`main` is about 19 commits ahead of origin and unpushed, and live was not restarted; it must be pushed before the hand-in at 12:45.",
+      "Show the '1' key badge only when more options are visible; this was in progress when the transcript ended.",
+      "The parked branch `jonas/pulse-ui` (Describe it chat) is not merged and is probably not wanted.",
+      "The Routines page is a long wall when there are many routines; the plan is a compact list with details on demand, a ⋯ menu and duplicate detection, to be done after the hand-in.",
+      "The 'send the email, then chase once if no answer' routine needs a follow-up watcher on the sent message.",
+      "Pick and apply a Lighthouse logo variant (the assistant prefers 3, the subagent 2) to the favicon, top bar and sign-in page.",
+      "Make 'N decisions' in the top bar open a bottom-sheet case list on phones (about 15 minutes, optional).",
+      "Send the Karton Nowak art-book order and the Boise terms reply, which require a registered sender address in the portal Settings and an inbox. The Nowak offer was valid for 24 hours.",
+      "The briefing page and doc still show the 14:00 state and do not include the 14:37 drop; the earlier Claude doc may need deleting.",
+      "Rotate the portal password, which was pasted into Discord.",
+      "Code in the case-flow branch was not tested in a browser by clicking 'Details'; the compact view was not re-screenshotted after the shorter connectors."
+    ]
+  }
+}
