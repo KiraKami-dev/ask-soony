@@ -28,7 +28,7 @@ COOKIE_DAYS = 30
 LOGIN_PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#fbfbfa"><title>Ask Soony</title>
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
 <link rel="stylesheet"
 href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap">
 <style>*{{box-sizing:border-box}}body{{margin:0;min-height:100vh;display:grid;place-items:center;
