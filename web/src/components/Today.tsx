@@ -154,7 +154,7 @@ export function Today(p: Props) {
   return (
     <div className="relative flex-1">
       <div className="mx-auto grid w-full max-w-[1440px] grid-cols-[240px_minmax(0,640px)] gap-x-16 px-12 pb-32 pt-24 xl:grid-cols-[300px_640px] xl:gap-x-[124px] xl:px-24">
-        <aside aria-label="Cases" className="space-y-10">
+        <aside aria-label="Cases" className="sticky top-6 -mx-4 max-h-[calc(100vh-48px)] space-y-10 self-start overflow-y-auto px-4 pb-6 [scrollbar-width:thin]">
           {p.order.length > 0 && <QuietList {...p} />}
           {groups}
           {!phone && <p className="t-small text-ink-3"><kbd>J</kbd> <kbd>K</kbd> move · <kbd>1</kbd>–<kbd>9</kbd> choose · <kbd>A</kbd> go</p>}
@@ -179,12 +179,20 @@ function QuietList({ order, card, onFocus, state, nowMs }: Props) {
     else seen.set(k, { c, n: 1 })
   }
   const rows = [...seen.values()]
-  const shown = rows.slice(0, 5)
+  // Five by default; all when asked, or when the case in focus sits further down (j/k, links).
+  const [all, setAll] = useState(false)
+  const focusAt = rows.findIndex((r) => r.c.id === card?.id || (card && r.c.group && r.c.group === card.group))
+  const open = all || focusAt >= 5
+  const shown = open ? rows : rows.slice(0, 5)
   const more = rows.slice(5).reduce((n, r) => n + r.n, 0)
+  const listRef = useRef<HTMLUListElement>(null)
+  useEffect(() => {
+    listRef.current?.querySelector('[aria-current="true"]')?.scrollIntoView({ block: 'nearest' })
+  }, [card?.id, open])
   return (
     <div>
       <p className="t-small mb-3 text-ink-3">Needs you · {plural(order.length, 'decision')}</p>
-      <ul className="-mx-3.5">
+      <ul ref={listRef} className="-mx-3.5">
         {shown.map(({ c, n }) => {
           const on = card?.id === c.id
           return (
@@ -209,7 +217,11 @@ function QuietList({ order, card, onFocus, state, nowMs }: Props) {
           )
         })}
       </ul>
-      {more > 0 && <p className="t-small mt-2 text-ink-3">+{more} more</p>}
+      {more > 0 && (
+        <button onClick={() => setAll(!open)} className="t-small mt-2 cursor-pointer text-ink-3 hover:text-ink">
+          {open ? 'Show fewer' : `+${more} more`}
+        </button>
+      )}
     </div>
   )
 }
