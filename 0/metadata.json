@@ -1,0 +1,172 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M80QN5W0X5MZ2T38TKJC9EC4",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T04:19:18.732019Z",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "1d2fcc10601b",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 11,
+    "cache_creation_tokens": 6169,
+    "cache_read_tokens": 4779619,
+    "output_tokens": 3883,
+    "api_call_count": 5
+  },
+  "session_token_usage": {
+    "input_tokens": 2184,
+    "cache_creation_tokens": 2406898,
+    "cache_read_tokens": 510524097,
+    "output_tokens": 927706,
+    "api_call_count": 932,
+    "subagent_tokens": {
+      "input_tokens": 1564,
+      "cache_creation_tokens": 3958340,
+      "cache_read_tokens": 103487738,
+      "output_tokens": 1054338,
+      "api_call_count": 743
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 1486,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 66,
+      "credentialed_uri": 0,
+      "entropy": 437,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 959,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 862,
+      "IP": 32,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 207
+  },
+  "summary": {
+    "intent": "Win the Lio 'Keep the Line Running' hackathon challenge for Soony: analyze the confidential supplier/ERP data, find launch-critical contradictions, and build a generic agent product that rechecks on every portal drop and acts (emails suppliers, asks for approval) with a calm phone-first UI.",
+    "outcome": "Found that the Collector's Edition (and later game cards for Standard) miss the Sunday launch despite a plan saying 'ok'. Built a polling/versioned pipeline, verifier fix (game cards 34,800 -> 6,800 short), calm Today flow with email review, routines with a When/Then/Always diagram, and a two-step voice decision. Pushed everything to `jonas/today-flow`, with the latest restyle and suggestions endpoint committed locally.",
+    "learnings": {
+      "repo": [
+        "Portal API has only three endpoints (files list, single file, archive.zip) and no webhooks. Change detection must poll and compare SHA-256, because files are replaced under the same name and formats may change.",
+        "Confidential portal data lives in the gitignored `data/` folder; `.env` is ignored and `.env.example` is committed. Nothing from the data should be hardcoded or committed.",
+        "Team workflow requires CLAUDE.md/PROGRESS.md claims, Entire enabled, and Brain connected before pushing. Entire only writes checkpoints when repo files change.",
+        "The image recognizer put the part number in the `item` field with an empty `material_id`, so the shortfall linker needed a part-number fallback when mapping doc lines.",
+        "Legacy routines written as code have no recipe, so they cannot render a diagram. New routines are recipes and default to 'ask' mode.",
+        "Email sends cannot be undone. The UI now shows an email review dialog first, and Undo is kept only for internal steps."
+      ],
+      "code": [
+        {
+          "path": "src/ask_soony/verifier/impact/shortfall.py",
+          "finding": "Each part carries `arriving` and `not_counted` lists. gap = needed - usable - arriving. Inbound counts only if ETA is on or before launch, it is not cancelled or arrived, it has no receipt in the ETD to stock-date window, and the supplier document doesn't say less. Unread shipping docs are not counted (conservative)."
+        },
+        {
+          "path": "web/src/components/routines/FlowGraph.tsx",
+          "finding": "The wide view was rewritten into When/Then/Always lanes that wrap. The narrow vertical view stays for the panel and phone."
+        },
+        {
+          "path": "web/src/components/Today.tsx",
+          "finding": "Holds the Focus decision view with email review before send, source sheet, voice prepare/decide guard, and inline automation proposals."
+        }
+      ],
+      "workflow": [
+        "Run one-off analysis in the main session and use subagents for bulk cross-checks (200 order confirmations, 59 scans). Give a single builder the whole front end to avoid edit conflicts.",
+        "Verify UI changes on real data by viewing only, and use Playwright with mocked POSTs so no real supplier email goes out.",
+        "Ask before any paid API call (the one OpenAI reading, a fraction of a cent) and before pushing branches.",
+        "Portal data is unannounced and changes: five new files arrived within 37 minutes, so recheck regularly."
+      ]
+    },
+    "friction": [
+      "Portal token was empty at first, which blocked data access (401) until the user supplied it.",
+      "Voice agent said it would outline the decision but then just said 'done', which led to the two-step prepare/decide token flow.",
+      "The dashboard kept showing 34,800 game cards short locally until a shipping-advice reading existed; the first fix wasn't enough without the linker fallback.",
+      "The Today screen briefly attributed the Standard stop to the wrong card (Sat 22:00), requiring an attribution fix.",
+      "Undo was shown for sent emails, and routine views (Flow/Steps/Expand) were redundant.",
+      "Legacy code-only routines failed and showed no diagram, so they were backed up and removed.",
+      "A mid-session rebuild was blocked until another builder's files compiled again.",
+      "`.vite/` cache folder appeared in the repo root and was left out of the commit."
+    ],
+    "open_items": [
+      "Push the latest commits (restyle, suggestions endpoint, silent-shipment ring pulse) to `jonas/today-flow`; PR #5 still holds the older state and a merge into `main` is undecided.",
+      "Make Plan a pure overview that opens Today for decisions, and offer automation after the second similar decision (endpoint added, UI pending).",
+      "Voice flow is untested end to end (no mic), and an email edited on screen then confirmed by voice sends the original draft.",
+      "On phone, an Approve with no cost sends a real supplier email immediately.",
+      "Hand-in by 12:00: README section, demo script, 3-minute video and deck.",
+      "Send the Karton Nowak order (offer valid 24 h) and reply to Boise; register sender emails in the portal.",
+      "The 'runs dry' time still ignores arrivals, and `impact/__main__.py` doesn't print the arriving list (note left for Farhan).",
+      "Codex hooks need approval in `/hooks`; delete the portal-data snapshot `data/state.json` after the hack.",
+      "The portal login password was shared in Discord and should be changed after the hack."
+    ]
+  }
+}
