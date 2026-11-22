@@ -10,6 +10,8 @@ interface Props {
   card: Card
   nowMs: number
   isNew?: boolean
+  /** Opened from the deep link (/d/<id>): whoever it is routed to can act on it here. */
+  direct?: boolean
   offer?: Offer | null
   onOffer: (o: Offer | null) => void
   onChanged: () => void
@@ -18,9 +20,9 @@ interface Props {
 }
 
 // A person's first name; a role ('Head of Procurement', 'DC site lead') stays whole.
-const first = (s?: string) => (!s ? '' : /\s[a-z]/.test(s) ? s : s.split(' ')[0])
+const first = (s?: string) => (!s ? '' : /\s[a-z]/.test(s) ? s : (s.split(' ').find((w) => !w.endsWith('.')) ?? s))
 
-export function DecisionCard({ card, nowMs, isNew, offer, onOffer, onChanged, onHover, onDrawer }: Props) {
+export function DecisionCard({ card, nowMs, isNew, direct, offer, onOffer, onChanged, onHover, onDrawer }: Props) {
   const [sel, setSel] = useState(0)
   const [mode, setMode] = useState<'idle' | 'edit' | 'escalate'>('idle')
   const [text, setText] = useState('')
@@ -98,7 +100,7 @@ export function DecisionCard({ card, nowMs, isNew, offer, onOffer, onChanged, on
         </div>
       )}
 
-      {!other && !decided && opt && (
+      {(!other || direct) && !decided && opt && (
         <>
           <div className="mt-4 rounded-xl border-2 p-4" style={{ borderColor: `${color}55`, background: `${color}0d` }}>
             <div className="text-xs font-bold uppercase tracking-wide" style={{ color }}>
