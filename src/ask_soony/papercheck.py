@@ -44,7 +44,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Callable
 
-from ask_soony import anchors, api
+from ask_soony import anchors, api, columns
 
 VERSION = "papercheck-1"
 ORIGIN = "papercheck"
@@ -203,6 +203,9 @@ class Erp:
     components: dict[str, dict] = field(default_factory=dict)
     shipments: list[dict] = field(default_factory=list)
     suppliers: dict[str, dict] = field(default_factory=dict)  # id -> {dir, profile, parts}
+    # PO line values a newer export changed: {po, line, material, field, old, new, files}
+    revisions: list[dict] = field(default_factory=list)
+    schedules: list[dict] = field(default_factory=list)  # supplier CSVs of confirmed dates
     snapshot: str = ""
     site: str = "our distribution center"  # where parts are delivered, from sites.csv
 
@@ -295,7 +298,13 @@ class Erp:
 
 def is_open(po_row: dict) -> bool:
     status = str(po_row.get("status") or "").lower()
-    return status not in ("delivered", "cancelled", "canceled", "closed", "completed")
+    if status in ("delivered", "cancelled", "canceled", "closed", "completed"):
+        return False
+    q = qty(po_row.get("quantity"))
+    if q is not None and q <= 0:  # a reversal or deletion line has nothing to deliver
+        return False
+    # Exports with status codes (SAP) say it with a delivery date instead.
+    return not (po_row.get("delivered_date") and not status.startswith(("open", "partial")))
 
 
 # What the readers did with each file on the last load: {path: {"read": bool, "wanted": [...]}}.
@@ -303,12 +312,26 @@ def is_open(po_row: dict) -> bool:
 READS: dict[str, dict] = {}
 
 
-def _csv_rows(root: Path, folder: str, pattern: str, need: tuple[str, ...]) -> list[dict]:
-    """Rows of every CSV in folder matching pattern whose header has all `need` columns."""
+def _csv_rows(
+    root: Path, folder: str, pattern: str, need: tuple[str, ...], kind: str | None = None
+) -> list[dict]:
+    """
+    Rows of every CSV in folder matching pattern whose header has all `need` columns, with
+    canonical column names added (columns.py). With `kind`, a CSV under another name is read
+    too when its mapped columns make it that kind of file (a German PO export, say).
+    """
     out: list[dict] = []
     base = root / folder
-    for f in sorted(base.glob(pattern)) if base.is_dir() else []:
-        rows = api.read_csv(f)
+    files = sorted(base.glob(pattern)) if base.is_dir() and pattern else []
+    if kind and base.is_dir():
+        mode = columns.model_mode()
+        files += [
+            f
+            for f in sorted(base.rglob("*.csv"))
+            if f not in files and columns.read(f, mode)[1].kind == kind
+        ]
+    for f in files:
+        rows, mapping = columns.read(f, columns.model_mode())
         seen = READS.setdefault(str(f.relative_to(root)), {"read": False, "wanted": []})
         if rows and pattern != "*.csv" and not all(c in rows[0] for c in need):
             seen["wanted"].append(
@@ -316,6 +339,12 @@ def _csv_rows(root: Path, folder: str, pattern: str, need: tuple[str, ...]) -> l
             )
         if rows and all(c in rows[0] for c in need):
             seen["read"] = True
+            if mapping.needed:
+                seen["mapped"] = {
+                    "kind": mapping.kind,
+                    "renamed": mapping.renamed,
+                    "model": list(mapping.model),
+                }
             out += [
                 {**r, "_file": str(f.relative_to(root)), "_row": i + 1} for i, r in enumerate(rows)
             ]
@@ -346,13 +375,87 @@ def launch_time(root: Path) -> datetime:
     return datetime(day.year, day.month, day.day, 23, 59, tzinfo=api.tz())
 
 
+def _newness(root: Path, rel: str) -> tuple:
+    """When a file arrived in the mirror, then the date in its name: later is newer."""
+    try:
+        mtime = (root / rel).stat().st_mtime
+    except OSError:
+        mtime = 0.0
+    named = max(iso_dates(Path(rel).stem.replace("_", " ")) or [""])
+    return (mtime, named, rel)
+
+
+REVISED_FIELDS = ("material_id", "quantity", "unit_price", "promised_date", "status")
+
+
+def merge_pos(root: Path, rows: list[dict]) -> tuple[list[dict], list[dict]]:
+    """
+    One row per PO line across all PO exports. When two files carry the same line, the newer
+    file's values win (blank values do not erase older ones), and every value it changed is
+    kept as a revision on the row (`_revised`) and in the returned list, so a moved date is
+    evidence, not a silent overwrite.
+    """
+    for r in rows:
+        if not r.get("promised_date") and r.get("confirmed_date"):
+            r["promised_date"] = r["confirmed_date"]
+    ordered = sorted(rows, key=lambda r: _newness(root, r["_file"]))
+    out: list[dict] = []
+    where: dict[tuple, int] = {}
+    revisions: list[dict] = []
+    for r in ordered:
+        k = (r.get("po_number"), str(r.get("po_line") or ""))
+        i = where.get(k)
+        if i is None or out[i]["_file"] == r["_file"]:
+            where[k] = len(out)
+            out.append(r)
+            continue
+        old = out[i]
+        changes = []
+        for f in REVISED_FIELDS:
+            a, b = str(old.get(f) or "").strip(), str(r.get(f) or "").strip()
+            same = a == b or (qty(a) is not None and qty(a) == qty(b))
+            if a and b and not same:
+                changes.append(
+                    {
+                        "po": k[0],
+                        "line": k[1],
+                        "material": r.get("material_id") or old.get("material_id"),
+                        "field": f,
+                        "old": a,
+                        "new": b,
+                        "old_file": old["_file"],
+                        "new_file": r["_file"],
+                        "note": str(r.get("note") or "").strip(),
+                    }
+                )
+        merged = {**old, **{c: v for c, v in r.items() if v not in (None, "")}}
+        merged["_revised"] = (old.get("_revised") or []) + changes
+        merged["_previous_file"] = old["_file"]
+        out[i] = merged
+        revisions += changes
+    return out, revisions
+
+
+def load_schedules(root: Path) -> list[dict]:
+    """Supplier CSVs that restate confirmed dates per PO line (recognised by their columns)."""
+    return _csv_rows(
+        root, "suppliers", "", ("po_number", "material_id", "confirmed_date"), "confirmed_schedule"
+    )
+
+
 def load_erp(root: Path) -> Erp:
     erp = Erp(root=root, launch_at=launch_time(root))
-    erp.pos = _csv_rows(root, "soony/erp", "purchase_order*.csv", ("po_number", "material_id"))
-    erp.grs = _csv_rows(root, "soony/erp", "goods_receipt*.csv", ("gr_number", "material_id"))
-    erp.stock = _csv_rows(root, "soony/erp", "stock*.csv", ("material_id", "quantity"))
+    pos = _csv_rows(
+        root, "soony/erp", "purchase_order*.csv", ("po_number", "material_id"), "purchase_orders"
+    )
+    erp.pos, erp.revisions = merge_pos(root, pos)
+    erp.schedules = load_schedules(root)
+    erp.grs = _csv_rows(
+        root, "soony/erp", "goods_receipt*.csv", ("gr_number", "material_id"), "goods_receipts"
+    )
+    erp.stock = _csv_rows(root, "soony/erp", "stock*.csv", ("material_id", "quantity"), "stock")
     erp.packout = _csv_rows(root, "soony/erp", "packout*.csv", ("product_id", "units_packed"))
-    erp.shipments = _csv_rows(root, "soony/erp", "*shipment*.csv", ("shipment_id",))
+    erp.shipments = _csv_rows(root, "soony/erp", "*shipment*.csv", ("shipment_id",), "shipments")
     erp.bom = _csv_rows(root, "soony/master", "bom*.csv", ("parent_id", "child_id", "qty_per"))
     erp.ecns = _csv_rows(root, "soony/master", "*.csv", ("child_id", "rev_old", "rev_new"))
     erp.products = _csv_rows(root, "soony/master", "products*.csv", ("product_id",))
@@ -891,6 +994,47 @@ def claims(erp: Erp, llm: Llm | None = None) -> list[Doc]:
             for key, out in pool.map(one, list(by_key)):
                 for d in by_key[key][1] if out else []:
                     apply_llm(d, out, erp, parts, key.startswith("vision"))
+    return docs + [d for d in schedule_docs(erp) if d.pos]  # tables need no model reading
+
+
+def schedule_docs(erp: Erp) -> list[Doc]:
+    """
+    A supplier's spreadsheet of confirmed dates (a revised schedule) as a document: one line per
+    row, so the rules hold each confirmed date against the PO line like any confirmation.
+    """
+    by_file: dict[str, list[dict]] = {}
+    for r in erp.schedules:
+        by_file.setdefault(r["_file"], []).append(r)
+    docs = []
+    for rel, rows in by_file.items():
+        raw = api.read_csv(erp.root / rel)  # the row as the supplier wrote it, for the quote
+        pages, lines = [], []
+        for r in rows:
+            po, mat = r.get("po_number"), r.get("material_id")
+            orig = raw[r["_row"] - 1] if r["_row"] <= len(raw) else {}
+            quote = " · ".join(str(v).strip() for k, v in orig.items() if k and v)
+            pages.append((r["_row"], quote))
+            if po not in erp.po_numbers:
+                continue
+            lines.append(
+                {
+                    "po": po,
+                    "item": r.get("po_line"),
+                    "part": mat,
+                    "material": mat,
+                    "confirmed": qty(r.get("quantity")),
+                    "confirmed_date": r.get("confirmed_date") or None,
+                    "previous_date": r.get("previous_date") or None,
+                    "quote": quote,
+                    "page": r["_row"],
+                }
+            )
+        d = Doc(rel, pages, "table", type="revised_schedule")
+        d.supplier = erp.supplier_of_doc(rel)
+        d.language = language(" ".join(t for _, t in pages))
+        d.pos = sorted({ln["po"] for ln in lines})
+        d.lines = lines
+        docs.append(d)
     return docs
 
 
@@ -931,7 +1075,7 @@ class Hit:
 
 def _po_side(rows: list[dict], value: str) -> dict:
     r = rows[0]
-    return {
+    side = {
         "source": "System says · SAP purchase order",
         "value": value,
         "doc": r["_file"],
@@ -942,6 +1086,13 @@ def _po_side(rows: list[dict], value: str) -> dict:
         ),
         "row": r.get("_row"),
     }
+    revised = [c for x in rows for c in x.get("_revised") or []]
+    if revised:  # a newer export changed the line: show what it said before
+        side["revised"] = revised
+        side["quote"] += " ; revised: " + " ; ".join(
+            f"{c['field']} {c['old']} → {c['new']} ({Path(c['new_file']).name})" for c in revised
+        )
+    return side
 
 
 def _doc_side(doc: Doc, label: str, value: str, quote: str, page: int, translation=None) -> dict:
@@ -2078,6 +2229,15 @@ def run(write: bool = True, llm: bool | None = None, verbose: bool = True) -> li
             "papercheck_reads.json", {**ever, **{r: True for r, v in READS.items() if v["read"]}}
         )
     _OFFERS.pop(str(root), None)
+    if verbose and erp.revisions:
+        moved = [c for c in erp.revisions if c["field"] == "promised_date"]
+        late = [c for c in moved if c["old"][:10] <= erp.launch_at.date().isoformat() < c["new"]]
+        log(
+            f"newer PO export changed {len(erp.revisions)} values on "
+            f"{len({(c['po'], c['line']) for c in erp.revisions})} PO lines "
+            f"({len(moved)} promised dates, {len(late)} of them moved past launch); "
+            "the newer values are used, the old ones kept as evidence"
+        )
     model = make_llm(llm)
     cards, docs = build(erp, model, cur)
     if write:

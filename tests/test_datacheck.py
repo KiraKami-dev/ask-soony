@@ -15,7 +15,8 @@ def test_renamed_column_is_reported_not_skipped_silently(tmp_path, monkeypatch):
     monkeypatch.setattr(api, "state_dir", lambda: tmp_path)
     root = _portal(tmp_path, "po_number,material_id")
     assert datacheck.check(root)["issues"] == []  # read fine
-    (root / "soony/erp/purchase_orders.csv").write_text("po_number,material\nPO-1,M-1\n")
+    # A rename the column mapping does not know either ("material" alone would be mapped).
+    (root / "soony/erp/purchase_orders.csv").write_text("po_number,mat_xyz\nPO-1,M-1\n")
     issues = datacheck.check(root)["issues"]
     assert [(i["kind"], i["missing"]) for i in issues] == [("not_read", ["material_id"])]
     assert json.loads((tmp_path / datacheck.STATE).read_text())["issues"] == issues

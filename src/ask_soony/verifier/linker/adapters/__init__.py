@@ -49,6 +49,7 @@ ADAPTERS = {
     "inspection_report": documents.inspection_report,
     "purchase_orders": sap.purchase_orders,
     "purchase_orders_sap": sap.purchase_orders_sap,
+    "purchase_orders_mapped": sap.purchase_orders_mapped,
     "goods_receipts": sap.goods_receipts,
     "stock": sap.stock,
     "shipments": logistics.shipments,
