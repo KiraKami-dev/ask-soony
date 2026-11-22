@@ -157,7 +157,14 @@ def sync(days: int = 3) -> list[dict]:
             except Exception:
                 pass
         if new:
-            api.write_json("actions.json", actions)
+            # Re-read and append under the app's lock: the IMAP fetch above takes seconds, and an
+            # approval recorded meanwhile must not be overwritten by our older copy.
+            with api._lock:
+                fresh = api.read_list("actions.json")
+                known = {a.get("message_id") for a in fresh if a.get("message_id")}
+                api.write_json(
+                    "actions.json", fresh + [r for r in new if r["message_id"] not in known]
+                )
     return new
 
 

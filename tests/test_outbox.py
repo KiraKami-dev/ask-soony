@@ -53,3 +53,27 @@ def test_second_send_is_held_until_forced(agent_env):
     assert held.status_code == 409 and agent_env["sent"] == []
     ok = client.post("/api/cards/gap-X/approve", json={"option": 0, "force": True})
     assert ok.status_code == 200 and len(agent_env["sent"]) == 1
+
+
+def test_sync_does_not_overwrite_actions_written_meanwhile(agent_env, monkeypatch):
+    """The IMAP fetch takes time; an approval recorded during it must survive the sync."""
+    from ask_soony import api, outbox
+
+    api.write_json("actions.json", [])
+
+    def slow_sent_folder(box):
+        api.write_json("actions.json", [{"id": "meanwhile", "decision_id": "gap-X"}])
+        return None  # no Sent folder: sync records nothing
+
+    class Box:
+        def __init__(self, *a, **k): ...
+        def login(self, *a): ...
+        def logout(self): ...
+
+    monkeypatch.setenv("ASK_IMAP_HOST", "imap.example.com")
+    monkeypatch.setenv("ASK_MAIL_ADDRESS", "user@example.com")
+    monkeypatch.setenv("ASK_MAIL_PASSWORD", "x")
+    monkeypatch.setattr(outbox.imaplib, "IMAP4_SSL", Box)
+    monkeypatch.setattr(outbox, "_sent_folder", slow_sent_folder)
+    outbox.sync()
+    assert [a["id"] for a in api.read_list("actions.json")] == ["meanwhile"]
