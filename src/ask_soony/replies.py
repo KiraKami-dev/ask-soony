@@ -258,7 +258,9 @@ def check_once() -> list[dict]:
                     )
                     api.write_json("actions.json", actions)
                     sts = api.read_json("decision_status.json", {})
-                    entry = sts.get(card_id) or {"status": "sent", "at": at}
+                    # A reply to a side email (a status question, a follow-up) adds to the card; it
+                    # does not decide it. Only a card that was decided keeps its decided status.
+                    entry = sts.get(card_id) or {"status": "open", "at": at}
                     entry.update(
                         note=f"{who} replied: {summary}",
                         reply=summary,
