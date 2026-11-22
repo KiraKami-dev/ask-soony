@@ -1,0 +1,178 @@
+<task-notification>
+<task-id>a0c1f85d173234107</task-id>
+<tool-use-id>toolu_01WnKQygDjAGukUfVJGebR9C</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a0c1f85d173234107.output</output-file>
+<status>completed</status>
+<summary>Agent "Routines UI: new nodes, trust, proposals" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>All six parts of the routines UI are built against the contract, nothing is committed or pushed, and the type check and `npm run build` both pass. All screenshots use mocked routines endpoints, since the backend may not be live yet, and the mocks answered every write (Do it, Skip, Undo, mode, toggle), so nothing real was sent. `npm run build` rewrote `web/dist`, which is what the live app on :8000 serves, so the new UI is already showing there.
+
+**What changed**
+1. **Flow and steps views:** the trigger node shows the three new trigger texts. Conditions on the new fields read in plain words ("No answer for more than 2 h", "Less than 6 h before the deadline", "The supplier has not answered yet"); a field name never shows. The new steps have their own icons: chase (MailWarning), call (Phone) and ask status (PackageSearch). A call step is purple and marked "Rings a person". The palette gains "Chase once if no answer", "Call me" and "Ask for a status". Changes still go through review before they apply.
+2. **Trust selector:** each routine has "Ask me · Do it and tell me · Do it quietly" next to the existing on/off switch, with your three explanation lines as tooltips and as a caption under the control. A change shows straight away and goes back if the server refuses it; a 404 says trust levels are not available yet.
+3. **Proposals:** "Waiting for your OK · N" sits at the top of the Routines sheet. Each one shows the routine name, what it would do, the card or shipment and the preview text, with Do it and Skip. The selected card's pane shows "Your routine ‘…’ suggests: …". The Routines button badge now counts proposals plus voice drafts.
+4. **Undo:** it appears in the "Handled for you" rows and in the pane when a routine handled the card. If the server says no, its reason replaces the button ("The email already went out. Send a correction instead?"). The list and the pane share the result.
+5. **Would handle:** the pane shows a quiet chip, "Your routine ‘…’ would handle this", with "Turn it on" (switches it on in tell mode) and "Let it ask me first" (ask mode).
+6. **Replies:** the pane shows a line such as "Hwaseong Memory confirms 20,000 Game Card 128 GB on Tue 24 Nov", with "· after launch" in red only when `reply_after_launch` is true.
+
+App.tsx and the other files on your do-not-touch list are unchanged. The new pieces are in `web/src/components/routines/`: `live.ts` (one shared store for proposals, would-handle and undo results), `Proposals.tsx`, `PaneHints.tsx` and `Undo.tsx`. Proposals and would-handle refresh whenever the app reloads its state (every 5 s), at most every 4 s, plus after each action; a missing endpoint simply counts as empty.
+
+**For the lead and the backend**
+- **Undo id:** the UI reads the action id from `action_id` on the activity item, falling back to `id`. Please confirm the field name; without either, Undo stays hidden.
+- **Recipe text:** conditions and steps use the recipe's `text` when it is set; the plain-word fallback only covers the new fields.
+- **Would-handle shape:** I expect `{card_id: [...]}` at the top level, with no wrapper object.
+- **Undo in the list:** DecisionList has no refresh hook, so after an undo there the list waits for the app's next 5 s refresh; it shows "Undone" straight away. Passing an `onChanged` from App would make it instant, but I left App alone.
+- **Working tree:** `src/ask_soony/cardtools.py` and `routines.py` show as modified. Those are the backend engineer's changes, not mine.
+
+**Screenshots** in `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/routines-more/` (the mock script is `shoot.py` in the same folder):
+- At 1440 wide:
+  - `wide-1-pane-proposal-reply.png`
+  - `wide-2-pane-would-handle.png`
+  - `wide-3-handled-undo.png`
+  - `wide-4-sheet.png`
+  - `wide-5-sheet-steps.png`
+  - `wide-6-expanded-flow.png`
+- At 390 wide:
+  - `phone-1-pane.png`
+  - `phone-2-sheet.png`
+  - `phone-3-sheet-routine.png`</result>
+<usage><subagent_tokens>186149</subagent_tokens><tool_uses>47</tool_uses><duration_ms>444074</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>a32203f8012f007ef</task-id>
+<tool-use-id>toolu_01K6kKvazEdV4PuDAKUWmTxH</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a32203f8012f007ef.output</output-file>
+<status>completed</status>
+<summary>Agent "Critique identity and build alternative" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I've built all six screens and a shorter page B. Everything renders in headless Chrome with no sideways scrolling, and none of the files contain em dashes.
+
+**Critique of A, bluntly**
+- It reads as a style sheet, not a product. Loose specimen cards in the stock Inter, blue and purple look, rounded 14 px corners everywhere.
+- The icons are Unicode glyphs (◷ ⌕ ➤ ⚿): toy-like, and they render differently per font.
+- The timeline is broken. "Trucks 20:00" and "Too late" print on top of each other, and the SVG text stretches when the width changes.
+- It breaks its own rules: Collector's and "now" are drawn in the action blue, and a list headline contains a purchase order number.
+- The clock doesn't add up: "6 h 12 min" until the trucks means it is 13:48, yet the same page says "decide by 10:00, in 3 h 40 min".
+- On a projector, amber and red merge, the 55% highlighter fades away, and the 11 to 12 px grey captions are unreadable.
+- The two USPs are not visible. Sources sit behind a small "cite" and there is no automation story at all.
+
+**The three desktop directions (01a, 01b, 01c)**
+All three use the same content and layout:
+- **01a Precise instrument:** Geist with Geist Mono numbers, cool graphite neutrals, 4 px corners, compact 13 px text. Engineered and Linear-like.
+- **01b Calm operations:** Instrument Sans with IBM Plex Mono, soft warm-grey ground, larger 15 px text, 14 px corners, one confident blue. Built for a stressed buyer and the back row.
+- **01c High-contrast signal:** Archivo with condensed heavy numbers and JetBrains Mono, stark black and white, square corners, black rules. Loudest on a projector, but it feels the least like a calm tool.
+
+**What changed in the new screens**
+- **Grounding:** every figure carries a numbered highlighter marker that matches a numbered source list. The decision puts SAP and the shipping advice side by side, each with its crop (the highlighted SAP row, and the Korean text with highlights plus a translation). The headline number is 20,000 late.
+- **Automation:** a green routine strip ("handled 3 of 4 PackRight confirmations overnight, learned from your decision Sat 18:12, 3 of 7 cases by routine"), a "Handled for you · 3 by routine" list section, and the routine offer after you approve. Money always ends in "You decide".
+- **Calm and consistent:** red appears only on the 17:00 stop and the late cards. The header now reads "Standard runs out of game cards at 17:00 today. Two decisions by 10:00 fix that."
+- **Fixes:** I moved the clock to 06:20 and set the art books to "by 10:00" so the numbers agree.
+- **Invented for illustration:** the Korean balance line in the crop, the three PackRight orders, and the times on the agent trail.
+
+**Recommendation:** use 01b for the demo. It is the most legible on a projector and reads as a funded tool rather than a showpiece. I built 02 to 04 and page B in it; 01c is the fallback if the jury room is very bright.
+
+Everything is in `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/brand/`; renders of every screen are in the `shots/` subfolder.
+- screens/01a-launch-desktop.html
+- screens/01b-launch-desktop.html
+- screens/01c-launch-desktop.html
+- screens/02-decision-phone.html
+- screens/03-routine-flow.html
+- screens/04-after-approve.html
+- ask-soony-identity-b.html
+- gen/build.py (generates all of the above)</result>
+<usage><subagent_tokens>196718</subagent_tokens><tool_uses>30</tool_uses><duration_ms>909307</duration_ms></usage>
+</task-notification>
+
+---
+
+"https://claude.ai/artifact/SdNAvJpZdm7opuvVYCxhqP" they all look way way way too cluttered
+
+---
+
+this is not good ui / ux, is it?
+
+---
+
+not sth you would like to use on Sunday? (like really good ux)
+
+---
+
+<task-notification>
+<task-id>a51aefaa4eabb7adf</task-id>
+<tool-use-id>toolu_01HFMg9UDGNx9HxkEvutoQVQ</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a51aefaa4eabb7adf.output</output-file>
+<status>completed</status>
+<summary>Agent "Routines backend: time, replies, trust, undo" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>The routines engine can now chase suppliers, call people, watch silent shipments and react to replies. It has the three trust modes and undo, and the API contract is implemented as specified. `uv run pytest -q` passes (214 tests, 20 of them new in `tests/test_routines_more.py`) and ruff is clean. Nothing is committed or pushed, and I only touched `routines.py`, `replies.py`, `cardtools.py` and the new test file.
+
+**Contract as built**
+1. **Recipe:**
+   - `"on"` takes `decisions` (default), `waiting` or `shipments`.
+   - New conditions:
+     - `hours_left`, `waiting_hours` and `silent_hours` take `lt`/`gt` and are stored as numbers.
+     - `has_reply` and `reply_after_launch` take `is` with `yes`/`no`.
+   - New steps:
+     - `chase` sends one follow-up in the same thread, with a default message using `{headline}`/`{supplier}`.
+     - `call` phones a person.
+     - `ask_status` emails the supplier contact in the shipment's profile.
+   - Every step keeps its `id` and `text`.
+   - `clean_spec` refuses combinations that make no sense with a plain reason, for example a chase on open decisions, `silent_hours` outside shipments, or a non-number for an hours field. The editor agent's repair round uses that reason.
+   - `SPEC_HELP` and both prompts now carry your three examples in buyer language.
+2. **Building blocks:** `waiting_cards`, `silent_shipments`, `chase`, `call` and `ask_status` exist in the sandbox. `open_cards()` gains `hours_left`, `has_reply` and `reply_after_launch`. Dry runs only record.
+3. **Trust modes:**
+   - `ask` turns carry_out, chase, ask_status and call into pending proposals in `routine_proposals.json`, without duplicates.
+   - `tell` acts and pushes one line per action.
+   - `quiet` acts and only logs.
+   - Accept runs the step through the same code as a real run, exactly once. If it fails, the proposal stays pending.
+   - The new routes are the proposals list (pending first), accept, skip, and `POST /api/routines/{id}/mode`, which returns 400 for an unknown mode.
+4. **Undo:**
+   - An approval or note without an email goes back to open: its `decision_status` entry is removed and an `undo` action is added.
+   - Emails, chases and status questions return "The email already went out. Send a correction instead?"
+   - Calls return "The call already happened."
+   - Chase, ask_status and call are now recorded in `actions.json` with an `id` and `via: "routine: &lt;name&gt;"`.
+5. **Would handle:** `GET /api/routines/would-handle` dry-runs routines that are off or in ask mode against one shared state, cached for 30 seconds. The cache is cleared on save, mode change, accept and undo.
+6. **Replies:**
+   - `summarise()` keeps its signature, so the existing test still works.
+   - Summary and facts now come from one cached model call.
+   - `reply_date`, `reply_quantity`, `reply_after_launch` and `reply_confirms` are stored on the `decision_status` entry.
+   - "After launch" is decided by comparing the date with `state["clock"]["launch"]`; the model's own yes/no is only used when there is no usable date.
+   - When the date is after launch, it pushes "Supplier confirms after launch: &lt;headline&gt;".
+7. **Time triggers:** they run in the existing `run_enabled` loop. With `repeat_hours`, the repeat key is based on hours since the email was sent (or hours of silence for shipments).
+
+**Calls:** a call raises a critical alert through `AlertBook.raise_alert` and dials with `make_caller(ASK_CALL_PROVIDER)`, so nothing is dialled in dry_run. It is logged as a `channel: "call"` action, which fills the card's `called_at`. The money/plan guard does not apply to calls.
+
+**Additions beyond the contract (all additive)**
+- **Fourth trigger, `"on": "replies"`**, with a sandbox block `replied_cards()`. A card with a supplier reply is neither open nor waiting, so without it nothing could react to `reply_after_launch`.
+- **Per-step `"when"`.** This is what makes "chase at 2 hours, call at 4 hours" one routine.
+- **More step options:**
+  - `call` takes `"who": "me" | "responsible"` (default responsible). It is passed as a third, optional argument, `call(text, card_id, who)`.
+  - `repeat_hours` also works on notify, call and ask_status.
+  - Templates can also use `{shipment}` and `{eta}`.
+- **Extra keys in the sandbox data:**
+  - `open_cards`: `status`, `reply`, `reply_date`, `reply_quantity`.
+  - `waiting_cards`: the full card view plus `waiting_hours` and `chases`.
+  - `silent_shipments`: `shipment_id`, `headline`, `kind`, `silent`, `status`, `mode`, `updated_at`.
+- **Extra keys in run records and routes:**
+  - Run records carry `mode`; their `did` entries carry `action_id`, `preview` on dry runs and `proposed` in ask mode.
+  - Proposals gain `done_at`, `result`, `error` and `skipped_at`.
+  - Undo also returns `card_id` and `action`, and can refuse with "Already undone.", "Something newer happened on this decision since." or "A supplier's reply cannot be undone."
+- **Extra `decision_status` fields:** a chase sets `chased_at` and `chases`.
+- **Other behaviour:**
+  - An ask-mode proposal also pushes "Routine asks: …".
+  - `GET /api/routines`, toggle and mode always return `mode`, defaulting to "tell". Saving a new version of a routine keeps its mode.
+- **Reusable helpers:**
+  - `cardtools.send_followup(to, subject, body, in_reply_to, references)` sets "Re:", In-Reply-To and References, sends only to supplier addresses from the profiles, and uses `_send_mail_in_thread`, which tests replace with a fake.
+  - `routines.supplier_email(supplier_id)` reads a supplier's address from its profile.
+
+**Behaviour to know**
+- `silent_hours` is measured against the newest update of any shipment, the same way `api.py` measures silence. If the whole feed stops at once, every shipment reads as 0 hours silent.
+- A shipments routine without a `silent_hours` condition only acts on shipments past the `ASK_SILENT_HOURS` limit.
+- A status-question email has no decision attached, so a supplier's answer to it will not show up on a card.
+
+The tests cover each new step, field and trigger; ask mode creating a proposal that accept carries out once; skip; quiet mode; the mode route; undo restoring a card and refusing for email and calls; would-handle; and reply facts with the after-launch push. No real email or call happens in them.</result>
+<usage><subagent_tokens>199618</subagent_tokens><tool_uses>36</tool_uses><duration_ms>630214</duration_ms></usage>
+</task-notification>
