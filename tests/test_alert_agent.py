@@ -3,7 +3,7 @@
 import json
 from email.message import EmailMessage
 
-from conftest import SUPPLIER
+from conftest import SUPPLIER, voice_decide
 
 
 def _status(agent_env) -> dict:
@@ -25,22 +25,29 @@ def test_approve_without_a_supplier_address_only_records(agent_env):
     assert _status(agent_env)["status"] == "approved"
 
 
-def test_voice_approves_only_after_a_yes_and_like_the_button(agent_env):
+def test_voice_approves_only_after_a_prepared_yes_and_like_the_button(agent_env):
     tool = "/api/cards/gap-X/tool"
-    no = agent_env["client"].post(
-        tool, json={"name": "decide", "arguments": {"decision": "approve"}}
-    )
-    assert no.json()["ok"] is False and agent_env["sent"] == []
-    yes = agent_env["client"].post(
-        tool, json={"name": "decide", "arguments": {"decision": "approve", "confirmed": True}}
-    )
-    out = yes.json()
+    client = agent_env["client"]
+    approve = {"decision": "approve", "option_index": 0, "confirmed": True}
+    no_token = client.post(tool, json={"name": "decide", "arguments": approve}).json()
+    assert no_token["ok"] is False and agent_env["sent"] == []
+    prep = client.post(
+        tool, json={"name": "prepare_decision", "arguments": {"decision": "approve"}}
+    ).json()
+    assert prep["ok"] and SUPPLIER in prep["summary"] or "Acme" in prep["summary"]
+    wrong = client.post(
+        tool,
+        json={
+            "name": "decide",
+            "arguments": {**approve, "option_index": 1, "token": prep["token"]},
+        },
+    ).json()
+    assert wrong["ok"] is False and agent_env["sent"] == []  # token was for option 0, now used
+    out = voice_decide(client)
     assert (out["ok"], out["status"], out["sent_to"]) == (True, "sent", SUPPLIER)
     assert len(agent_env["sent"]) == 1
-    again = agent_env["client"].post(
-        tool, json={"name": "decide", "arguments": {"decision": "approve", "confirmed": True}}
-    )
-    assert again.json()["ok"] is False and len(agent_env["sent"]) == 1
+    again = voice_decide(client)
+    assert again["ok"] is False and len(agent_env["sent"]) == 1
 
 
 def test_reply_is_attached_to_the_card(agent_env, monkeypatch):

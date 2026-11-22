@@ -73,3 +73,14 @@ def agent_env(tmp_path, monkeypatch):
         lambda to, subject, body: sent.append((to, subject, body)) or "<m1@x>",
     )
     return {"state": state, "client": TestClient(api.app), "sent": sent}
+
+
+def voice_decide(client, card="gap-X", decision="approve", option=0) -> dict:
+    """The voice assistant's two steps: prepare (summary + token), then decide after a yes."""
+    tool = f"/api/cards/{card}/tool"
+    args = {"decision": decision, "option_index": option}
+    prep = client.post(tool, json={"name": "prepare_decision", "arguments": args}).json()
+    token = prep.get("token", "")
+    return client.post(
+        tool, json={"name": "decide", "arguments": {**args, "token": token, "confirmed": True}}
+    ).json()

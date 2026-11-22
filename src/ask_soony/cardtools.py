@@ -34,22 +34,39 @@ TOOLS = [
     },
     {
         "type": "function",
-        "name": "decide",
-        "description": "Record the person's decision on this card. approve carries out the chosen "
-        "option: if it is an email to a supplier, it is sent. Only approve after reading out what "
-        "will happen (recipient and gist for an email) and the person clearly said yes.",
+        "name": "prepare_decision",
+        "description": "Step 1 of every decision. Returns exactly what would happen (who gets "
+        "what, the gist of any email, the cost) and a one-time token. Read the summary out, ask "
+        "the person, and wait for their answer before calling decide.",
         "parameters": {
             "type": "object",
             "properties": {
                 "decision": {"type": "string", "enum": ["approve", "escalate", "reject"]},
                 "option_index": {"type": "integer", "description": "Which option, 0 = recommended"},
                 "note": {"type": "string", "description": "Short reason or condition, if any"},
+            },
+            "required": ["decision"],
+        },
+    },
+    {
+        "type": "function",
+        "name": "decide",
+        "description": "Step 2: carry out a decision that prepare_decision summarised and the "
+        "person then clearly said yes to. Needs the token from prepare_decision; approve carries "
+        "out the option (an email to a supplier is sent).",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "decision": {"type": "string", "enum": ["approve", "escalate", "reject"]},
+                "option_index": {"type": "integer", "description": "Which option, 0 = recommended"},
+                "note": {"type": "string", "description": "Short reason or condition, if any"},
+                "token": {"type": "string", "description": "The token from prepare_decision"},
                 "confirmed": {
                     "type": "boolean",
-                    "description": "True only if the person explicitly confirmed",
+                    "description": "True only if the person explicitly said yes after the summary",
                 },
             },
-            "required": ["decision", "confirmed"],
+            "required": ["decision", "token", "confirmed"],
         },
     },
     {
@@ -191,6 +208,60 @@ def _details(card: dict) -> dict:
     }
 
 
+TOKEN_TTL_S = 600
+
+
+def _summary(card: dict, decision: str, idx: int, note: str) -> str:
+    """What a decision would do, in words the assistant reads out before asking."""
+    if decision == "escalate":
+        return f"Pass this to {card.get('approver') or 'the approver'} with a short brief."
+    if decision == "reject":
+        return "Take this off the list. Nothing is sent."
+    opt = (card.get("options") or [])[idx]
+    to = opt.get("to") or ""
+    cost = opt.get("cost")
+    cost_txt = "" if not cost or str(cost).lower() in ("none", "no cost") else f" Cost: {cost}."
+    if opt.get("channel") == "email" and "@" in to:
+        gist = " ".join((opt.get("draft") or "").split())[:220]
+        return f"Send an email to {card.get('supplier_name') or to}: {gist}{cost_txt}"
+    return f"{opt.get('action') or 'Approve the recommendation'}.{cost_txt}"
+
+
+def _issue_token(card_id: str, decision: str, idx: int) -> str:
+    import time
+    import uuid
+
+    from ask_soony import api
+
+    tokens = {
+        k: v
+        for k, v in api.read_json("voice_tokens.json", {}).items()
+        if time.time() - v.get("t", 0) < TOKEN_TTL_S
+    }
+    tok = uuid.uuid4().hex[:12]
+    tokens[tok] = {"card": card_id, "decision": decision, "option": idx, "t": time.time()}
+    api.write_json("voice_tokens.json", tokens)
+    return tok
+
+
+def _use_token(tok: str, card_id: str, decision: str, idx: int) -> bool:
+    """One-time: valid only for the prepared card, decision and option, within the TTL."""
+    import time
+
+    from ask_soony import api
+
+    tokens = api.read_json("voice_tokens.json", {})
+    entry = tokens.pop(tok, None) if tok else None
+    api.write_json("voice_tokens.json", tokens)
+    return bool(
+        entry
+        and time.time() - entry.get("t", 0) < TOKEN_TTL_S
+        and entry.get("card") == card_id
+        and entry.get("decision") == decision
+        and (decision != "approve" or entry.get("option") == idx)
+    )
+
+
 @router.post("/api/cards/{card_id}/tool")
 def run_tool(card_id: str, call: ToolCall):
     from ask_soony import api
@@ -201,19 +272,35 @@ def run_tool(card_id: str, call: ToolCall):
         return _details(card)
     if call.name == "teach_routine":
         return teach_routine(card, str(args.get("instruction") or "").strip()[:300])
-    if call.name != "decide":
+    if call.name not in ("prepare_decision", "decide"):
         raise HTTPException(400, f"unknown tool {call.name}")
 
     decision = str(args.get("decision") or "")
     note = str(args.get("note") or "").strip()[:300]
+    idx = int(args.get("option_index") or 0)
     if card.get("status") not in ("open", None):
         return {"ok": False, "error": f"Already {card.get('status')}; nothing changed."}
+    if decision not in ("approve", "escalate", "reject"):
+        return {"ok": False, "error": f"unknown decision {decision}"}
+    if decision == "approve" and not 0 <= idx < len(card.get("options") or []):
+        return {"ok": False, "error": f"No option {idx}."}
+    if call.name == "prepare_decision":
+        return {
+            "ok": True,
+            "summary": _summary(card, decision, idx, note),
+            "token": _issue_token(card_id, decision, idx),
+            "next": "Read the summary out, ask 'Shall I go ahead?', and wait for a clear yes.",
+        }
+    # decide: only with a token from prepare_decision for this exact decision, after a yes.
+    if not args.get("confirmed"):
+        return {"ok": False, "error": "Not done: ask the person to confirm first."}
+    if not _use_token(str(args.get("token") or ""), card_id, decision, idx):
+        return {
+            "ok": False,
+            "error": "Not done: call prepare_decision first, read the summary out and wait for "
+            "a clear yes.",
+        }
     if decision == "approve":
-        if not args.get("confirmed"):
-            return {"ok": False, "error": "Not done: ask the person to confirm first."}
-        idx = int(args.get("option_index") or 0)
-        if not 0 <= idx < len(card.get("options") or []):
-            return {"ok": False, "error": f"No option {idx}."}
         out = api.approve(card_id, {"option": idx, "via": "voice"})
         action = out["action"]
         return {

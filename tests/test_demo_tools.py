@@ -2,6 +2,8 @@
 
 import json
 
+from conftest import voice_decide
+
 TOOL = "/api/cards/gap-X/tool"
 
 
@@ -11,9 +13,7 @@ def _activity(agent_env, card="gap-X") -> dict:
 
 
 def test_activity_says_who_decided(agent_env):
-    agent_env["client"].post(
-        TOOL, json={"name": "decide", "arguments": {"decision": "approve", "confirmed": True}}
-    )
+    voice_decide(agent_env["client"])
     assert _activity(agent_env)["via"] == "voice"
 
 
@@ -45,9 +45,7 @@ def test_teach_routine_drafts_only_after_a_decision(agent_env, monkeypatch):
     early = client.post(TOOL, json=teach).json()
     assert early == {"ok": False, "error": "decide first"} and calls == []
 
-    client.post(
-        TOOL, json={"name": "decide", "arguments": {"decision": "approve", "confirmed": True}}
-    )
+    voice_decide(client)
     out = client.post(TOOL, json=teach).json()
     assert out == {"ok": True, "name": "Chase late trucks", "description": "d"}
     assert pushes == [("Routine draft ready", "Chase late trucks", "gap-X")]
