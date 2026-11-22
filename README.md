@@ -6,9 +6,48 @@ Soony, a (fictional) games publisher, launches Grand Heist 6 on **Sunday 22 Nov,
 
 We build agents that read that data, decide what is at risk and act on it before it is too late.
 
-## Status
+## What it is
 
-Work in progress. The product direction is being decided; this README will describe it once it is fixed.
+**Ask Soony is an AI procurement team for the last mile of a launch.** Agents read everything the customer has (SAP exports, spreadsheets, supplier PDFs and scans in four languages, emails, news), find where the paperwork and the plan disagree, work out what that costs in copies and hours, and act: they write to suppliers, ask the warehouse, chase, and pass decisions to the person who signs. A human decides anything that costs money or changes the plan, with one tap.
+
+Live: `https://ask-soony.stenglein.dev` (password protected; ask the team).
+
+### Who uses it
+
+| | Today | Launch | Sign-off page (phone) |
+|---|---|---|---|
+| **For** | The senior buyer, all day | The head of procurement, a few times a day | Whoever signs, when their phone buzzes |
+| **Question** | What do I do now? | Will we make the deadline, what breaks first, who must decide? | Do I approve this? |
+
+### The loop: notice → show → act → learn
+
+1. **Notice.** Every portal change runs all checks within minutes. Documents are held against SAP (late or short, old revision, failed lot, goods receipt vs. delivery note), shipments are reconciled from every source (goods receipts, warehouse answers, supplier documents and replies, the hand-kept tracker, the system export), and silence is measured against the clock. Numbers that are only projections (a pack-out log hours old, book stock without a count) are called what they are.
+2. **Show.** One calm decision at a time: the contradiction in one sentence, every number linked to the highlighted spot in its source document, what it means for the launch (when the packing line runs out of the part, how many copies that costs), and a recommendation with its price. Ranked by what the launch loses, not by which detector found it.
+3. **Act.** Approve sends the email (reviewable: text, subject, recipient from known contacts only), asks the warehouse through a one-tap count page with photo OCR, or passes it on to the approver named in the approval policy, who answers on their phone. Supplier replies come back onto the case; confirmed orders become inbound with an estimated arrival; if it arrives too late to help, a follow-up decision appears. A voice assistant can talk a decision through and act only after a spoken yes.
+4. **Learn.** After the second similar decision the system offers a routine. Routines start by asking (prepare, you send with one tap), then tell, then run quietly. Money and plan changes always come to a person.
+
+### What makes it trustworthy
+
+- **Nothing is hardcoded.** Products, parts, suppliers, sites, deadlines, shifts and policies are read from the data at runtime; files are recognised by their content, not their names.
+- **Contradictions are shown, not resolved silently.** Every source keeps its age and its say.
+- **The data can change shape.** A data check warns when a file can no longer be read, a column disappears, or a new kind of file arrives that nothing reads. Supplier master changes (status, contacts, bank details) become cases; a new address is never a send target without a human OK.
+- **The mailbox is shared.** Emails sent by hand are read back from the Sent folder and tied to their case; sending the same thing twice needs a second click.
+
+### Where it lives
+
+| Area | Code |
+|---|---|
+| Server, state, ranking, sign-off routing | `src/ask_soony/api.py`, `signoff.py` |
+| Document vs. ERP checks, grounding | `papercheck.py`, `anchors.py`, `verifier/` |
+| Launch clock, editions, parts, inbound | `launch.py`, `launch_view.py`, `commitments.py`, `tracking.py` |
+| Asking the warehouse (counts, arrivals) | `floor.py` |
+| Supplier email, replies, shared mailbox | `cardtools.py`, `replies.py`, `outbox.py` |
+| Routines (sandboxed, trust ladder) | `routines.py` |
+| Data shape and master data checks | `datacheck.py`, `supplier_master.py`, `memo.py` |
+| Voice, push, Teams, calls | `voice.py`, `push.py`, `teams.py`, `calls.py` |
+| UI (React, Tailwind) | `web/src/components/` (`Today`, `Launch`, `Routines`, `SupplyMap`, `CountPage`, `OkPage`) |
+
+Tests: `uv run pytest -q`. UI: `cd web && npm run build`.
 
 ## Getting started
 
@@ -166,10 +205,10 @@ All customer data comes from the Soony portal at runtime (`GET /api/v1/files`, `
 
 ## Hand-in (Sun 12:00)
 
-- [ ] Working prototype, deployed
+- [x] Working prototype, deployed (`ask-soony.stenglein.dev`)
 - [ ] Pitch deck
 - [ ] Demo video, max 3 minutes
-- [ ] This repo with a short README (how to run, what it does)
+- [x] This repo with a short README (how to run, what it does)
 
 Live demo from Sun 14:00: 3 minutes of pitch, 2 minutes of questions.
 
