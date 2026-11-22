@@ -324,6 +324,8 @@ export interface State {
   activity: ActivityItem[]
   last_drop_at: string | null
   last_check_at: string | null
+  /** The buyer's job title, set per customer; null: 'Buyer'. */
+  viewer_title?: string | null
   /** This instance polls the portal; false on the demo. */
   watching?: boolean
   read_since_6: number

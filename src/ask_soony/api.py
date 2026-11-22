@@ -291,6 +291,14 @@ def first_name(person: str | None) -> str:
     return (person or "").split()[0] if person else ""
 
 
+def viewer_title() -> str | None:
+    """The buyer's job title from the setup (ASK_VIEWER_TITLE in .env); the data does not say."""
+    from ask_soony.config import load_dotenv
+
+    load_dotenv()
+    return os.environ.get("ASK_VIEWER_TITLE") or None
+
+
 def viewer_name(root: Path | None) -> str:
     """The person using the inbox: the buyer named on most purchase orders, unless overridden."""
     if os.environ.get("ASK_VIEWER"):
@@ -1463,6 +1471,8 @@ def build_state() -> dict:
     return {
         "now": cur.isoformat(),
         "viewer": viewer_name(root),
+        # The buyer's job title is not in the data; set once per customer (ASK_VIEWER_TITLE).
+        "viewer_title": viewer_title(),
         "portal_found": root is not None,
         "map": {
             "nodes": list((net["nodes"] or {}).values()),

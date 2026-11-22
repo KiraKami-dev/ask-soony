@@ -77,7 +77,9 @@ def _people() -> dict[str, str]:
         from ask_soony import api
 
         return {
-            "buyer": api.viewer_name(api.portal_root()) or "",
+            "buyer": ", ".join(
+                x for x in (api.viewer_name(api.portal_root()), api.viewer_title()) if x
+            ),
             "approver": api.exception_approver() or "",
         }
     except Exception:  # noqa: BLE001  the sign-in page must render without data

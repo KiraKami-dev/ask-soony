@@ -237,7 +237,7 @@ export default function App() {
       routinesBadge={pending}
       role={role}
       onRole={chooseRole}
-      people={{ buyer: state.launch?.money?.viewer ?? state.viewer, approver: state.launch?.money?.approver ?? null }}
+      people={{ buyer: [state.launch?.money?.viewer ?? state.viewer, state.viewer_title].filter(Boolean).join(', '), approver: state.launch?.money?.approver ?? null }}
       checkedAt={state.watching ? state.last_check_at : null}
       nowMs={nowMs}
     />
