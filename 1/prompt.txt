@@ -1,0 +1,23 @@
+I think we had some Hardworker agent or so once. can we bring that back (for agents in Discord)?
+
+---
+
+Yeah, it was some discord bot somewhere else
+
+---
+
+<task-notification>
+<task-id>bmbpiya7t</task-id>
+<tool-use-id>toolu_012ff4fQ37GWF1B17kvrJoyM</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/362eb22e-53b0-4fff-868e-fe71cb3b6af5/tasks/bmbpiya7t.output</output-file>
+<status>completed</status>
+<summary>Background command "cd ~; timeout 90 grep -r -i -l -E "hard.?worker" ~/.claude --include="*.md" --include="*.json" --include="*.ts" --include="*.py" --include="*.sh" 2&gt;/dev/null | grep -v '/projects/' | head; timeout 120 grep -r -i -l -E "hard.?worker" ~/.claude/projects 2&gt;/dev/null | head -20; timeout 60 grep -r -i -l -E "hard.?worker" ~/OtherProjects ~/.config 2&gt;/dev/null --exclude-dir=node_modules --exclude-dir=.build --exclude-dir=.venv | head" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+can it be in Do you know what the other session is doing?
+
+---
+
+[Cross-session delivery notice] Your message to another session was held by that session (recipient: uds:/tmp/cc-socks/25277.sock; msg_id: 498e920b-5c9c-4ff0-b57c-df562699d135). NOT delivered: its Claude has not seen it. Do not report it as delivered, do not wait for a reply, and do not resend while held. The usual cause is that the two sessions run in different permission modes: a terminal session then asks its user to approve, but a Claude Desktop or non-interactive session cannot ask, so there the hold expires undelivered unless the modes come to match. A session can also be set to hold every message. Another notice follows on release, denial or expiry. Tell your user what is held and why, or choose another approach.
