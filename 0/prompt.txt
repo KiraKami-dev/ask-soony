@@ -1,0 +1,21 @@
+Maybe you can look at the lio page. We feel we move a lot to what they are doing. What is our USP / stand out feature?
+
+---
+
+But that is what the challenge requires
+
+---
+
+how to get this set up in teams?
+
+---
+
+what do you think of these ideas (montey / code one or n8n)? /Users/jonasstenglein/Downloads/Sync\ automation\ steps\ :\ USP.txt
+
+---
+
+Can you built the montey idea and give me an mvp on it?
+
+---
+
+would the data be in the sandbox then as well?
