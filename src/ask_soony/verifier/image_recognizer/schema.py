@@ -12,6 +12,7 @@ NULLABLE_STRING = {"type": ["string", "null"]}
 FIELDS = [
     "quantity_ordered",
     "quantity_confirmed",
+    "quantity_offered",
     "quantity_shipped",
     "quantity_delivered",
     "quantity_received",
