@@ -6,8 +6,8 @@ import { undoAction, useLive } from './live'
 // email that went out cannot be unsent); its reason shows in place of the link.
 
 export function UndoAction({
-  actionId, onUndone, className,
-}: { actionId: string; onUndone?: () => void; className?: string }) {
+  actionId, onUndone, className, label = 'Undo',
+}: { actionId: string; onUndone?: () => void; className?: string; label?: string }) {
   const live = useLive()
   const [busy, setBusy] = useState(false)
   const outcome = live.undo[actionId]
@@ -29,7 +29,7 @@ export function UndoAction({
           onKeyDown={(e) => e.stopPropagation()}
           className="uline disabled:opacity-60"
         >
-          {busy ? 'Undoing…' : 'Undo'}
+          {busy ? 'Undoing…' : label}
         </button>
       )}
       {outcome && !outcome.ok && <span className="text-ink-2">{outcome.reason}</span>}

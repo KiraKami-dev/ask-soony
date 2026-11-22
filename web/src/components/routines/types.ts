@@ -5,7 +5,7 @@ export type Field =
   | 'hours_left' | 'waiting_hours' | 'has_reply' | 'reply_after_launch' | 'silent_hours'
 export type Channel = 'phone' | 'teams' | 'both'
 /** What a routine looks at on each check. Missing means open decisions. */
-export type Trigger = 'decisions' | 'waiting' | 'shipments'
+export type Trigger = 'decisions' | 'waiting' | 'replies' | 'shipments'
 /** How much a routine may do on its own. Missing means "tell". */
 export type Mode = 'ask' | 'tell' | 'quiet'
 export type StepKind = 'carry_out' | 'notify' | 'log' | 'chase' | 'call' | 'ask_status'
@@ -26,6 +26,10 @@ export interface Spec { on?: Trigger; when: Cond[]; then: Step[] }
 export interface Did {
   do: StepKind
   card?: string; shipment?: string; option?: string; text?: string; channel?: Channel; status?: string; dry?: boolean
+  /** Set on a real run: the recorded action, for Undo. */
+  action_id?: string | null
+  /** Set in "ask me" mode: the proposal waiting for an OK instead of the action. */
+  proposed?: string
 }
 export interface Run { at: string; ok: boolean; dry?: boolean; result?: unknown; error?: string; log?: string[]; did?: Did[] }
 export interface Routine {
@@ -49,16 +53,18 @@ export interface Proposal {
 /** A routine that matches a card (GET /api/routines/would-handle). */
 export interface WouldHandle { routine_id: string; routine_name: string; mode?: Mode; enabled: boolean }
 
-export const MODES: { key: Mode; label: string; hint: string }[] = [
-  { key: 'ask', label: 'Ask me', hint: 'Prepares it, you confirm with one tap' },
-  { key: 'tell', label: 'Do it and tell me', hint: 'Does it and tells you' },
-  { key: 'quiet', label: 'Do it quietly', hint: 'Does it, you see it in Handled for you' },
+/** The trust ladder: a routine starts by asking, then tells you, then runs quietly. */
+export const MODES: { key: Mode; label: string; hint: string; changes: string }[] = [
+  { key: 'ask', label: 'Ask me', hint: 'Prepares each step, you send it with one tap', changes: 'Nothing leaves before you tap Send.' },
+  { key: 'tell', label: 'Tell me', hint: 'Does it, then tells you what it did', changes: 'It acts on its own and you get a note each time.' },
+  { key: 'quiet', label: 'Quietly', hint: 'Does it, you find it under Handled for you', changes: 'No notes; it shows up in the history only.' },
 ]
 export const modeOf = (r: Pick<Routine, 'mode'>): Mode => (r.mode === 'ask' || r.mode === 'quiet' ? r.mode : 'tell')
 
 /** The trigger node: what the routine looks at, in the buyer's words. */
 export function triggerText(on?: Trigger): { title: string; text: string } {
   if (on === 'waiting') return { title: 'Messages still waiting for an answer', text: 'Every portal check, the emails we sent that have no reply yet' }
+  if (on === 'replies') return { title: 'Suppliers who answered', text: 'Every portal check, the decisions a supplier has replied to' }
   if (on === 'shipments') return { title: 'Shipments that stopped updating', text: 'Every portal check, shipments with no new status for a while' }
   return { title: 'Every portal check · open decisions', text: 'New files, replies and open decisions, about every minute' }
 }
@@ -108,13 +114,13 @@ export async function call<T>(url: string, payload: unknown = {}, method = 'POST
 export const newId = (prefix: string) => `${prefix}${Math.random().toString(36).slice(2, 8)}`
 
 /** Steps a buyer can add with one click or drag. */
-export const PALETTE: { key: string; label: string; make: () => Step }[] = [
-  { key: 'phone', label: 'Tell me on my phone', make: () => ({ id: newId('s'), do: 'notify', channel: 'phone', message: '{headline}', text: 'Tell me on my phone' }) },
-  { key: 'teams', label: 'Tell me on Teams', make: () => ({ id: newId('s'), do: 'notify', channel: 'teams', message: '{headline}', text: 'Tell me on Teams' }) },
-  { key: 'call', label: 'Call me', make: () => ({ id: newId('s'), do: 'call', text: 'Call me' }) },
-  { key: 'chase', label: 'Chase once if no answer', make: () => ({ id: newId('s'), do: 'chase', text: 'Chase once in the same thread if there is no answer' }) },
-  { key: 'log', label: 'Note it in the history', make: () => ({ id: newId('s'), do: 'log', message: 'Handled by a routine: {headline}', text: 'Note it in the history' }) },
-  { key: 'ask_status', label: 'Ask for a status', make: () => ({ id: newId('s'), do: 'ask_status', text: 'Ask the supplier for the shipment status' }) },
+export const PALETTE: { key: string; label: string; hint: string; make: () => Step }[] = [
+  { key: 'phone', label: 'Tell me on my phone', hint: 'A push note with the case, nothing is sent out', make: () => ({ id: newId('s'), do: 'notify', channel: 'phone', message: '{headline}', text: 'Tell me on my phone' }) },
+  { key: 'teams', label: 'Tell me on Teams', hint: 'A card in your Teams channel', make: () => ({ id: newId('s'), do: 'notify', channel: 'teams', message: '{headline}', text: 'Tell me on Teams' }) },
+  { key: 'call', label: 'Call me', hint: 'Rings your phone and reads the case to you', make: () => ({ id: newId('s'), do: 'call', text: 'Call me' }) },
+  { key: 'chase', label: 'Chase once if no answer', hint: 'One friendly reminder in the same email thread', make: () => ({ id: newId('s'), do: 'chase', text: 'Chase once in the same thread if there is no answer' }) },
+  { key: 'log', label: 'Note it in the history', hint: 'A line in the case history, nobody is told', make: () => ({ id: newId('s'), do: 'log', message: 'Handled by a routine: {headline}', text: 'Note it in the history' }) },
+  { key: 'ask_status', label: 'Ask for a status', hint: 'Emails the supplier for where the shipment is', make: () => ({ id: newId('s'), do: 'ask_status', text: 'Ask the supplier for the shipment status' }) },
 ]
 
 export function paletteKey(s: Step): string | null {
@@ -132,7 +138,9 @@ export function didLines(run: Run, spec?: Spec | null): { kind: LineKind; channe
   const out: { kind: LineKind; channel?: Channel; text: string }[] = []
   for (const d of run.did ?? []) {
     const about = d.text || d.option || ''
-    if (d.do === 'carry_out') {
+    if (d.proposed) {
+      out.push({ kind: (d.do === 'carry_out' ? 'send' : d.do === 'notify' || d.do === 'log' ? 'tell' : d.do) as LineKind, text: `Prepared for your OK${about ? `: ${about}` : ''}` })
+    } else if (d.do === 'carry_out') {
       out.push({ kind: 'send', text: `${d.dry ? 'Would send' : 'Sent'}: ${d.option ?? 'the message'}` })
     } else if (d.do === 'chase') {
       out.push({ kind: 'chase', text: `${d.dry ? 'Would chase' : 'Chased'} once in the same thread${about ? `: ${about}` : ''}` })
@@ -158,7 +166,9 @@ export function didLines(run: Run, spec?: Spec | null): { kind: LineKind; channe
 /** "Told you about 1 card", "Sent 2 messages", "Nothing to do" for the stats line. */
 export function summarise(run: Run): string {
   if (!run.ok) return 'The last run failed'
-  const did = run.did ?? []
+  const all = run.did ?? []
+  const asked = all.filter((d) => d.proposed).length
+  const did = all.filter((d) => !d.proposed)
   const n = (k: StepKind) => did.filter((d) => d.do === k).length
   const sent = n('carry_out')
   const told = new Set(did.filter((d) => d.do === 'notify').map((d) => d.card)).size
@@ -168,7 +178,26 @@ export function summarise(run: Run): string {
   if (n('chase')) parts.push(`chased ${n('chase')} time${s(n('chase'))}`)
   if (n('ask_status')) parts.push(`asked for ${n('ask_status')} status${n('ask_status') === 1 ? '' : 'es'}`)
   if (n('call')) parts.push(`called you ${n('call') === 1 ? 'once' : `${n('call')} times`}`)
-  if (told) parts.push(`told you about ${told} card${s(told)}`)
+  if (told) parts.push(`told you about ${told} case${s(told)}`)
+  if (asked) parts.push(`prepared ${asked} for your OK`)
   const out = parts.join(', ')
   return out ? out[0].toUpperCase() + out.slice(1) : 'Nothing to do'
+}
+
+/** The last thing a real run did that may still be undone (a decision without an email). */
+export function lastUndoable(runs?: Run[]): { id: string; text: string } | null {
+  for (const r of runs ?? []) {
+    if (r.dry || !r.ok) continue
+    for (const d of [...(r.did ?? [])].reverse()) {
+      if (d.action_id && d.do === 'carry_out' && d.status !== 'sent') return { id: d.action_id, text: d.option || d.text || 'its last step' }
+    }
+  }
+  return null
+}
+
+/** A sample recipe for the empty state's small diagram. */
+export const SAMPLE: Spec = {
+  on: 'waiting',
+  when: [{ id: 'c1', field: 'waiting_hours', op: 'gt', value: 2, text: 'A supplier has not answered for 2 hours' }],
+  then: [{ id: 's1', do: 'chase', text: 'Send one friendly reminder in the same thread' }],
 }

@@ -2,8 +2,8 @@ import { cn } from '@/lib/utils'
 import { ChannelIcon, StepIcon } from './RoutineFlow'
 import { MODES, didLines, type Mode, type Run, type Spec } from './types'
 
-// Small parts of the routine view: the test run as plain lines, and the trust choice as quiet
-// text ("Ask me · Do it and tell me · Do it quietly").
+// Small parts of the routine view: the test run as plain lines, and the trust ladder as a
+// segmented control ("Ask me · Tell me · Quietly").
 
 export function TestResult({ run, spec, title = "Test on today's inbox" }: { run: Run; spec?: Spec | null; title?: string }) {
   const lines = didLines(run, spec)
@@ -36,31 +36,42 @@ export function TestResult({ run, spec, title = "Test on today's inbox" }: { run
   )
 }
 
-/** "Ask me · Do it and tell me · Do it quietly" as quiet text, the chosen one in ink. */
+/**
+ * The trust ladder as a segmented control: Ask me, Tell me, Quietly. Each segment says in one
+ * line what it does (on a phone only the selected one does, below the control).
+ */
 export function TrustControl({
-  value, onChange, disabled, dim,
-}: { value: Mode; onChange: (m: Mode) => void; disabled?: boolean; dim?: boolean }) {
+  value, onChange, disabled, dim, note,
+}: { value: Mode; onChange: (m: Mode) => void; disabled?: boolean; dim?: boolean; note?: string }) {
+  const cur = MODES.find((m) => m.key === value) ?? MODES[0]
   return (
-    <div role="radiogroup" aria-label="How it acts" className={cn('t-small flex flex-wrap items-baseline gap-x-1', dim && 'opacity-60')}>
-      {MODES.map((m, i) => (
-        <span key={m.key} className="inline-flex items-baseline gap-x-1">
-          {i > 0 && <span aria-hidden className="text-ink-3">·</span>}
-          <button
-            type="button"
-            role="radio"
-            aria-checked={value === m.key}
-            disabled={disabled}
-            title={m.hint}
-            onClick={() => value !== m.key && onChange(m.key)}
-            className={cn(
-              'cursor-pointer whitespace-nowrap rounded px-0.5 focus-visible:outline-2 focus-visible:outline-accent disabled:cursor-default',
-              value === m.key ? 'font-medium text-ink underline decoration-ink-3 decoration-1 underline-offset-[5px]' : 'text-ink-3 hover:text-ink-2',
-            )}
-          >
-            {m.label}
-          </button>
-        </span>
-      ))}
+    <div className={cn('transition-opacity', dim && 'opacity-55')}>
+      <div role="radiogroup" aria-label="How much it does on its own" className="grid grid-cols-3 gap-1 rounded-[14px] bg-soft p-1">
+        {MODES.map((m) => {
+          const on = value === m.key
+          return (
+            <button
+              key={m.key}
+              type="button"
+              role="radio"
+              aria-checked={on}
+              disabled={disabled}
+              onClick={() => !on && onChange(m.key)}
+              className={cn(
+                'min-w-0 cursor-pointer rounded-[10px] px-3 py-2 text-left transition-[background-color,box-shadow,color] duration-200 focus-visible:outline-2 focus-visible:outline-accent disabled:cursor-default',
+                'max-sm:py-2.5 max-sm:text-center',
+                on ? 'bg-white shadow-[0_1px_2px_rgba(24,24,26,.06),0_0_0_1px_var(--color-hair)]' : 'hover:bg-white/60',
+              )}
+            >
+              <span className={cn('t-small block whitespace-nowrap font-medium', on ? 'text-ink' : 'text-ink-2')}>{m.label}</span>
+              <span className={cn('t-small hidden leading-snug sm:block', on ? 'text-ink-2' : 'text-ink-3')}>{m.hint}</span>
+            </button>
+          )
+        })}
+      </div>
+      <p className="t-small mt-2 text-ink-3" aria-live="polite">
+        <span className="sm:hidden">{cur.hint}. </span>{note ?? cur.changes}
+      </p>
     </div>
   )
 }

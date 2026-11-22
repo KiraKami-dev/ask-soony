@@ -4,12 +4,13 @@ import { fmtTime } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { TestResult, TrustControl } from './Diagram'
 import { FlowGraph } from './FlowGraph'
-import { setMode } from './live'
-import { MODES, body, call, modeOf, summarise, type Mode, type Routine, type Run, type Spec } from './types'
+import { setMode, useLive } from './live'
+import { UndoAction } from './Undo'
+import { body, call, lastUndoable, modeOf, summarise, type Mode, type Routine, type Run, type Spec } from './types'
 
-// One routine in the Today style, one view: its name and last run, how much it may do on its
-// own, and the When / Then / Always diagram that is also the editor (× to remove, drag to
-// reorder, "+ add"), with "Change it in your words" below. A change is never saved straight
+// One routine in the Today style, one view: its name and what it did, the trust ladder (how much
+// it may do on its own), and the When / Then / Always diagram that is also the editor (× to
+// remove, drag to reorder, "Add step"), with "Change it in your words" below. A change is never saved straight
 // away: it is tested on today's inbox first and shown on the diagram as before/after, then the
 // buyer applies it or keeps the old version. The same block shows a suggested routine (draft)
 // before it is on, everywhere: in the sheet, after "Show me how" and from "How it decided".
@@ -55,6 +56,7 @@ export function RoutineCard({
   const [error, setError] = useState('')
   const [words, setWords] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [confirmRun, setConfirmRun] = useState(false)
   // Shown right away; the server's answer (or a failure) settles it. A draft starts by asking.
   const [mode, setModeLocal] = useState<Mode | null>(draft ? 'ask' : null)
   const shownMode = mode ?? modeOf(routine)
@@ -68,6 +70,9 @@ export function RoutineCard({
     }
   }
 
+  const live = useLive()
+  const would = Object.values(live.would).filter((ws) => ws.some((w) => w.routine_id === routine.id)).length
+  const undoable = draft ? null : lastUndoable(routine.runs)
   const spec = routine.spec
   const working = review?.after ?? routine
   const lastRun = review?.preview ?? draft?.preview ?? routine.runs?.[0]
@@ -110,14 +115,18 @@ export function RoutineCard({
     try { await fn(); onChanged() } catch (e) { setError((e as Error).message) } finally { setBusy(null) }
   }
 
+  const ran = routine.runs?.find((x) => !x.dry)
+  const dot = <span aria-hidden className="hidden sm:inline">·</span>
   const stats = (
-    <p className="t-small mt-1 text-ink-3">
-      {routine.handled ? <span className="text-routine">Handled {routine.handled} case{routine.handled === 1 ? '' : 's'}</span> : 'Nothing handled yet'}
-      {' · '}
-      {lastRun ? (
-        <>Last ran {fmtTime(lastRun.at)} · <span className={cn(!lastRun.ok && 'text-ink')}>{summarise(lastRun)}</span></>
-      ) : 'Not run yet'}
-    </p>
+    <div className="t-small mt-1.5 flex flex-col gap-y-0.5 text-ink-3 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-2">
+      {routine.handled ? <span className="dot-routine text-routine">Handled {routine.handled} case{routine.handled === 1 ? '' : 's'}</span> : <span>Nothing handled yet</span>}
+      {dot}
+      {ran ? (
+        <span>Last ran {fmtTime(ran.at)}: <span className={cn(!ran.ok ? 'text-late' : 'text-ink-2')}>{summarise(ran).replace(/^./, (ch) => ch.toLowerCase())}</span></span>
+      ) : <span>Not run yet</span>}
+      {would > 0 && <>{dot}<span className="text-ink-2">Would handle {would} open case{would === 1 ? '' : 's'} now</span></>}
+      {undoable && <>{dot}<UndoAction actionId={undoable.id} onUndone={onChanged} label="Undo its last step" /></>}
+    </div>
   )
 
   let content: ReactNode
@@ -131,10 +140,29 @@ export function RoutineCard({
   } else {
     content = (
       <>
-        <p className="t-small mt-7 text-ink-3">
-          {review ? 'Your change, before you apply it' : 'Change it right here: × removes a step, drag to reorder, + add at the end.'}
-        </p>
-        <div className="mt-4">
+        {review ? (
+          <div className="rise mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-2xl bg-soft px-5 py-4" role="status">
+            <div className="min-w-0 flex-1 basis-[280px]">
+              <p className="t-small font-medium text-ink">Your change, tested on today's inbox. Nothing is saved yet.</p>
+              <p className="t-small mt-0.5 flex flex-wrap items-center gap-x-4 text-ink-3">
+                <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-[3px] border border-accent/50 bg-accent/10" />New or changed</span>
+                <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-[3px] border border-dashed border-ink-3" />Removed</span>
+              </p>
+            </div>
+            <div className="flex items-center gap-5">
+              <button className={quiet} disabled={!!busy} onClick={() => { setReview(null); setError('') }}>Keep as is</button>
+              <button className={primary} disabled={!review.preview.ok || !!busy} onClick={apply}>
+                {busy === 'apply' ? 'Applying…' : draft ? 'Use this version' : 'Apply change'}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-8 flex items-baseline justify-between gap-4">
+            <p className="t-small font-medium text-ink-3">How it works</p>
+            {!busy && <p className="t-small hidden text-ink-3 lg:block">Hover a step to remove it, drag to reorder</p>}
+          </div>
+        )}
+        <div className={cn('mt-4 transition-opacity', busy === 'preview' && 'opacity-60')}>
           <FlowGraph
             wide
             spec={working.spec ?? spec}
@@ -153,29 +181,23 @@ export function RoutineCard({
         {busy === 'edit' && <Working text="The agent is changing the routine…" />}
 
         {review ? (
-          <div className="mt-6 space-y-6">
+          <div className="mt-6 space-y-3">
             {review.note && <p className="t-small text-ink-2">{review.note}</p>}
-            <TestResult run={review.preview} spec={review.after.spec} />
-            <div className="flex flex-wrap items-center gap-6">
-              <button className={primary} disabled={!review.preview.ok || !!busy} onClick={apply}>
-                {busy === 'apply' ? 'Applying…' : 'Apply change'}
-              </button>
-              <button className={quiet} disabled={!!busy} onClick={() => { setReview(null); setError('') }}>Keep as is</button>
-            </div>
+            <TestResult run={review.preview} spec={review.after.spec} title="What this version would do on today's inbox" />
           </div>
         ) : (
-          <form onSubmit={askInWords} className="mt-5 flex items-center gap-4">
+          <form onSubmit={askInWords} className="mt-5 flex items-center gap-2 rounded-xl border border-hair bg-white py-1 pl-3.5 pr-1 focus-within:border-ink-3/40">
             <label className="min-w-0 flex-1">
               <span className="sr-only">Change it in your words</span>
               <input
                 value={words}
                 onChange={(e) => setWords(e.target.value)}
                 disabled={!!busy}
-                placeholder="Change it in your words: “also tell me on Teams”"
-                className="t-small h-10 w-full rounded-xl bg-soft px-3.5 text-ink placeholder:text-ink-3 focus:outline-2 focus:outline-accent disabled:opacity-60"
+                placeholder="Say what to change, like “call me too”"
+                className="t-small h-9 w-full bg-transparent text-ink outline-none placeholder:text-ink-3 disabled:opacity-60"
               />
             </label>
-            <button type="submit" disabled={!words.trim() || !!busy} className="t-small shrink-0 cursor-pointer font-medium text-accent hover:underline disabled:cursor-default disabled:text-ink-3 disabled:no-underline">Change</button>
+            <button type="submit" disabled={!words.trim() || !!busy} className="t-small h-9 shrink-0 cursor-pointer rounded-lg px-3 font-medium text-ink hover:bg-soft disabled:cursor-default disabled:text-ink-3 disabled:hover:bg-transparent">Change</button>
           </form>
         )}
       </>
@@ -184,7 +206,7 @@ export function RoutineCard({
 
   return (
     <section aria-label={routine.name}>
-      {draft && <p className="t-small mb-1.5 text-ink-3">Suggested routine, not on yet</p>}
+      {draft && <p className="t-small mb-1.5 font-medium text-ink-3">Suggested routine, not on yet</p>}
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           {big ? <h2 className="t-big text-ink">{routine.name}</h2> : <h3 className="t-body font-medium text-ink">{routine.name}</h3>}
@@ -198,20 +220,25 @@ export function RoutineCard({
           />
         )}
       </div>
-      <div className="mt-4">
-        <TrustControl value={shownMode} onChange={changeMode} disabled={!!busy} dim={!draft && !routine.enabled} />
-        <p className="t-small mt-1 text-ink-3">
-          {draft
-            ? shownMode === 'ask' ? 'It starts by asking: it prepares them, you send with one tap.' : MODES.find((m) => m.key === shownMode)?.hint + '.'
-            : routine.enabled ? MODES.find((m) => m.key === shownMode)?.hint + '.' : 'Off. Switch it on to let it act.'}
-        </p>
+      <div className="mt-6 max-w-[620px]">
+        <TrustControl
+          value={shownMode}
+          onChange={changeMode}
+          disabled={!!busy}
+          dim={!draft && !routine.enabled}
+          note={
+            draft && shownMode === 'ask' ? 'Every routine starts here. Move it up once you trust what it prepares.'
+            : !draft && !routine.enabled ? 'Off. Switch it on to let it act.'
+            : undefined
+          }
+        />
       </div>
 
       {content}
       {error && <p className="t-small mt-3 text-late" role="alert">{error}</p>}
 
       {draft && !review && (
-        <div className="mt-6 space-y-6">
+        <div className="mt-8 space-y-6">
           <TestResult run={draft.preview} spec={routine.spec} title="Test run on today's inbox" />
           <div className="flex flex-wrap items-center gap-6">
             <button className={primary} disabled={!draft.preview.ok || !!busy} onClick={() => act('save', () => draft.onTurnOn(shownMode))}>
@@ -222,12 +249,22 @@ export function RoutineCard({
         </div>
       )}
 
-      <div className="t-small mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-ink-3">
+      <div className="t-small mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-ink-3">
         {!draft && !review && (
           <>
-            <button className={quiet} disabled={!!busy} onClick={() => act('run', () => call(`/api/routines/${routine.id}/run`))} title="Run it on the inbox now">
-              {busy === 'run' ? 'Running…' : 'Run now'}
-            </button>
+            {confirmRun ? (
+              <span className="inline-flex items-center gap-3">
+                <span className="text-ink-2">It acts for real: messages go out. Run it now?</span>
+                <button className="cursor-pointer font-medium text-ink hover:underline" disabled={!!busy}
+                  onClick={() => { setConfirmRun(false); act('run', () => call(`/api/routines/${routine.id}/run`)) }}>Run it</button>
+                <button className={quiet} onClick={() => setConfirmRun(false)}>Cancel</button>
+              </span>
+            ) : (
+              <button className={quiet} disabled={!!busy} title="Run it on the inbox now"
+                onClick={() => (shownMode === 'ask' ? act('run', () => call(`/api/routines/${routine.id}/run`)) : setConfirmRun(true))}>
+                {busy === 'run' ? 'Running…' : 'Run now'}
+              </button>
+            )}
             {confirmDelete ? (
               <span className="inline-flex items-center gap-3">
                 <span className="text-ink-2">Delete this routine?</span>
