@@ -389,12 +389,13 @@ def money(
                 ),
                 None,
             )
-        else:
-            holder, role, since = viewer or None, "viewer", None
+        else:  # still open with the buyer: since the case came up
+            holder, role, since = viewer or None, "viewer", c.get("created_at")
         pending.append(
             {
                 "card": c["id"],
                 "status": status,
+                "signoff": c.get("signoff"),
                 "label": (opt or {}).get("action") or c.get("headline"),
                 "part_name": c.get("part_name"),
                 "cost_text": (opt or {}).get("cost"),

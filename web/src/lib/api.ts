@@ -272,6 +272,8 @@ export interface PricedDecision {
   currency?: string | null
   holder?: string | null
   holder_role: 'viewer' | 'approver' | 'supplier'
+  /** Who signs, when someone other than the buyer must (approval policy). */
+  signoff?: string | null
   since?: string | null
   copies_at_risk?: number | null
 }

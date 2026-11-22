@@ -46,7 +46,15 @@ export function LaunchBrief({ state, nowMs, phone, role, onOpen }: Props) {
       const who = (d.holder ?? '').split(/\s/)[0] || 'the supplier'
       return `sent ${when(d.since, nowMs)}, waiting for ${who}`
     }
-    return isMe(d.holder) ? `with you${since}` : `with ${firstNameOf(d.holder) || 'someone'}${since}`
+    const name = (n?: string | null) => (isMe(n) ? 'you' : firstNameOf(n) || 'someone')
+    if (d.holder_role === 'approver') {
+      // Passed on: waiting for the person who signs.
+      return isMe(d.holder) ? `waiting for your OK${since}` : `with ${name(d.holder)}${since}`
+    }
+    // Still open with the buyer: who decides, who signs, how long it has been open.
+    const decides = isMe(d.holder) ? 'you decide' : `${name(d.holder)} decides`
+    const signs = d.signoff ? ` · ${isMe(d.signoff) ? 'you sign' : `${name(d.signoff)} signs`}` : ''
+    return `${decides}${signs}${d.since ? ` · open since ${when(d.since, nowMs)}` : ''}`
   }
 
   // Waiting on others: sent and not answered, and decisions passed on to someone who is not me.

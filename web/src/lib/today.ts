@@ -152,6 +152,18 @@ export function claimOf(card: Card): Claim | null {
   // Our own count (verifier: stock + arriving vs still to pack), not a document's words, and a
   // system side that is a verdict ("Plan says ok"), not a number: say it as what it is.
   const counted = !d.doc && !docKind(d.source)
+  // "Launch plan: ok, 350,000 counted as due": a source's verdict plus a detail.
+  const okForm = String(s.value ?? '').match(/^\s*([^:]{2,40}):\s*ok\b[,;]?\s*(.*)$/i)
+  if (okForm) {
+    const detail = okForm[2].replace(/\bcounted as\b\s*/i, '').trim()
+    return {
+      sys: { index: pair.sys, ev: s, value: `${okForm[1].trim().toLowerCase()} counts it as covered${detail ? ` (${detail})` : ''}` },
+      doc: { index: pair.doc, ev: d, value: counted ? dv.replace(/^[A-Z](?=[a-z])/, (x) => x.toLowerCase()) : dv },
+      pre: 'The ',
+      mid: counted ? ', but we count ' : `, but ${owner} ${kind} says `,
+      post: '.',
+    }
+  }
   const verdict = !/\d/.test(sv)
   return {
     sys: {
@@ -247,15 +259,57 @@ export function routineCount(state: State, nowMs: number): number {
 export const isDecided = (status: string) => DECIDED.includes(status)
 
 /** The launch status line for the all-clear screen: honest when an edition stops. */
+/**
+ * The launch in one or two plain sentences for the calm screen: per edition that stops before the
+ * trucks, which part it waits for and the last thing done about it.
+ * "Standard has stood still since Sat 21:50 for Game Card Case; the DC site lead was told at 07:32."
+ */
 export function launchStatus(state: State, nowMs: number): string {
   const launch = launchAt(state)
-  const stops = (state.clock?.editions ?? []).filter((e) => e.stops_at && (!launch || ms(e.stops_at) < ms(launch)))
-  if (stops.length) {
-    const e = stops.sort((a, b) => ms(a.stops_at) - ms(b.stops_at))[0]
+  const items = (state.strip ?? [])
+    .filter((e) => e.stops_at && (!launch || ms(e.stops_at) < ms(launch)))
+    .sort((a, b) => ms(a.stops_at) - ms(b.stops_at))
+  if (!items.length) return launch ? `On track for the trucks at ${fmtTime(launch)}.` : 'On track.'
+  const parts = state.launch?.parts ?? []
+  const lines = items.slice(0, 2).map((e) => {
+    const cardId = e.breaks_first?.card ?? null
+    const part = parts.find((p) => cardId && p.cards.includes(cardId))
+      ?? parts.filter((p) => p.editions.includes(e.edition) && p.runs_dry).sort((a, b) => ms(a.runs_dry) - ms(b.runs_dry))[0]
+    const what = part?.short_name ?? part?.name
     const past = ms(e.stops_at) <= nowMs
-    return `${e.label} ${past ? 'is waiting for parts' : `stops at ${at(e.stops_at!, nowMs)} unless parts arrive`}. Your agents are on it.`
+    const head = past
+      ? `${e.label} has stood still since ${at(e.stops_at!, nowMs)}${what ? ` (${what})` : ''}`
+      : `${e.label} stops at ${at(e.stops_at!, nowMs)}${what ? ` (${what})` : ''}`
+    // The latest step on any case about that part: what someone actually did about it.
+    // Decided cases drop off the part's list, so find them by the part number too.
+    const ids = new Set([
+      ...(part?.cards ?? []), ...(cardId ? [cardId] : []),
+      ...state.cards.filter((c) => part && c.part === part.part).map((c) => c.id),
+    ])
+    const acted = state.cards
+      .filter((c) => ids.has(c.id) && ['sent', 'approved', 'escalated', 'answered'].includes(c.status))
+      .sort((a, b) => ms((b.ui as { at?: string } | undefined)?.at) - ms((a.ui as { at?: string } | undefined)?.at))[0]
+    const open = state.cards.some((c) => ids.has(c.id) && c.status === 'open')
+    const done = acted ? lastStep(acted, nowMs) : open ? 'a decision is open' : ''
+    return `${head}${done ? `; ${done}` : ''}.`
+  })
+  return lines.join(' ')
+}
+
+/** The last thing done on a card, in a few words: "Karton was asked at 07:58". */
+function lastStep(card: Card, nowMs: number): string {
+  const ui = card.ui as { at?: string } | undefined
+  const t = ui?.at ? at(ui.at, nowMs) : ''
+  const who = (card.approver ?? '').split(' ').find((w) => !w.endsWith('.')) || 'the approver'
+  if (card.status === 'escalated') return `with ${who}${t ? ` since ${t}` : ''}`
+  if (card.status === 'sent') {
+    const site = (card as { site_question?: unknown }).site_question
+    return `${site ? 'the warehouse' : shortName(card.supplier_name) || 'the supplier'} was asked${t ? ` at ${t}` : ''}`
   }
-  return launch ? `On track for the trucks at ${fmtTime(launch)}.` : 'On track.'
+  if (card.status === 'approved') return `you decided${t ? ` at ${t}` : ''}`
+  if (card.status === 'answered') return `the site answered${t ? ` at ${t}` : ''}`
+  if (card.status === 'open') return 'a decision is open'
+  return ''
 }
 
 export const sentenceOf = sentence
