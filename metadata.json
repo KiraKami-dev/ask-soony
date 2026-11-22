@@ -1,0 +1,57 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M80PCNANWV26RY8MMYTF5CE3",
+  "strategy": "manual-commit",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "src/ask_soony/routines.py",
+    "tests/test_routines_more.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt",
+      "assets_manifest": "/0/assets/manifest.json"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 21,
+    "cache_creation_tokens": 9117,
+    "cache_read_tokens": 8049299,
+    "output_tokens": 7304,
+    "api_call_count": 9,
+    "subagent_tokens": {
+      "input_tokens": 56,
+      "cache_creation_tokens": 273001,
+      "cache_read_tokens": 2779595,
+      "output_tokens": 7534,
+      "api_call_count": 28
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 1414,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 63,
+      "credentialed_uri": 0,
+      "entropy": 398,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 929,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 832,
+      "IP": 32,
+      "PHONE": 65
+    }
+  }
+}
