@@ -9,6 +9,7 @@
 #   scripts/demo.sh story      restore that saved state and (re)start, like reset
 #   ASK_DEMO_OPEN=on ASK_DEMO_HOST=lighthouse.stenglein.dev scripts/demo.sh restart
 #                              same, without a password and with links to that host (for the jury)
+#   ASK_DEMO_MAIL=real ...     supplier email really goes out instead of being recorded
 # Live keeps running on :8000 with data/state; the demo uses data/demo/state.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -71,8 +72,10 @@ start() {
   PW="$(grep '^ASK_DASHBOARD_PASSWORD=' .env | cut -d= -f2-)"
   [ "${ASK_DEMO_OPEN:-}" = on ] && PW=""  # open to anyone with the link; email stays recorded only
   HOST="https://${ASK_DEMO_HOST:-ask-soony-demo.stenglein.dev}"
+  # ASK_DEMO_MAIL=real: supplier email really goes out (shared mailbox); default: recorded only.
+  DRY=on; [ "${ASK_DEMO_MAIL:-}" = real ] && DRY=off
   tmux new-session -d -s ask-soony-demo "cd $PWD && \
-    ASK_STATE_DIR=$STATE ASK_MAIL_DRY=on ASK_OUTBOX=off ASK_REPLY_POLL=off ASK_TEAMS=off \
+    ASK_STATE_DIR=$STATE ASK_MAIL_DRY=$DRY ASK_OUTBOX=off ASK_REPLY_POLL=off ASK_TEAMS=off \
     ASK_CALL_PROVIDER=${CALLS:-dry_run} ASK_CALL_AFTER_MIN=${ASK_CALL_AFTER_MIN:-15} SOONY_PORTAL_TOKEN= ASK_BACKGROUND=on ASK_LLM_PROVIDER=none \
     ASK_DASHBOARD_PASSWORD='$PW' ASK_APP_URL=$HOST \
     ASK_PUSH_CONTACT=$HOST ASK_PUBLIC_URL=$HOST \
