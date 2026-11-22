@@ -16,7 +16,9 @@ interface Routine {
   created_from?: string; created_at?: string; runs?: Run[]
 }
 
-export function Routines({ state, onChanged }: { state: State; onChanged: () => void }) {
+export function Routines({
+  state, onChanged, request,
+}: { state: State; onChanged: () => void; request?: { cardId: string; k: number } | null }) {
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState<Routine[]>([])
   const [draft, setDraft] = useState<{ routine: Routine; preview: Run } | null>(null)
@@ -34,6 +36,14 @@ export function Routines({ state, onChanged }: { state: State; onChanged: () => 
     const t = window.setInterval(load, 10000)
     return () => clearInterval(t)
   }, [open, load])
+
+  // Asked from the "automate this" offer: open and start drafting right away.
+  useEffect(() => {
+    if (!request) return
+    setOpen(true)
+    void suggest(request.cardId)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [request?.k])
 
   const decided = state.cards.filter((c) => ['approved', 'sent', 'escalated', 'dismissed'].includes(c.status))
   const active = items.filter((r) => r.enabled).length
@@ -73,6 +83,16 @@ export function Routines({ state, onChanged }: { state: State; onChanged: () => 
             </SheetDescription>
           </div>
           <div className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
+            {busy && state.cards.some((c) => c.id === busy) && (
+              <div className="rounded-xl border-2 border-dashed border-ok/40 bg-ok/5 p-4 text-[15px]">
+                <div className="flex items-center gap-2 font-semibold text-ok">
+                  <Sparkles size={16} className="animate-pulse" /> The agent is writing a routine…
+                </div>
+                <p className="mt-1 text-ink-2">
+                  From your decision on “{state.cards.find((c) => c.id === busy)?.headline}”. It checks the code in the sandbox and runs a test on the inbox before you see it.
+                </p>
+              </div>
+            )}
             {draft && <DraftView draft={draft} onSave={save} onDiscard={() => setDraft(null)} />}
             {error && <p className="rounded-lg bg-stop/10 p-3 text-sm text-stop">{error}</p>}
 

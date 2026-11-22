@@ -23,6 +23,10 @@ export default function App() {
   const [fresh, setFresh] = useState<Set<string>>(new Set())
   const seenEvents = useRef<Set<string> | null>(null)
   const seenCards = useRef<Set<string> | null>(null)
+  // A card that was just decided (button or voice): offer to automate the next one like it.
+  const lastStatus = useRef<Map<string, string> | null>(null)
+  const [justDecided, setJustDecided] = useState<Card | null>(null)
+  const [automate, setAutomate] = useState<{ cardId: string; k: number } | null>(null)
   const offset = useRef(0)
   const [path, setPath] = useState(window.location.pathname)
   // Opened from a push alert (/d/<id>?talk=1): show the card as an incoming call.
@@ -64,6 +68,15 @@ export default function App() {
         }
       }
       seenCards.current = ids
+
+      const prev = lastStatus.current
+      if (prev) {
+        const done = s.cards.find(
+          (c) => prev.get(c.id) === 'open' && ['approved', 'sent', 'escalated', 'dismissed'].includes(c.status),
+        )
+        if (done) setJustDecided(done)
+      }
+      lastStatus.current = new Map(s.cards.map((c) => [c.id, c.status]))
     } catch {
       setError(true)
     }
@@ -163,7 +176,30 @@ export default function App() {
       )}
       <EvidenceDrawer view={drawer} onClose={() => setDrawer(null)} />
       <AlertsButton />
-      <Routines state={state} onChanged={load} />
+      <Routines state={state} onChanged={load} request={automate} />
+      {justDecided && (
+        <AutomateOffer
+          card={justDecided}
+          onYes={() => { setAutomate({ cardId: justDecided.id, k: Date.now() }); setJustDecided(null) }}
+          onNo={() => setJustDecided(null)}
+        />
+      )}
+    </div>
+  )
+}
+
+const DONE_WORD: Record<string, string> = { approved: 'Approved', sent: 'Sent', escalated: 'Escalated', dismissed: 'Dismissed' }
+
+function AutomateOffer({ card, onYes, onNo }: { card: Card; onYes: () => void; onNo: () => void }) {
+  return (
+    <div className="toast-in fixed bottom-4 left-1/2 z-50 w-[min(640px,calc(100vw-32px))] -translate-x-1/2 rounded-2xl border border-line bg-white p-4 shadow-xl">
+      <div className="text-sm font-semibold text-ok">{DONE_WORD[card.status] ?? 'Done'}: {card.headline}</div>
+      <div className="mt-1 text-[17px] font-bold leading-snug">Handle cards like this automatically next time?</div>
+      <div className="mt-1 text-[15px] text-ink-2">An agent writes a small routine from your decision and shows you a test run first. Anything that costs money still comes to you.</div>
+      <div className="mt-3 flex gap-2">
+        <button onClick={onYes} className="cursor-pointer rounded-lg bg-ok px-4 py-2 text-[15px] font-semibold text-white hover:bg-[#1859b8]">Write a routine</button>
+        <button onClick={onNo} className="cursor-pointer rounded-lg px-4 py-2 text-[15px] font-semibold text-ink-2 hover:bg-panel">Not now</button>
+      </div>
     </div>
   )
 }
