@@ -353,7 +353,7 @@ function CaseGroups({
       rows: sec.handled.map((h) => <HandledCase key={h.key} h={h} state={state} {...row} onChanged={onChanged} />),
     },
     {
-      key: 'done', title: 'Decided by you', n: sec.done.length,
+      key: 'done', title: savedRole() === 'approver' ? 'Decided' : 'Decided by you', n: sec.done.length,
       rows: sec.done.map((c) => {
         // A sent email cannot be taken back, so no Undo for it.
         const undo = c.status !== 'sent' ? actionIdOf(state.activity.find((x) => x.card === c.id)) : null

@@ -4,7 +4,7 @@ import { firstNameOf } from '@/lib/role'
 import { cn } from '@/lib/utils'
 
 // What was decided, by whom and how, newest first: the record the person who signs reads back.
-// "Everything" adds the files the agents read. Rows that belong to a case open it.
+// "With files read" adds the portal files the agents read. Rows that belong to a case open it.
 
 interface Props {
   state: State
@@ -42,7 +42,7 @@ export function History({ state, nowMs, phone, onOpen }: Props) {
         <h1 className="t-big text-ink">History</h1>
         <p className="t-small mt-2 text-ink-3">What was decided, by whom and how. Newest first.</p>
         <div className="t-small mt-6 flex gap-1" role="group" aria-label="Show">
-          {[{ on: !all, label: 'Decisions', set: false }, { on: all, label: 'Everything', set: true }].map((b) => (
+          {[{ on: !all, label: 'Decisions', set: false }, { on: all, label: 'With files read', set: true }].map((b) => (
             <button
               key={b.label}
               onClick={() => setAll(b.set)}

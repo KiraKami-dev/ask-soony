@@ -47,6 +47,8 @@ export default function App() {
   // Who uses this device: the approver lands on Launch, the buyer (and no choice) on Today.
   const [role, setRoleState] = useState<Role | null>(savedRole)
   const chooseRole = useCallback((r: Role | null) => { saveRole(r); setRoleState(r) }, [])
+  // The approver's inbox: what reaches her (default) or every open case, as the buyer sees it.
+  const [allCases, setAllCases] = useState(false)
   const roleRef = useRef(role)
   roleRef.current = role
   const landed = useRef(false)
@@ -175,14 +177,14 @@ export default function App() {
   }, [state, role, chooseRole])
 
   // The buyer sees every case; the person who signs only those that reach her.
-  const today = useMemo(() => {
+  const allOpen = useMemo(() => (state ? todayOrder(state) : []), [state])
+  const mine = useMemo(() => {
     if (!state) return []
-    const all = todayOrder(state)
-    if (role !== 'approver') return all
     const m = state.launch?.money
     const priced = new Set((m?.pending_decisions ?? []).map((d) => d.card))
-    return all.filter((c) => mattersToApprover(c, m?.approver, priced))
-  }, [state, role])
+    return allOpen.filter((c) => mattersToApprover(c, m?.approver, priced))
+  }, [state, allOpen])
+  const today = role === 'approver' && !allCases ? mine : allOpen
   // Launch and the folded groups on Today open a case on Today.
   const openCase = useCallback((id: string) => {
     setDone(null)
@@ -273,6 +275,9 @@ export default function App() {
     return (
       <div className="flex min-h-full flex-col bg-ground">
         {bar}
+        {role === 'approver' && (
+          <Scope all={allCases} onAll={(v) => { setAllCases(v); setFocusId(null); if (single) go('/') }} mine={mine.length} total={allOpen.length} phone={narrow} />
+        )}
         {forMe.length > 0 && <ForYourOk cards={forMe} nowMs={nowMs} phone={narrow} />}
         <Today
           state={state}
@@ -394,7 +399,7 @@ function ForYourOk({ cards, nowMs, phone }: { cards: Card[]; nowMs: number; phon
     }
   }
   return (
-    <section aria-label="Waiting for your OK" className={phone ? 'px-6 pt-4' : 'mx-auto w-full max-w-[960px] px-8 pt-6'}>
+    <section aria-label="Waiting for your OK" className={phone ? 'mx-auto w-full max-w-[560px] px-7 pt-4' : 'mx-auto -mb-12 w-full max-w-[1440px] px-12 pt-16 xl:px-24'}>
       <h2 className="t-small text-ink-3">Waiting for your OK</h2>
       <ul className="mt-2 divide-y divide-hair border-y border-hair">
         {cards.map((c) => {
@@ -414,5 +419,24 @@ function ForYourOk({ cards, nowMs, phone }: { cards: Card[]; nowMs: number; phon
       </ul>
       {err && <p className="t-small mt-2 text-late">{err}</p>}
     </section>
+  )
+}
+
+/** The approver's two views of the inbox: what reaches her, or every open case. */
+function Scope({ all, onAll, mine, total, phone }: { all: boolean; onAll: (v: boolean) => void; mine: number; total: number; phone: boolean }) {
+  const tab = (on: boolean, label: string, v: boolean) => (
+    <button
+      onClick={() => onAll(v)}
+      aria-pressed={on}
+      className={on ? 'cursor-pointer rounded-full bg-ink px-3 py-1 text-white' : 'cursor-pointer rounded-full px-3 py-1 text-ink-3 hover:text-ink'}
+    >
+      {label}
+    </button>
+  )
+  return (
+    <div role="group" aria-label="Show" className={phone ? 't-small mx-auto flex w-full max-w-[560px] gap-1 px-7 pt-4' : 't-small mx-auto -mb-12 flex w-full max-w-[1440px] gap-1 px-12 pt-10 xl:px-[88px]'}>
+      {tab(!all, `For you · ${mine}`, false)}
+      {tab(all, `All open · ${total}`, true)}
+    </div>
   )
 }
