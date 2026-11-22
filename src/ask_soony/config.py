@@ -51,12 +51,18 @@ class Settings:
     @classmethod
     def from_env(cls) -> "Settings":
         load_dotenv()
-        provider = _env("ASK_LLM_PROVIDER", "anthropic").lower()
+        # Fall back to OpenAI when only an OpenAI key is configured.
+        only_openai = _env("OPENAI_API_KEY") and not _env("ANTHROPIC_API_KEY")
+        fallback = "openai" if only_openai else "anthropic"
+        provider = _env("ASK_LLM_PROVIDER", fallback).lower()
+        portal_url = _env("SOONY_PORTAL_URL") or _env("URL")
+        if portal_url and "://" not in portal_url:
+            portal_url = "https://" + portal_url
         default_model = {"anthropic": "claude-opus-5-5", "openai": "gpt-5"}.get(provider, "")
         notifiers = [n.strip() for n in _env("ASK_NOTIFIERS", "console").split(",") if n.strip()]
         return cls(
-            portal_url=_env("SOONY_PORTAL_URL").rstrip("/"),
-            portal_token=_env("SOONY_PORTAL_TOKEN"),
+            portal_url=portal_url.rstrip("/"),
+            portal_token=_env("SOONY_PORTAL_TOKEN") or _env("TOKEN"),
             data_dir=Path(_env("ASK_DATA_DIR", "data/store")),
             llm_provider=provider,
             llm_model=_env("ASK_LLM_MODEL", default_model),

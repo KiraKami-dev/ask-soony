@@ -70,12 +70,22 @@ uv run ask-soony download       # one-off: fetch everything into data/portal/ (n
 uv run ask-soony poll           # one poll; the first one stores the baseline
 uv run ask-soony analyze --path suppliers/SUP-0028_Karton_Nowak/notices/   # analyse chosen files
 uv run ask-soony watch          # poll, analyse and notify every ASK_INTERVAL_SECONDS
+uv run ask-soony refresh soony/erp/stock_snapshot.csv  # refresh verifier + decision cards
+uv run ask-soony predict        # trace notices/news through the supply network
 uv run ask-soony findings       # open findings
 uv run ask-soony status
 uv run pytest
 ```
 
 LLM backends (`ASK_LLM_PROVIDER`): `anthropic` (Claude via the Anthropic SDK, default `claude-opus-5-5`), `openai` (OpenAI), `llamacpp` (any OpenAI-compatible server, e.g. `llama-server --jinja` with `ASK_LLM_BASE_URL=http://localhost:8080/v1`), `none` (poll and store only). Local models need vision support for scans.
+
+## Change routing
+
+All product code lives in `src/ask_soony/`. The watcher routes every new or changed portal
+file through `verifier` and regenerates approval-gated decision cards. Changes under notices,
+news, logistics, or shipments also run `predictor`. `dispatch` combines the refreshed results
+into `data/state/dispatch.json`; it prepares notifications, emails, or calls for approval but
+does not send external messages automatically.
 
 ## Data
 

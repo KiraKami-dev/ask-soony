@@ -4,13 +4,16 @@ import argparse
 import json
 import os
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
 from ask_soony.agent import Analyst
 from ask_soony.config import Settings
+from ask_soony.dispatch import refresh
 from ask_soony.llm import make_backend
 from ask_soony.notify import build_notifiers
 from ask_soony.portal import PortalClient
+from ask_soony.predictor import Event, ImpactAgent, format_impact
 from ask_soony.store import Store
 from ask_soony.watcher import analyze_pending, describe_poll, mirror, poll, watch
 
@@ -47,9 +50,18 @@ def main(argv: list[str] | None = None) -> int:
         "--interval", type=int, help="Seconds between polls (default ASK_INTERVAL_SECONDS)"
     )
     p_watch.add_argument("--analyze-baseline", action="store_true")
+    p_refresh = sub.add_parser("refresh", help="Route changed portal paths through the pipeline")
+    p_refresh.add_argument("paths", nargs="+", help="changed portal paths")
     p_f = sub.add_parser("findings", help="Print findings")
     p_f.add_argument("--all", action="store_true", help="Include resolved findings")
     p_f.add_argument("--json", action="store_true")
+    p_imp = sub.add_parser(
+        "predict", aliases=["impact"], help="Trace news/notices to suppliers, parts, products"
+    )
+    p_imp.add_argument("--path", default="", help="Only events under this path prefix")
+    p_imp.add_argument("--text", help="Analyse this free-text event instead of portal files")
+    p_imp.add_argument("--force", action="store_true", help="Re-analyse events already done")
+    p_imp.add_argument("--list", action="store_true", help="Print stored impacts only")
     sub.add_parser("status", help="Versions, pending analyses and open findings")
     p_srv = sub.add_parser("serve", help="Serve the decision inbox UI and its API")
     p_srv.add_argument("--host", default="127.0.0.1")
@@ -82,6 +94,24 @@ def main(argv: list[str] | None = None) -> int:
     settings = Settings.from_env()
     store = Store(settings.data_dir)
     notify = build_notifiers(settings.notifiers, settings.discord_webhook_url, settings.webhook_url)
+
+    def refresh_pipeline(paths: list[str]) -> None:
+        mirror(store, Path("data/portal"))
+        backend = None if settings.llm_provider == "none" else make_backend(
+            settings.llm_provider, settings.llm_model, settings.llm_api_key,
+            settings.llm_base_url, settings.llm_effort,
+        )
+        predictor = (
+            ImpactAgent(store, backend, settings.data_dir.parent / "state") if backend else None
+        )
+        routed = refresh(
+            paths,
+            Path("data/portal"),
+            Path("data/store/image_recognizer"),
+            Path("data/state/dispatch.json"),
+            predictor,
+        )
+        print(f"refreshed verifier={routed.verifier} predictor={routed.predictor}", file=sys.stderr)
 
     if args.cmd == "download":
         result = poll(store, PortalClient(settings.portal_url, settings.portal_token))
@@ -118,7 +148,11 @@ def main(argv: list[str] | None = None) -> int:
             args.interval or settings.interval_seconds,
             settings.notify_min_severity,
             args.analyze_baseline,
+            refresh_pipeline,
         )
+        return 0
+    if args.cmd == "refresh":
+        refresh_pipeline(args.paths)
         return 0
     if args.cmd == "findings":
         items = store.findings(None if args.all else "open")
@@ -132,6 +166,27 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"    Action: {f['suggested_action']}")
         if not items:
             print("No findings.")
+        return 0
+    if args.cmd in {"predict", "impact"}:
+        if args.list:
+            agent = ImpactAgent(store, None, settings.data_dir.parent / "state")
+            results = list(agent.load().values())
+        else:
+            backend = make_backend(
+                settings.llm_provider, settings.llm_model, settings.llm_api_key,
+                settings.llm_base_url, settings.llm_effort,
+            )
+            agent = ImpactAgent(store, backend, settings.data_dir.parent / "state")
+            if args.text:
+                eid = "manual-" + datetime.now(UTC).strftime("%Y%m%dT%H%M%S")
+                events = [Event(eid, "manual", args.text)]
+            else:
+                events = agent.events_from_portal(args.path)
+            results = agent.run(events, args.force)
+        for r in results:
+            print(format_impact(r) + "\n")
+        if not results:
+            print("No new events.", file=sys.stderr)
         return 0
     if args.cmd == "status":
         q = store.db.execute

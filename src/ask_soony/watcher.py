@@ -8,6 +8,7 @@ import io
 import sys
 import time
 import zipfile
+from collections.abc import Callable
 from pathlib import Path
 
 from ask_soony.agent import Analyst
@@ -124,6 +125,7 @@ def watch(
     interval: int,
     min_severity: str,
     analyze_baseline: bool = False,
+    on_change: Callable[[list[str]], None] | None = None,
 ) -> None:
     while True:
         try:
@@ -131,6 +133,9 @@ def watch(
             event = describe_poll(result)
             if event:
                 notify.send(event)
+            changed = [v.path for v in result.new] + [v.path for v in result.changed]
+            if changed and on_change:
+                on_change(changed)
             if analyst:
                 analyze_pending(store, analyst, notify, min_severity)
         except KeyboardInterrupt:

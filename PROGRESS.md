@@ -14,12 +14,14 @@ flowchart LR
 - Lucas: arrival forecast: rules for ETA + road leg, silence detection, news/notice risks, alternatives — see plan.md §5
 - Jonas: watcher (in progress) + criticality agent (call / email / notify) + ElevenLabs calls and supplier emails — see plan.md §5
 
+
 ## Next
 - Sat 21:00 target (overdue): shared shapes in `src/ask_soony/schema.py`, sender addresses registered, office hours booked
 - Sat 23:00: art books path in the CLI (finding → impact → decision → draft email)
 - Sun 07:00: UI on real findings; Sun 10:00 freeze + deploy; Sun 11:00 video + deck; **Sun 12:00 submit**
 
 ## Done
+- 2026-11-22: Verifier, predictor and dispatch moved under `src/ask_soony`; watcher routes changes through them and regenerates approval-gated decision cards
 - 2026-11-21: Product direction fixed and work split (plan.md)
 - 2026-11-21: Read all portal files; findings in local `data/UNDERSTANDING.md` (gitignored, ask Akshat)
 - 2026-11-21: Entire session tracking and Brain shared memory set up (see AGENTS.md)
@@ -28,6 +30,7 @@ flowchart LR
 ## Blockers
 - Art books: Nowak rush order must go out tonight to reach the Collector's cell before it runs out (~12:30 Sun) — needs a human decision, plan.md §3
 - Cases: 6,000 in stock vs 38,000 needed for Sunday; 350,000 waiting at CTA Hamburg
+- Predictor needs a launch-date guard: its PackRight notice reading correctly records `effective_from: 2026-12-01` but incorrectly labels it a 22 Nov launch risk; dispatch does not yet turn predictor output into a notify/email/call decision
 
 ## Decisions
 - Coordinate through this file, not a board: zero setup, and agents follow it via AGENTS.md
