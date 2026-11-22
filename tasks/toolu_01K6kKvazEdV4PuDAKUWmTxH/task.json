@@ -1,0 +1,15 @@
+{
+  "tool_use_id": "toolu_01K6kKvazEdV4PuDAKUWmTxH",
+  "agent_id": "a32203f8012f007ef",
+  "subagent_type": "general-purpose",
+  "task_description": "Critique identity and build alternative",
+  "token_usage": {
+    "input_tokens": 62,
+    "cache_creation_tokens": 177105,
+    "cache_read_tokens": 3616272,
+    "output_tokens": 110010,
+    "api_call_count": 26
+  },
+  "started_at": "2026-11-22T04:12:41.837301+01:00",
+  "completed_at": "2026-11-22T04:27:51.067758+01:00"
+}

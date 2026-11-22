@@ -1,0 +1,20 @@
+{
+  "tool_use_id": "toolu_01HFMg9UDGNx9HxkEvutoQVQ",
+  "agent_id": "a51aefaa4eabb7adf",
+  "subagent_type": "general-purpose",
+  "task_description": "Routines backend: time, replies, trust, undo",
+  "files": [
+    "src/ask_soony/cardtools.py",
+    "src/ask_soony/routines.py",
+    "tests/test_routines_more.py"
+  ],
+  "token_usage": {
+    "input_tokens": 70,
+    "cache_creation_tokens": 176730,
+    "cache_read_tokens": 4891192,
+    "output_tokens": 66693,
+    "api_call_count": 35
+  },
+  "started_at": "2026-11-22T04:19:55.759293+01:00",
+  "completed_at": "2026-11-22T04:30:25.911319+01:00"
+}
