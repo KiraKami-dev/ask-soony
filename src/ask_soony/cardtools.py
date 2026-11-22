@@ -1,22 +1,20 @@
 """
-Tools the voice assistant can use on a decision card. They run on the server; the browser only
-relays the model's tool calls. Every action is recorded through the dashboard contract
-(decisions.json, actions.json, feed.json), so it shows on the card and in the activity feed.
+What the alert agent does with an inbox card, for the voice assistant and the Approve button alike.
 
-- get_card_details: evidence, options and drafted messages of the card (read-only)
-- send_supplier_email: send one of the card's drafted messages, only after explicit confirmation
-  and only to an address listed in the portal's supplier profiles
-- escalate: hand the card to the next person (decision note + push to subscribed devices)
+- deliver(): the one send path. If the approved option is an email to an address listed in the
+  portal's supplier profiles, send it from the agent mailbox and return the message id. Anything
+  else (internal roles, no draft) is only recorded, never sent.
+- POST /api/cards/{id}/tool: the voice assistant's tools. They call the inbox's own approve /
+  escalate / dismiss, so a spoken "yes" and a click behave the same and land in the same
+  actions.json and decision_status.json.
 """
 
-import json
 import os
 import re
 import smtplib
 import ssl
 from email.message import EmailMessage
 from email.utils import formatdate, make_msgid
-from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -24,63 +22,47 @@ from pydantic import BaseModel
 from ask_soony.config import load_dotenv
 
 router = APIRouter()
-ROOT = Path(__file__).resolve().parents[2]
 
 TOOLS = [
     {
         "type": "function",
         "name": "get_card_details",
-        "description": "Look up the evidence, options and drafted supplier messages of this card. "
-        "Use it before answering questions about sources, costs or what would be sent.",
+        "description": "Look up this card's options (with recipient and draft), evidence and "
+        "status. Use it before answering questions about sources, costs or what would be sent.",
         "parameters": {"type": "object", "properties": {}},
     },
     {
         "type": "function",
-        "name": "send_supplier_email",
-        "description": "Send one of the card's drafted messages to the supplier. Only call this "
-        "after reading out recipient and gist and the person explicitly said yes to sending it.",
+        "name": "decide",
+        "description": "Record the person's decision on this card. approve carries out the chosen "
+        "option: if it is an email to a supplier, it is sent. Only approve after reading out what "
+        "will happen (recipient and gist for an email) and the person clearly said yes.",
         "parameters": {
             "type": "object",
             "properties": {
-                "message_index": {
-                    "type": "integer",
-                    "description": "Which drafted message, 0 for the first",
-                },
+                "decision": {"type": "string", "enum": ["approve", "escalate", "reject"]},
+                "option_index": {"type": "integer", "description": "Which option, 0 = recommended"},
+                "note": {"type": "string", "description": "Short reason or condition, if any"},
                 "confirmed": {
                     "type": "boolean",
-                    "description": "True only if the person explicitly confirmed sending",
+                    "description": "True only if the person explicitly confirmed",
                 },
             },
-            "required": ["message_index", "confirmed"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "escalate",
-        "description": "Hand this card to the next person, e.g. when the decision is above the "
-        "person's authority or they cannot decide now.",
-        "parameters": {
-            "type": "object",
-            "properties": {"reason": {"type": "string"}},
-            "required": ["reason"],
+            "required": ["decision", "confirmed"],
         },
     },
 ]
 
 
-def _card(card_id: str) -> dict:
-    from ask_soony import api  # late import: api includes this router
-
-    card = next((c for c in api.get_state()["cards"] if c.get("id") == card_id), None)
-    if card is None:
-        raise HTTPException(404, "card not found")
-    return card
-
-
 def supplier_addresses() -> set[str]:
-    """Every email address found in the portal's supplier profiles (CSV or JSON, any layout)."""
+    """Every email address in the portal's supplier profiles (CSV or JSON, any layout)."""
+    from ask_soony import api
+
+    root = api.portal_root()
     found: set[str] = set()
-    for path in (ROOT / "data" / "portal" / "suppliers").glob("*/profile.*"):
+    if root is None:
+        return found
+    for path in (root / "suppliers").glob("*/profile.*"):
         try:
             text = path.read_text(encoding="utf-8", errors="replace")
         except OSError:
@@ -108,14 +90,15 @@ def _send_mail(to: str, subject: str, body: str) -> str:
     return mid
 
 
-def _record(card_id: str, action: str, note: str | None, actor: str, text: str) -> None:
-    from ask_soony import api
-
-    state = api._state_dir()
-    decisions = api._read(state / "decisions.json", {})
-    decisions[card_id] = {"action": action, "note": note, "ts": api._now()}
-    api._write(state / "decisions.json", decisions)
-    api._add_event(actor, text, card_id)
+def deliver(card: dict, option: dict, text: str | None) -> dict | None:
+    """Send the approved option if it is an email to a known supplier; None if nothing was sent."""
+    to = (option.get("to") or "").strip().lower()
+    body = (text or option.get("draft") or "").strip()
+    if option.get("channel") != "email" or not body or to not in supplier_addresses():
+        return None
+    subject = option.get("subject") or card.get("headline") or "Soony procurement"
+    mid = _send_mail(to, subject, body)
+    return {"message_id": mid, "to": to, "subject": subject, "sent_body": body}
 
 
 class ToolCall(BaseModel):
@@ -123,100 +106,69 @@ class ToolCall(BaseModel):
     arguments: dict = {}
 
 
+def _details(card: dict) -> dict:
+    ui = card.get("ui") or {}
+    return {
+        "headline": card.get("headline"),
+        "summary": card.get("summary"),
+        "status": card.get("status"),
+        "approver": card.get("approver"),
+        "options": [
+            {
+                "index": o.get("index", i),
+                "action": o.get("action"),
+                "cost": o.get("cost"),
+                "effect": o.get("effect"),
+                "channel": o.get("channel"),
+                "to": o.get("to"),
+                "draft": (o.get("draft") or "")[:600],
+            }
+            for i, o in enumerate(card.get("options") or [])
+        ],
+        "evidence": (card.get("evidence") or [])[:8],
+        "supplier_reply": ui.get("reply"),
+    }
+
+
 @router.post("/api/cards/{card_id}/tool")
 def run_tool(card_id: str, call: ToolCall):
-    card = _card(card_id)
+    from ask_soony import api
+
+    card = api._card(card_id)
     args = call.arguments or {}
-
     if call.name == "get_card_details":
-        messages = [
-            {
-                "index": i,
-                "to_role": m.get("to_role"),
-                "to": m.get("to_email"),
-                "subject": m.get("subject"),
-                "body": (m.get("body") or "")[:600],
-            }
-            for i, m in enumerate(card.get("messages") or [])
-        ]
-        return {
-            "evidence": (card.get("evidence") or [])[:6],
-            "options": card.get("options") or [],
-            "messages": messages,
-            "status": {
-                k: v for k, v in (card.get("action_status") or {}).items() if k != "reply_text"
-            },
-        }
+        return _details(card)
+    if call.name != "decide":
+        raise HTTPException(400, f"unknown tool {call.name}")
 
-    if call.name == "send_supplier_email":
+    decision = str(args.get("decision") or "")
+    note = str(args.get("note") or "").strip()[:300]
+    if card.get("status") not in ("open", None):
+        return {"ok": False, "error": f"Already {card.get('status')}; nothing changed."}
+    if decision == "approve":
         if not args.get("confirmed"):
-            return {"ok": False, "error": "Not sent: ask the person to confirm first."}
-        pending = card.get("human_decision") or {}
-        if pending.get("action") == "edit":
-            return {
-                "ok": False,
-                "error": "Not sent: the draft was edited in the dashboard and must be "
-                "re-issued by its module first.",
-            }
-        msgs = card.get("messages") or []
-        i = int(args.get("message_index", 0))
-        if not 0 <= i < len(msgs):
-            return {"ok": False, "error": f"No drafted message {i}; the card has {len(msgs)}."}
-        m = msgs[i]
-        to = (m.get("to_email") or "").strip().lower()
-        if to not in supplier_addresses():
-            return {
-                "ok": False,
-                "error": f"{to or 'empty address'} is not a known supplier address; not sent.",
-            }
-        mid = _send_mail(to, m.get("subject") or card.get("title", ""), m.get("body") or "")
-        from ask_soony import api
-
-        state = api._state_dir()
-        actions = api._read(state / "actions.json", {})
-        if isinstance(actions, list):
-            actions = {r["card_id"]: r for r in actions if isinstance(r, dict) and "card_id" in r}
-        actions[card_id] = {
-            "card_id": card_id,
-            "status": "sent",
-            "at": api._now(),
-            "message_id": mid,
+            return {"ok": False, "error": "Not done: ask the person to confirm first."}
+        idx = int(args.get("option_index") or 0)
+        if not 0 <= idx < len(card.get("options") or []):
+            return {"ok": False, "error": f"No option {idx}."}
+        out = api.approve(card_id, {"option": idx, "via": "voice"})
+        action = out["action"]
+        return {
+            "ok": True,
+            "status": action.get("status"),
+            "sent_to": action.get("to") if action.get("status") == "sent" else None,
+            "offer_trust": out.get("offer_trust"),
         }
-        api._write(state / "actions.json", actions)
-        outbox = ROOT / "data" / "outbox"
-        outbox.mkdir(parents=True, exist_ok=True)
-        (outbox / f"{mid.strip('<>').split('@')[0]}.json").write_text(
-            json.dumps(
-                {
-                    "message_id": mid,
-                    "to": to,
-                    "subject": m.get("subject"),
-                    "body": m.get("body"),
-                    "card_id": card_id,
-                    "date": api._now(),
-                    "via": "voice assistant",
-                },
-                indent=2,
-            )
-        )
-        _record(
-            card_id,
-            "allow_once",
-            f"sent by voice: {m.get('subject')}",
-            "voice assistant",
-            f"sent '{m.get('subject')}' to {to}",
-        )
-        return {"ok": True, "sent_to": to, "subject": m.get("subject")}
-
-    if call.name == "escalate":
-        reason = str(args.get("reason") or "escalated by voice")[:300]
-        _record(card_id, "edit", f"escalate: {reason}", "voice assistant", f"escalated: {reason}")
+    if decision == "escalate":
+        action = api.escalate(card_id, {"note": note or "escalated by voice"})
         try:
             from ask_soony import push
 
-            push.send("⬆️ Escalated launch alert", f"{card.get('title', '')}: {reason}", card_id)
-        except Exception:  # no devices or push unavailable: the decision is recorded anyway
+            push.send("⬆️ Escalated launch alert", f"{card.get('headline', '')}", card_id)
+        except Exception:  # no devices: the escalation is recorded anyway
             pass
-        return {"ok": True, "escalated": True}
-
-    raise HTTPException(400, f"unknown tool {call.name}")
+        return {"ok": True, "status": "escalated", "to": action.get("to")}
+    if decision == "reject":
+        api.dismiss(card_id, {"note": note or "rejected by voice"})
+        return {"ok": True, "status": "dismissed"}
+    return {"ok": False, "error": f"unknown decision {decision}"}

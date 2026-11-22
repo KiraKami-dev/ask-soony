@@ -364,7 +364,8 @@ def cards_file() -> Path:
     if os.environ.get("ASK_CARDS_FILE"):
         return Path(os.environ["ASK_CARDS_FILE"])
     dispatch = state_dir() / "dispatch.json"
-    return dispatch if dispatch.exists() else Path("data/store/decision_cards.json")
+    store = Path(os.environ.get("ASK_DATA_DIR", "data/store"))
+    return dispatch if dispatch.exists() else store / "decision_cards.json"
 
 
 def readings_dir() -> Path:
@@ -841,12 +842,19 @@ def approve(card_id: str, body: dict = Body(default_factory=dict)) -> dict:
         raise HTTPException(400, "unknown option")
     opt = card["options"][idx]
     trust = read_json("trust.json", {})
-    action = _record(card_id, "approved", {
+    # Same send path for the Approve button and a spoken yes (alert agent, cardtools.deliver):
+    # an email option to a known supplier address goes out now; anything else is only recorded.
+    from ask_soony.cardtools import deliver
+
+    sent = deliver(card, opt, body.get("text"))
+    status = "sent" if sent else "approved"
+    action = _record(card_id, status, {
         "kind": "approve", "option": idx, "action": opt["action"], "channel": opt.get("channel"),
         "to": opt.get("to"), "draft": body.get("text") or opt.get("draft"),
         "edited": bool(body.get("text") and body.get("text") != opt.get("draft")),
         "trust": "allow_always" if trust.get(opt.get("routine_type") or "") == "allow_always" else "allow_once",
-        "status": "approved", "action_type": opt.get("routine_type"),
+        "status": status, "action_type": opt.get("routine_type"), "via": body.get("via") or "inbox",
+        **({"message_id": sent["message_id"], "subject": sent["subject"]} if sent else {}),
     })
     offer = opt.get("routine_type") if opt.get("routine_type") and opt["routine_type"] not in trust else None
     return {"action": action, "offer_trust": offer}

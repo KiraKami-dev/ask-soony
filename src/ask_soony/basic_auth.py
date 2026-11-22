@@ -21,7 +21,7 @@ from starlette.responses import HTMLResponse, RedirectResponse, Response
 
 # Static PWA files hold no data; browsers (notably iOS) fetch the manifest without credentials,
 # and without it the page is not installable and cannot ask for notification permission.
-PUBLIC_PATHS = {"/manifest.webmanifest", "/sw.js", "/icon-192.png", "/icon-512.png"}
+PUBLIC_PATHS = {"/manifest.webmanifest", "/sw.js", "/icon-192.png", "/icon-512.png", "/favicon.svg"}
 COOKIE = "ask_session"
 COOKIE_DAYS = 30
 

@@ -20,8 +20,7 @@ router = APIRouter()
 
 
 def _state_dir() -> Path:
-    root = Path(__file__).resolve().parents[2]
-    return Path(os.environ.get("ASK_SOONY_STATE_DIR") or root / "data" / "state")
+    return Path(os.environ.get("ASK_STATE_DIR", "data/state"))
 
 
 def _b64url(raw: bytes) -> str:
@@ -118,12 +117,14 @@ class TestPush(BaseModel):
 def push_test(body: TestPush):
     from ask_soony import api  # late import: api includes this router
 
-    cards = api.get_state()["cards"]
+    state = api.build_state()
+    cards = state["cards"]
+    inbox = [c for c in cards if c["id"] in state["inbox_ids"]]
     card = next((c for c in cards if c.get("id") == body.card_id), None) or (
-        cards[0] if cards else None
+        inbox[0] if inbox else None
     )
     if not subscriptions():
         raise HTTPException(409, "no device has enabled alerts yet")
     title = "🔴 Launch at risk"
-    text = card["title"] if card else "Test alert"
+    text = card["headline"] if card else "Test alert"
     return send(title, f"{text}. Tap to talk to the assistant.", card["id"] if card else None)

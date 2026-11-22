@@ -3,8 +3,8 @@ Voice conversation about a decision card, in the browser (OpenAI gpt-realtime ov
 
 The browser asks this route for a short-lived OpenAI client secret; the API key never leaves the
 server. The secret carries the session: the card as instructions, a voice, noise handling and the
-`record_decision` function. The browser then talks to OpenAI directly and records the decision
-through the dashboard's normal card action endpoint.
+card tools (cardtools.TOOLS). The browser talks to OpenAI directly and relays tool calls to
+/api/cards/{id}/tool, which decides through the inbox's own approve / escalate / dismiss.
 """
 
 import json
@@ -18,20 +18,6 @@ from ask_soony.config import load_dotenv
 
 router = APIRouter()
 
-DECISION_TOOL = {
-    "type": "function",
-    "name": "record_decision",
-    "description": "Record the person's decision on this card as soon as they have decided.",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "decision": {"type": "string", "enum": ["approve", "escalate", "reject"]},
-            "note": {"type": "string", "description": "Short reason or condition, if any"},
-        },
-        "required": ["decision"],
-    },
-}
-
 
 def _text(value) -> str:
     if isinstance(value, str):
@@ -42,17 +28,36 @@ def _text(value) -> str:
 
 
 def instructions(card: dict) -> str:
-    options = "\n".join(f"- {_text(o)}" for o in card.get("options") or []) or "- none listed"
+    options = (
+        "\n".join(
+            f"- option {o.get('index', i)}: {o.get('action')}"
+            + (f" (cost: {o['cost']})" if o.get("cost") else "")
+            + (f" (effect: {o['effect']})" if o.get("effect") else "")
+            + (
+                f" [sends an email to {o['to']}]"
+                if o.get("channel") == "email" and o.get("to")
+                else ""
+            )
+            for i, o in enumerate(card.get("options") or [])
+        )
+        or "- none listed"
+    )
+    evidence = "\n".join(
+        f"- {e.get('source') or ''}: "
+        + str(e.get("value") or e.get("translation") or e.get("quote") or "")
+        for e in (card.get("evidence") or [])[:6]
+    )
     facts = [
-        f"Title: {card.get('title', '')}",
-        f"Edition: {card.get('edition', '')}, part: {card.get('part', '')}",
-        f"Copies at risk: {card.get('at_risk')} (if we act: {card.get('at_risk_if_acted')})",
-        f"Act by: {card.get('act_by') or 'not given'}",
-        f"Runs dry: {card.get('runs_dry') or 'not given'}",
-        f"System says: {card.get('system_says', '')}",
-        f"Documents say: {card.get('paper_says', '')}",
+        f"Headline: {card.get('headline', '')}",
+        f"Summary: {card.get('summary') or ''}",
+        f"Supplier: {card.get('supplier_name') or 'n/a'}, part: {card.get('part') or 'n/a'}",
+        f"{card.get('number_label') or 'At risk'}: {card.get('number')}",
+        f"Decide by: {card.get('deadline') or 'not given'}",
+        f"Runs dry: {card.get('runs_dry') or 'n/a'}",
+        f"Status: {card.get('status')}; approver: {card.get('approver') or 'the buyer'}",
+        f"Evidence:\n{evidence or '- none'}",
         f"Options:\n{options}",
-        f"Supplier reply so far: {(card.get('action_status') or {}).get('reply') or 'none yet'}",
+        f"Supplier reply so far: {(card.get('ui') or {}).get('reply') or 'none yet'}",
     ]
     return (
         "You are the procurement assistant of the dashboard, talking to a buyer about one decision "
@@ -61,13 +66,12 @@ def instructions(card: dict) -> str:
         + "\n\nStart by stating the problem in two short sentences and the recommended option. "
         "Answer questions only with the facts above; if you do not know, say so. Then ask for a "
         "decision: approve the recommended action, escalate to the next person, or reject. "
-        "When they decide, call record_decision, confirm in one sentence and say goodbye.\n\n"
-        "Tools: use get_card_details when asked about sources, costs or what would be sent. If the "
-        "person approves and the card has a drafted supplier message, read out recipient and gist, "
-        "ask 'Shall I send it now?' and only after a clear yes call send_supplier_email with "
-        "confirmed true; then tell them it was sent. "
-        "Use escalate when they want the next person to decide. "
-        "Use record_decision for approve or reject without sending anything.\n\n"
+        "Tools: use get_card_details when asked about sources, costs or what would be sent. "
+        "Before approving, say what will happen; for an option that sends an email, read out the "
+        "recipient and gist and ask 'Shall I send it now?'. Only after a clear yes call decide "
+        "with decision approve, the option index and confirmed true, then confirm in one "
+        "sentence (say it was sent if sent_to is set) and say goodbye. For escalate or reject, "
+        "call decide the same way.\n\n"
         "The person may be in a noisy room. Only respond to what they say to you about this card. "
         "Ignore background conversations, other languages and fragments; if unsure, ask: 'Sorry, "
         "was that for me?' Never record a decision from background speech."
@@ -82,9 +86,7 @@ def voice_session(card_id: str):
         raise HTTPException(503, "OPENAI_API_KEY is not set")
     from ask_soony import api  # late import: api includes this router
 
-    card = next((c for c in api.get_state()["cards"] if c.get("id") == card_id), None)
-    if card is None:
-        raise HTTPException(404, "card not found")
+    card = api._card(card_id)
     model = os.environ.get("OPENAI_REALTIME_MODEL", "gpt-realtime-2.1")
     session = {
         "type": "realtime",
@@ -109,7 +111,7 @@ def voice_session(card_id: str):
                 },
             },
         },
-        "tools": [DECISION_TOOL, *cardtools.TOOLS],
+        "tools": cardtools.TOOLS,
         "tool_choice": "auto",
     }
     resp = httpx.post(

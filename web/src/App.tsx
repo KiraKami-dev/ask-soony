@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { AlertsButton } from '@/components/AlertsButton'
 import { DecisionCard, type Offer } from '@/components/DecisionCard'
 import { EvidenceDrawer, type DrawerView } from '@/components/EvidenceDrawer'
 import { Rail } from '@/components/Rail'
@@ -23,6 +24,12 @@ export default function App() {
   const seenCards = useRef<Set<string> | null>(null)
   const offset = useRef(0)
   const [path, setPath] = useState(window.location.pathname)
+  // Opened from a push alert (/d/<id>?talk=1): show the card as an incoming call.
+  const [ringing, setRinging] = useState(new URLSearchParams(window.location.search).get('talk') === '1')
+  const stopRinging = () => {
+    setRinging(false)
+    window.history.replaceState(null, '', window.location.pathname)
+  }
 
   const load = useCallback(async () => {
     try {
@@ -102,6 +109,8 @@ export default function App() {
                 onOffer={setOffer}
                 onChanged={load}
                 onDrawer={openDrawer}
+                ringing={ringing && card.status === 'open'}
+                onRingingDone={stopRinging}
               />
             </>
           ) : (
@@ -109,6 +118,7 @@ export default function App() {
           )}
         </main>
         <EvidenceDrawer view={drawer} onClose={() => setDrawer(null)} />
+        <AlertsButton />
       </div>
     )
   }
@@ -151,6 +161,7 @@ export default function App() {
         </div>
       )}
       <EvidenceDrawer view={drawer} onClose={() => setDrawer(null)} />
+      <AlertsButton />
     </div>
   )
 }

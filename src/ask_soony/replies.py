@@ -3,8 +3,9 @@ Tie supplier replies back to the decision card whose message was sent (cardtools
 
 Polls the agent mailbox over IMAP (read-only), matches a reply to a sent message by thread
 (In-Reply-To / References, falling back to "Re: <subject>"), and records it through the
-dashboard contract: actions.json gets status "replied" with a one-line English summary, the
-feed gets an event and subscribed devices get a push. Reply text is supplier-written data: it is
+inbox state: the card's entry in decision_status.json gets the reply (one-line English summary,
+sender, text) and keeps its status, actions.json gets a "reply" record, and subscribed devices
+get a push. Reply text is supplier-written data: it is
 summarised and shown, never followed as instructions.
 
 The background loop runs only when ASK_REPLY_POLL=on is in the process environment, so tests
@@ -13,7 +14,6 @@ and local runs never touch the mailbox. POST /api/replies/check runs one pass on
 
 import email
 import imaplib
-import json
 import logging
 import os
 import re
@@ -95,23 +95,14 @@ def summarise(text: str, subject: str) -> str:
 
 
 def _sent_messages() -> dict[str, dict]:
-    """message_id -> {card_id, subject, to} for every message the cards sent."""
+    """message_id -> the inbox action that sent it (decision_id, to, subject)."""
     from ask_soony import api
 
-    out: dict[str, dict] = {}
-    for card_id, rec in api._action_status().items():
-        mid = (rec.get("message_id") or "").strip()
-        if mid:
-            out[mid] = {"card_id": card_id, **rec}
-    outbox = api.ROOT / "data" / "outbox"
-    for f in outbox.glob("*.json"):
-        try:
-            d = json.loads(f.read_text())
-        except (OSError, ValueError):
-            continue
-        if d.get("card_id") and d.get("message_id") in out:
-            out[d["message_id"]].update(subject=d.get("subject"), to=d.get("to"))
-    return out
+    return {
+        a["message_id"]: a
+        for a in api.read_list("actions.json")
+        if a.get("message_id") and a.get("decision_id")
+    }
 
 
 def _match(msg: email.message.Message, sent: dict[str, dict]) -> dict | None:
@@ -141,8 +132,7 @@ def check_once() -> list[dict]:
         sent = _sent_messages()
         if not sent:
             return []
-        state = api._state_dir()
-        seen = set(api._read(state / "replies_seen.json", []))
+        seen = set(api.read_json("replies_seen.json", []))
         since = (datetime.now(UTC) - timedelta(days=3)).strftime("%d-%b-%Y")
         attached: list[dict] = []
         box = imaplib.IMAP4_SSL(host, 993, ssl_context=ssl.create_default_context())
@@ -167,25 +157,39 @@ def check_once() -> list[dict]:
                 try:
                     at = parsedate_to_datetime(msg.get("Date")).astimezone(UTC).isoformat()
                 except (TypeError, ValueError):
-                    at = api._now()
+                    at = api.now().isoformat()
                 summary = summarise(text, subject)
-                card_id = rec["card_id"]
-                actions = api._action_status()
-                prev = actions.get(card_id, {})
-                actions[card_id] = {
-                    **prev,
-                    "card_id": card_id,
-                    "status": "replied",
-                    "at": at,
-                    "reply": summary,
-                    "reply_from": sender,
-                    "reply_subject": subject,
-                    "reply_text": text[:8000],
-                    "reply_message_id": mid,
-                }
-                api._write(state / "actions.json", actions)
+                card_id = rec["decision_id"]
                 who = sender.split("<")[0].strip().strip('"') or parseaddr(sender)[1]
-                api._add_event("mail agent", f"{who} replied: {summary}", card_id)
+                with api._lock:
+                    actions = api.read_list("actions.json")
+                    actions.append(
+                        {
+                            "id": mid.strip("<>")[:10],
+                            "decision_id": card_id,
+                            "at": at,
+                            "kind": "reply",
+                            "status": "replied",
+                            "from": sender,
+                            "subject": subject,
+                            "summary": summary,
+                            "text": text[:8000],
+                            "message_id": mid,
+                            "in_reply_to": rec["message_id"],
+                        }
+                    )
+                    api.write_json("actions.json", actions)
+                    sts = api.read_json("decision_status.json", {})
+                    entry = sts.get(card_id) or {"status": "sent", "at": at}
+                    entry.update(
+                        note=f"{who} replied: {summary}",
+                        reply=summary,
+                        reply_from=who,
+                        reply_at=at,
+                        reply_text=text[:8000],
+                    )
+                    sts[card_id] = entry
+                    api.write_json("decision_status.json", sts)
                 try:
                     from ask_soony import push
 
@@ -198,7 +202,7 @@ def check_once() -> list[dict]:
                 box.logout()
             except Exception:
                 pass
-            api._write(state / "replies_seen.json", sorted(seen))
+            api.write_json("replies_seen.json", sorted(seen))
         return attached
 
 
