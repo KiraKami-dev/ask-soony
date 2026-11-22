@@ -10,6 +10,7 @@ Nothing is sent automatically: a person reads the card and clicks send.
 """
 
 from dataclasses import dataclass, field
+from pathlib import Path
 
 import pandas as pd
 
@@ -323,6 +324,16 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
             ],
             decision=f"Which edition gets the {_n(have)} {desc}?",
         )
+        # A management memo may already settle it ("Collector's Edition first"): recommend that,
+        # quoted, and still ask the approver (the memo is evidence, not the decision).
+        ruling = _memo_first(need.editions)
+        memo_line = ""
+        if ruling:
+            first, rule = ruling
+            src = Path(rule["file"]).name + (f", {rule['date']}" if rule.get("date") else "")
+            card.evidence.append(f'{src}: "{rule["text"]}"')
+            card.decision = f"{card.decision} Recommended: {first} first, per {src}."
+            memo_line = f'\n\nPer {src}: "{rule["text"]}" We recommend {first} first.'
         # A trade-off between editions is an exception to the plan: the policy's approver of exceptions
         approver = people.exception_approver()
         card.evidence.append(
@@ -337,7 +348,7 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
                 f"Hello,\n\nwe have {_n(have)} {desc} (stock{arriving}) for {_n(need.needed)} "
                 f"still to pack "
                 f"({', '.join(need.editions)}): {_n(need.gap)} short. Please decide which edition gets "
-                f"them first." + _signature(),
+                f"them first." + memo_line + _signature(),
             )
         )
         if email:
@@ -356,6 +367,21 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
 
     _add_timing(cards, result)
     return sorted(cards, key=lambda c: (-c.at_risk, c.act_by is None))
+
+
+def _memo_first(editions: list[str]) -> tuple[str, dict] | None:
+    """The edition the customer's priorities memo puts first, if a memo says so."""
+    try:
+        from ask_soony import api, memo
+
+        root = api.portal_root()
+        hit = memo.first_edition(root, editions)
+        if not hit:
+            return None
+        label = api.edition_labels(root).get(hit[0])
+        return (f"{label} Edition ({hit[0]})" if label else hit[0]), hit[1]
+    except Exception:  # no portal or an unreadable memo: no recommendation, never a crash
+        return None
 
 
 # Which fix a card stands for, by the start of its id
