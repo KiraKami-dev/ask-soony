@@ -266,7 +266,7 @@ function Layer({ state, hoverRoutes, selection, onSelect, pulseNode, id, project
         const c = s.silent ? INK : s.level === 'red' ? LATE : INK3
         return (
           <g key={s.id} opacity={dim && !focus(s.route_id) ? 0.2 : 1} style={{ transition: 'opacity .2s' }}>
-            {s.silent && <circle cx={p.x} cy={p.y} r={4} fill="none" stroke={INK2} strokeWidth={1} className="pulse-ring" />}
+            {s.silent && <circle cx={p.x} cy={p.y} r={4} fill="none" stroke={INK2} strokeWidth={1} className="pulse-once" />}
             <circle
               cx={p.x} cy={p.y} r={(s.silent ? 4 : 3.5) * k} fill={s.silent ? GROUND : c} stroke={s.silent ? INK : GROUND}
               strokeWidth={s.silent ? 1.5 : 1} style={{ transition: 'fill .8s' }}
