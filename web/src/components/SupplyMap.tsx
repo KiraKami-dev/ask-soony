@@ -5,12 +5,29 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { feature, mesh } from 'topojson-client'
 import type { GeometryCollection, Topology } from 'topojson-specification'
 import countries from 'world-atlas/countries-110m.json'
-import { COLORS, LEVEL_RANK, type Leg, type Level, type MapNode, type State } from '@/lib/api'
+import { LEVEL_RANK, type Card, type Leg, type Level, type MapNode, type Shipment, type State } from '@/lib/api'
+import { groupCards, when } from '@/lib/decisions'
+import { shortTitle } from '@/lib/today'
+import { cn } from '@/lib/utils'
 
 const PAD_DEG = 6
 // Inset: everything within this distance of the distribution center, drawn larger.
 const INSET_RADIUS_KM = 1400
 const EARTH_KM = 6371
+
+// Muted land, hairline routes; colour only where something is late (red) or silent (ink, hollow).
+const GROUND = 'var(--color-ground)'
+const INK = 'var(--color-ink)'
+const INK2 = 'var(--color-ink-2)'
+const INK3 = 'var(--color-ink-3)'
+const HAIR = 'var(--color-hair)'
+const LATE = 'var(--color-late)'
+const ACCENT = 'var(--color-accent)'
+const LAND = 'var(--color-land)'
+const ROUTE = '#c4c4c9'
+const ROUTE_IDLE = '#dcdcdf'
+/** Route and shipment colour: red when late, ink when silent, quiet grey otherwise. */
+const toneOf = (l?: Level) => (l === 'red' ? LATE : l === 'grey' ? INK2 : ROUTE)
 
 export interface MapSelection { routeId?: string; nodeId?: string }
 
@@ -61,7 +78,8 @@ export function SupplyMap(props: Props) {
   }, [nodes, dc])
 
   const inset = useMemo(() => {
-    if (!w || !h || nearIds.size < 2) return null
+    // A phone's map is too small for an inset: Europe stays in the main map there.
+    if (!w || !h || w < 640 || nearIds.size < 2) return null
     const pts = nodes.filter((n) => nearIds.has(n.id)).map((n) => [n.lon, n.lat] as [number, number])
     const b = geoPath(geoNaturalEarth1()).bounds(boxOf(pts, 1.2))
     const aspect = (b[1][1] - b[0][1]) / Math.max(1e-6, b[1][0] - b[0][0])
@@ -92,17 +110,17 @@ export function SupplyMap(props: Props) {
         <div className="grid h-full place-items-center text-ink-3">Waiting for supplier and port master data…</div>
       ) : main && (
         <svg width={w} height={h} className="block select-none" role="img" aria-label="Supply chain map" onClick={() => props.onSelect({})}>
-          <rect width={w} height={h} fill="#fff" />
+          <rect width={w} height={h} fill={GROUND} />
           <Layer {...props} id="main" projection={main} w={w} h={h} labelSkip={inset ? nearIds : undefined} />
           {inset && insetProj && (
             <>
               <InsetFrame main={main} proj={insetProj} inset={inset} />
               <g transform={`translate(${inset.x},${inset.y})`}>
-                <rect width={inset.w} height={inset.h} rx={10} fill="#fff" stroke="#cbd5e1" strokeWidth={1.5} />
+                <rect width={inset.w} height={inset.h} rx={12} fill={GROUND} stroke={HAIR} strokeWidth={1} />
                 <svg width={inset.w} height={inset.h}>
                   <Layer {...props} id="inset" projection={insetProj} w={inset.w} h={inset.h} labelAll={nearIds} />
                 </svg>
-                <text x={12} y={20} fontSize={12} fontWeight={700} fill="#64748b" letterSpacing={0.6}>EUROPE</text>
+                <text x={14} y={22} fontSize={12} fill={INK3}>Europe</text>
               </g>
             </>
           )}
@@ -122,7 +140,7 @@ function InsetFrame({ main, proj, inset }: { main: GeoProjection; proj: GeoProje
   return (
     <rect
       x={Math.min(...xs)} y={Math.min(...ys)} width={Math.max(...xs) - Math.min(...xs)} height={Math.max(...ys) - Math.min(...ys)}
-      fill="none" stroke="#94a3b8" strokeWidth={1.2} strokeDasharray="3 3" rx={3} pointerEvents="none"
+      fill="none" stroke={INK3} strokeOpacity={0.6} strokeWidth={1} strokeDasharray="2 3" rx={3} pointerEvents="none"
     />
   )
 }
@@ -185,8 +203,11 @@ function Layer({ state, hoverRoutes, selection, onSelect, pulseNode, id, project
   }, [state.cards, nodes])
 
   const labelled = useMemo(
-    () => nodes.filter((n) => (labelAll ? labelAll.has(n.id) : (n.kind === 'dc' || n.kind === 'supplier') && !labelSkip?.has(n.id))),
-    [nodes, labelAll, labelSkip],
+    // A phone-width map names only the DC and late suppliers; the list below names the rest.
+    () => nodes.filter((n) => (labelAll ? labelAll.has(n.id)
+      : w < 640 ? n.kind === 'dc' || nodeLevel[n.id] === 'red'
+        : (n.kind === 'dc' || n.kind === 'supplier') && !labelSkip?.has(n.id))),
+    [nodes, labelAll, labelSkip, w, nodeLevel],
   )
   const labels = useMemo(() => placeLabels(labelled, nodes, projection, w, h, compact), [labelled, nodes, projection, w, h, compact])
 
@@ -203,12 +224,12 @@ function Layer({ state, hoverRoutes, selection, onSelect, pulseNode, id, project
 
   return (
     <g>
-      <path d={gp(landFC) ?? ''} fill="var(--color-land)" />
-      <path d={gp(borders) ?? ''} fill="none" stroke="#fff" strokeWidth={0.7} />
+      <path d={gp(landFC) ?? ''} fill={LAND} />
+      <path d={gp(borders) ?? ''} fill="none" stroke={GROUND} strokeWidth={0.6} />
 
       {feeders.map(([a, b]) => {
         const p = xy(nodeById[a]), q = xy(nodeById[b])
-        return <line key={a + b} x1={p[0]} y1={p[1]} x2={q[0]} y2={q[1]} stroke="#94a3b8" strokeWidth={1.5} strokeDasharray="1 4" strokeLinecap="round" />
+        return <line key={a + b} x1={p[0]} y1={p[1]} x2={q[0]} y2={q[1]} stroke={ROUTE} strokeWidth={1.25} strokeDasharray="1 4" strokeLinecap="round" />
       })}
 
       {legs.map((l) => {
@@ -216,7 +237,7 @@ function Layer({ state, hoverRoutes, selection, onSelect, pulseNode, id, project
         if (!d) return null
         const level = state.route_level[l.id] ?? 'blue'
         const live = hasShip.has(l.id) || !!state.route_level[l.id]
-        const color = live ? COLORS[level] : '#c3cad5'
+        const color = live ? toneOf(level) : ROUTE_IDLE
         const on = focus(l.id)
         const selected = selection.routeId === l.id || hl.has(l.id)
         return (
@@ -224,9 +245,9 @@ function Layer({ state, hoverRoutes, selection, onSelect, pulseNode, id, project
             <path
               ref={(el) => { pathEls.current[l.id] = el }}
               d={d} fill="none" stroke={color}
-              strokeWidth={selected ? 4.5 : live ? 2.75 : 1.5}
-              strokeLinecap="round" strokeDasharray={l.mode === 'sea' ? '7 6' : undefined}
-              className={state.route_level[l.id] && level !== 'blue' ? 'route-recolour' : undefined}
+              strokeWidth={selected ? 2.75 : level === 'red' ? 1.75 : live ? 1.25 : 1}
+              strokeLinecap="round" strokeDasharray={l.mode === 'sea' ? '4 4' : undefined}
+              className={level === 'red' ? 'route-recolour' : undefined}
               style={{ transition: 'stroke .8s, stroke-width .15s' }}
             />
             <path
@@ -242,12 +263,15 @@ function Layer({ state, hoverRoutes, selection, onSelect, pulseNode, id, project
       {state.shipments.map((s) => {
         const p = dots[s.id]
         if (!p) return null
-        const c = COLORS[s.level]
+        const c = s.silent ? INK : s.level === 'red' ? LATE : INK3
         return (
           <g key={s.id} opacity={dim && !focus(s.route_id) ? 0.2 : 1} style={{ transition: 'opacity .2s' }}>
-            {s.silent && <circle cx={p.x} cy={p.y} r={5} fill="none" stroke={c} strokeWidth={2} className="pulse-ring" />}
-            <circle cx={p.x} cy={p.y} r={5 * k} fill={c} stroke="#fff" strokeWidth={1.5} style={{ transition: 'fill .8s' }}>
-              <title>{`${s.id} · ${s.status}${s.silent_hours ? ` · silent ${s.silent_hours} h` : ''} · ETA ${s.eta ?? '?'}`}</title>
+            {s.silent && <circle cx={p.x} cy={p.y} r={4} fill="none" stroke={INK2} strokeWidth={1} className="pulse-once" />}
+            <circle
+              cx={p.x} cy={p.y} r={(s.silent ? 4 : 3.5) * k} fill={s.silent ? GROUND : c} stroke={s.silent ? INK : GROUND}
+              strokeWidth={s.silent ? 1.5 : 1} style={{ transition: 'fill .8s' }}
+            >
+              <title>{`${s.id} · ${s.derived?.label ?? s.status.replace(/_/g, ' ')}${s.silent_hours ? ` · silent ${s.silent_hours} h` : ''} · ETA ${s.eta ?? '?'}`}</title>
             </circle>
           </g>
         )
@@ -256,9 +280,9 @@ function Layer({ state, hoverRoutes, selection, onSelect, pulseNode, id, project
       {nodes.map((n) => {
         const [x, y] = xy(n)
         if (x < -20 || y < -20 || x > w + 20 || y > h + 20) return null
-        const badge = state.badges[n.id]
         const lab = labels[n.id]
         const sel = selection.nodeId === n.id
+        const late = nodeLevel[n.id] === 'red'
         return (
           <g
             key={n.id}
@@ -267,34 +291,29 @@ function Layer({ state, hoverRoutes, selection, onSelect, pulseNode, id, project
           >
             {pulseNode === n.id && (
               <>
-                <circle cx={x} cy={y} r={6} fill="none" stroke={COLORS.blue} strokeWidth={3} className="pulse-once" />
-                <circle cx={x} cy={y} r={6} fill="none" stroke={COLORS.blue} strokeWidth={2} className="pulse-once delay" />
+                <circle cx={x} cy={y} r={6} fill="none" stroke={ACCENT} strokeWidth={2} className="pulse-once" />
+                <circle cx={x} cy={y} r={6} fill="none" stroke={ACCENT} strokeWidth={1.5} className="pulse-once delay" />
               </>
             )}
+            {sel && <circle cx={x} cy={y} r={10} fill="none" stroke={ACCENT} strokeWidth={1.5} />}
             {n.kind === 'dc' ? (
-              <rect x={x - 6} y={y - 6} width={12} height={12} fill="#0f172a" stroke="#fff" strokeWidth={2} rx={2} />
+              <rect x={x - 5} y={y - 5} width={10} height={10} fill={INK} stroke={GROUND} strokeWidth={1.5} rx={1.5} />
             ) : n.kind === 'supplier' ? (
-              <circle cx={x} cy={y} r={sel ? 8 : 6.5 * k} fill="#fff" stroke="#0f172a" strokeWidth={2.5} />
+              <circle cx={x} cy={y} r={4.5 * k} fill={late ? LATE : INK} stroke={GROUND} strokeWidth={1.5} />
             ) : (
-              <circle cx={x} cy={y} r={compact ? 3.5 : 3} fill="#94a3b8" stroke="#fff" strokeWidth={1}>
+              <circle cx={x} cy={y} r={2.5} fill={INK3} stroke={GROUND} strokeWidth={1}>
                 <title>{n.name}</title>
               </circle>
             )}
             {lab && (
               <text
                 x={lab.x} y={lab.y} textAnchor={lab.anchor} fontSize={lab.size}
-                fontWeight={n.kind === 'port' ? 500 : n.kind === 'dc' ? 700 : 600}
-                fill={n.kind === 'port' ? '#475569' : '#0f172a'} stroke="#fff" strokeWidth={4} paintOrder="stroke" pointerEvents="none"
+                fontWeight={n.kind === 'port' ? 400 : n.kind === 'dc' ? 600 : 500}
+                fill={n.kind === 'port' ? INK3 : late ? LATE : INK} stroke={GROUND} strokeWidth={4} paintOrder="stroke" pointerEvents="none"
               >
                 {lab.text}
               </text>
             )}
-            {badge ? (
-              <g transform={`translate(${x + 9},${y - 10})`}>
-                <circle r={9} fill={COLORS[nodeLevel[n.id] ?? 'amber']} stroke="#fff" strokeWidth={2} />
-                <text textAnchor="middle" dy={4} fontSize={12} fontWeight={700} fill="#fff">{badge}</text>
-              </g>
-            ) : null}
           </g>
         )
       })}
@@ -316,7 +335,7 @@ function placeLabels(labelled: MapNode[], all: MapNode[], projection: GeoProject
   for (const n of order) {
     const p = projection([n.lon, n.lat])
     if (!p) continue
-    const size = n.kind === 'port' ? 11.5 : compact ? 12.5 : 13
+    const size = n.kind === 'port' ? 11.5 : compact ? 12 : 12.5
     const text = labelText(n)
     const wd = text.length * size * 0.57
     const tries: [number, number, 'start' | 'middle' | 'end'][] = [
@@ -344,4 +363,126 @@ function placeLabels(labelled: MapNode[], all: MapNode[], projection: GeoProject
     out[n.id] = { x: p[0] + chosen[0], y: p[1] + chosen[1], anchor: chosen[2], size, text }
   }
   return out
+}
+
+// ---------------------------------------------------------------- legend and list
+
+export function MapLegend({ className }: { className?: string }) {
+  const line = (dash: boolean, colour: string) => (
+    <svg width="22" height="6" aria-hidden="true">
+      <line x1="1" y1="3" x2="21" y2="3" stroke={colour} strokeWidth="1.5" strokeDasharray={dash ? '4 4' : undefined} strokeLinecap="round" />
+    </svg>
+  )
+  const dot = (fill: string, stroke?: string) => (
+    <svg width="10" height="10" aria-hidden="true"><circle cx="5" cy="5" r="3.5" fill={fill} stroke={stroke} strokeWidth={stroke ? 1.5 : 0} /></svg>
+  )
+  return (
+    <p className={cn('t-small flex flex-wrap items-center gap-x-5 gap-y-1 text-ink-3', className)}>
+      <span className="inline-flex items-center gap-1.5">{line(false, ROUTE)} Air or truck</span>
+      <span className="inline-flex items-center gap-1.5">{line(true, ROUTE)} Sea</span>
+      <span className="inline-flex items-center gap-1.5 text-late">{dot(LATE)} Misses the trucks</span>
+      <span className="inline-flex items-center gap-1.5 text-ink-2">{dot(GROUND, INK)} No news</span>
+    </p>
+  )
+}
+
+const OPEN = new Set(['open', 'escalated'])
+
+/** Every supplier with its open issues; late ones first. Rows open the decision on Today. */
+export function SupplierList({
+  state, nowMs, selection, onSelect, onOpen,
+}: { state: State; nowMs: number; selection: MapSelection; onSelect: (s: MapSelection) => void; onOpen: (cardId: string) => void }) {
+  const rows = state.map.nodes
+    .filter((n) => n.kind === 'supplier')
+    .map((n) => {
+      const cards = state.cards.filter((c) => OPEN.has(c.status) && c.supplier_id === n.id)
+      const groups = groupCards(cards)
+      const ships = state.shipments.filter((s) => s.supplier_id === n.id)
+      const silent = ships.filter((s) => s.silent)
+      const late = cards.some((c) => c.level === 'red')
+      // Shipments where another source knows more than the list ("List says booked · Hamburg received 21 Nov").
+      const truth = ships.filter((s) => s.derived && s.derived.contradictions.length > 0)
+      return { n, cards, groups, ships, silent, late, truth }
+    })
+    .sort((a, b) => Number(b.late) - Number(a.late) || b.silent.length - a.silent.length || b.cards.length - a.cards.length || a.n.name.localeCompare(b.n.name))
+  const openN = rows.reduce((k, r) => k + r.cards.length, 0)
+  return (
+    <div>
+      <p className="t-small text-ink-3">
+        {rows.length} suppliers · {state.shipments.length} shipments · {openN} open {openN === 1 ? 'issue' : 'issues'}
+      </p>
+      <ul className="mt-6 space-y-7">
+        {rows.map(({ n, cards, groups, ships, silent, late, truth }) => {
+          const on = selection.nodeId === n.id
+          const hours = Math.max(0, ...silent.map((s) => s.silent_hours ?? 0))
+          return (
+            <li key={n.id}>
+              <button
+                onClick={() => onSelect(on ? {} : { nodeId: n.id })}
+                aria-pressed={on}
+                className="grid w-full cursor-pointer grid-cols-[8px_1fr_auto] items-baseline gap-x-3.5 text-left focus-visible:outline-2 focus-visible:outline-accent"
+              >
+                <i
+                  className={cn(
+                    'h-[7px] w-[7px] -translate-y-px rounded-full',
+                    on ? 'bg-accent' : late ? 'bg-late' : silent.length ? 'bg-ground ring-[1.5px] ring-ink' : 'bg-ink-3',
+                  )}
+                  aria-hidden="true"
+                />
+                <span className={cn('t-body min-w-0 truncate text-ink', on && 'font-medium')}>{n.name}</span>
+                <span className="t-small text-ink-3">{ships.length} {ships.length === 1 ? 'shipment' : 'shipments'}</span>
+              </button>
+              <div className="t-small pl-[22px] text-ink-3">
+                {silent.length > 0 && (
+                  <p className="text-ink-2">No news on {silent.length === 1 ? silent[0].id : `${silent.length} shipments`}{hours ? ` for ${Math.round(hours)} h` : ''}.</p>
+                )}
+                {truth.map((s) => <p key={s.id}>{truthLine(s)}</p>)}
+                {cards.length === 0 && silent.length === 0 && truth.length === 0 && <p>Nothing open.</p>}
+                {groups.length > 0 && (
+                  <ul className="mt-1">
+                    {groups.slice(0, 4).map((g) => <Issue key={g.key} c={g.lead} n={g.cards.length} state={state} nowMs={nowMs} onOpen={onOpen} />)}
+                    {groups.length > 4 && <li className="py-1">+{groups.length - 4} more on Today</li>}
+                  </ul>
+                )}
+              </div>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
+  )
+}
+
+const LIST_WORDS: Record<string, string> = { arrived_port: 'at the port', in_delivery: 'out for delivery' }
+
+/** "SHP-2026-04311 received · List says booked · Hamburg booked 28,000 on 21 Nov". */
+function truthLine(s: Shipment): string {
+  const d = s.derived!
+  const listSays = s.list_status ? LIST_WORDS[s.list_status] ?? s.list_status.replace(/_/g, ' ') : null
+  const day = d.as_of ? new Date(d.as_of).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'Europe/Berlin' }) : null
+  const what =
+    d.status === 'received' && d.received
+      ? `Hamburg received ${d.received.qty.toLocaleString('en-US')}${day ? ` on ${day}` : ''}`
+      : `${d.source_label ?? 'Another source'}: ${d.label}${day ? ` (${day})` : ''}`
+  const heard = d.silent && d.silent_hours != null && d.status !== 'received' ? ` · no news for ${Math.round(d.silent_hours)} h` : ''
+  // The list is the best source left, but another sheet disagrees with it: show that.
+  if (d.source === 'tracker') return `${s.id} ${d.label} · ${d.contradictions[0]}${heard}`
+  return `${s.id} ${d.label}${listSays && listSays !== d.label ? ` · List says ${listSays}` : ''} · ${what}${heard}`
+}
+
+function Issue({ c, n, state, nowMs, onOpen }: { c: Card; n: number; state: State; nowMs: number; onOpen: (id: string) => void }) {
+  const late = c.level === 'red'
+  return (
+    <li>
+      <button
+        onClick={() => onOpen(c.id)}
+        className="flex w-full cursor-pointer items-baseline justify-between gap-3 py-1 text-left hover:text-ink focus-visible:outline-2 focus-visible:outline-accent"
+      >
+        <span className={cn('min-w-0 truncate', late ? 'text-late' : 'text-ink-2')}>
+          {shortTitle(c, state)}{n > 1 && <span className="text-ink-3"> · {n} like this</span>}
+        </span>
+        <span className="shrink-0">{c.status === 'escalated' ? 'escalated' : c.deadline ? when(c.deadline, nowMs) : ''}</span>
+      </button>
+    </li>
+  )
 }

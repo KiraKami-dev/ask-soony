@@ -62,13 +62,16 @@ def subscriptions() -> list[dict]:
         return []
 
 
-def send(title: str, body: str, card_id: str | None = None) -> dict:
-    """Push to every subscribed device; drop subscriptions the push service reports as gone."""
+def send(title: str, body: str, card_id: str | None = None, url: str | None = None) -> dict:
+    """Push to every subscribed device; drop subscriptions the push service reports as gone.
+    `url` opens that page on tap instead of the card (the count page of a site question)."""
     from pywebpush import WebPushException, webpush
 
     keys = vapid()
     claims_sub = os.environ.get("ASK_PUSH_CONTACT", "https://ask-soony.example.com")
-    payload = json.dumps({"title": title, "body": body, "card_id": card_id})
+    payload = json.dumps(
+        {"title": title, "body": body, "card_id": card_id, **({"url": url} if url else {})}
+    )
     kept, sent, failed = [], 0, []
     for sub in subscriptions():
         try:
@@ -125,6 +128,16 @@ def push_test(body: TestPush):
     )
     if not subscriptions():
         raise HTTPException(409, "no device has enabled alerts yet")
-    title = "🔴 Launch at risk"
-    text = card["headline"] if card else "Test alert"
-    return send(title, f"{text}. Tap to talk to the assistant.", card["id"] if card else None)
+    if card is None:
+        return send("Ask Soony", "Test alert: alerts are on for this device.", None)
+    return send(decision_title(card), card["headline"], card["id"])
+
+
+def decision_title(card: dict) -> str:
+    """'One decision before 10:00' (local time), or plain 'One decision' without a deadline."""
+    from ask_soony import api
+
+    deadline = api.parse_ts(card.get("deadline"))
+    if deadline is None:
+        return "One decision for you"
+    return f"One decision before {deadline.astimezone(api.tz()).strftime('%H:%M')}"

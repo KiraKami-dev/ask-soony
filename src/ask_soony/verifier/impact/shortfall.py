@@ -4,7 +4,9 @@ Price it: from the linked graph to copies at risk.
 For every edition still being packed: remaining = day-one demand - packed. For every part in
 its bill of materials: needed = remaining x quantity per copy. Usable stock = the latest book
 stock minus what the evidence says is not really there or can't be used (live linker issues with
-a stock effect). Gap = needed - usable. Everything comes from the data; nothing is typed in.
+a stock effect). Arriving = inbound already on its way that lands in the DC before packing ends
+and is not yet in that stock (see _arriving). Gap = needed - usable - arriving. Everything comes
+from the data; nothing is typed in.
 """
 
 import math
@@ -49,14 +51,25 @@ class PartNeed:
     rate_per_hour: float | None = None  # how fast the lines use it
     runs_dry: datetime | None = None  # None: lasts to the end of packing
     fixes: list[dict] = field(default_factory=list)  # supply that can arrive in time, with act-by
+    # Inbound already on its way that lands before packing ends: counted as available.
+    # Each: reference, quantity, eta, status, supplier_id, po_numbers, basis (see _arriving)
+    arriving: list[dict] = field(default_factory=list)
+    # Inbound due before packing ends that is NOT counted, with the reason (already in stock,
+    # shipped short, supplier's paper not read yet, ...). Shown so nobody counts it twice.
+    not_counted: list[dict] = field(default_factory=list)
 
     @property
     def usable(self) -> float:
         return max(self.book_stock - sum(d.units for d in self.deductions), 0)
 
     @property
+    def arriving_in_time(self) -> float:
+        return sum(a["quantity"] for a in self.arriving)
+
+    @property
     def gap(self) -> float:
-        return max(self.needed - self.usable, 0)
+        """Needed minus usable stock minus inbound that lands before packing ends."""
+        return max(self.needed - self.usable - self.arriving_in_time, 0)
 
     @property
     def gap_if_acted(self) -> float:
@@ -287,10 +300,185 @@ def compute(records: pd.DataFrame, issues: pd.DataFrame) -> Shortfall:
                     }
                 )
 
+    _arriving(needs, by_kind, launch)
+
     parts = sorted(needs.values(), key=lambda p: -p.gap)
     result = Shortfall(editions, parts, excluded)
     _add_timing(result, by_kind, launch)
     return result
+
+
+def _skips(status: str) -> str | None:
+    """Why an inbound with this status is not 'on its way', or None if it is."""
+    s = status.lower().replace("_", " ")
+    if "cancel" in s:
+        return "cancelled"
+    if "arrived" in s:  # at the port: a fix (collect it), see the at_port supply above
+        return "at the port, needs collecting"
+    if s in ("delivered", "received", "closed", "completed"):
+        return f"status '{status}'"
+    return None
+
+
+def _arriving(
+    needs: dict[str, PartNeed], by_kind: dict[str, list[dict]], launch: str | None
+) -> None:
+    """
+    Inbound that lands in the DC before packing ends counts as available for the gap.
+
+    Sources, per part: the launch plan's inbound rows (with quantity) and the ERP's open shipments
+    (newest row per reference; quantity from its open PO lines when the plan has no row for it).
+    An inbound counts when all of these hold:
+    - ETA on or before launch day (ETAs are dates; packing ends on launch day, so a same-day ETA
+      is taken as in time; the same cut-off as 'after_launch' above)
+    - not cancelled, not at the port (that is a 'collect' fix, not available stock)
+    - not already in the book stock: a goods receipt for its PO and part on or before the stock
+      date means it is in the stock figure; one after it means it arrived since and counts
+    - not overdue: an ETA before the stock date with no receipt is a lost shipment, not supply
+    - the supplier's own shipping document for the same air waybill or container does not say
+      less: then only the shipped quantity counts and the balance is listed as not counted. If
+      that document exists but has not been read yet, nothing counts until it is (it may be a
+      short-shipment advice).
+    Everything not counted lands in `need.not_counted` with the reason.
+    """
+    if not launch:
+        return
+    shipments: dict[str, dict] = {}  # reference -> newest ERP row
+    for s in by_kind.get("shipment", []):
+        ref = s["reference"] or s["shipment_id"]
+        if ref and (ref not in shipments or (s["as_of"] or "") > (shipments[ref]["as_of"] or "")):
+            shipments[ref] = s
+    docs_by_ref: dict[str, list[dict]] = {}
+    for d in by_kind.get("shipping_doc", []):
+        if d["reference"]:
+            docs_by_ref.setdefault(d["reference"], []).append(d)
+    read_paths = {r["doc_path"] for r in by_kind.get("reading", [])}
+    lines_by_doc: dict[tuple, list[dict]] = {}
+    for line in by_kind.get("doc_line", []):
+        # The reader sometimes puts our part number in `item` (or the supplier part number)
+        # and the linker leaves material_id empty; fall back so the line is still found.
+        attrs = line.get("attrs") or {}
+        part_key = line["material_id"] or attrs.get("item") or attrs.get("supplier_part_no")
+        lines_by_doc.setdefault((line["doc_path"], part_key), []).append(line)
+    receipts: dict[tuple, list[dict]] = {}
+    for g in by_kind.get("goods_receipt", []):
+        receipts.setdefault((g["po_number"], g["material_id"]), []).append(g)
+    open_lines: dict[tuple, list[dict]] = {}
+    for p in by_kind.get("po_line", []):
+        if (p["attrs"].get("state") or p["attrs"].get("status")) == "open":
+            open_lines.setdefault((p["po_number"], p["material_id"]), []).append(p)
+
+    for part, need in needs.items():
+        stock_day = (need.book_as_of or "")[:10]
+        candidates = []  # (reference, quantity, etd, eta, status, supplier, po_numbers, basis)
+        planned = set()
+        for plan in by_kind.get("plan_inbound", []):
+            if plan["material_id"] != part:
+                continue
+            ref, a = plan["reference"], plan["attrs"]
+            erp = shipments.get(ref)
+            eta, status, basis = a.get("eta"), a.get("status") or "", "launch plan"
+            if erp:  # the ERP row is time-stamped, the plan is not: it wins on status and ETA
+                status = erp["attrs"].get("status") or status
+                if erp["attrs"].get("eta") and erp["attrs"]["eta"] != eta:
+                    basis += f" (ERP ETA {erp['attrs']['eta']}, plan said {eta})"
+                    eta = erp["attrs"]["eta"]
+            pos = sorted(
+                set((erp or {}).get("po_numbers") or [])
+                | {d["po_number"] for d in docs_by_ref.get(ref, []) if d["po_number"]}
+            )
+            planned.add(ref)
+            etd = (erp or {}).get("attrs", {}).get("etd") or a.get("etd")
+            candidates.append(
+                (ref, a.get("quantity"), etd, eta, status, plan["supplier_id"], pos, basis)
+            )
+        for ref, s in shipments.items():
+            if ref in planned or part not in (s["material_ids"] or []):
+                continue
+            pos = sorted(s["po_numbers"] or [])
+            quantity = sum(
+                p["attrs"].get("quantity") or 0
+                for po in pos
+                for p in open_lines.get((po, part), [])
+            )
+            a = s["attrs"]
+            candidates.append(
+                (ref, quantity, a.get("etd"), a.get("eta"), a.get("status") or "",
+                 s["supplier_id"], pos, "ERP shipment, open PO lines")
+            )  # fmt: skip
+
+        for ref, quantity, etd, eta, status, supplier, pos, basis in candidates:
+            entry = {
+                "reference": ref,
+                "quantity": quantity or 0,
+                "eta": eta,
+                "status": status,
+                "supplier_id": supplier,
+                "po_numbers": pos,
+                "basis": basis,
+            }
+
+            def skip(reason: str, entry: dict = entry) -> None:
+                need.not_counted.append({**entry, "reason": reason})
+
+            if not eta or eta[:10] > launch:
+                continue  # after launch: listed as 'after_launch' supply above, never available
+            if why := _skips(status):
+                skip(why)
+                continue
+            if not quantity:
+                skip("no quantity on record")
+                continue
+            # Receipts of this shipment: same PO and part, booked after it left (an earlier
+            # receipt on the same PO is an earlier delivery, not this one)
+            grs = [
+                g
+                for po in pos
+                for g in receipts.get((po, part), [])
+                if not etd or (g["attrs"].get("gr_date") or "") >= etd[:10]
+            ]
+            booked = [
+                g for g in grs if stock_day and (g["attrs"].get("gr_date") or "") <= stock_day
+            ]
+            if booked:  # received before the stock figure was taken: already in book stock
+                skip(f"already in stock (goods receipt {booked[0]['gr_number']})")
+                continue
+            if grs:  # received after the stock figure: it is in the DC, count what was received
+                entry["quantity"] = sum(g["attrs"].get("qty_received") or 0 for g in grs)
+                entry["basis"] += f"; received after the {stock_day} stock figure"
+                entry["status"] = "received"
+                need.arriving.append(entry)
+                continue
+            if stock_day and eta[:10] < stock_day:  # should be here by now, but nobody booked it
+                skip(f"ETA {eta} passed before the {stock_day} stock figure, no goods receipt")
+                continue
+            docs = docs_by_ref.get(ref, [])
+            unread = [d for d in docs if d["doc_path"] not in read_paths]
+            lines = [
+                line
+                for d in docs
+                for line in lines_by_doc.get((d["doc_path"], part), [])
+                if line["attrs"]["final"].get("quantity_shipped") is not None
+            ]
+            if lines:  # the supplier's paper is the latest word on what is on the plane
+                on_paper = min(line["attrs"]["final"]["quantity_shipped"] for line in lines)
+                if on_paper < entry["quantity"]:
+                    expected = [
+                        v["raw"]
+                        for line in lines
+                        for v in line["attrs"]["values"]
+                        if v["field"] == "date_expected" and v["raw"]
+                    ]
+                    skip(f"balance: supplier's shipping document says {on_paper:,.0f} shipped")
+                    need.not_counted[-1]["quantity"] = entry["quantity"] - on_paper
+                    need.not_counted[-1]["eta"] = expected[-1] if expected else None
+                    entry["quantity"] = on_paper
+                    entry["basis"] += "; quantity as shipped per the supplier's document"
+            elif unread:
+                skip(f"supplier's document {unread[0]['doc_path'].rsplit('/', 1)[-1]} not read yet")
+                continue
+            if entry["quantity"] > 0:
+                need.arriving.append(entry)
 
 
 def _add_timing(result: Shortfall, by_kind: dict[str, list[dict]], launch: str | None) -> None:

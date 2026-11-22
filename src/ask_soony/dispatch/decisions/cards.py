@@ -10,6 +10,7 @@ Nothing is sent automatically: a person reads the card and clicks send.
 """
 
 from dataclasses import dataclass, field
+from pathlib import Path
 
 import pandas as pd
 
@@ -291,6 +292,13 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
         supplier = supplier or directory.primary.get(need.part)
         name, email, person = directory.contact(supplier)
         later = [s for s in need.supply if s["kind"] == "after_launch"]
+        # What the line can pack with: usable stock plus inbound that lands before packing ends
+        have = need.usable + need.arriving_in_time
+        arriving = (
+            f" + {_n(need.arriving_in_time)} arriving before packing ends"
+            if need.arriving_in_time
+            else ""
+        )
         card = Card(
             id=f"allocate-{need.part}",
             title=f"{desc}: {_n(need.gap)} short across {len(need.editions)} editions",
@@ -298,14 +306,34 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
             at_risk=need.gap,
             part=need.part,
             system_says=short[0]["context"] if short else f"Plan says {need.plan_status or 'ok'}",
-            paper_says=f"{_n(need.usable)} in stock for {_n(need.needed)} still to pack",
-            evidence=[i["context"] for i in short] + [f"Book stock {_n(need.book_stock)}"],
+            paper_says=f"{_n(need.usable)} in stock{arriving} for {_n(need.needed)} still to pack",
+            evidence=[i["context"] for i in short]
+            + [f"Book stock {_n(need.book_stock)} (as of {need.book_as_of})"]
+            + [
+                f"Counted as arriving: {a['reference']} {_n(a['quantity'])} due {a['eta']} "
+                f"({a['basis']})"
+                for a in need.arriving
+            ]
+            + [
+                f"Not counted: {a['reference']} {_n(a['quantity'])} ({a['reason']})"
+                for a in need.not_counted
+            ],
             options=[
                 f"{s['reference']}: {_n(s['quantity'])} arriving {s['eta']} (after launch)"
                 for s in later
             ],
-            decision=f"Which edition gets the {_n(need.usable)} {desc}?",
+            decision=f"Which edition gets the {_n(have)} {desc}?",
         )
+        # A management memo may already settle it ("Collector's Edition first"): recommend that,
+        # quoted, and still ask the approver (the memo is evidence, not the decision).
+        ruling = _memo_first(need.editions)
+        memo_line = ""
+        if ruling:
+            first, rule = ruling
+            src = Path(rule["file"]).name + (f", {rule['date']}" if rule.get("date") else "")
+            card.evidence.append(f'{src}: "{rule["text"]}"')
+            card.decision = f"{card.decision} Recommended: {first} first, per {src}."
+            memo_line = f'\n\nPer {src}: "{rule["text"]}" We recommend {first} first.'
         # A trade-off between editions is an exception to the plan: the policy's approver of exceptions
         approver = people.exception_approver()
         card.evidence.append(
@@ -317,9 +345,10 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
                 people.label(approver, f"approver of exceptions (see {people.policy_name})"),
                 None,
                 f"Decision needed: allocate {desc} between editions",
-                f"Hello,\n\nwe have {_n(need.usable)} {desc} for {_n(need.needed)} still to pack "
+                f"Hello,\n\nwe have {_n(have)} {desc} (stock{arriving}) for {_n(need.needed)} "
+                f"still to pack "
                 f"({', '.join(need.editions)}): {_n(need.gap)} short. Please decide which edition gets "
-                f"them first." + _signature(),
+                f"them first." + memo_line + _signature(),
             )
         )
         if email:
@@ -338,6 +367,21 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
 
     _add_timing(cards, result)
     return sorted(cards, key=lambda c: (-c.at_risk, c.act_by is None))
+
+
+def _memo_first(editions: list[str]) -> tuple[str, dict] | None:
+    """The edition the customer's priorities memo puts first, if a memo says so."""
+    try:
+        from ask_soony import api, memo
+
+        root = api.portal_root()
+        hit = memo.first_edition(root, editions)
+        if not hit:
+            return None
+        label = api.edition_labels(root).get(hit[0])
+        return (f"{label} Edition ({hit[0]})" if label else hit[0]), hit[1]
+    except Exception:  # no portal or an unreadable memo: no recommendation, never a crash
+        return None
 
 
 # Which fix a card stands for, by the start of its id

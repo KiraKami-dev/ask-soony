@@ -176,3 +176,177 @@ def test_blocked_stock_card_asks_whether_it_was_packed(tmp_path):
     blocked = next(c for c in cards if c.id.startswith("wrong"))
     assert blocked.blocked_only and blocked.at_risk == 0
     assert "do any packed copies already contain this stock?" in blocked.messages[0].body
+
+
+# ---- inbound that lands before packing ends (launch day here is Sun 1 Mar 2026)
+
+ADVICE = "suppliers/SUP-0007_Acme_Parts/order_confirmations/Shipping_advice_020-1_9100000002.pdf"
+
+
+def inbound_plan(root, rows):
+    """A launch plan with an Inbound table (supplier, part, quantity, ..., status)."""
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Inbound"
+    ws.append(
+        ["Supplier", "Part", "Quantity", "Mode", "Reference", "ETD", "ETA", "Status", "Comment"]
+    )
+    for row in rows:
+        ws.append(["Acme Parts", *row, None])
+    (root / "soony/context").mkdir(parents=True, exist_ok=True)
+    wb.save(root / "soony/context/plan.xlsx")
+
+
+def shipping_advice(root, readings, shipped, expected, part_in_item=False):
+    """
+    The supplier's shipping advice for AWB 020-1, read: CMP-A shipped `shipped`.
+    part_in_item: the reader put the part number in `item` and left material_id empty.
+    """
+    folder = readings / "advice"
+    folder.mkdir(parents=True)
+    sha = hashlib.sha256((root / ADVICE).read_bytes()).hexdigest()
+    (folder / "meta.json").write_text(json.dumps({"path": ADVICE, "sha256": sha, "status": "ok"}))
+
+    def value(field, raw, number):
+        return {
+            "field": field,
+            "field_label": None,
+            "value": raw,
+            "number": number,
+            "unit": None,
+            "written": "printed",
+            "crossed_out": False,
+            "legible": "clear",
+        }
+
+    (folder / "verdict.json").write_text(
+        json.dumps(
+            {
+                "document_type": "shipping_advice",
+                "references": [{"type": "air_waybill", "value": "020-1"}],
+                "lines": [
+                    {
+                        "item": "CMP-A" if part_in_item else "1",
+                        "material_id": None if part_in_item else "CMP-A",
+                        "supplier_part_no": None,
+                        "description": None,
+                        "values": [
+                            value("quantity_shipped", str(shipped), shipped),
+                            value("date_expected", expected, None),
+                        ],
+                    }
+                ],
+                "statements": [],
+                "corrections": [],
+                "decisions": [],
+                "verdict": {
+                    "status": "has_warnings",
+                    "summary_en": "",
+                    "red_flags": [],
+                    "confidence": "high",
+                    "observations": [],
+                },
+            }
+        )
+    )
+
+
+PLAN_ROWS = [
+    ("CMP-A", 30, "air", "AWB-IN", "2026-02-27", "2026-02-28", "booked"),  # lands in time
+    ("CMP-A", 1000, "sea", "CONT-LATE", "2026-02-01", "2026-03-05", "in transit"),  # after launch
+    ("CMP-A", 500, "air", "AWB-X", "2026-02-27", "2026-02-28", "cancelled"),
+    ("CMP-A", 40, "air", "020-1", "2026-02-27", "2026-02-28", "booked"),  # has a shipping advice
+]
+
+
+def test_inbound_before_packing_ends_closes_part_of_the_gap(tmp_path):
+    root = portal_with_plan(tmp_path)
+    inbound_plan(root, PLAN_ROWS)
+    readings = tmp_path / "readings"
+    failed_inspection(root, readings)  # CMP-A: 550 usable for 600 needed
+    graph = build(root, readings)
+    result = compute(graph.records, graph.issues)
+    part_a = next(p for p in result.parts if p.part == "CMP-A")
+    # Only AWB-IN counts: CONT-LATE lands after launch, AWB-X is cancelled, and 020-1 has a
+    # shipping advice nobody has read yet (it may say short), so it is not counted either
+    assert [(a["reference"], a["quantity"]) for a in part_a.arriving] == [("AWB-IN", 30)]
+    assert part_a.gap == 600 - 550 - 30
+    reasons = {a["reference"]: a["reason"] for a in part_a.not_counted}
+    assert reasons["AWB-X"] == "cancelled"
+    assert "not read yet" in reasons["020-1"]
+    assert "CONT-LATE" not in reasons  # after launch is never 'arriving'
+    cards = build_cards(result, graph.issues, graph.records)
+    allocate = next(c for c in cards if c.id == "allocate-CMP-A")
+    assert allocate.title == "Part A: 20 short across 2 editions"
+    assert "550 in stock + 30 arriving before packing ends" in allocate.paper_says
+
+
+def test_shipped_short_counts_only_what_the_paper_says_and_the_card_goes(tmp_path):
+    root = portal_with_plan(tmp_path)
+    inbound_plan(root, PLAN_ROWS)
+    readings = tmp_path / "readings"
+    failed_inspection(root, readings)
+    shipping_advice(root, readings, shipped=25, expected="2026-03-04")  # 15 come after launch
+    graph = build(root, readings)
+    result = compute(graph.records, graph.issues)
+    part_a = next(p for p in result.parts if p.part == "CMP-A")
+    assert sorted((a["reference"], a["quantity"]) for a in part_a.arriving) == [
+        ("020-1", 25),
+        ("AWB-IN", 30),
+    ]
+    balance = next(a for a in part_a.not_counted if a["reference"] == "020-1")
+    assert (balance["quantity"], balance["eta"]) == (15, "2026-03-04")
+    assert part_a.gap == 0  # 550 + 30 + 25 >= 600
+    cards = build_cards(result, graph.issues, graph.records)
+    assert not any(c.id == "allocate-CMP-A" for c in cards)  # no gap left, nothing to allocate
+
+
+def test_shipped_short_is_found_when_the_part_number_sits_in_item(tmp_path):
+    root = portal_with_plan(tmp_path)
+    inbound_plan(root, PLAN_ROWS)
+    readings = tmp_path / "readings"
+    failed_inspection(root, readings)
+    shipping_advice(root, readings, shipped=25, expected="2026-03-04", part_in_item=True)
+    graph = build(root, readings)
+    part_a = next(p for p in compute(graph.records, graph.issues).parts if p.part == "CMP-A")
+    assert ("020-1", 25) in [(a["reference"], a["quantity"]) for a in part_a.arriving]
+    assert any(a["reference"] == "020-1" for a in part_a.not_counted)
+
+
+def receipt(root, gr_date):
+    path = root / "soony/erp/goods_receipts.csv"
+    path.write_text(
+        path.read_text()
+        + f"7000000030,{gr_date},9100000002,1,SUP-0007,CMP-B,DC-X,200,200,WZ-9,Insp,\n"
+    )
+
+
+def test_inbound_received_before_the_stock_figure_is_not_counted_twice(tmp_path):
+    root = portal_with_plan(tmp_path)  # stock figures as of 2026-02-28
+    inbound_plan(root, [("CMP-B", 200, "air", "AWB-002", "2026-02-01", "2026-02-03", "booked")])
+    receipt(root, "2026-02-20")
+    graph = build(root)
+    part_b = next(p for p in compute(graph.records, graph.issues).parts if p.part == "CMP-B")
+    assert not [a for a in part_b.arriving if a["reference"] == "AWB-002"]
+    shipment = next(a for a in part_b.not_counted if a["reference"] == "AWB-002")
+    assert shipment["reason"] == "already in stock (goods receipt 7000000030)"
+
+
+def test_inbound_received_after_the_stock_figure_counts(tmp_path):
+    root = portal_with_plan(tmp_path)
+    inbound_plan(root, [("CMP-B", 200, "air", "AWB-002", "2026-02-01", "2026-02-03", "booked")])
+    receipt(root, "2026-03-01")
+    graph = build(root)
+    part_b = next(p for p in compute(graph.records, graph.issues).parts if p.part == "CMP-B")
+    shipment = next(a for a in part_b.arriving if a["reference"] == "AWB-002")
+    assert (shipment["quantity"], shipment["status"]) == (200, "received")
+
+
+def test_overdue_shipment_without_receipt_is_not_supply(tmp_path):
+    root = portal_with_plan(tmp_path)
+    graph = build(root)  # ERP shipment CONT001: ETA 2026-02-02, still in transit, no receipt
+    part_b = next(p for p in compute(graph.records, graph.issues).parts if p.part == "CMP-B")
+    late = next(a for a in part_b.not_counted if a["reference"] == "CONT001")
+    assert late["quantity"] == 300  # the open PO line 9100000001/2
+    assert "passed before the 2026-02-28 stock figure" in late["reason"]
+    assert part_b.arriving == []

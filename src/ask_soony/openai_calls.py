@@ -197,7 +197,8 @@ def turn_detection() -> dict:
     How the model decides that the caller spoke. `server` (default) ignores sound below a volume
     threshold, which filters quieter background voices; `semantic` judges by meaning instead.
     """
-    if os.environ.get("OPENAI_TURN_DETECTION", "server") == "semantic":
+    # Default: semantic, so fragments of background talk ("Please.", a name) do not start a turn.
+    if os.environ.get("OPENAI_TURN_DETECTION", "semantic") == "semantic":
         return {
             "type": "semantic_vad",
             "eagerness": "low",
@@ -264,15 +265,26 @@ def handle_incoming(event: dict, data_dir: Path) -> None:
     sideband(call_id, alert_id, contact_name, data_dir, auth)
 
 
-def sideband(call_id: str, alert_id: int, contact_name: str, data_dir: Path, auth: dict) -> None:
+def sideband(
+    call_id: str,
+    alert_id: int,
+    contact_name: str,
+    data_dir: Path,
+    auth: dict,
+    greet: bool = True,
+    attempt: int = 0,
+) -> None:
     from websockets.sync.client import connect
 
     book = AlertBook(Store(data_dir))
     decided_at = None
+    active = False  # a response is being generated: never start a second one
+    pending = False  # our own response.create waits for the running one to finish
     with connect(
         f"wss://api.openai.com/v1/realtime?call_id={call_id}", additional_headers=auth
     ) as ws:
-        ws.send(json.dumps({"type": "response.create"}))  # greet first
+        if greet:
+            ws.send(json.dumps({"type": "response.create"}))  # greet first
         while True:
             try:
                 msg = json.loads(ws.recv(timeout=600))
@@ -287,8 +299,22 @@ def sideband(call_id: str, alert_id: int, contact_name: str, data_dir: Path, aut
                     "openai",
                     f"sideband closed: {type(e).__name__} {e}"[:300],
                 )
+                # A dropped control connection is not the end of the call: reconnect (twice).
+                if decided_at is None and attempt < 2 and "ConnectionClosed" in type(e).__name__:
+                    book.log(alert_id, "call", "call", "openai", "reconnecting the sideband")
+                    return sideband(
+                        call_id, alert_id, contact_name, data_dir, auth, False, attempt + 1
+                    )
                 break
             kind = msg.get("type")
+            if kind == "response.created":
+                active = True
+            elif kind == "response.done":
+                active = False
+                if pending:
+                    pending = False
+                    ws.send(json.dumps({"type": "response.create"}))
+                    active = True
             # Readable conversation log and errors in the alert history.
             if kind in {"response.output_audio_transcript.done", "response.audio_transcript.done"}:
                 book.log(
@@ -340,7 +366,11 @@ def sideband(call_id: str, alert_id: int, contact_name: str, data_dir: Path, aut
                         }
                     )
                 )
-                ws.send(json.dumps({"type": "response.create"}))
+                if active:
+                    pending = True  # answer once the running response has finished
+                else:
+                    ws.send(json.dumps({"type": "response.create"}))
+                    active = True
                 decided_at = time.time()
             elif kind == "response.done" and decided_at and time.time() - decided_at > 1:
                 time.sleep(4)  # let the goodbye play out

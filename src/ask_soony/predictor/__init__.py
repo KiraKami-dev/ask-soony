@@ -7,8 +7,9 @@ shipments) is read from the portal files at run time and given to the model as c
 model answers through one tool, so the output is structured and can be checked: every ID it
 names is validated against the IDs that actually appear in that context.
 
-Results are written to <data_dir>/state/impacts.json, keyed by event, so the UI and the
-criticality agent can read them.
+Results are written to <state>/event_impacts.json, keyed by event, so the UI and the
+criticality agent can read them. (impacts.json belongs to the paper check, a list keyed by
+finding; an older impacts.json keyed by event is still read.)
 """
 
 import json
@@ -152,15 +153,34 @@ def _is_context_path(path: str) -> bool:
     return any(x in CONTEXT_FOLDERS for x in parts)
 
 
+STATE_FILE = "event_impacts.json"
+LEGACY_FILE = "impacts.json"  # shared with the paper check's list; read only when keyed by event
+
+
 class ImpactAgent:
-    def __init__(self, store: Store, backend: Backend, state_dir: Path):
+    def __init__(
+        self, store: Store, backend: Backend, state_dir: Path, portal: Path | None = None
+    ):
         self.store = store
         self.backend = backend
-        self.state_file = state_dir / "impacts.json"
+        self.state_file = state_dir / STATE_FILE
+        self.legacy_file = state_dir / LEGACY_FILE
+        # The portal mirror: files dropped there by hand (`ask-soony drop`) that the watcher's
+        # store has not seen yet are read from disk.
+        self.portal = portal
+
+    def _known(self, path: str) -> bool:
+        return path in self.store.current() or bool(
+            self.portal and (self.portal / path).is_file()
+        )
 
     def _text(self, path: str) -> str:
-        v = self.store.current()[path]
-        return extract(path, self.store.read_blob(v.sha256), render_images=False).text
+        v = self.store.current().get(path)
+        if v is None and self.portal and (self.portal / path).is_file():
+            data = (self.portal / path).read_bytes()
+        else:
+            data = self.store.read_blob(v.sha256) if v else b""
+        return extract(path, data, render_images=False).text
 
     def network_context(self) -> str:
         chunks = []
@@ -192,7 +212,7 @@ class ImpactAgent:
         """Turn exactly the changed event or logistics files into predictor inputs."""
         events = []
         for path in paths:
-            if path not in self.store.current() or not is_predictor_path(path):
+            if not self._known(path) or not is_predictor_path(path):
                 continue
             text = self._text(path)
             if is_event_path(path):
@@ -236,9 +256,16 @@ class ImpactAgent:
         return result
 
     def load(self) -> dict:
-        if self.state_file.exists():
-            return json.loads(self.state_file.read_text(encoding="utf-8"))
-        return {}
+        """Impacts keyed by event; an older impacts.json keyed by event counts as well."""
+        out: dict = {}
+        for f in (self.legacy_file, self.state_file):
+            try:
+                data = json.loads(f.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            if isinstance(data, dict):  # the paper check's list in impacts.json is not ours
+                out.update({k: v for k, v in data.items() if isinstance(v, dict)})
+        return out
 
     def save(self, impact: dict) -> None:
         state = self.load()

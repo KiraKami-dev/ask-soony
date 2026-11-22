@@ -32,6 +32,9 @@ CSV_LAYOUTS: dict[str, frozenset[str]] = {
     "bom_change": frozenset({"change_id", "parent_id", "child_id", "rev_old", "rev_new"}),
     "supplier_parts": frozenset({"component_id", "share", "unit_price", "primary", "note"}),
 }
+# Files whose columns are named differently (German, SAP, another tool) but map to a known kind
+# through the column mapping (ask_soony.columns): mapped kind → adapter kind.
+MAPPED_KINDS = {"purchase_orders": "purchase_orders_mapped"}
 XLSX_LAYOUTS: dict[str, frozenset[str]] = {
     "shipment_tracker": frozenset({"Shipment", "POs", "Status"}),
 }
@@ -83,8 +86,12 @@ def sniff_separator(first_line: str) -> str:
 
 
 def csv_header(path: Path) -> set[str]:
-    with path.open(encoding="utf-8-sig") as handle:
-        first = handle.readline().strip()
+    raw = path.read_bytes()
+    try:
+        text = raw.decode("utf-8-sig")
+    except UnicodeDecodeError:  # German SAP/Excel exports are Windows-1252
+        text = raw.decode("cp1252", errors="replace")
+    first = text.split("\n", 1)[0].strip()
     return {col.strip() for col in first.split(sniff_separator(first))}
 
 
@@ -166,6 +173,14 @@ def classify(path: Path) -> tuple[str, dict]:
             kind = _best_layout(csv_header(path), CSV_LAYOUTS)
             if kind:
                 return kind, {}
+            from ask_soony import columns
+
+            info = columns.describe(path, "cache")
+            if info and info["kind"] in MAPPED_KINDS:
+                return MAPPED_KINDS[info["kind"]], {
+                    "columns": info["renamed"],
+                    "model": info["model"],
+                }
         elif suffix in (".xlsx", ".xlsm"):
             for kind, required in XLSX_LAYOUTS.items():
                 table = find_xlsx_table(path, required)
