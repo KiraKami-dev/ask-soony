@@ -1,4 +1,5 @@
 import { ExternalLink } from 'lucide-react'
+import { AnchorList, useAnchors } from '@/components/SourceAnchors'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
 import { fmtDay, fmtTime, type Card } from '@/lib/api'
 
@@ -27,6 +28,7 @@ export function EvidenceDrawer({ view, onClose }: { view: DrawerView; onClose: (
 }
 
 function Evidence({ card }: { card: Card }) {
+  const anchors = useAnchors(card.id)
   if (!card.evidence.length) return <p className="text-ink-2">No source documents attached to this decision yet.</p>
   return (
     <>
@@ -60,6 +62,7 @@ function Evidence({ card }: { card: Card }) {
               Open source document{e.page ? `, page ${e.page}` : ''} <ExternalLink size={14} />
             </a>
           )}
+          <AnchorList anchors={anchors.items?.[i]} ready={anchors.ready} />
         </section>
       ))}
     </>
