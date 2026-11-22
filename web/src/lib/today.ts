@@ -124,7 +124,7 @@ export interface Claim {
 
 const ID = /\b[A-Z]{0,4}[ -]?\d{6,}\b/
 function pick(v: string | number | undefined): string {
-  const s = tidy(String(v ?? '')).replace(PARENS, '').replace(/\s+(?:on|for)\s+[A-Z]{1,4}\s*\d{6,}/g, '').trim()
+  const s = tidy(String(v ?? '')).replace(PARENS, '').replace(/\s+(?:on|for|from)\s+[A-Z]{1,4}\s*\d{6,}/g, '').trim()
   const segs = s.split(/\s+·\s+|,\s+(?=[a-z])/).map((x) => x.trim()).filter(Boolean)
   const useful = segs.filter((x) => !ID.test(x))
   const dated = useful.find((x) => /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b|\b\d{1,2} [A-Z][a-z]{2}\b/.test(x) && /\d/.test(x))
@@ -173,7 +173,7 @@ export function claimOf(card: Card): Claim | null {
       value: verdict ? sv.replace(/^(Plan|System)\b/, (w) => w.toLowerCase()).replace(/\bsays\b/i, 'says it is').replace(/\bok\b/i, 'covered') : sv,
     },
     doc: { index: pair.doc, ev: d, value: dv },
-    pre: verdict ? (/^(plan|sap|system)\b/i.test(sv) ? 'The ' : '') : `${sysWho} ${expects ? 'expects' : 'says'} `,
+    pre: verdict && /^(plan|sap|system)\b/i.test(sv) ? 'The ' : `${sysWho} ${expects ? 'expects' : 'says'} `,
     mid: counted ? ', but we count ' : `, but ${owner} ${kind} says `,
     post: '.',
   }
