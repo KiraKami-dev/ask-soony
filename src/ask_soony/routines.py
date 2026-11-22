@@ -786,8 +786,15 @@ def propose(routine: dict, step: dict, preview: str) -> str:
                 p
                 for p in items
                 if p.get("status") == "pending"
-                and p.get("routine_id") == routine.get("id")
-                and p.get("step") == step
+                and (
+                    (p.get("routine_id") == routine.get("id") and p.get("step") == step)
+                    # the same step on the same card from another routine (two alike routines)
+                    or (
+                        step.get("card")
+                        and (p.get("step") or {}).get("card") == step.get("card")
+                        and (p.get("step") or {}).get("do") == step.get("do")
+                    )
+                )
             ),
             None,
         )
@@ -1729,8 +1736,32 @@ def post_preview(body: Draft):
         raise HTTPException(400, str(exc)) from exc
 
 
+def expire_stale() -> int:
+    """A pending step whose card was decided meanwhile (by hand, by voice) is no longer needed."""
+    from ask_soony import api
+
+    state = api.build_state()
+    open_ids = {c["id"] for c in state["cards"] if c.get("status") == "open"}
+    n = 0
+    with _plock:
+        items = _proposals()
+        for p in items:
+            card = p.get("card_id")
+            if p.get("status") == "pending" and card and card not in open_ids:
+                p["status"] = "expired"
+                p["note"] = "The case was decided meanwhile; nothing was sent."
+                n += 1
+        if n:
+            api.write_json(PROPOSALS, items)
+    return n
+
+
 @router.get("/api/routines/proposals")
 def list_proposals():
+    try:
+        expire_stale()
+    except Exception as exc:  # listing must work even if the state cannot be built
+        log.warning("expiring proposals failed: %s", exc)
     items = _proposals()
     pending = sorted(
         (p for p in items if p.get("status") == "pending"),

@@ -187,6 +187,13 @@ function ReadyList({ state, onReview }: { state: State; onReview: Review }) {
   const live = useLive()
   const pending = pendingOf(live)
   if (!pending.length) return null
+  // One row per routine: several steps of the same kind read as one thing to look at.
+  const byRoutine: { id: string; name: string; items: typeof pending }[] = []
+  for (const x of pending) {
+    const g = byRoutine.find((r) => r.id === x.routine_id)
+    if (g) g.items.push(x)
+    else byRoutine.push({ id: x.routine_id, name: x.routine_name, items: [x] })
+  }
   const title = (x: (typeof pending)[number]) => {
     const card = x.card_id ? state.cards.find((c) => c.id === x.card_id) : undefined
     return card ? shortTitle(card, state) : x.step.text || x.routine_name
@@ -200,16 +207,18 @@ function ReadyList({ state, onReview }: { state: State; onReview: Review }) {
         )}
       </p>
       <ul className="-mx-3.5">
-        {pending.map((x) => (
-          <li key={x.id}>
+        {byRoutine.map((g) => (
+          <li key={g.id}>
             <button
-              onClick={() => onReview([x])}
+              onClick={() => onReview(g.items)}
               className="t-small grid w-full cursor-pointer grid-cols-[8px_1fr] items-baseline gap-3.5 rounded-[10px] px-3.5 py-3 text-left text-ink-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-accent"
             >
               <i className="h-[7px] w-[7px] -translate-y-px rounded-full bg-routine" />
               <span className="min-w-0">
-                <span className="line-clamp-2">{title(x)}</span>
-                <span className="block text-ink-3">{x.step.text || 'Prepared'} · {x.routine_name}</span>
+                <span className="line-clamp-2">{g.name}</span>
+                <span className="block text-ink-3">
+                  {g.items.length === 1 ? title(g.items[0]) : `${g.items.length} prepared · ${title(g.items[0])} and more`}
+                </span>
               </span>
             </button>
           </li>
