@@ -180,11 +180,12 @@ export function Today(p: Props) {
           {ready}
           {p.order.length > 0 && <QuietList {...p} card={p.caseCard ? null : p.card} />}
           {groups}
+          {/* What routines did: a quiet line in the list, not pinned over the decision. */}
+          {view !== 'clear' && view !== 'case' && handled > 0 && <FootLines handled={handled} onRoutines={() => p.onRoutines()} nowMs={nowMs} center={false} />}
           {!phone && p.order.length > 0 && <p className="t-small text-ink-3">move <kbd>J</kbd> <kbd>K</kbd></p>}
         </aside>
         <main className="relative min-w-0">{body}</main>
       </div>
-      {view !== 'clear' && view !== 'case' && <div className="fixed inset-x-0 bottom-8 z-10 flex justify-center">{foot}</div>}
       {sheet}
     </div>
   )
