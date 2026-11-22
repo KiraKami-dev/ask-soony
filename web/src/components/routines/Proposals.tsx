@@ -136,7 +136,7 @@ export function ProposalLines({
 
 // ---------------------------------------------------------------- would handle
 
-/** "Your routine ‘X’ handles cases like this · let it · ask me first" on a focused decision. */
+/** "Your routine ‘X’ fits this case, but it is off · switch it on, asking you first" on a decision. */
 export function WouldLine({ w, onChanged, className }: { w: WouldHandle; onChanged: () => void; className?: string }) {
   const [busy, setBusy] = useState<'tell' | 'ask' | null>(null)
   const [done, setDone] = useState<'tell' | 'ask' | null>(null)
@@ -163,15 +163,24 @@ export function WouldLine({ w, onChanged, className }: { w: WouldHandle; onChang
       </RoutineLine>
     )
   }
-  const links = [
-    ...(!w.enabled || mode === 'ask' ? [{ label: 'let it', onClick: () => go('tell'), busy: busy === 'tell' }] : []),
-    ...(!w.enabled || mode !== 'ask' ? [{ label: 'ask me first', onClick: () => go('ask'), busy: busy === 'ask' }] : []),
-  ]
+  // Say the routine's real state, and links that say what they do.
+  const name = w.routine_name.length > 48 ? `${w.routine_name.slice(0, 46).replace(/\s+\S*$/, '')}…` : w.routine_name
+  const say = !w.enabled
+    ? `Your routine ‘${name}’ fits this case, but it is off`
+    : mode === 'ask'
+      ? `Your routine ‘${name}’ prepares cases like this for you to send`
+      : `Your routine ‘${name}’ handles cases like this on its own`
+  const links = !w.enabled
+    ? [
+        { label: 'switch it on, asking you first', onClick: () => go('ask'), busy: busy === 'ask' },
+        { label: 'let it act and tell you', onClick: () => go('tell'), busy: busy === 'tell' },
+      ]
+    : mode === 'ask'
+      ? [{ label: 'let it send on its own', onClick: () => go('tell'), busy: busy === 'tell' }]
+      : [{ label: 'ask me first instead', onClick: () => go('ask'), busy: busy === 'ask' }]
   return (
     <div className={className}>
-      <RoutineLine links={links}>
-        Your routine ‘{w.routine_name}’ {w.enabled && mode === 'ask' ? 'prepares cases like this for you' : 'handles cases like this'}
-      </RoutineLine>
+      <RoutineLine links={links}>{say}</RoutineLine>
       {error && <p className="t-small mt-1 text-late" role="alert">{error}</p>}
     </div>
   )
