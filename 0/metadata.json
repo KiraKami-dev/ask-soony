@@ -1,0 +1,179 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M80K2D27KSFGEHFD7BGHH7B6",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T02:59:07.763873Z",
+  "branch": "jonas/alert-platform",
+  "checkpoints_count": 4,
+  "save_step_count": 1,
+  "files_touched": [
+    "web/src/components/Routines.tsx",
+    "web/src/components/routines/FlowGraph.tsx",
+    "web/src/components/routines/RoutineCard.tsx",
+    "web/src/components/routines/RoutineFlow.tsx",
+    "web/src/components/routines/types.ts"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "dc0a84321923",
+  "compact_transcript_start": 0,
+  "session_token_usage": {
+    "input_tokens": 1794,
+    "cache_creation_tokens": 2075211,
+    "cache_read_tokens": 372585217,
+    "output_tokens": 767138,
+    "api_call_count": 764,
+    "subagent_tokens": {
+      "input_tokens": 514,
+      "cache_creation_tokens": 1839439,
+      "cache_read_tokens": 19945867,
+      "output_tokens": 295791,
+      "api_call_count": 245
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 1245,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 63,
+      "credentialed_uri": 0,
+      "entropy": 269,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 889,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 792,
+      "IP": 32,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 176
+  },
+  "summary": {
+    "intent": "Win the Lio 'Keep the Line Running' hackathon challenge by analyzing Soony's confidential launch data, then building a product (ask-soony) that detects document-vs-SAP contradictions, recommends and executes supplier actions, and scales to other customers.",
+    "outcome": "Found that the Collector's Edition misses launch despite an 'all ok' plan (art book overbooking, failed statue lot, game cards offloaded). Built a poller/agent/inbox app with Teams/push/voice alerts, a Monty-sandbox 'routines' feature with recipe compiler and flow view, 7 demo cards, and a UI redesign in progress. 181 tests passed, but many commits remain unpushed.",
+    "learnings": {
+      "repo": [
+        "Confidential portal data lives in the gitignored data/ folder (raw, drops, notes, state, img); .env holds SOONY_PORTAL_TOKEN and .env.example is committed",
+        "Portal API has only three endpoints (files list, single file, archive.zip) with no webhooks; changes must be detected by polling and comparing per-file SHA-256, since files get replaced under the same name",
+        "Team workflow lives in CLAUDE.md and PROGRESS.md; work is claimed with a Now line, and branch jonas/alert-platform feeds Akshat's PR #5",
+        "Entire hooks only write a checkpoint when repo files change; a session with no repo changes logs 'skipping checkpoint'",
+        "Routines are structured recipes (conditions, steps, fixed brake) compiled to Monty sandbox code, which lets the flow chart be generated automatically",
+        "scripts/demo_cards.py seeds demo cards from live portal data (only document references are fixed) and supports --reset, which backs up state files and switches routines off",
+        "Some UI files (api.ts, Routines.tsx) and the map/main view belong to teammates; coordinate before changing them"
+      ],
+      "code": [
+        {
+          "path": "src/ask_soony/routines.py",
+          "finding": "_costs_money treated an option as free based on its cost text, so an allocation option with cost 'none' could run automatically; fixed to allow only free communication options, never re-plans, allocations or orders"
+        },
+        {
+          "path": "src/ask_soony/api.py",
+          "finding": "build_activity, escalate and dismiss now record a 'via' value (inbox, voice or routine) for each decision"
+        },
+        {
+          "path": "src/ask_soony/cardtools.py",
+          "finding": "Added teach_routine voice tool, which only works on decided cards, stores a switched-off draft in routine_drafts.json, and exposes GET /api/routines/drafts"
+        },
+        {
+          "path": "web/src/components/VoiceCall.tsx",
+          "finding": "Hang-up delay raised from 0.8 s to 4 s so the buyer can say 'next time just do that'; it is cancelled if the buyer speaks or a tool is running"
+        }
+      ],
+      "workflow": [
+        "Subagents in parallel (UX, UI, jury devil's advocate, data scout, builders) were effective, each with a narrow brief and its own files",
+        "Back up state files before resetting demo state, and check that background loops don't silently re-enable routines",
+        "Verify UI changes with headless-browser screenshots rather than assuming they render correctly",
+        "Keep confidential data and findings out of commits and external services; share artifacts only with the team",
+        "Local pip/uv tooling: run lint and tests before each commit, and ask before pushing the accumulated commits"
+      ]
+    },
+    "friction": [
+      "The portal token was missing at the start, which blocked the data step until the user added it",
+      "The Routines and Enable alerts buttons overlapped the map legend and the rest of the UI",
+      "'Automate cards like this' kept appearing for cards that already had a routine or draft",
+      "Monty's API was larger than expected, so it needed several rounds of reading docs and examples",
+      "The sandbox type checker rejected the first compiled recipes with mixed text and dict types, requiring explicit conversions",
+      "The dashboard contradicted itself (-7 h slack with 'on track', mismatched at-risk counts) and showed raw codes like CMP-GAM-001",
+      "Demo card deadlines will already be overdue by 14:00 unless the script is re-run",
+      "One recipe test failed because it assumed the wrong option wording from Akshat's adapter",
+      "The team's Teams webhook setup was a manual step that depended on organisation permissions"
+    ],
+    "open_items": [
+      "13 or more commits on jonas/alert-platform are unpushed and waiting for the user's OK to push into PR #5",
+      "Frontend still needs to show activity[].via and read GET /api/routines/drafts",
+      "Full UI redesign (launch-control top bar, timeline replacing the world map, map as a Suppliers tab) awaits agreement with Akshat; three design subagents were running",
+      "Routines flow view (n8n-style, with last-run counters) was being built and was not yet reviewed",
+      "Send the Karton Nowak order and the Boise reply; register sender addresses in portal Settings",
+      "Ask Lio whether portal data is the same for all teams and whether actions create files",
+      "Run demo_cards.py --reset shortly before the demo to refresh deadlines",
+      "Remaining deliverables: demo script, deck and video; hand-in at 12:00 Sunday",
+      "Decide whether to delete the older Claude doc now that the briefing page exists",
+      "Change the portal password that ended up in Discord history after the hack"
+    ]
+  }
+}
