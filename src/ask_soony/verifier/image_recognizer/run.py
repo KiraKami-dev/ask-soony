@@ -154,9 +154,30 @@ def _tokens(run: dict) -> int:
     return (run.get("usage") or {}).get("total_tokens") or 0
 
 
+# A key or permission problem says nothing about the document: it does not count as a failure
+AUTH_ERRORS = ("AuthenticationError", "PermissionDeniedError")
+
+
+def failures(folder: Path) -> tuple[int, str | None]:
+    """How often this file version failed to read in a row (across runs), and the last error."""
+    try:
+        meta = json.loads((folder / "meta.json").read_text())
+    except (OSError, json.JSONDecodeError):
+        return 0, None
+    return int(meta.get("failures") or 0), meta.get("error")
+
+
 def _save(job: Job, settings: Settings, run: dict, started: float, attempts: int) -> dict:
     folder = settings.out / job.folder
     folder.mkdir(parents=True, exist_ok=True)
+    error = run.get("error")
+    before, _ = failures(folder)
+    if not error:
+        failed = 0
+    elif any(marker in error for marker in AUTH_ERRORS):
+        failed = before
+    else:
+        failed = before + 1
     meta = {
         "path": job.rel,
         "sha256": job.sha256,
@@ -166,6 +187,7 @@ def _save(job: Job, settings: Settings, run: dict, started: float, attempts: int
         "status": "error" if run.get("error") else "ok",
         "error": run.get("error"),
         "attempts": attempts,
+        "failures": failed,  # failed runs in a row; live reading gives up at MAX_FAILURES
         "finished_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "seconds": round(time.time() - started, 1),
         "usage": run.get("usage"),

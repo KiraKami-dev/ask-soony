@@ -21,7 +21,11 @@ uv run python -m ask_soony.verifier.image_recognizer.gate --model gpt-5.4-mini  
 uv run python -m ask_soony.verifier.image_recognizer.gate --readings src/ask_soony/verifier/baseline_sonnet   # free
 ```
 
-Exit code 0 only if every must-catch case passes.
+Exit code 0 only if every must-catch case passes; then the reader (model, effort, prompt+schema fingerprint) is written to `trusted.json`.
+
+## Live reading (`live.py`)
+
+On every portal change, `dispatch.refresh` reads the documents that have no reading yet (changed ones first) before the verifier links, so a new scan's content reaches the cards in one cycle (~10–15 s for one scan). It only runs a reader listed in `trusted.json`, skips the baseline and the ignored list, reads at most `ASK_READER_MAX_DOCS` (30) per refresh, and never blocks the pipeline: what was read, failed or left unread (with the reason) is in `dispatch.json` under `reading`. Settings: `ASK_READER` (on/off), `ASK_READER_MODEL` (`gpt-5.4-mini`), `ASK_READER_EFFORT` (`medium`), `OPENAI_API_KEY`.
 
 ## Output: `data/store/image_recognizer/` (gitignored, confidential)
 

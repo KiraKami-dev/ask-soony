@@ -1,0 +1,24 @@
+{
+  "about": "Readers (model, effort, prompt+schema fingerprint) that passed the gate. Written by the gate; the live reader only runs these.",
+  "readers": [
+    {
+      "model": "gpt-5.4-mini",
+      "effort": "medium",
+      "fingerprint": "571da4d6d2c54141",
+      "passed_at": "2026-11-22T10:00:36+00:00",
+      "cases": [
+        "artbook_handwritten_correction",
+        "sleeves_wrong_pallet_remark",
+        "statue_failed_inspection",
+        "game_cards_short_shipment",
+        "artbook_rush_offer",
+        "two_lines_same_part",
+        "thousands_dot",
+        "sleeve_old_revision",
+        "clean_note_polish",
+        "clean_note_chinese",
+        "clean_note_english"
+      ]
+    }
+  ]
+}

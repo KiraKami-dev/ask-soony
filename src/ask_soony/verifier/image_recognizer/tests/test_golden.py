@@ -107,3 +107,13 @@ def test_a_changed_file_makes_the_case_fail():
     changed = score(case, verdict, "0" * 64)
     assert not changed.passed
     assert "case invalid" in report([changed])[0]
+
+
+def test_scoring_existing_readings_never_records_trust(monkeypatch):
+    from ask_soony.verifier.image_recognizer import gate
+
+    recorded = []
+    monkeypatch.setattr(gate, "record_trust", lambda *a, **k: recorded.append(a))
+    monkeypatch.setattr("sys.argv", ["gate", "--readings", str(BASELINE_DIR)])
+    assert gate.main() == 0  # the baseline passes ...
+    assert recorded == []  # ... but only a reader the gate just ran earns trust

@@ -6,16 +6,19 @@ uv run python -m ask_soony.verifier.image_recognizer.gate \
     --readings src/ask_soony/verifier/baseline_sonnet                           # free
 
 Readings go to a scratch folder per model and effort (data/store/gate/), never into the live store
-or the baseline. Exit code 0 only if every must-catch case passes.
+or the baseline. Exit code 0 only if every must-catch case passes; then the reader (model,
+effort, prompt+schema fingerprint) is recorded in trusted.json and may run live (live.py).
 """
 
 import argparse
 import asyncio
+import json
 import sys
 from pathlib import Path
 
 from ask_soony.config import load_dotenv
 from ask_soony.verifier.image_recognizer.golden import load_cases, report, score_store
+from ask_soony.verifier.image_recognizer.live import record_trust
 from ask_soony.verifier.image_recognizer.run import Settings, run_all, select_jobs
 
 
@@ -49,9 +52,28 @@ def main() -> int:
         settings = Settings(root, store, args.model, args.effort, args.concurrency, 2, None)
         asyncio.run(run_all(jobs, settings, args.force))
 
-    text, trusted = report(score_store(store, cases))
+    results = score_store(store, cases)
+    text, trusted = report(results)
     print(text)
+    if trusted and args.readings is None:  # only a reader the gate just ran earns trust
+        _record(store, results)
     return 0 if trusted else 1
+
+
+def _record(store: Path, results) -> None:
+    """Every must-catch case passed: let this reader (model, effort, fingerprint) run live."""
+    metas = []
+    for r in results:
+        folder = next(store.glob(f"{r.case['path'].replace('/', '__')}__*/meta.json"), None)
+        if folder is not None:
+            metas.append(json.loads(folder.read_text(encoding="utf-8")))
+    readers = {(m.get("model"), m.get("effort"), m.get("fingerprint")) for m in metas}
+    if len(readers) != 1 or None in next(iter(readers)):
+        print("not recorded as trusted: the readings come from more than one reader")
+        return
+    model, effort, reader_fingerprint = readers.pop()
+    record_trust(model, effort, reader_fingerprint, [r.case["id"] for r in results if r.passed])
+    print(f"recorded as trusted for live reading: {model} / {effort} ({reader_fingerprint})")
 
 
 if __name__ == "__main__":
