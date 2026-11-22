@@ -33,3 +33,17 @@ export function roleFromParam(v: string | null, names: { viewer?: string | null;
   if (names.viewer && firstNameOf(names.viewer).toLowerCase() === x) return 'buyer'
   return null
 }
+
+/**
+ * What reaches the person who signs: cases that are red for the launch, that she signs, or that
+ * cost money. Everything else stays with the buyer, who sees every case.
+ */
+export function mattersToApprover(
+  c: { id: string; level?: string; signoff?: string | null; approver?: string | null },
+  approver: string | null | undefined,
+  priced: Set<string>,
+): boolean {
+  if (c.level === 'red' || priced.has(c.id)) return true
+  const me = firstNameOf(approver)
+  return !!me && (firstNameOf(c.signoff) === me || firstNameOf(c.approver) === me)
+}

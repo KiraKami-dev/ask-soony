@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertsButton } from '@/components/AlertsButton'
 import { EvidenceDrawer, type DrawerView } from '@/components/EvidenceDrawer'
+import { History } from '@/components/History'
 import { Launch } from '@/components/Launch'
 import { Routines, RoutinesLive } from '@/components/Routines'
 import { pendingOf, refreshNow, suggestionFor, useLive } from '@/components/routines/live'
@@ -9,7 +10,7 @@ import { Today, type DoneInfo } from '@/components/Today'
 import { TopBar, type Page } from '@/components/TopBar'
 import { DECIDED, DONE_WORD, fetchState, tidy, viaOf, type Card, type State } from '@/lib/api'
 import { actionIdOf } from '@/lib/decisions'
-import { roleFromParam, savedRole, saveRole, type Role } from '@/lib/role'
+import { mattersToApprover, roleFromParam, savedRole, saveRole, type Role } from '@/lib/role'
 import { lookAlikes, repeatWords, todayOrder, trucksLeave } from '@/lib/today'
 
 const POLL_MS = 5000
@@ -46,6 +47,8 @@ export default function App() {
   // Who uses this device: the approver lands on Launch, the buyer (and no choice) on Today.
   const [role, setRoleState] = useState<Role | null>(savedRole)
   const chooseRole = useCallback((r: Role | null) => { saveRole(r); setRoleState(r) }, [])
+  const roleRef = useRef(role)
+  roleRef.current = role
   const landed = useRef(false)
   const phone = !useMedia('(min-width: 1024px)')
   const narrow = useMedia('(max-width: 767px)')
@@ -63,7 +66,8 @@ export default function App() {
   }, [])
 
   const live = useLive()
-  const pending = pendingOf(live).length + drafts
+  // Routines are the buyer's: the person who signs is not asked to build or approve them.
+  const pending = role === 'approver' ? 0 : pendingOf(live).length + drafts
   const readyN = pendingOf(live).length
 
   const load = useCallback(async () => {
@@ -113,6 +117,7 @@ export default function App() {
 
   async function finish(s: State, d: { card: Card; text: string; sub: string; actionId: string | null }) {
     const k = Date.now()
+    if (roleRef.current === 'approver') { setDone({ ...d, offer: 0, k }); return }
     const more = lookAlikes(d.card, s).length
     if (more > 0) {
       setDone({ ...d, offer: (await hasRoutine(d.card.id)) ? 0 : more, k })
@@ -169,7 +174,15 @@ export default function App() {
     }
   }, [state, role, chooseRole])
 
-  const today = useMemo(() => (state ? todayOrder(state) : []), [state])
+  // The buyer sees every case; the person who signs only those that reach her.
+  const today = useMemo(() => {
+    if (!state) return []
+    const all = todayOrder(state)
+    if (role !== 'approver') return all
+    const m = state.launch?.money
+    const priced = new Set((m?.pending_decisions ?? []).map((d) => d.card))
+    return all.filter((c) => mattersToApprover(c, m?.approver, priced))
+  }, [state, role])
   // Launch and the folded groups on Today open a case on Today.
   const openCase = useCallback((id: string) => {
     setDone(null)
@@ -192,7 +205,7 @@ export default function App() {
   }
 
   const single = path.match(/^\/d\/(.+)$/)
-  const page: Page | null = single || path === '/' ? 'today' : path.startsWith('/launch') ? 'launch' : path.startsWith('/suppliers') ? 'suppliers' : path.startsWith('/routines') ? 'routines' : 'today'
+  const page: Page | null = single || path === '/' ? 'today' : path.startsWith('/launch') ? 'launch' : path.startsWith('/suppliers') ? 'suppliers' : path.startsWith('/routines') ? 'routines' : path.startsWith('/history') ? 'history' : 'today'
   // Routines is its own page; "Show me how" lands there drafting from the decision.
   const openRoutines = (request?: { cardId: string; k: number }) =>
     go(request ? `/routines?draft=${encodeURIComponent(request.cardId)}` : '/routines')
@@ -223,6 +236,8 @@ export default function App() {
       role={role}
       onRole={chooseRole}
       people={{ buyer: state.launch?.money?.viewer ?? state.viewer, approver: state.launch?.money?.approver ?? null }}
+      checkedAt={state.last_check_at}
+      nowMs={nowMs}
     />
   )
   const routines = <RoutinesLive state={state} />
@@ -271,6 +286,17 @@ export default function App() {
           allReq={allReq}
           onDrawer={(c, tab) => setDrawer({ card: c, tab })}
         />
+        {overlays}
+      </div>
+    )
+  }
+
+  // ------------------------------------------------------------ History
+  if (page === 'history') {
+    return (
+      <div className="flex min-h-full flex-col bg-ground">
+        {bar}
+        <History state={state} nowMs={nowMs} phone={narrow} onOpen={openCase} />
         {overlays}
       </div>
     )

@@ -1278,6 +1278,7 @@ def build_activity(cards: list[dict], events: list[dict], root: Path | None) -> 
                     "text": f"{'No launch risk' if c['status'] == 'logged' else 'Dismissed'}: {c['headline']}",
                     "detail": c.get("reason") or c.get("summary"),
                     "via": via(c),
+                    "by": act_of(c).get("by"),
                     "action_id": act_of(c).get("id"),
                 }
             )
@@ -1291,13 +1292,14 @@ def build_activity(cards: list[dict], events: list[dict], root: Path | None) -> 
                     "text": f"{c['status'].title()}: {c['headline']}",
                     "detail": ui.get("note"),
                     "via": via(c),
+                    "by": act_of(c).get("by"),
                     "action_id": act_of(c).get("id"),
                 }
             )
     items.sort(
         key=lambda x: parse_ts(x.get("at")) or datetime.min.replace(tzinfo=tz()), reverse=True
     )
-    return items[:40]
+    return items[:200]
 
 
 def event_node(path: str, net: dict) -> str | None:

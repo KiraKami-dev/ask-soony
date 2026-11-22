@@ -296,6 +296,8 @@ export interface ActivityItem {
   at?: string; text: string; kind: string; detail?: string | null; card?: string
   /** Who handled it: "inbox", "voice" or "routine: <name>". Missing on older items. */
   via?: string | null
+  /** Who decided, when the action records it. */
+  by?: string | null
   /** The action behind it, for undo (POST /api/routines/actions/{id}/undo). Missing: no undo. */
   action_id?: string | null
   id?: string | null

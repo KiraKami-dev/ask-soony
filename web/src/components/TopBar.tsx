@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { firstNameOf, type Role } from '@/lib/role'
 import { cn } from '@/lib/utils'
 
-export type Page = 'today' | 'launch' | 'suppliers' | 'routines'
+export type Page = 'today' | 'launch' | 'suppliers' | 'routines' | 'history'
 
 export function Mark({ size = 20 }: { size?: number }) {
   return (
@@ -27,6 +27,9 @@ interface Props {
   role?: Role | null
   onRole?: (r: Role | null) => void
   people?: { buyer?: string | null; approver?: string | null }
+  /** The agents' last look at the portal: a quiet heartbeat by the mark. */
+  checkedAt?: string | null
+  nowMs?: number
 }
 
 interface RoleProps { role: Role | null; onRole: (r: Role | null) => void; people: { buyer?: string | null; approver?: string | null } }
@@ -35,17 +38,32 @@ interface RoleProps { role: Role | null; onRole: (r: Role | null) => void; peopl
 function roleChoices({ people }: Pick<RoleProps, 'people'>): { role: Role; label: string; lands: string }[] {
   const out: { role: Role; label: string; lands: string }[] = []
   if (people.buyer) out.push({ role: 'buyer', label: `I'm ${firstNameOf(people.buyer)}`, lands: 'opens on Today' })
-  if (people.approver) out.push({ role: 'approver', label: `I'm ${firstNameOf(people.approver)}`, lands: 'opens on Launch' })
+  if (people.approver) out.push({ role: 'approver', label: `I'm ${firstNameOf(people.approver)}`, lands: 'launch and what needs her' })
   return out
 }
 
-const LINKS: { page: Page; label: string; path: string }[] = [
-  { page: 'today', label: 'Today', path: '/' },
-  { page: 'launch', label: 'Launch', path: '/launch' },
-]
+type Link = { page: Page; label: string; path: string }
+/**
+ * The buyer works the whole inbox and builds the routines; the person who signs gets the launch,
+ * the cases that reach her, and the record of what was decided. Nobody chose: the buyer's set.
+ */
+function linksFor(role: Role | null): Link[] {
+  const history: Link = { page: 'history', label: 'History', path: '/history' }
+  const suppliers: Link = { page: 'suppliers', label: 'Suppliers', path: '/suppliers' }
+  if (role === 'approver') {
+    return [{ page: 'launch', label: 'Launch', path: '/launch' }, { page: 'today', label: 'Inbox', path: '/' }, history, suppliers]
+  }
+  return [
+    { page: 'today', label: 'Today', path: '/' },
+    { page: 'launch', label: 'Launch', path: '/launch' },
+    { page: 'routines', label: 'Routines', path: '/routines' },
+    suppliers,
+    history,
+  ]
+}
 
 // One quiet line: the mark, where the launch stands, and where to go.
-export function TopBar({ page, go, status, bell, phone, routinesBadge = 0, role = null, onRole, people = {} }: Props) {
+export function TopBar({ page, go, status, bell, phone, routinesBadge = 0, role = null, onRole, people = {}, checkedAt = null, nowMs = Date.now() }: Props) {
   const who = onRole ? { role, onRole, people } : null
   const link = (on: boolean, label: ReactNode, onClick: () => void, key: string) => (
     <button
@@ -71,15 +89,21 @@ export function TopBar({ page, go, status, bell, phone, routinesBadge = 0, role 
         <Mark />
         {!phone && <span className="font-medium">Ask Soony</span>}
       </a>
+      {!phone && checkedAt && <Heartbeat at={checkedAt} nowMs={nowMs} />}
       <p className={cn('min-w-0 truncate text-center', phone && 'max-w-[calc(100%-88px)]')} aria-live="polite">{status}</p>
       <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-3 lg:right-6">
         {phone ? (
-          <PhoneMenu page={page} go={go} bell={bell} badge={routinesBadge} who={who} />
+          <PhoneMenu page={page} go={go} bell={bell} badge={role === 'approver' ? 0 : routinesBadge} who={who} links={linksFor(role)} />
         ) : (
           <nav className="flex items-center gap-4" aria-label="Views">
-            {LINKS.map((l) => link(page === l.page, l.label, () => go(l.path), l.page))}
-            {link(page === 'routines', <>Routines{routinesBadge > 0 && <span className="ml-1 text-routine">· {routinesBadge}</span>}</>, () => go('/routines'), 'routines')}
-            {link(page === 'suppliers', 'Suppliers', () => go('/suppliers'), 'suppliers')}
+            {linksFor(role).map((l) =>
+              link(
+                page === l.page,
+                l.page === 'routines' && routinesBadge > 0 ? <>Routines<span className="ml-1 text-routine">· {routinesBadge}</span></> : l.label,
+                () => go(l.path),
+                l.page,
+              ),
+            )}
             {bell}
             {who && roleChoices(who).length > 0 && <RoleMenu {...who} />}
           </nav>
@@ -89,7 +113,7 @@ export function TopBar({ page, go, status, bell, phone, routinesBadge = 0, role 
   )
 }
 
-function PhoneMenu({ page, go, bell, badge, who }: { page: Page | null; go: (p: string) => void; bell: ReactNode; badge: number; who: RoleProps | null }) {
+function PhoneMenu({ page, go, bell, badge, who, links }: { page: Page | null; go: (p: string) => void; bell: ReactNode; badge: number; who: RoleProps | null; links: Link[] }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -121,10 +145,11 @@ function PhoneMenu({ page, go, bell, badge, who }: { page: Page | null; go: (p: 
         {badge > 0 && <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-routine" />}
       </button>
       <div className={cn('absolute right-0 top-12 z-30 w-56 rounded-2xl bg-ground p-1.5 shadow-[0_12px_40px_-12px_rgba(0,0,0,.28)]', !open && 'hidden')}>
-        {item(page === 'today', 'Today', () => go('/'))}
-        {item(page === 'launch', 'Launch', () => go('/launch'))}
-        {item(page === 'routines', <>Routines{badge > 0 && <span className="ml-1.5 text-routine">· {badge}</span>}</>, () => go('/routines'))}
-        {item(page === 'suppliers', 'Suppliers', () => go('/suppliers'))}
+        {links.map((l) => (
+          <div key={l.page}>
+            {item(page === l.page, l.page === 'routines' && badge > 0 ? <>Routines<span className="ml-1.5 text-routine">· {badge}</span></> : l.label, () => go(l.path))}
+          </div>
+        ))}
         <div className="flex items-center justify-between px-3 pb-1 pt-2 text-[13px] text-ink-3">
           Launch alerts {bell}
         </div>
@@ -190,5 +215,25 @@ function RoleMenu({ role, onRole, people }: RoleProps) {
         </div>
       )}
     </div>
+  )
+}
+
+/**
+ * The agents are watching: a filled dot while the last portal check is fresh, a hollow ring and
+ * "Not checked since" when it is not. The words carry the meaning; the colour only adds to it.
+ */
+function Heartbeat({ at, nowMs }: { at: string; nowMs: number }) {
+  const t = new Date(at)
+  if (Number.isNaN(t.getTime())) return null
+  const fresh = nowMs - t.getTime() < 30 * 60000
+  const hm = t.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+  return (
+    <span className="absolute left-[150px] top-1/2 hidden -translate-y-1/2 items-center gap-2 text-ink-3 xl:flex lg:left-[166px]">
+      <span
+        aria-hidden="true"
+        className={cn('inline-block h-1.5 w-1.5 rounded-full', fresh ? 'bg-routine' : 'ring-1 ring-ink-3/50')}
+      />
+      {fresh ? `Watching · checked ${hm}` : `Not checked since ${hm}`}
+    </span>
   )
 }
