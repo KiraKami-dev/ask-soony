@@ -115,7 +115,37 @@ def supplier_addresses() -> set[str]:
     return supplier_master.trusted_addresses(api.portal_root())
 
 
+def _dry_send(to: str, subject: str, body: str, cc=None, in_reply_to: str = "") -> str | None:
+    """
+    Demo instance (ASK_MAIL_DRY=on): record the email in dry_outbox.json instead of sending it,
+    so a rehearsal never writes to a real supplier. Returns a message id, or None when live.
+    """
+    if os.environ.get("ASK_MAIL_DRY", "").lower() not in ("1", "on", "true", "yes"):
+        return None
+    from ask_soony import api
+
+    mid = make_msgid(domain="demo.example.com")
+    with api._lock:
+        sent = api.read_list("dry_outbox.json")
+        sent.append(
+            {
+                "message_id": mid,
+                "to": to,
+                "cc": cc or [],
+                "subject": subject,
+                "body": body,
+                "in_reply_to": in_reply_to,
+                "at": api.now().isoformat(),
+            }
+        )
+        api.write_json("dry_outbox.json", sent)
+    return mid
+
+
 def _send_mail(to: str, subject: str, body: str, cc: list[str] | None = None) -> str:
+    dry = _dry_send(to, subject, body, cc)
+    if dry:
+        return dry
     load_dotenv()
     user = os.environ.get("ASK_MAIL_ADDRESS", "")
     password = os.environ.get("ASK_MAIL_PASSWORD", "").replace(" ", "")
@@ -195,6 +225,9 @@ def _send_mail_in_thread(
     to: str, subject: str, body: str, in_reply_to: str, references: str
 ) -> str:
     """Like _send_mail, with In-Reply-To and References so the mail lands in the same thread."""
+    dry = _dry_send(to, subject, body, None, in_reply_to)
+    if dry:
+        return dry
     load_dotenv()
     user = os.environ.get("ASK_MAIL_ADDRESS", "")
     password = os.environ.get("ASK_MAIL_PASSWORD", "").replace(" ", "")

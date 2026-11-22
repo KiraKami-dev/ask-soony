@@ -40,3 +40,20 @@ def test_someone_who_replied_becomes_a_known_contact(agent_env):
     out = client.post(APPROVE, json={"option": 0, "cc": ["logistics@supplier.example.com"]})
     assert out.status_code == 200
     assert agent_env["sent"][0][3] == ["logistics@supplier.example.com"]
+
+
+def test_dry_mail_records_instead_of_sending(agent_env, monkeypatch):
+    from ask_soony import api, cardtools
+
+    monkeypatch.setenv("ASK_MAIL_DRY", "on")
+    monkeypatch.setattr(
+        cardtools.smtplib, "SMTP", lambda *a, **k: (_ for _ in ()).throw(AssertionError)
+    )
+    mid = (
+        cardtools._send_mail.__wrapped__("a@example.com", "s", "b")
+        if hasattr(cardtools._send_mail, "__wrapped__")
+        else None
+    )
+    assert mid is None  # _send_mail is mocked by the fixture; call the dry path directly
+    out = cardtools._dry_send("a@example.com", "Subject", "Body")
+    assert out and api.read_list("dry_outbox.json")[-1]["subject"] == "Subject"

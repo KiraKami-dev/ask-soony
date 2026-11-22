@@ -67,7 +67,8 @@ def start() -> None:
         os.environ.setdefault("ASK_REPLY_POLL", "on")
         from ask_soony import outbox
 
-        outbox.start_background()  # shared mailbox: what others sent to suppliers, by hand too
+        if os.environ.get("ASK_OUTBOX", "on").lower() in ON:
+            outbox.start_background()  # shared mailbox: what others sent to suppliers, by hand
     replies.start_background()
     from ask_soony import teams
 
