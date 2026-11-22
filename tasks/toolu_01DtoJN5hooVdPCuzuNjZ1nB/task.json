@@ -1,0 +1,22 @@
+{
+  "tool_use_id": "toolu_01DtoJN5hooVdPCuzuNjZ1nB",
+  "agent_id": "a546ddcc440dfeb86",
+  "subagent_type": "general-purpose",
+  "task_description": "Rebuild app shell: header, two panes",
+  "files": [
+    "web/src/App.tsx",
+    "web/src/components/DecisionList.tsx",
+    "web/src/components/DecisionPane.tsx",
+    "web/src/components/Header.tsx",
+    "web/src/lib/decisions.ts"
+  ],
+  "token_usage": {
+    "input_tokens": 112,
+    "cache_creation_tokens": 192288,
+    "cache_read_tokens": 8552646,
+    "output_tokens": 70669,
+    "api_call_count": 56
+  },
+  "started_at": "2026-11-22T04:00:17.778766+01:00",
+  "completed_at": "2026-11-22T04:14:36.853537+01:00"
+}
