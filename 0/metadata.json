@@ -35,22 +35,22 @@
     "subagent_tokens_complete": true
   },
   "redaction": {
-    "replacements": 2100,
+    "replacements": 2114,
     "layers": {
       "betterleaks": 28,
       "connection_string": 0,
       "credential_key": 0,
-      "credential_value": 70,
+      "credential_value": 73,
       "credentialed_uri": 0,
-      "entropy": 713,
+      "entropy": 714,
       "goredact": 2,
       "key_context": 0,
-      "pii": 1293,
+      "pii": 1303,
       "provider_token": 0,
       "shell_stdin": 0
     },
     "pii": {
-      "EMAIL": 1180,
+      "EMAIL": 1190,
       "IP": 48,
       "PHONE": 65
     }
