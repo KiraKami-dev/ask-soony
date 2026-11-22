@@ -385,3 +385,11 @@ and are automations offered automatically?
 ---
 
 and on suppliers what is the blinking stuff on there?
+
+---
+
+"- No (missing):
+  - Repetition over time. If you decide the same kind of case for the second time without an open look-alike, nothing is offered. That's exactly Felix's "flip the switch once you trust it" moment.
+  - A suggestion on the all-clear screen ("You did this 3 times this week · make it a routine")." should be there "Today vs Plan, honestly: they've grown very similar. Plan is currently "Today plus timeline plus more sections (waiting on others, decided) plus folded extras". The decision pane exists twice, almost identical. That's redundant. My suggestion for a clear split:
+- Today = the place to decide: one decision at a time, the source, Approve, done.
+- Plan = the overview, without its own decision pane: the launch timeline at the top, then all cases in groups (needs you, waiting on others, handled by routines, decided, with undo and history). A click on a case leads to Today, focused on that case. So Plan answers "where do we stand overall?", and Today answers "what do I do now?"." so how would you handle it?
