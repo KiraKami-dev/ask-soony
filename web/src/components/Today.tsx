@@ -298,7 +298,8 @@ function QuietList({ order, card, onFocus, state, nowMs, phone }: Props) {
         {shown.map(({ c, n }) => {
           const on = cardKey != null && rowKey(c, state) === cardKey
           return (
-            <li key={c.id}>
+            // A stable name per row: when a case leaves, the browser slides the others up (App.load).
+            <li key={c.id} style={{ viewTransitionName: `case-${c.id.replace(/[^\w-]/g, '_')}` }}>
               <button
                 onClick={() => onFocus(c.id)}
                 aria-current={on ? 'true' : undefined}

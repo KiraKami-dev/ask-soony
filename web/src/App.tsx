@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { AlertsButton } from '@/components/AlertsButton'
 import { EvidenceDrawer, type DrawerView } from '@/components/EvidenceDrawer'
 import { History } from '@/components/History'
@@ -44,6 +45,8 @@ export default function App() {
   const seenEvents = useRef<Set<string> | null>(null)
   const lastStatus = useRef<Map<string, string> | null>(null)
   const offset = useRef(0)
+  // The open cases at the last refresh: when the set changes, the list animates (view transition).
+  const openKey = useRef('')
   // Who uses this device: the approver lands on Launch, the buyer (and no choice) on Today.
   const [role, setRoleState] = useState<Role | null>(savedRole)
   const chooseRole = useCallback((r: Role | null) => { saveRole(r); setRoleState(r) }, [])
@@ -77,7 +80,17 @@ export default function App() {
       const s = await fetchState()
       offset.current = new Date(s.now).getTime() - Date.now()
       setNowMs(Date.now() + offset.current)
-      setState(s)
+      // A case left or arrived: let the browser animate the list (the decided row fades, the rest
+      // slide up). Plain update without support, on the first load, or with reduced motion.
+      const key = s.cards.filter((c) => c.status === 'open').map((c) => c.id).sort().join('|')
+      const changed = !!openKey.current && openKey.current !== key
+      openKey.current = key
+      const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown }
+      if (changed && doc.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        doc.startViewTransition(() => flushSync(() => setState(s)))
+      } else {
+        setState(s)
+      }
       setError(false)
 
       // A new portal drop: say the agents are reading it (and pulse its place on the map).
