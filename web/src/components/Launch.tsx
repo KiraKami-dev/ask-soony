@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react'
+import { type ReactNode, useEffect, useState } from 'react'
 import { LaunchTimeline } from '@/components/LaunchTimeline'
 import { fmtNum, type Card, type Inbound, type LaunchPart, type State, type StripItem } from '@/lib/api'
 import { launchAt, when } from '@/lib/decisions'
@@ -75,7 +75,24 @@ function verdictBits(state: State, nowMs: number): Bit[] {
   return out
 }
 
+interface DataIssue { kind: 'not_read' | 'changed' | 'unused'; file: string; text: string }
+interface DataHealth { checked_at: string | null; issues: DataIssue[] }
+
+/** The data check: which customer files the picture leaves out (refreshed with the state). */
+function useDataHealth(stamp: unknown): DataHealth | null {
+  const [h, setH] = useState<DataHealth | null>(null)
+  useEffect(() => {
+    let live = true
+    fetch('/api/data-health').then((r) => (r.ok ? r.json() : null)).then((j) => live && setH(j)).catch(() => {})
+    return () => { live = false }
+  }, [stamp])
+  return h
+}
+
 export function Launch({ state, nowMs, phone, onOpen }: Props) {
+  const health = useDataHealth(state)
+  const gaps = (health?.issues ?? []).filter((i) => i.kind !== 'unused')
+  const unused = (health?.issues ?? []).filter((i) => i.kind === 'unused')
   const bits = verdictBits(state, nowMs)
   const launch = launchAt(state)
   return (
@@ -85,6 +102,17 @@ export function Launch({ state, nowMs, phone, onOpen }: Props) {
         <h1 className="t-big max-w-[820px] text-ink">
           {bits.map((b, i) => <span key={i} className={cn(b.late && 'text-late')}>{b.text}</span>)}
         </h1>
+        {gaps.length > 0 && (
+          <div className="t-body mt-6 max-w-[760px] text-ink">
+            <p>
+              This picture leaves out {gaps.length === 1 ? 'one file' : `${gaps.length} files`} we could not read, so it
+              may look better than it is:
+            </p>
+            <ul className="mt-2 space-y-1 text-ink-2">
+              {gaps.map((g) => <li key={g.file}>{g.text}</li>)}
+            </ul>
+          </div>
+        )}
       </div>
 
       <div className={cn('border-y border-hair', phone ? 'px-6 py-2' : 'px-8 py-4 xl:px-12')}>
@@ -107,6 +135,13 @@ export function Launch({ state, nowMs, phone, onOpen }: Props) {
           {state.strip[0]?.packed_as_of ? ` (${when(state.strip[0].packed_as_of, nowMs)})` : ''}. Parts and stock as the
           verifier counted them; the trucks leave when the last shift ends.
         </p>
+        {health?.checked_at && (
+          <p className="t-small mt-2 text-ink-3">
+            {gaps.length === 0 ? 'Every customer spreadsheet was read' : `${gaps.length} customer ${gaps.length === 1 ? 'file' : 'files'} left out`}
+            {unused.length > 0 ? `; new and not used yet: ${unused.map((u) => u.file.split('/').pop()).join(', ')}` : ''}
+            . Checked {when(health.checked_at, nowMs)}.
+          </p>
+        )}
       </div>
     </div>
   )
