@@ -1,0 +1,18 @@
+{
+  "tool_use_id": "toolu_01G5Xn5SbTgAR7JaUiovAjwL",
+  "agent_id": "af61907b1528d4f2d",
+  "subagent_type": "general-purpose",
+  "task_description": "Plan as overview, repeat-based offers",
+  "files": [
+    "web/src/components/Plan.tsx"
+  ],
+  "token_usage": {
+    "input_tokens": 82,
+    "cache_creation_tokens": 189206,
+    "cache_read_tokens": 4944103,
+    "output_tokens": 38164,
+    "api_call_count": 37
+  },
+  "started_at": "2026-11-22T05:19:46.103463+01:00",
+  "completed_at": "2026-11-22T05:26:14.802815+01:00"
+}
