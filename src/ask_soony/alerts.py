@@ -249,7 +249,13 @@ class AlertBook:
             fields["next_escalation_at"] = None
         self.update(alert_id, **fields)
         self.log(alert_id, "decision", channel, by, decision)
-        return self.get(alert_id)
+        decided = self.get(alert_id)
+        if decided.source == "card":  # raised for a case: the decision goes to the case too
+            from ask_soony import card_alerts
+
+            card_alerts.on_decided(self, decided)
+            decided = self.get(alert_id)
+        return decided
 
     def as_dict(self, alert: Alert) -> dict:
         d = asdict(alert)

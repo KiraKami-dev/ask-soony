@@ -19,9 +19,9 @@ def _supplier(raw, ctx) -> tuple[str | None, dict]:
     return supplier_id, ({} if supplier_id or clean(raw) is None else {"supplier_raw": clean(raw)})
 
 
-def purchase_orders(source, ctx) -> list[dict]:
+def purchase_orders(source, ctx, rows: list[dict] | None = None) -> list[dict]:
     records = []
-    for row in adapters.rows(source.abspath):
+    for row in adapters.rows(source.abspath) if rows is None else rows:
         po, line = clean(row.get("po_number")), po_line(row.get("po_line"))
         if po is None or line is None:
             continue
@@ -54,6 +54,22 @@ def purchase_orders(source, ctx) -> list[dict]:
             )
         )
     return records
+
+
+def purchase_orders_mapped(source, ctx) -> list[dict]:
+    """
+    A PO export under other column names (German Excel, another tool), read through the column
+    mapping: canonical keys with numbers and dates already normalised.
+    """
+    from ask_soony import columns
+
+    rows = []
+    for row in columns.canonical_rows(source.abspath, "cache"):
+        row = {k: v for k, v in row.items() if isinstance(k, str)}
+        row.setdefault("promised_date", row.get("confirmed_date"))
+        row.setdefault("actual_delivery_date", row.get("delivered_date"))
+        rows.append(row)
+    return purchase_orders(source, ctx, rows)
 
 
 def purchase_orders_sap(source, ctx) -> list[dict]:

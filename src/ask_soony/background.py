@@ -14,24 +14,16 @@ ON = ("1", "on", "true", "yes")
 
 
 def _watcher() -> None:
-    from ask_soony.cli import _analyst
+    """
+    The team's portal loop (runner.loop): poll and mirror the portal, record each drop as an
+    event (the UI's "New: … Agent reading" toast), and run the verifier and predictor pipeline
+    on the changed files. The paper check notices the mirror change on its own (_papercheck), so
+    every drop reaches all three detectors with one watcher.
+    """
+    from ask_soony import runner
     from ask_soony.config import Settings
-    from ask_soony.notify import build_notifiers
-    from ask_soony.portal import PortalClient
-    from ask_soony.store import Store
-    from ask_soony.watcher import watch
 
-    settings = Settings.from_env()
-    store = Store(settings.data_dir)
-    notify = build_notifiers(settings.notifiers, settings.discord_webhook_url, settings.webhook_url)
-    watch(
-        store,
-        PortalClient(settings.portal_url, settings.portal_token),
-        _analyst(settings, store),
-        notify,
-        settings.interval_seconds,
-        settings.notify_min_severity,
-    )
+    runner.loop(Settings.from_env().interval_seconds)
 
 
 def _escalation() -> None:
@@ -39,6 +31,15 @@ def _escalation() -> None:
     from ask_soony.config import Settings
 
     _escalation_loop(Settings.from_env())
+
+
+def _papercheck() -> None:
+    """Supplier documents against the ERP: at start and whenever the portal mirror changes
+    (cheap when nothing changed: LLM answers are cached by content hash)."""
+    from ask_soony import papercheck
+
+    if os.environ.get("ASK_PAPERCHECK", "on").lower() in ON:
+        papercheck.loop()
 
 
 def _guard(target):
@@ -55,7 +56,20 @@ def start() -> None:
     from ask_soony import replies
 
     if os.environ.get("ASK_BACKGROUND", "").lower() in ON:
-        for loop in (_watcher, _escalation):
+        from ask_soony import anchors
+
+        anchors.ensure_index()  # evidence anchoring: index portal files (cached by hash)
+        from ask_soony import routines
+
+        routines.start_background()  # routines the agent wrote, run in the Monty sandbox
+        for loop in (_watcher, _escalation, _papercheck):
             threading.Thread(target=_guard(loop), daemon=True, name=loop.__name__).start()
         os.environ.setdefault("ASK_REPLY_POLL", "on")
+        from ask_soony import outbox
+
+        if os.environ.get("ASK_OUTBOX", "on").lower() in ON:
+            outbox.start_background()  # shared mailbox: what others sent to suppliers, by hand
     replies.start_background()
+    from ask_soony import teams
+
+    teams.start_background()  # ASK_TEAMS=on: post new launch alerts to a Teams channel

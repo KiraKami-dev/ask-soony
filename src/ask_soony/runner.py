@@ -63,7 +63,7 @@ def run_pipeline(paths: list[str], root: Path) -> str:
         if s.llm_provider != "none":
             backend = make_backend(s.llm_provider, s.llm_model, s.llm_api_key, s.llm_base_url,
                                    s.llm_effort)
-            predictor = ImpactAgent(Store(s.data_dir), backend, state_dir())
+            predictor = ImpactAgent(Store(s.data_dir), backend, state_dir(), root)
     except Exception as e:  # no LLM configured: the verifier still runs
         print(f"pipeline: predictor off ({e})", file=sys.stderr)
     store = Path(os.environ.get("ASK_DATA_DIR", "data/store"))

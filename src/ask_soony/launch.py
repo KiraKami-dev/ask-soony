@@ -4,6 +4,12 @@ The launch plan workbook holds a shift table (rows like 'Saturday | 06:00–22:0
 table (product, packed, rate per hour). Sheets and columns are found by their headers, so a new
 version of the plan is read without code changes. Packed copies come from the pack-out log when it
 is newer than the plan. Nothing about Soony is written here.
+
+A packed figure carries the time it was counted when its sheet states one ('status 2026-11-20
+18:00', 'Saturday 13:00') or, for the pack-out log, the end of its last day. From then on the
+lines are assumed to pack at their plan rate inside shifts (the plan's own assumption), so a status
+from Saturday noon still says how far the cell is on Sunday. Parts shortfalls are separate: they
+stop a line early (line_stops).
 """
 
 from __future__ import annotations
@@ -17,6 +23,10 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 _TIMES = re.compile(r"(\d{1,2}):(\d{2})\s*[–—-]\s*(\d{1,2}):(\d{2})")
+_STAMP_ISO = re.compile(r"(\d{4}-\d{2}-\d{2})[ T](\d{1,2}):(\d{2})")
+_STAMP_DAY = re.compile(r"\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s+(\d{1,2}):(\d{2})", re.I)
+# The challenge brief's shifts, used only when no plan workbook states any: no night shift.
+DEFAULT_SHIFTS = [("saturday", "06:00–22:00"), ("sunday", "06:00–20:00")]
 WEEKDAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 
 
@@ -27,6 +37,8 @@ class EditionPlan:
     day_one: float | None = None
     packed: float | None = None
     rate_per_hour: float | None = None
+    packed_as_of: datetime | None = None  # when `packed` was counted, if a source says so
+    packed_source: str | None = None  # the file (and sheet) the packed figure comes from
 
     @property
     def remaining(self) -> float | None:
@@ -40,8 +52,39 @@ class PackClock:
     windows: list[tuple[datetime, datetime]] = field(default_factory=list)
     editions: dict[str, EditionPlan] = field(default_factory=dict)
 
+    @property
+    def launch(self) -> datetime | None:
+        """Trucks leave when the last shift ends."""
+        return self.windows[-1][1] if self.windows else None
+
     def hours_left(self, now: datetime) -> float:
         return sum(max((e - max(s, now)).total_seconds(), 0) for s, e in self.windows) / 3600
+
+    def shift_hours_between(self, a: datetime, b: datetime) -> float:
+        return sum(max((min(e, b) - max(s, a)).total_seconds(), 0) for s, e in self.windows) / 3600
+
+    def _base(self, now: datetime, ed: EditionPlan) -> datetime:
+        """Where projections start: the time the packed figure was counted, if earlier than now."""
+        return ed.packed_as_of if ed.packed_as_of and ed.packed_as_of < now else now
+
+    def remaining_at(self, now: datetime, product: str | None) -> float | None:
+        """Copies still to pack at `now`: the counted figure, less the plan rate for the shift
+        hours since it was counted."""
+        ed = self.editions.get(product or "")
+        if not ed or ed.remaining is None:
+            return None
+        if not ed.rate_per_hour:
+            return ed.remaining
+        return max(ed.remaining - ed.rate_per_hour * self.shift_hours_between(self._base(now, ed), now), 0)
+
+    def finishes(self, now: datetime, product: str | None) -> datetime | None:
+        """When the last copy is packed at plan rate; None if the shifts run out first."""
+        ed = self.editions.get(product or "")
+        if not ed or not ed.rate_per_hour or ed.remaining is None:
+            return None
+        base = self._base(now, ed)
+        done = self.after_packing_hours(base, ed.remaining / ed.rate_per_hour)
+        return max(done, now) if done else None
 
     def after_packing_hours(self, now: datetime, hours: float) -> datetime | None:
         """Wall-clock time once `hours` of packing from `now` are used up; None if they outlast
@@ -65,13 +108,14 @@ class PackClock:
         if not ed or not copies_short or not ed.rate_per_hour or ed.remaining is None:
             return None
         packable = max(ed.remaining - copies_short, 0)
-        return self.after_packing_hours(now, packable / ed.rate_per_hour)
+        return self.after_packing_hours(self._base(now, ed), packable / ed.rate_per_hour)
 
     def slack_hours(self, now: datetime, product: str | None) -> float | None:
         ed = self.editions.get(product or "")
-        if not ed or not ed.rate_per_hour or ed.remaining is None:
+        left = self.remaining_at(now, product)
+        if not ed or not ed.rate_per_hour or left is None:
             return None
-        return round(self.hours_left(now) - ed.remaining / ed.rate_per_hour, 1)
+        return round(self.hours_left(now) - left / ed.rate_per_hour, 1)
 
 
 def _num(v: Any) -> float | None:
@@ -114,6 +158,23 @@ def _col(header: dict[str, int], *needles: str) -> int | None:
     return next((j for c, j in header.items() if all(n in c for n in needles)), None)
 
 
+def _stamp(text: str, launch: date | None, tz: ZoneInfo) -> datetime | None:
+    """'status 2026-11-20 18:00' or 'Saturday 13:00' (the weekday of launch week) in a title."""
+    m = _STAMP_ISO.search(text)
+    if m:
+        d = date.fromisoformat(m.group(1))
+        return datetime(d.year, d.month, d.day, int(m.group(2)), int(m.group(3)), tzinfo=tz)
+    m = _STAMP_DAY.search(text)
+    if m and launch:
+        on = launch - timedelta(days=(launch.weekday() - WEEKDAYS.index(m.group(1).lower())) % 7)
+        return datetime(on.year, on.month, on.day, int(m.group(2)), int(m.group(3)), tzinfo=tz)
+    return None
+
+
+def default_windows(launch: date, tz: ZoneInfo) -> list[tuple[datetime, datetime]]:
+    return _windows([("Day", "Shift"), *DEFAULT_SHIFTS], launch, tz)
+
+
 def _windows(rows: list[tuple], launch: date | None, tz: ZoneInfo):
     found = _table(rows, "day", "shift")
     if not found or not launch:
@@ -142,7 +203,17 @@ def _read_csv(path: Path) -> list[dict]:
         return []
 
 
-def _read_editions(rows: list[tuple], editions: dict[str, EditionPlan]) -> None:
+def _set_packed(ed: EditionPlan, n: float, at: datetime | None, source: str | None = None) -> None:
+    """Packed copies only grow, so the highest figure is the newest; it keeps its own stamp."""
+    if ed.packed is None or n > ed.packed:
+        ed.packed, ed.packed_as_of, ed.packed_source = n, at, source
+    elif n == ed.packed and at and (ed.packed_as_of is None or at > ed.packed_as_of):
+        ed.packed_as_of, ed.packed_source = at, source
+
+
+def _read_editions(rows: list[tuple], editions: dict[str, EditionPlan],
+                   launch: date | None = None, tz: ZoneInfo | None = None,
+                   source: str | None = None) -> None:
     """Rates and packed copies from any table that lists launch products by id."""
     for i, r in enumerate(rows):
         cells = [str(c or "").strip().lower() for c in r]
@@ -151,6 +222,7 @@ def _read_editions(rows: list[tuple], editions: dict[str, EditionPlan]) -> None:
             continue
         header = {c: j for j, c in enumerate(cells) if c}
         title = " ".join(str(c or "") for row in rows[:i] for c in row).lower()
+        at = _stamp(title, launch, tz) if tz else None
         rc = _col(header, "rate")
         kc = header.get("packed")
         if kc is None and "packed" in title:
@@ -162,8 +234,9 @@ def _read_editions(rows: list[tuple], editions: dict[str, EditionPlan]) -> None:
             ed = editions[pid]
             if rc is not None and _num(row[rc]):
                 ed.rate_per_hour = _num(row[rc])
-            if kc is not None and _num(row[kc]) is not None:
-                ed.packed = max(ed.packed or 0, _num(row[kc]))
+            n = _num(row[kc]) if kc is not None else None
+            if n is not None:
+                _set_packed(ed, n, at, source)
 
 
 def load(root: Path | None, tz: ZoneInfo) -> PackClock:
@@ -181,16 +254,29 @@ def load(root: Path | None, tz: ZoneInfo) -> PackClock:
     windows: list[tuple[datetime, datetime]] = []
     books = [b for d in ("context", "erp") if (soony / d).is_dir() for b in sorted((soony / d).glob("*.xlsx"))]
     for book in books:
-        for rows in _rows(book).values():
+        for sheet, rows in _rows(book).items():
             windows = windows or _windows(rows, launch, tz)
-            _read_editions(rows, editions)
+            _read_editions(rows, editions, launch, tz, f"{book.relative_to(root)} · {sheet}")
+    if not windows and launch:
+        windows = default_windows(launch, tz)
     # Packed copies only grow, so the highest figure across the plan, status sheets and the
-    # pack-out log is the newest one.
+    # pack-out log is the newest one. A log is complete up to the end of its last day.
     packed: dict[str, float] = {}
+    last_day: dict[str, date] = {}
+    log_file: dict[str, str] = {}
     for f in sorted((soony / "erp").glob("packout_log*.csv")) if (soony / "erp").is_dir() else []:
         for r in _read_csv(f):
-            if r.get("product_id") in editions:
-                packed[r["product_id"]] = packed.get(r["product_id"], 0) + (_num(r.get("units_packed")) or 0)
+            pid = r.get("product_id")
+            if pid in editions:
+                packed[pid] = packed.get(pid, 0) + (_num(r.get("units_packed")) or 0)
+                log_file[pid] = str(f.relative_to(root))
+                try:
+                    d = date.fromisoformat(str(r.get("date") or "")[:10])
+                    last_day[pid] = max(last_day.get(pid, d), d)
+                except ValueError:
+                    pass
     for pid, n in packed.items():
-        editions[pid].packed = max(editions[pid].packed or 0, n)
+        d = last_day.get(pid)
+        at = datetime(d.year, d.month, d.day, tzinfo=tz) + timedelta(days=1) if d else None
+        _set_packed(editions[pid], n, at, log_file.get(pid))
     return PackClock(windows, editions)

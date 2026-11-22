@@ -1,6 +1,7 @@
 """Turn verifier and predictor outputs into one approval-gated decision payload."""
 
 import json
+import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -36,7 +37,10 @@ def refresh(
     routes = routes_for(paths)
     predictions = []
     if routes.predictor and predictor:
-        predictions = predictor.run(predictor.events_for_paths(paths), force=True)
+        try:
+            predictions = predictor.run(predictor.events_for_paths(paths), force=True)
+        except Exception as e:  # a failed model call must not stop the verifier refresh
+            print(f"dispatch: predictor failed: {e!r}", file=sys.stderr)
     if routes.verifier:
         graph = build(root, readings)
         result = compute(graph.records, graph.issues)

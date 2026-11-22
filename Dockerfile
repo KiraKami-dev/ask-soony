@@ -8,6 +8,9 @@ COPY web/ ./
 RUN npm run build
 
 FROM python:3.13-slim
+# Local OCR for evidence anchoring on scans (numbers and ids are Latin in every supplier language)
+RUN apt-get update && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-pol \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY pyproject.toml uv.lock README.md ./
 COPY src ./src
