@@ -124,7 +124,7 @@ export function Today(p: Props) {
     ) : view === 'case' ? (
       <>
         <CaseView key={`case-${p.caseCard!.id}`} card={p.caseCard!} state={state} nowMs={nowMs} onChanged={p.onChanged} onDrawer={p.onDrawer} />
-        <CaseFlow card={p.caseCard!} state={state} nowMs={nowMs} phone={phone} className="mt-14" />
+        <CaseFlow card={p.caseCard!} state={state} nowMs={nowMs} phone={phone} className={phone ? 'mt-10' : 'mt-14'} onDoc={() => p.onDrawer(p.caseCard!, 'evidence')} />
       </>
     ) : view === 'decide' ? (
       <>
@@ -136,7 +136,7 @@ export function Today(p: Props) {
           onCall={(live) => setCall(live ? focusCard : null)}
           doneText={done && done.card.id === focusCard!.id ? done.text : undefined}
         />
-        <CaseFlow key={`flow-${focusCard!.id}`} card={focusCard!} state={state} nowMs={nowMs} phone={phone} className="mt-14" />
+        <CaseFlow key={`flow-${focusCard!.id}`} card={focusCard!} state={state} nowMs={nowMs} phone={phone} className={phone ? 'mt-10' : 'mt-14'} onDoc={() => p.onDrawer(focusCard!, 'evidence')} />
       </>
     ) : (
       <AllClear state={state} nowMs={nowMs} handled={handled} onRoutines={p.onRoutines} onReview={setReview} onChanged={p.onChanged} go={p.go} onReveal={reveal} />
@@ -659,7 +659,7 @@ function Focus(p: Props & {
       : signer ? `Ask ${signer} to approve` : emails ? 'Review email' : 'Approve'
   const quietPrimary = choice.kind === 'dismiss'
   const actions = (opt || choice.kind !== 'option') && (
-    <div className={cn(phone ? 'fixed inset-x-0 bottom-0 z-20 bg-gradient-to-t from-ground from-70% to-ground/0 px-6 pb-[max(28px,env(safe-area-inset-bottom))] pt-8' : 'mt-8')}>
+    <div className={cn(phone ? 'fixed inset-x-0 bottom-0 z-20 bg-gradient-to-t from-ground from-[calc(100%-20px)] to-ground/0 px-6 pb-[max(28px,env(safe-area-inset-bottom))] pt-8' : 'mt-8')}>
       <div className={cn(phone && 'mx-auto max-w-[520px]')}>
         {signer && choice.kind === 'option' && (
           <p className={cn('t-small mb-3 text-ink-2', phone && 'text-center')}>
@@ -1266,7 +1266,7 @@ function DoneView(p: Props & { done: DoneInfo }) {
       )}
 
       {(primary || quiet) && (
-        <div className={cn(phone ? 'fixed inset-x-0 bottom-0 z-20 bg-gradient-to-t from-ground from-70% to-ground/0 px-6 pb-[max(28px,env(safe-area-inset-bottom))] pt-8' : 'mt-10')}>
+        <div className={cn(phone ? 'fixed inset-x-0 bottom-0 z-20 bg-gradient-to-t from-ground from-[calc(100%-20px)] to-ground/0 px-6 pb-[max(28px,env(safe-area-inset-bottom))] pt-8' : 'mt-10')}>
           <div className={cn(phone ? 'mx-auto grid max-w-[520px] justify-items-center gap-3.5' : 'flex items-center gap-6')}>
             {primary && (
               <button

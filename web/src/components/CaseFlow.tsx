@@ -1,5 +1,5 @@
 import { FileInput, Inbox, ScanText, Scale, Send, ShieldCheck, TrendingDown } from 'lucide-react'
-import { Fragment, useState, type ReactNode } from 'react'
+import { Fragment, type ReactNode } from 'react'
 import { fmtNum, tidy, type Card, type Evidence, type State } from '@/lib/api'
 import { languageOf, sourceName, splitValue, when } from '@/lib/decisions'
 import { firstNameOf } from '@/lib/role'
@@ -11,10 +11,11 @@ import { Link, NODE, NodeHead } from './routines/FlowGraph'
 // look as a routine's diagram. Every node is read from the case itself (its trail, evidence,
 // impact, approval rule, options and status); a step the data does not have is left out, never
 // made up. Done steps are quiet, the step the case waits at is marked, what comes after is
-// dashed. One column, top to bottom; folded to one line on a phone.
+// dashed. One column, top to bottom; on a phone one line per step. The document steps open
+// the document.
 
 type Tone = 'done' | 'now' | 'next'
-interface Step { key: string; icon: ReactNode; kicker: string; title: string; text?: string; at?: string | null; tone: Tone; late?: boolean }
+interface Step { doc?: boolean; key: string; icon: ReactNode; kicker: string; title: string; text?: string; at?: string | null; tone: Tone; late?: boolean }
 
 const SYS = /system|sap|erp|plan|book stock/i
 const short = (s: string, n = 90) => (s.length > n ? `${s.slice(0, n - 1).replace(/\s+\S*$/, '')}…` : s)
@@ -30,13 +31,13 @@ function stepsOf(card: Card, state: State, nowMs: number): Step[] {
   const found = trail(/watch/i)
   if (found || paper?.doc) {
     const file = (paper?.doc ?? '').split('/').pop()
-    out.push({ key: 'source', icon: icon(FileInput), kicker: 'Portal', title: 'New document', text: file || short(tidy(found?.text)), at: found?.at, tone: 'done' })
+    out.push({ doc: true, key: 'source', icon: icon(FileInput), kicker: 'Portal', title: 'New document', text: file || short(tidy(found?.text)), at: found?.at, tone: 'done' })
   }
   const read = trail(/paper|read|recogn|vision/i)
   if (read || paper) {
     const lang = languageOf(paper?.source, paper?.language)
     out.push({
-      key: 'read', icon: icon(ScanText), kicker: 'Reader', title: lang && lang !== 'English' ? `Read it (${lang})` : 'Read it',
+      doc: true, key: 'read', icon: icon(ScanText), kicker: 'Reader', title: lang && lang !== 'English' ? `Read it (${lang})` : 'Read it',
       text: paper ? short(tidy(String(paper.value)), 80) : short(tidy(read?.text)), at: read?.at, tone: 'done',
     })
   }
@@ -87,11 +88,18 @@ function stepsOf(card: Card, state: State, nowMs: number): Step[] {
 }
 
 /** One step, in the same box as a routine's diagram: icon tile, kicker, title, detail. */
-function Node({ s, nowMs }: { s: Step; nowMs: number }) {
+function Node({ s, nowMs, compact, onDoc }: { s: Step; nowMs: number; compact?: boolean; onDoc?: () => void }) {
+  const open = s.doc && onDoc
+  const right = (
+    <span className="t-small flex shrink-0 items-baseline gap-2 tabular-nums text-ink-3">
+      {s.at && <span>{when(s.at, nowMs)}</span>}
+      {open && <button type="button" onClick={onDoc} className="uline cursor-pointer text-ink-2 hover:text-ink">Open</button>}
+    </span>
+  )
   return (
     <div
       className={cn(
-        'min-w-0 pb-3',
+        'min-w-0', compact ? 'pb-2.5' : 'pb-3',
         s.tone === 'next' ? 'rounded-xl border border-dashed border-ink-3/40 bg-ground/70' : NODE,
         s.tone === 'now' && 'border-accent/45 shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-accent)_9%,transparent)]',
       )}
@@ -101,9 +109,9 @@ function Node({ s, nowMs }: { s: Step; nowMs: number }) {
         kicker={s.kicker}
         title={s.title}
         accent={s.tone === 'now'}
-        right={s.at ? <span className="t-small shrink-0 tabular-nums text-ink-3">{when(s.at, nowMs)}</span> : undefined}
+        right={s.at || open ? right : undefined}
       />
-      {s.text && <p className={cn('t-small mt-1.5 line-clamp-2 pl-[52px] pr-3.5', s.late ? 'text-late' : 'text-ink-3')}>{s.text}</p>}
+      {s.text && !compact && <p className={cn('t-small mt-1.5 line-clamp-2 pl-[52px] pr-3.5', s.late ? 'text-late' : 'text-ink-3')}>{s.text}</p>}
     </div>
   )
 }
@@ -113,20 +121,9 @@ const CANVAS = {
   backgroundSize: '18px 18px',
 }
 
-export function CaseFlow({ card, state, nowMs, phone, className }: { card: Card; state: State; nowMs: number; phone?: boolean; className?: string }) {
+export function CaseFlow({ card, state, nowMs, phone, className, onDoc }: { card: Card; state: State; nowMs: number; phone?: boolean; className?: string; onDoc?: () => void }) {
   const steps = stepsOf(card, state, nowMs)
-  // Phone: folded to one line so the decision stays in reach; one tap shows the steps.
-  const [open, setOpen] = useState(!phone)
   if (steps.length < 3) return null
-  if (!open) {
-    return (
-      <section aria-label="How we got here" className={className}>
-        <button onClick={() => setOpen(true)} className="t-small cursor-pointer text-ink-3 hover:text-ink">
-          <span className="border-b border-hair">How we got here · {steps.length} steps</span>
-        </button>
-      </section>
-    )
-  }
 
   // One column, top to bottom, in the order the agents worked: no turns to follow.
   const body = (
@@ -134,7 +131,7 @@ export function CaseFlow({ card, state, nowMs, phone, className }: { card: Card;
       {steps.map((s, i) => (
         <Fragment key={s.key}>
           {i > 0 && <li aria-hidden="true"><Link dashed={s.tone === 'next'} /></li>}
-          <li><Node s={s} nowMs={nowMs} /></li>
+          <li><Node s={s} nowMs={nowMs} compact={phone} onDoc={onDoc} /></li>
         </Fragment>
       ))}
     </ol>
