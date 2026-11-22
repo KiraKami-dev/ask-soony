@@ -279,11 +279,12 @@ _EMAIL = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
 
 def supplier_email(supplier_id: str | None) -> str | None:
     """The contact address of one supplier, from its profile in the portal (CSV or any text)."""
-    from ask_soony import api
+    from ask_soony import api, supplier_master
 
     root = api.portal_root()
     if root is None or not supplier_id:
         return None
+    trusted = supplier_master.trusted_addresses(root)  # a new, unconfirmed address is never used
     for path in sorted((root / "suppliers").glob("*/profile.*")):
         try:
             text = path.read_text(encoding="utf-8", errors="replace")
@@ -295,9 +296,9 @@ def supplier_email(supplier_id: str | None) -> str | None:
             for row in csv.DictReader(io.StringIO(text)):
                 if (row.get("supplier_id") or "").strip() == supplier_id:
                     for v in row.values():
-                        if v and _EMAIL.fullmatch(v.strip()):
+                        if v and _EMAIL.fullmatch(v.strip()) and v.strip().lower() in trusted:
                             return v.strip().lower()
-        m = _EMAIL.search(text)
+        m = next((m for m in _EMAIL.finditer(text) if m.group(0).lower() in trusted), None)
         if m:
             return m.group(0).lower()
     return None

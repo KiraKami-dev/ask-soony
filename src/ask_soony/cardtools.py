@@ -104,20 +104,15 @@ TOOLS = [
 
 
 def supplier_addresses() -> set[str]:
-    """Every email address in the portal's supplier profiles (CSV or JSON, any layout)."""
-    from ask_soony import api
+    """
+    Supplier addresses mail may go to: every address in the master profiles (profile.csv), plus
+    addresses in newer profiles (profile.json, any layout) that repeat them or that a person
+    confirmed on the supplier's contact card. A new address only a newer profile names is flagged
+    there and not trusted, so an edited profile cannot redirect supplier mail on its own.
+    """
+    from ask_soony import api, supplier_master
 
-    root = api.portal_root()
-    found: set[str] = set()
-    if root is None:
-        return found
-    for path in (root / "suppliers").glob("*/profile.*"):
-        try:
-            text = path.read_text(encoding="utf-8", errors="replace")
-        except OSError:
-            continue
-        found |= {m.lower() for m in re.findall(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+", text)}
-    return found
+    return supplier_master.trusted_addresses(api.portal_root())
 
 
 def _send_mail(to: str, subject: str, body: str, cc: list[str] | None = None) -> str:
