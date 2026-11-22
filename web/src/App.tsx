@@ -9,6 +9,7 @@ import { Today, type DoneInfo } from '@/components/Today'
 import { TopBar, type Page } from '@/components/TopBar'
 import { DECIDED, DONE_WORD, fetchState, tidy, viaOf, type Card, type State } from '@/lib/api'
 import { actionIdOf } from '@/lib/decisions'
+import { roleFromParam, savedRole, saveRole, type Role } from '@/lib/role'
 import { lookAlikes, repeatWords, todayOrder, trucksLeave } from '@/lib/today'
 
 const POLL_MS = 5000
@@ -42,6 +43,10 @@ export default function App() {
   const seenEvents = useRef<Set<string> | null>(null)
   const lastStatus = useRef<Map<string, string> | null>(null)
   const offset = useRef(0)
+  // Who uses this device: the approver lands on Launch, the buyer (and no choice) on Today.
+  const [role, setRoleState] = useState<Role | null>(savedRole)
+  const chooseRole = useCallback((r: Role | null) => { saveRole(r); setRoleState(r) }, [])
+  const landed = useRef(false)
   const phone = !useMedia('(min-width: 1024px)')
   const narrow = useMedia('(max-width: 767px)')
   // Opened from a push alert (/d/<id>?talk=1): the card rings as an incoming call.
@@ -144,6 +149,26 @@ export default function App() {
     return () => clearInterval(t)
   }, [])
 
+  // First state: ?as=<name> (from a sign-off link) picks the role; "/" opens the role's page.
+  useEffect(() => {
+    if (!state || landed.current) return
+    landed.current = true
+    const q = new URLSearchParams(window.location.search)
+    let r = role
+    if (q.has('as')) {
+      const named = roleFromParam(q.get('as'), { viewer: state.launch?.money?.viewer ?? state.viewer, approver: state.launch?.money?.approver })
+      if (named) { r = named; chooseRole(named) }
+      q.delete('as')
+      const rest = q.toString()
+      window.history.replaceState(null, '', window.location.pathname + (rest ? `?${rest}` : '') + window.location.hash)
+      setSearch(window.location.search)
+    }
+    if (r === 'approver' && window.location.pathname === '/') {
+      window.history.replaceState(null, '', '/launch')
+      setPath('/launch')
+    }
+  }, [state, role, chooseRole])
+
   const today = useMemo(() => (state ? todayOrder(state) : []), [state])
   // Launch and the folded groups on Today open a case on Today.
   const openCase = useCallback((id: string) => {
@@ -195,6 +220,9 @@ export default function App() {
       bell={<AlertsButton />}
       phone={phone}
       routinesBadge={pending}
+      role={role}
+      onRole={chooseRole}
+      people={{ buyer: state.launch?.money?.viewer ?? state.viewer, approver: state.launch?.money?.approver ?? null }}
     />
   )
   const routines = <RoutinesLive state={state} />
@@ -298,7 +326,7 @@ export default function App() {
   return (
     <div className="flex min-h-full flex-col bg-ground">
       {bar}
-      <Launch state={state} nowMs={nowMs} phone={narrow} onOpen={openCase} />
+      <Launch state={state} nowMs={nowMs} phone={narrow} onOpen={openCase} role={role} />
       {overlays}
     </div>
   )

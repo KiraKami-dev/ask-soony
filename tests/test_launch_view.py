@@ -82,3 +82,74 @@ def test_parts_say_when_they_run_dry(env):
     assert parts["C-CARD"]["shared"] and parts["C-CARD"]["runs_dry"] is None
     assert s["launch"]["hours_left"] == 15.0
     assert s["launch"]["editions"][0]["day_one"] == 1000
+
+
+def test_state_carries_the_money_block(env):
+    m = env.get("/api/state").json()["launch"]["money"]
+    assert m["committed_today"] == [] and isinstance(m["pending_decisions"], list)
+
+
+def _card(cid, status, options, **kw):
+    return {"id": cid, "status": status, "options": options, "ui": {}, **kw}
+
+
+def test_money_counts_what_was_committed_and_what_waits_for_a_price():
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    from ask_soony.launch_view import money, price
+
+    cur = datetime(2030, 6, 2, 9, 0, tzinfo=ZoneInfo("Europe/Berlin"))
+    order = {"action": "Order 8,000 books", "cost": "about EUR 16,800", "recommended": True}
+    van = {"action": "Ask Box Co for a van, or a split load", "cost": "unknown: they quote first"}
+    free = {"action": "Ask the site", "cost": "No cost to ask", "recommended": True}
+    cards = [
+        _card("books", "sent", [order], supplier_name="Box Co", ui={"reply": "ok"}),
+        _card("van", "sent", [van], supplier_name="Box Co", ui={"at": "2030-06-02T07:58:00+02:00"}),
+        _card(
+            "sign",
+            "escalated",
+            [{**van, "recommended": True}],
+            approver="Dr. Ann Boss",
+            signoff="Dr. Ann Boss",
+        ),
+        _card("mine", "open", [{"action": "Book air freight", "cost": "EUR 2,000"}]),
+        _card("chase", "open", [free]),
+        _card("old", "approved", [order]),
+    ]
+    actions = [
+        {
+            "decision_id": "books",
+            "kind": "approve",
+            "option": 0,
+            "status": "sent",
+            "at": "2030-06-02T06:50:00+02:00",
+        },
+        {
+            "decision_id": "old",
+            "kind": "approve",
+            "option": 0,
+            "status": "approved",
+            "at": "2030-06-01T12:00:00+02:00",
+        },  # yesterday: not today's money
+        {
+            "decision_id": "van",
+            "kind": "approve",
+            "option": 0,
+            "status": "sent",
+            "at": "2030-06-02T07:58:00+02:00",
+        },
+        {"decision_id": "sign", "kind": "escalate", "at": "2030-06-02T07:49:00+02:00"},
+    ]
+    m = money(cards, actions, cur, "Bo Buyer", "Dr. Ann Boss")
+    assert m["committed_today"] == [{"currency": "EUR", "value": 16800.0}]
+    got = {p["card"]: p for p in m["pending_decisions"]}
+    assert set(got) == {"van", "sign", "mine"}  # free and decided-with-a-price stay out
+    assert got["van"]["cost_value"] is None and got["van"]["holder"] == "Box Co"
+    assert got["van"]["since"].startswith("2030-06-02T07:58")
+    assert got["sign"]["holder_role"] == "approver" and got["sign"]["since"].endswith(
+        "07:49:00+02:00"
+    )
+    assert got["mine"]["cost_value"] == 2000 and got["mine"]["holder"] == "Bo Buyer"
+    assert price({"cost": "No cost"}) == (False, None, None)
+    assert price({"cost": "PLN 4.200"})[2] == "PLN"

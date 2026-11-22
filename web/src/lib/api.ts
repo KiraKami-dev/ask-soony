@@ -260,11 +260,34 @@ export interface LaunchPart {
   /** Open or passed-on cases about it, most urgent first. */
   cards: string[]
 }
+/** A decision that costs money, still in the air (launch_view.money). */
+export interface PricedDecision {
+  card: string
+  status: string
+  label: string | null
+  part_name?: string | null
+  cost_text?: string | null
+  /** The amount as the option states it; null: price pending. */
+  cost_value: number | null
+  currency?: string | null
+  holder?: string | null
+  holder_role: 'viewer' | 'approver' | 'supplier'
+  since?: string | null
+  copies_at_risk?: number | null
+}
+export interface LaunchMoney {
+  committed_today: { currency: string; value: number }[]
+  committed_items: { card: string; label: string | null; cost_value: number; currency: string; at: string }[]
+  pending_decisions: PricedDecision[]
+  approver?: string | null
+  viewer?: string | null
+}
 export interface LaunchData {
   hours_left: number | null
   editions: ({ edition: string; day_one: number | null } & Partial<FloorEdition>)[]
   parts: LaunchPart[]
   floor?: Floor | null
+  money?: LaunchMoney
 }
 export interface EventItem { id: string; at: string; path?: string; file?: string; node?: string }
 export interface ActivityItem {

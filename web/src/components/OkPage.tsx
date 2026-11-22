@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useState } from 'react'
 import { costText, sentence, type Card } from '@/lib/api'
 import { when } from '@/lib/decisions'
+import { firstNameOf } from '@/lib/role'
 import { claimOf, plain, summaryLine } from '@/lib/today'
 import { cn } from '@/lib/utils'
 
@@ -86,9 +87,19 @@ export function OkPage({ token }: { token: string }) {
     } finally { setBusy(null) }
   }
 
+  // The approver goes on to Launch as themselves (?as=<first name>, remembered on this device).
+  const asWho = page?.kind === 'escalation' ? firstNameOf(page.who || page.to).toLowerCase() : ''
+  const appLink = asWho ? `/launch?as=${encodeURIComponent(asWho)}` : '/'
   const shell = (children: ReactNode) => (
     <main className="min-h-full bg-ground px-6 pb-[max(32px,env(safe-area-inset-bottom))] pt-12">
-      <div className="mx-auto max-w-[440px]">{children}</div>
+      <div className="mx-auto max-w-[440px]">
+        {children}
+        {page && (
+          <p className="t-small mt-10 text-center">
+            <a href={appLink} className="text-ink-3 hover:text-ink">Open in Ask Soony{asWho ? ': where the launch stands' : ''}</a>
+          </p>
+        )}
+      </div>
     </main>
   )
   const tick = (

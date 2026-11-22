@@ -1,5 +1,6 @@
-import { Menu } from 'lucide-react'
+import { Check, Menu, UserRound } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { firstNameOf, type Role } from '@/lib/role'
 import { cn } from '@/lib/utils'
 
 export type Page = 'today' | 'launch' | 'suppliers' | 'routines'
@@ -8,7 +9,7 @@ export function Mark({ size = 20 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
       <path d="M2.5 8V2.5H8M16 2.5h5.5V8M21.5 16v5.5H16M8 21.5H2.5V16" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="square" />
-      <rect x="6.5" y="9.5" width="11" height="5" rx="1" fill="var(--color-mark)" />
+      <rect x="6.5" y="9.5" width="11" height="5" rx="1" fill="currentColor" />
     </svg>
   )
 }
@@ -22,6 +23,20 @@ interface Props {
   bell: ReactNode
   phone: boolean
   routinesBadge?: number
+  /** Who uses this device (remembered); null: nobody chose, "/" is Today. */
+  role?: Role | null
+  onRole?: (r: Role | null) => void
+  people?: { buyer?: string | null; approver?: string | null }
+}
+
+interface RoleProps { role: Role | null; onRole: (r: Role | null) => void; people: { buyer?: string | null; approver?: string | null } }
+
+/** The two people this device can be, as "I'm Felix · opens on Today". Unnamed ones are left out. */
+function roleChoices({ people }: Pick<RoleProps, 'people'>): { role: Role; label: string; lands: string }[] {
+  const out: { role: Role; label: string; lands: string }[] = []
+  if (people.buyer) out.push({ role: 'buyer', label: `I'm ${firstNameOf(people.buyer)}`, lands: 'opens on Today' })
+  if (people.approver) out.push({ role: 'approver', label: `I'm ${firstNameOf(people.approver)}`, lands: 'opens on Launch' })
+  return out
 }
 
 const LINKS: { page: Page; label: string; path: string }[] = [
@@ -30,7 +45,8 @@ const LINKS: { page: Page; label: string; path: string }[] = [
 ]
 
 // One quiet line: the mark, where the launch stands, and where to go.
-export function TopBar({ page, go, status, bell, phone, routinesBadge = 0 }: Props) {
+export function TopBar({ page, go, status, bell, phone, routinesBadge = 0, role = null, onRole, people = {} }: Props) {
+  const who = onRole ? { role, onRole, people } : null
   const link = (on: boolean, label: ReactNode, onClick: () => void, key: string) => (
     <button
       key={key}
@@ -58,13 +74,14 @@ export function TopBar({ page, go, status, bell, phone, routinesBadge = 0 }: Pro
       <p className={cn('min-w-0 truncate text-center', phone && 'max-w-[calc(100%-88px)]')} aria-live="polite">{status}</p>
       <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-3 lg:right-6">
         {phone ? (
-          <PhoneMenu page={page} go={go} bell={bell} badge={routinesBadge} />
+          <PhoneMenu page={page} go={go} bell={bell} badge={routinesBadge} who={who} />
         ) : (
           <nav className="flex items-center gap-4" aria-label="Views">
             {LINKS.map((l) => link(page === l.page, l.label, () => go(l.path), l.page))}
             {link(page === 'routines', <>Routines{routinesBadge > 0 && <span className="ml-1 text-routine">· {routinesBadge}</span>}</>, () => go('/routines'), 'routines')}
             {link(page === 'suppliers', 'Suppliers', () => go('/suppliers'), 'suppliers')}
             {bell}
+            {who && roleChoices(who).length > 0 && <RoleMenu {...who} />}
           </nav>
         )}
       </div>
@@ -72,7 +89,7 @@ export function TopBar({ page, go, status, bell, phone, routinesBadge = 0 }: Pro
   )
 }
 
-function PhoneMenu({ page, go, bell, badge }: { page: Page | null; go: (p: string) => void; bell: ReactNode; badge: number }) {
+function PhoneMenu({ page, go, bell, badge, who }: { page: Page | null; go: (p: string) => void; bell: ReactNode; badge: number; who: RoleProps | null }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -111,7 +128,67 @@ function PhoneMenu({ page, go, bell, badge }: { page: Page | null; go: (p: strin
         <div className="flex items-center justify-between px-3 pb-1 pt-2 text-[13px] text-ink-3">
           Launch alerts {bell}
         </div>
+        {who && roleChoices(who).length > 0 && (
+          <div className="mt-1 border-t border-hair px-1 pt-1.5">
+            <p className="px-2 pb-1 pt-1 text-[13px] text-ink-3">On this phone</p>
+            {roleChoices(who).map((c) => (
+              <button
+                key={c.role}
+                onClick={() => { who.onRole(who.role === c.role ? null : c.role); setOpen(false) }}
+                aria-pressed={who.role === c.role}
+                className="flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-2 text-left text-[15px] text-ink-2 hover:bg-soft"
+              >
+                <span>{c.label} <span className="text-ink-3">· {c.lands}</span></span>
+                {who.role === c.role && <Check size={16} className="text-ink" />}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
+    </div>
+  )
+}
+
+/** Desktop: a quiet person button; picks who uses this device ("/" then opens their page). */
+function RoleMenu({ role, onRole, people }: RoleProps) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!open) return
+    const off = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) setOpen(false) }
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    document.addEventListener('mousedown', off)
+    document.addEventListener('keydown', esc)
+    return () => { document.removeEventListener('mousedown', off); document.removeEventListener('keydown', esc) }
+  }, [open])
+  const name = role === 'approver' ? people.approver : role === 'buyer' ? people.buyer : null
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        aria-label={name ? `Using this as ${firstNameOf(name)}` : 'Who is using this?'}
+        aria-expanded={open}
+        className="flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-2 text-ink-3 hover:bg-soft hover:text-ink focus-visible:outline-2 focus-visible:outline-accent"
+      >
+        <UserRound size={16} />
+        {name && <span>{firstNameOf(name)}</span>}
+      </button>
+      {open && (
+        <div className="absolute right-0 top-10 z-30 w-64 rounded-2xl bg-ground p-1.5 shadow-[0_12px_40px_-12px_rgba(0,0,0,.28)]">
+          <p className="px-3 pb-1 pt-2 text-[13px] text-ink-3">On this device</p>
+          {roleChoices({ people }).map((c) => (
+            <button
+              key={c.role}
+              onClick={() => { onRole(role === c.role ? null : c.role); setOpen(false) }}
+              aria-pressed={role === c.role}
+              className="flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-left text-ink-2 hover:bg-soft"
+            >
+              <span>{c.label} <span className="text-ink-3">· {c.lands}</span></span>
+              {role === c.role && <Check size={15} className="text-ink" />}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

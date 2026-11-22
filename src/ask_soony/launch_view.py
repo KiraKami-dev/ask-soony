@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from datetime import datetime
 from typing import Any
 
@@ -259,4 +260,159 @@ def build(
         "editions": editions,
         "parts": parts,
         "floor": floor.view(site) if site else None,
+    }
+
+
+# ---------------------------------------------------------------- money: what the launch costs
+
+_NO_COST = re.compile(r"^\s*(?:|none|free|0|-|–|n/a|no cost\b.*)\s*$", re.I)
+_PRICE = re.compile(r"(EUR|USD|PLN|€|\$)\s*(\d[\d,.']*)|(\d[\d,.']*)\s*(EUR|USD|PLN|€|\$)", re.I)
+_CURRENCY = {"€": "EUR", "$": "USD"}
+
+
+def price(option: dict | None) -> tuple[bool, float | None, str | None]:
+    """(costs money, amount, currency) of an option, from its cost value or its cost text
+    ('about EUR 16,800'). Money without a readable amount ('unknown: they quote first') costs, at
+    an unknown price; nothing is guessed."""
+    if not option:
+        return False, None, None
+    for key in ("cost_value", "cost_eur"):
+        v = _num(option.get(key))
+        if v:
+            return True, v, "EUR"
+    text = str(option.get("cost") or "")
+    if _NO_COST.match(text):
+        return False, None, None
+    m = _PRICE.search(text)
+    if not m:
+        return True, None, None
+    cur_ = (m.group(1) or m.group(4)).upper()
+    raw = (m.group(2) or m.group(3)).replace(",", "").replace("'", "").rstrip(".")
+    try:
+        return True, float(raw), _CURRENCY.get(cur_, cur_)
+    except ValueError:
+        return True, None, _CURRENCY.get(cur_, cur_)
+
+
+def _carried(card: dict, actions: list[dict]) -> tuple[dict | None, dict | None]:
+    """The approve action behind a decided card and the option it carried out."""
+    act = next(
+        (
+            a
+            for a in reversed(actions)
+            if str(a.get("decision_id")) == card["id"]
+            and a.get("kind") == "approve"
+            and str(a.get("option")).isdigit()
+        ),
+        None,
+    )
+    opts = card.get("options") or []
+    if act is None or int(act["option"]) >= len(opts):
+        return act, None
+    return act, opts[int(act["option"])]
+
+
+def _recommended(card: dict) -> dict | None:
+    opts = card.get("options") or []
+    return next((o for o in opts if o.get("recommended")), opts[0] if opts else None)
+
+
+def money(
+    cards: list[dict], actions: list[dict], cur: datetime, viewer: str, approver: str | None = None
+) -> dict:
+    """What the launch costs today, for the person who signs it: the money carried out today
+    (approved or sent options with an amount) and the decisions with a price still in the air
+    (open, passed on for sign-off, or sent and waiting for the supplier's quote), each with who
+    holds it and since when. Amounts only as the options state them; otherwise `cost_value` is
+    None and the page says "price pending"."""
+    from ask_soony.api import parse_ts
+
+    today = cur.date()
+    committed: list[dict] = []
+    seen: set[tuple] = set()
+    by_id = {c["id"]: c for c in cards}
+    for a in actions:
+        if a.get("kind") != "approve" or a.get("status") not in ("approved", "sent"):
+            continue
+        at = parse_ts(a.get("at"))
+        card = by_id.get(str(a.get("decision_id")))
+        if not at or at.astimezone(cur.tzinfo).date() != today or not card:
+            continue
+        if not str(a.get("option")).isdigit() or int(a["option"]) >= len(card["options"]):
+            continue
+        opt = card["options"][int(a["option"])]
+        costs, value, currency = price(opt)
+        key = (card["id"], int(a["option"]))
+        if not costs or value is None or key in seen:
+            continue
+        seen.add(key)
+        committed.append(
+            {
+                "card": card["id"],
+                "label": opt.get("action"),
+                "part_name": card.get("part_name"),
+                "cost_text": opt.get("cost"),
+                "cost_value": value,
+                "currency": currency,
+                "at": at.isoformat(),
+                "by": a.get("by") or viewer or None,
+            }
+        )
+    totals: dict[str, float] = {}
+    for c in committed:
+        totals[c["currency"]] = totals.get(c["currency"], 0) + c["cost_value"]
+
+    pending = []
+    for c in cards:
+        status = c.get("status")
+        if status in OPEN:
+            opt, act = _recommended(c), None
+        elif status == "sent" and not (c.get("ui") or {}).get("reply"):
+            act, opt = _carried(c, actions)
+            opt = opt or (_recommended(c) if act is None else None)
+        else:
+            continue
+        costs, value, currency = price(opt)
+        # Sent: only a price still to come is a decision in the air; a stated price is committed.
+        if not costs or (status == "sent" and value is not None):
+            continue
+        if status == "sent":  # signed and sent: the supplier owes the quote
+            holder, role = c.get("supplier_name") or (opt or {}).get("to"), "supplier"
+            since = (c.get("ui") or {}).get("at")
+        elif status == "escalated" or c.get("routed_to_other"):
+            holder, role = c.get("signoff") or c.get("approver"), "approver"
+            since = next(
+                (
+                    a.get("at")
+                    for a in reversed(actions)
+                    if str(a.get("decision_id")) == c["id"] and a.get("kind") == "escalate"
+                ),
+                None,
+            )
+        else:
+            holder, role, since = viewer or None, "viewer", None
+        pending.append(
+            {
+                "card": c["id"],
+                "status": status,
+                "label": (opt or {}).get("action") or c.get("headline"),
+                "part_name": c.get("part_name"),
+                "cost_text": (opt or {}).get("cost"),
+                "cost_value": value,
+                "currency": currency,
+                "holder": holder,
+                "holder_role": role,
+                "since": since or (c.get("ui") or {}).get("at") or c.get("created_at"),
+                "copies_at_risk": (
+                    c.get("number") if c.get("number_label") == "copies at risk" else None
+                ),
+            }
+        )
+    return {
+        "committed_today": [{"currency": k, "value": v} for k, v in totals.items()],
+        "committed_items": committed,
+        "pending_decisions": pending,
+        # Who signs money (approval policy) and who buys: the page's "I'm ..." choice.
+        "approver": approver,
+        "viewer": viewer or None,
     }

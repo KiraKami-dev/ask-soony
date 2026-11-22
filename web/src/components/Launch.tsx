@@ -1,7 +1,9 @@
 import { type ReactNode, useEffect, useState } from 'react'
+import { LaunchBrief } from '@/components/LaunchBrief'
 import { LaunchTimeline } from '@/components/LaunchTimeline'
 import { fmtNum, type Card, type Inbound, type LaunchPart, type State, type StripItem } from '@/lib/api'
 import { launchAt, when } from '@/lib/decisions'
+import type { Role } from '@/lib/role'
 import { cn } from '@/lib/utils'
 
 // Launch: "Will we make Sunday 20:00, and what breaks first?" One honest sentence, the timeline,
@@ -15,6 +17,8 @@ interface Props {
   phone: boolean
   /** Opens a case on Today. */
   onOpen: (cardId: string) => void
+  /** Who uses this device: "with you" means them. */
+  role?: Role | null
 }
 
 const OPEN = new Set(['open', 'escalated'])
@@ -124,7 +128,7 @@ function useDataHealth(stamp: unknown): DataHealth | null {
   return h
 }
 
-export function Launch({ state, nowMs, phone, onOpen }: Props) {
+export function Launch({ state, nowMs, phone, onOpen, role = null }: Props) {
   const health = useDataHealth(state)
   const gaps = (health?.issues ?? []).filter((i) => i.kind !== 'unused')
   const unused = (health?.issues ?? []).filter((i) => i.kind === 'unused')
@@ -148,6 +152,7 @@ export function Launch({ state, nowMs, phone, onOpen }: Props) {
             </ul>
           </div>
         )}
+        <LaunchBrief state={state} nowMs={nowMs} phone={phone} role={role} onOpen={onOpen} />
       </div>
 
       <div className={cn('border-y border-hair', phone ? 'px-6 py-2' : 'px-8 py-4 xl:px-12')}>
