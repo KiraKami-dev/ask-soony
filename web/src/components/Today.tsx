@@ -772,7 +772,8 @@ function Focus(p: Props & {
                   <span className="t-body block text-ink-2">{costLine(card, sel)}{opt.effect ? ` ${cap(tidy(opt.effect))}.`.replace(/\.\.$/, '.') : ''}</span>
                 )}
               </span>
-              {!phone && keys && choices.length > 1 && chosenKey < 9 && <kbd className="t-small">{chosenKey + 1}</kbd>}
+              {/* Its number only while the other options are open, when the numbers mean something. */}
+              {!phone && keys && others && choices.length > 1 && chosenKey < 9 && <kbd className="t-small">{chosenKey + 1}</kbd>}
             </button>
           ) : choice.kind === 'escalate' ? (
             <>
