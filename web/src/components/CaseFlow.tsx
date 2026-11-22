@@ -1,5 +1,5 @@
 import { FileInput, Inbox, ScanText, Scale, Send, ShieldCheck, TrendingDown } from 'lucide-react'
-import { Fragment, type ReactNode } from 'react'
+import { Fragment, useState, type ReactNode } from 'react'
 import { fmtNum, tidy, type Card, type Evidence, type State } from '@/lib/api'
 import { languageOf, sourceName, splitValue, when } from '@/lib/decisions'
 import { firstNameOf } from '@/lib/role'
@@ -11,7 +11,7 @@ import { Link, NODE, NodeHead } from './routines/FlowGraph'
 // look as a routine's diagram. Every node is read from the case itself (its trail, evidence,
 // impact, approval rule, options and status); a step the data does not have is left out, never
 // made up. Done steps are quiet, the step the case waits at is marked, what comes after is
-// dashed. One column, top to bottom; on a phone one line per step. The document steps open
+// dashed. One column, top to bottom, one line a step until "Details". The document steps open
 // the document.
 
 type Tone = 'done' | 'now' | 'next'
@@ -121,8 +121,11 @@ const CANVAS = {
   backgroundSize: '18px 18px',
 }
 
-export function CaseFlow({ card, state, nowMs, phone, className, onDoc }: { card: Card; state: State; nowMs: number; phone?: boolean; className?: string; onDoc?: () => void }) {
+export function CaseFlow({ card, state, nowMs, className, onDoc }: { card: Card; state: State; nowMs: number; phone?: boolean; className?: string; onDoc?: () => void }) {
   const steps = stepsOf(card, state, nowMs)
+  // Compact by default (one line a step); "Details" shows the evidence lines. Remembered here.
+  const [detail, setDetail] = useState(() => { try { return localStorage.getItem('ask-soony.flow-detail') === '1' } catch { return false } })
+  const toggle = () => setDetail((d) => { try { localStorage.setItem('ask-soony.flow-detail', d ? '0' : '1') } catch { /* private mode */ } return !d })
   if (steps.length < 3) return null
 
   // One column, top to bottom, in the order the agents worked: no turns to follow.
@@ -131,7 +134,7 @@ export function CaseFlow({ card, state, nowMs, phone, className, onDoc }: { card
       {steps.map((s, i) => (
         <Fragment key={s.key}>
           {i > 0 && <li aria-hidden="true"><Link dashed={s.tone === 'next'} /></li>}
-          <li><Node s={s} nowMs={nowMs} compact={phone} onDoc={onDoc} /></li>
+          <li><Node s={s} nowMs={nowMs} compact={!detail} onDoc={onDoc} /></li>
         </Fragment>
       ))}
     </ol>
@@ -139,7 +142,12 @@ export function CaseFlow({ card, state, nowMs, phone, className, onDoc }: { card
 
   return (
     <section aria-label="How we got here" className={className}>
-      <h2 className="t-small text-ink-3">How we got here</h2>
+      <div className="flex items-baseline justify-between gap-4">
+        <h2 className="t-small text-ink-3">How we got here</h2>
+        <button type="button" onClick={toggle} aria-expanded={detail} className="t-small cursor-pointer text-ink-3 hover:text-ink">
+          <span className="border-b border-hair">{detail ? 'Less' : 'Details'}</span>
+        </button>
+      </div>
       <div className="mt-3 rounded-2xl border border-hair p-3 sm:p-4" style={CANVAS}>{body}</div>
     </section>
   )
