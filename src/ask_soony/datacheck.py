@@ -11,6 +11,7 @@ it never guesses a rename on its own.
 
 from __future__ import annotations
 
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -117,7 +118,15 @@ def check(root: Path | None = None, now: datetime | None = None) -> dict:
             seen = dict(reads.get(rel) or {"read": False, "wanted": []})
             if not seen["read"] and _verifier_reads(f):
                 seen["read"] = True
-            lost = [c for c in old.get(rel, []) if isinstance(c, str) and c not in head]
+            # A "column" that was a whole header read with the wrong separator is not lost when
+            # its parts are all there now (the file was read right this time).
+            lost = [
+                c
+                for c in old.get(rel, [])
+                if isinstance(c, str)
+                and c not in head
+                and not set(filter(None, re.split(r"[;,\t|]", c))) <= set(head)
+            ]
             info = _mapped(f, seen)
             if info:
                 mapped[rel] = info["renamed"]
