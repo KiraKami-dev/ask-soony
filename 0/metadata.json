@@ -1,0 +1,185 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M80XKVRV9Y034PVDQ388T9TJ",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T06:03:30.048329Z",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 2,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "b3b5d9cb44b3",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 46,
+    "cache_creation_tokens": 29864,
+    "cache_read_tokens": 8108976,
+    "output_tokens": 17201,
+    "api_call_count": 22,
+    "subagent_tokens": {
+      "input_tokens": 58,
+      "cache_creation_tokens": 119556,
+      "cache_read_tokens": 2623668,
+      "output_tokens": 16258,
+      "api_call_count": 29
+    },
+    "subagent_tokens_complete": true
+  },
+  "session_token_usage": {
+    "input_tokens": 2583,
+    "cache_creation_tokens": 2756005,
+    "cache_read_tokens": 558328448,
+    "output_tokens": 1071199,
+    "api_call_count": 1113,
+    "subagent_tokens": {
+      "input_tokens": 2450,
+      "cache_creation_tokens": 5493097,
+      "cache_read_tokens": 179666318,
+      "output_tokens": 1484554,
+      "api_call_count": 1163
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 1776,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 66,
+      "credentialed_uri": 0,
+      "entropy": 581,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 1105,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1008,
+      "IP": 32,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 234
+  },
+  "summary": {
+    "intent": "Win the Lio 'Keep the Line Running' hackathon challenge by analysing Soony's confidential launch data and building a general, adaptable agent product that detects plan-vs-reality gaps, handles new data drops, and takes real supplier actions with human approval.",
+    "outcome": "Found that the Collector's Edition misses Sunday despite an 'all ok' plan (overbooked art books, failed statues, slow packing, rev B/C sleeves). Built and committed a poller, versioned store, verifier, paper check, Today/Launch UI, site questions, reconciled shipment tracking and editable email review (274 tests passing). Several supplier emails were sent and a drop rehearsal is running.",
+    "learnings": {
+      "repo": [
+        "The portal API has only three endpoints (list files, get file, archive.zip) and no webhook or notification, so new drops must be detected by polling the file list and comparing SHA-256; existing files get replaced under the same name.",
+        "Confidential portal data lives in gitignored data/ and .env; .env.example is the committed template. Nothing from the data should be committed or hardcoded.",
+        "Teammates use CLAUDE.md and PROGRESS.md for workflow; tasks are claimed in PROGRESS.md with a Now line, and Entire checkpoints are only written when a commit changes files.",
+        "api.py defines a _MONEY regex later in the file that overrides an earlier one with the same name, so new regexes there need unique names.",
+        "Server only sends supplier emails to known addresses (cardtools.supplier_addresses()/known_addresses()), now extended with reply senders as contacts; subject, To and CC overrides are validated against this list.",
+        "open_shipments.csv stopped updating Fri 20 Nov 17:00 and contradicts goods receipts; the hand-kept Excel tracker holds knowledge (e.g. 'RP: call terminal') not in any system, so shipment status is reconciled across receipts, site answers, documents/emails, tracker and export by precedence.",
+        "Lucas's origin/new-approach branch (pulse-console/server.mjs) sends emails through the shared mailbox with no allow-list, which caused stray messages to Hwaseong and an external Gmail address.",
+        "The JSON supplier profiles (Pune 'watch/conditional', PackRight 'at risk') contradict the CSV 'active' status, but only email addresses were read from them; the CPO memo (.docx) and launch_status.xlsx are also not read by the app."
+      ],
+      "code": [
+        {
+          "path": "src/ask_soony/floor.py",
+          "finding": "New generic site-question model (packed/received/count) with staleness rules, tokenised count pages, backflush of book stock, and env-tunable thresholds (ASK_PACKOUT_STALE_HOURS, ASK_COUNT_MARGIN, etc.)."
+        },
+        {
+          "path": "src/ask_soony/tracking.py",
+          "finding": "Reconciles each shipment's status from all sources with precedence; frozen-list and per-shipment silence cards use ASK_TRACKER_STALE_HOURS and ASK_SILENT_HOURS."
+        },
+        {
+          "path": "src/ask_soony/api.py",
+          "finding": "Today ranking and routing; cards with a signoff stay with the viewer until passed on, and routing must be decided after the final status (half done/open) is known."
+        }
+      ],
+      "workflow": [
+        "Check whether Entire hooks fired via its log; it skips checkpoints when no files in the repo changed.",
+        "Delegate large, independent builds to subagents but hold commits until they report when they edit the same shared file (api.py).",
+        "Outward-facing actions such as supplier emails need approval; the user granted standing permission for small paid image-recognition calls, saved in memory.",
+        "Hand-written emails should use the full contact name from supplier profiles with no guessed title (saved as memory).",
+        "Don't send a second email into the same supplier thread within minutes; Lio warns that spammed suppliers may stop cooperating.",
+        "Check for doc edits before overwriting artifact/doc sections, and verify UI changes with screenshots."
+      ]
+    },
+    "friction": [
+      "Portal token was initially empty, blocking data access until the user filled it in.",
+      "Hand-written follow-up emails guessed salutations ('Mr Nowak', 'Mr Rohan') from addresses instead of using profile names.",
+      "The art-book card rule was evaluated before the final 'half done' status, so it landed in the wrong place on Today until moved.",
+      "Two builders editing api.py at once prevented clean partial commits.",
+      "The recognizer cannot read Word files, so the CPO memo is still unread.",
+      "Lucas's Pulse console sent confusing and possibly confidential emails (Hwaseong and an external Gmail) through the shared mailbox.",
+      "A UI bug in the claim sentence for the game-card case ('The Plan says ok…'), with the period dropping onto its own line, took several screenshot iterations.",
+      "Earlier drops (news, JSON profiles, lead-time delta, memo) were only partially ingested; the data check covers CSV only."
+    ],
+    "open_items": [
+      "Wait for the drop-rehearsal builder's results and fix the ingestion gaps (news cases, JSON profile status changes, CPO memo).",
+      "Decide whether to send a note to Hwaseong disregarding the stray emails, and draft a message to Lucas about Pulse's missing allow-list.",
+      "The Karton art-book order (€16,800) is not sent; it awaits Maren's approval.",
+      "Finish the claim-sentence UI fix (period still wrapping) and commit.",
+      "Rev B PackRight card should pick up Lin Hui's reply instead of re-recommending 'produce to rev C'.",
+      "Possible double count of 28,000 cards in the verifier if book stock already includes them; floor.receipts() ignores receipt dates.",
+      "Express offer vs Karton downtime notice contradiction is not yet flagged by the app.",
+      "Register sender addresses, set ASK_APP_URL to the public tunnel before demo, and consider changing the portal password that appeared in Discord.",
+      "Prepare office-hours question cards for Nils (data provenance), Felix and Maren, and decide on the second-email option for API/tracking questions.",
+      "Copying internal colleagues in emails is not possible, as there are no internal addresses in the data."
+    ]
+  }
+}
