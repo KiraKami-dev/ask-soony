@@ -1,15 +1,16 @@
 import * as Dialog from '@radix-ui/react-dialog'
-import { Check, Database, FileText } from 'lucide-react'
+import { ArrowLeft, Check, Database, FileText } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { AnchorCrop, NUM_OR_ID, fileUrl, normTok, useAnchors, type Anchor } from '@/components/SourceAnchors'
 import { VoiceCall, type Prepared, type ScreenWhat } from '@/components/VoiceCall'
 import { pendingOf, undoAction, useLive } from '@/components/routines/live'
+import { UndoAction } from '@/components/routines/Undo'
 import { ProposalLines, ProposalSheet, RoutineLine, WouldLine, groupProposals } from '@/components/routines/Proposals'
 import type { Proposal } from '@/components/routines/types'
-import { post, tidy, type Card, type Evidence, type State } from '@/lib/api'
-import { languageOf, splitValue, when } from '@/lib/decisions'
+import { DONE_WORD, post, sentence, tidy, type Card, type Evidence, type State } from '@/lib/api'
+import { actionIdOf, languageOf, replyFacts, routineActionOf, routineOf, splitValue, when } from '@/lib/decisions'
 import {
-  actionText, claimOf, costLine, costsMoney, docKind, forToday, headlineOf, launchStatus, plural,
+  actionText, claimOf, costLine, costsMoney, docKind, forToday, headlineOf, launchStatus, ordinal, plural,
   recommendedIndex, routineCount, shortName, shortTitle, summaryLine, type Claim,
 } from '@/lib/today'
 import { cn } from '@/lib/utils'
@@ -23,8 +24,16 @@ export interface DoneInfo {
   actionId: string | null
   /** Open look-alikes to offer a routine for; 0 when none (or a routine exists). */
   offer: number
+  /**
+   * No open look-alikes, but this is the n-th time the same kind of case was decided the same
+   * way (GET /api/routines/suggestions): offer to make it a routine. `words` is what was done.
+   */
+  repeat?: { n: number; words: string } | null
   k: number
 }
+
+/** Which part of the evidence drawer to open. */
+type Drawer = (card: Card, tab: 'evidence' | 'trail') => void
 
 interface Props {
   state: State
@@ -43,6 +52,11 @@ interface Props {
   onRingingDone?: () => void
   /** Routine proposals waiting for an OK plus drafts from calls (the live store is read here). */
   pending: number
+  /** A case opened by link (/d/<id>) that is no longer open: shown as it stands, not decided. */
+  caseCard?: Card | null
+  /** Arrived from Plan: a quiet way back. */
+  onBack?: (() => void) | null
+  onDrawer: Drawer
 }
 
 /** Opens the review sheet for what routines prepared. */
@@ -59,13 +73,15 @@ export function Today(p: Props) {
   const [call, setCall] = useState<Card | null>(null)
   const callCard = call ? state.cards.find((c) => c.id === call.id) ?? call : null
   const focusCard = callCard ?? card
-  const view = callCard ? 'decide' : done ? 'done' : card ? 'decide' : 'clear'
+  const view = callCard ? 'decide' : done ? 'done' : p.caseCard ? 'case' : card ? 'decide' : 'clear'
 
   const foot = <FootLines handled={handled} onRoutines={() => p.onRoutines()} nowMs={nowMs} center={!phone} />
 
   const body =
     view === 'done' ? (
       <DoneView key={`done-${done!.k}`} {...p} done={done!} />
+    ) : view === 'case' ? (
+      <CaseView key={`case-${p.caseCard!.id}`} card={p.caseCard!} state={state} nowMs={nowMs} onChanged={p.onChanged} onDrawer={p.onDrawer} />
     ) : view === 'decide' ? (
       <Focus
         key={focusCard!.id}
@@ -81,10 +97,19 @@ export function Today(p: Props) {
   const sheet = (
     <ProposalSheet items={review} ctx={state} onClose={() => setReview(null)} onChanged={p.onChanged} />
   )
+  const back = p.onBack && (
+    <button
+      onClick={p.onBack}
+      className={cn('t-small inline-flex cursor-pointer items-center gap-1.5 text-ink-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-accent', phone ? 'mb-6' : 'absolute -top-14 left-0')}
+    >
+      <ArrowLeft size={15} strokeWidth={1.75} aria-hidden="true" />Plan
+    </button>
+  )
 
   if (phone) {
     return (
       <main className="mx-auto w-full max-w-[560px] px-7 pb-[220px] pt-5">
+        {back}
         {body}
         {view === 'decide' && handled > 0 && <div className="mt-14">{foot}</div>}
         {sheet}
@@ -98,9 +123,9 @@ export function Today(p: Props) {
         <aside aria-label="Needs you">
           {p.order.length > 0 && <QuietList {...p} />}
         </aside>
-        <main className="min-w-0">{body}</main>
+        <main className="relative min-w-0">{back}{body}</main>
       </div>
-      {view !== 'clear' && <div className="fixed inset-x-0 bottom-8 z-10 flex justify-center">{foot}</div>}
+      {view !== 'clear' && view !== 'case' && <div className="fixed inset-x-0 bottom-8 z-10 flex justify-center">{foot}</div>}
       {sheet}
     </div>
   )
@@ -400,9 +425,7 @@ function Focus(p: Props & {
           <button disabled={busy} onClick={dismiss} className="t-body block w-full cursor-pointer py-2 text-left text-ink-2 hover:text-ink">
             <span className="text-ink-3">Or </span>dismiss: nothing to do
           </button>
-          <button onClick={() => p.go(`/plan?card=${encodeURIComponent(card.id)}`)} className="t-small block cursor-pointer pt-2 text-left text-ink-3 hover:text-ink">
-            Edit the message, all evidence and the trail in Plan
-          </button>
+          <EvidenceLinks card={card} onDrawer={p.onDrawer} className="pt-2" />
         </div>
       )}
 
@@ -667,6 +690,8 @@ function DoneView(p: Props & { done: DoneInfo }) {
   const [undoing, setUndoing] = useState(false)
   const next = p.order.find((c) => c.id !== done.card.id) ?? null
   const offer = done.offer > 0 && !outcome?.ok
+  // No look-alikes open, but the same call made again: offer it as a routine on its own.
+  const repeat = !offer && !outcome?.ok && done.repeat && done.repeat.n >= 2 ? done.repeat : null
   const who = shortName(done.card.supplier_name)
 
   const undo = async () => {
@@ -677,12 +702,12 @@ function DoneView(p: Props & { done: DoneInfo }) {
     if (r.ok) p.onChanged()
   }
 
-  const primary = offer
+  const primary = offer || repeat
     ? { label: 'Show me how', onClick: () => { p.onClearDone(); p.onRoutines({ cardId: done.card.id, k: Date.now() }) } }
     : next
       ? { label: 'Next decision', onClick: () => { p.onFocus(next.id); p.onClearDone() } }
       : null
-  const quiet = offer ? { label: 'Not now', onClick: p.onClearDone } : null
+  const quiet = offer || repeat ? { label: 'Not now', onClick: p.onClearDone } : null
 
   return (
     <section className="rise" aria-live="polite">
@@ -703,6 +728,13 @@ function DoneView(p: Props & { done: DoneInfo }) {
             {plural(done.offer, 'more like this', 'more like this')}{who ? ` from ${who}` : ''}. Handle them the same way?
           </p>
           <p className="t-small dot-routine mt-7 text-routine">You'll see a test run first. It starts by asking: it prepares them, you send with one tap.</p>
+        </div>
+      ) : repeat ? (
+        <div>
+          <p className="t-body text-ink">
+            That's the {ordinal(repeat.n)} time you {repeat.words}. Handle it like this from now on?
+          </p>
+          <p className="t-small dot-routine mt-7 text-routine">It will prepare them; you send with one tap.</p>
         </div>
       ) : next ? (
         <p className="t-body text-ink-2">Next: <span className="text-ink">{headlineOf(next, state)}</span></p>
@@ -743,6 +775,7 @@ function AllClear({
   const waiting = state.cards.filter((c) => (c.status === 'open' && c.routed_to_other) || c.status === 'escalated').length
   const live = useLive()
   const pending = pendingOf(live)
+  const suggestion = live.suggestions[0] ?? null
   return (
     <section className="rise pt-[16vh] lg:pt-[10vh]">
       <h1 className="t-big text-ink">Nothing needs you.</h1>
@@ -760,6 +793,11 @@ function AllClear({
           <RoutineLine links={[{ label: 'review', onClick: () => onReview(pending) }]}>{pending.length} waiting for your OK</RoutineLine>
         )}
         <Automation state={state} onRoutines={onRoutines} onReview={onReview} onChanged={onChanged} className="grid gap-3.5" />
+        {suggestion && (
+          <RoutineLine links={[{ label: 'make it a routine', onClick: () => onRoutines({ cardId: suggestion.last_card_id, k: Date.now() }) }]}>
+            You did ‘{suggestionLabel(suggestion, state)}’ {suggestion.count} times
+          </RoutineLine>
+        )}
       </div>
       {state.last_check_at && <p className="t-small mt-16 text-ink-3">Last checked the portal at {when(state.last_check_at, nowMs)}.</p>}
     </section>
@@ -810,5 +848,82 @@ function FootLines({ handled, onRoutines, nowMs, center }: { handled: number; on
         {handled} handled by your routines {new Date(nowMs).getHours() < 11 ? 'overnight' : 'today'}
       </RoutineLine>
     </div>
+  )
+}
+
+/** The short label of a suggestion: the latest case's list title, else its headline. */
+function suggestionLabel(sg: { last_card_id: string; label?: string | null }, state: State): string {
+  const c = state.cards.find((x) => x.id === sg.last_card_id)
+  const t = c ? shortTitle(c, state) : tidy(sg.label).replace(/\.$/, '')
+  return t.length > 60 ? `${t.slice(0, 57).replace(/\s+\S*$/, '')}…` : t
+}
+
+/** Everything behind a case, one tap away in the side drawer. */
+function EvidenceLinks({ card, onDrawer, className }: { card: Card; onDrawer: Drawer; className?: string }) {
+  if (!card.evidence.length && !card.trail.length) return null
+  return (
+    <p className={cn('t-small flex flex-wrap gap-x-5 gap-y-2 text-ink-3', className)}>
+      {card.evidence.length > 0 && (
+        <button onClick={() => onDrawer(card, 'evidence')} className="cursor-pointer hover:text-ink"><span className="border-b border-hair">All evidence · {card.evidence.length}</span></button>
+      )}
+      {card.trail.length > 0 && (
+        <button onClick={() => onDrawer(card, 'trail')} className="cursor-pointer hover:text-ink"><span className="border-b border-hair">How we know</span></button>
+      )}
+    </p>
+  )
+}
+
+// ---------------------------------------------------------------- a case that is not open any more
+
+/** A decided or passed-on case, opened from Plan: where it stands, why, and Undo where it works. */
+function CaseView({ card, state, nowMs, onChanged, onDrawer }: { card: Card; state: State; nowMs: number; onChanged: () => void; onDrawer: Drawer }) {
+  const [source, setSource] = useState<number | null>(null)
+  const anchors = useAnchors(card.id)
+  const claim = claimOf(card)
+  const routine = routineOf(state, card.id)
+  const waiting = card.status === 'escalated'
+  const actionId = routine ? routineActionOf(state, card.id) : actionIdOf(state.activity.find((a) => a.card === card.id))
+  const undo = !waiting && card.status !== 'sent' ? actionId : null
+  const facts = replyFacts(card)
+  const who = (card.approver ?? '').split(' ').find((w) => !w.endsWith('.')) || 'the approver'
+  const at = card.ui?.at ? ` at ${when(card.ui.at, nowMs)}` : ''
+  return (
+    <article className="rise" aria-label={headlineOf(card, state)}>
+      <p className="t-small mb-4 text-ink-3">{card.supplier_name || card.part_name || 'Soony'}</p>
+      <h1 className="t-big text-ink">{headlineOf(card, state)}</h1>
+
+      <p className="t-body mt-6 flex flex-wrap items-baseline gap-x-2 text-ink-2">
+        {waiting ? (
+          <span className="text-ink">Waiting for {who}{card.ui?.at ? ` since ${when(card.ui.at, nowMs)}` : ''}.</span>
+        ) : (
+          <>
+            <Check size={17} strokeWidth={1.75} className="translate-y-0.5 self-center text-ink" aria-hidden="true" />
+            <span className="text-ink">{DONE_WORD[card.status] ?? 'Done'}{at}.</span>
+            {routine ? <span className="t-small dot-routine text-routine">By your routine ‘{routine}’</span> : <span className="t-small text-ink-3">By you</span>}
+          </>
+        )}
+        {undo && <UndoAction actionId={undo} onUndone={onChanged} />}
+      </p>
+      {waiting && card.reason && <p className="t-body mt-2 text-ink-2">{sentence(card.reason)}</p>}
+
+      {facts && (
+        <p className="t-body mt-6 text-ink">{facts.text}{facts.late ? <span className="text-late">, after launch.</span> : '.'}</p>
+      )}
+      {card.ui?.reply && !facts && (
+        <p className="t-body mt-6 text-ink-2">
+          <span className="text-ink-3">Reply from {card.ui.reply_from || 'the supplier'}: </span>{card.ui.reply}
+        </p>
+      )}
+
+      <p className="t-body mt-6 text-ink-2">
+        {claim ? (
+          <ClaimLine claim={claim} late={card.level === 'red'} open={source} onOpen={setSource} />
+        ) : (
+          <Cited text={summaryLine(card)} anchors={anchors.items} onOpen={setSource} open={source} />
+        )}
+      </p>
+      <EvidenceLinks card={card} onDrawer={onDrawer} className="mt-12" />
+      <SourceSheet card={card} claim={claim} index={source} anchors={anchors.items} ready={anchors.ready} onIndex={setSource} />
+    </article>
   )
 }

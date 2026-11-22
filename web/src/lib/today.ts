@@ -250,3 +250,33 @@ export function launchStatus(state: State, nowMs: number): string {
 }
 
 export const sentenceOf = sentence
+
+// ---------------------------------------------------------------- repeated decisions
+
+const ORDINAL = ['', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth']
+/** "second", "third", … "11th". */
+export function ordinal(n: number): string {
+  if (ORDINAL[n]) return ORDINAL[n]
+  const t = n % 100
+  const suf = t >= 11 && t <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' } as Record<number, string>)[n % 10] ?? 'th'
+  return `${n}${suf}`
+}
+
+const firstName = (s?: string) => (!s ? '' : /\s[a-z]/.test(s) ? s : (s.split(' ').find((w) => !w.endsWith('.')) ?? s))
+
+/**
+ * What the person did, in plain past-tense words for "That's the third time you …":
+ * "asked PackRight to switch to the new artwork", "passed it on to Maren".
+ */
+export function repeatWords(decision: string, action: string | null | undefined, card: Card | null): string {
+  if (decision === 'escalate') return `passed this kind of case on to ${firstName(card?.approver) || 'the approver'}`
+  if (decision === 'dismiss') return 'took this kind of case off the list'
+  const supplier = card?.supplier_name
+  let a = plain(action, card?.part_name).replace(/\.$/, '')
+  if (supplier) a = a.split(supplier).join(shortName(supplier))
+  a = a.replace(/\b(?:PO|order)\s+\d{6,}/g, 'the order')
+  const m = a.match(/^(\w+)\s+(.*)$/)
+  const past = m && PAST[m[1].toLowerCase()]
+  if (past) return `${past.toLowerCase()} ${m![2]}`
+  return a ? `approved ‘${a[0].toLowerCase()}${a.slice(1)}’` : 'approved this kind of case'
+}

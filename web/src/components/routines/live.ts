@@ -1,13 +1,28 @@
 import { useSyncExternalStore } from 'react'
 import { call, type Mode, type Proposal, type Routine, type Run, type WouldHandle } from './types'
 
-// What the routines prepared for the buyer, shared by the Routines sheet, the decision pane and
-// the inbox list: proposals waiting for an OK, routines that would handle a card, and actions
-// undone on this screen. Refreshed on the app's own refresh (see `refreshLive`), never on its
+// What the routines prepared for the buyer, shared by the Routines sheet, Today and Plan:
+// proposals waiting for an OK, routines that would handle a card, repeated decisions worth a
+// routine, and actions undone on this screen. Refreshed on the app's own refresh (see `refreshLive`), never on its
 // own timer. Endpoints that are not there yet (404) simply count as empty.
 
 /** A routine the voice assistant drafted during a call (GET /api/routines/drafts). */
 export interface VoiceDraft { card_id: string; instruction?: string; at?: string; via?: string; routine: Routine; preview?: Run }
+
+/** Past decisions made the same way at least twice, with no routine for them yet (GET /api/routines/suggestions). */
+export interface Suggestion {
+  key: string
+  count: number
+  card_ids: string[]
+  decision: 'approve' | 'escalate' | 'dismiss'
+  /** The option's action, as the agents wrote it ("Ask ... to ..."); null for escalate and dismiss. */
+  action?: string | null
+  /** The latest card's headline. */
+  label?: string | null
+  supplier?: string | null
+  last_card_id: string
+  last_at: string
+}
 
 interface Live {
   proposals: Proposal[]
@@ -18,6 +33,8 @@ interface Live {
   undo: Record<string, { ok: boolean; reason?: string }>
   /** Proposals the buyer just accepted or skipped, hidden before the server agrees. */
   settled: Set<string>
+  /** Repeated decisions worth a routine, newest first. */
+  suggestions: Suggestion[]
 }
 
 const HIDDEN_KEY = 'ask-soony.hidden-routine-drafts'
@@ -28,7 +45,7 @@ let hidden = readHidden()
 let allDrafts: VoiceDraft[] = []
 const visibleDrafts = () => allDrafts.filter((d) => !hidden.has(d.routine.id))
 
-let live: Live = { proposals: [], drafts: [], would: {}, undo: {}, settled: new Set() }
+let live: Live = { proposals: [], drafts: [], would: {}, undo: {}, settled: new Set(), suggestions: [] }
 const subs = new Set<() => void>()
 const set = (next: Partial<Live>) => { live = { ...live, ...next }; subs.forEach((f) => f()) }
 const subscribe = (f: () => void) => { subs.add(f); return () => { subs.delete(f) } }
@@ -48,11 +65,15 @@ export function refreshLive(minMs = 4000): Promise<void> {
   if (Date.now() - lastAt < minMs) return Promise.resolve()
   lastAt = Date.now()
   inflight = (async () => {
-    const [p, w, d] = await Promise.all([
+    const [p, w, d, s] = await Promise.all([
       getJson<{ proposals?: Proposal[] }>('/api/routines/proposals'),
       getJson<Record<string, WouldHandle[]>>('/api/routines/would-handle'),
       getJson<{ drafts?: VoiceDraft[] }>('/api/routines/drafts'),
+      getJson<{ suggestions?: Suggestion[] }>('/api/routines/suggestions'),
     ])
+    const suggestions = Array.isArray(s?.suggestions)
+      ? s.suggestions.filter((x) => x && x.count >= 2 && Array.isArray(x.card_ids) && x.last_card_id)
+      : live.suggestions
     if (d) allDrafts = (d.drafts ?? []).filter((x) => x?.routine?.id)
     const proposals = Array.isArray(p?.proposals) ? p.proposals.filter((x) => x && x.id) : []
     const would: Record<string, WouldHandle[]> = {}
@@ -60,7 +81,7 @@ export function refreshLive(minMs = 4000): Promise<void> {
     // Forget settled ids the server no longer lists as pending.
     const pending = new Set(proposals.filter((x) => x.status === 'pending').map((x) => x.id))
     const settled = new Set([...live.settled].filter((id) => pending.has(id)))
-    set({ proposals, would, settled, drafts: visibleDrafts() })
+    set({ proposals, would, settled, suggestions, drafts: visibleDrafts() })
   })().finally(() => { inflight = null })
   return inflight
 }
@@ -74,6 +95,11 @@ export function pendingOf(l: Live, cardId?: string): Proposal[] {
   return l.proposals.filter(
     (p) => (p.status ?? 'pending') === 'pending' && !l.settled.has(p.id) && (cardId == null || p.card_id === cardId),
   )
+}
+
+/** The suggestion a decided card belongs to (read outside React, right after a decision). */
+export function suggestionFor(cardId: string): Suggestion | null {
+  return live.suggestions.find((x) => x.card_ids.includes(cardId) && x.count >= 2) ?? null
 }
 
 /** Hide a voice draft on this device (turned on, or "Not now"). */

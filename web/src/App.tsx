@@ -1,17 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertsButton } from '@/components/AlertsButton'
-import { DecisionList, visibleOrder } from '@/components/DecisionList'
-import { DecisionPane, type Offer } from '@/components/DecisionPane'
 import { EvidenceDrawer, type DrawerView } from '@/components/EvidenceDrawer'
-import { LaunchTimeline } from '@/components/LaunchTimeline'
+import { Plan } from '@/components/Plan'
 import { Routines, RoutinesLive } from '@/components/Routines'
-import { pendingOf, useLive } from '@/components/routines/live'
+import { pendingOf, refreshNow, suggestionFor, useLive } from '@/components/routines/live'
 import { MapLegend, SupplierList, SupplyMap, type MapSelection } from '@/components/SupplyMap'
 import { Today, type DoneInfo } from '@/components/Today'
 import { TopBar, type Page } from '@/components/TopBar'
 import { DECIDED, DONE_WORD, fetchState, tidy, viaOf, type Card, type State } from '@/lib/api'
-import { actionIdOf, groupKey, sections } from '@/lib/decisions'
-import { lookAlikes, todayOrder, trucksLeave } from '@/lib/today'
+import { actionIdOf } from '@/lib/decisions'
+import { lookAlikes, repeatWords, todayOrder, trucksLeave } from '@/lib/today'
 
 const POLL_MS = 5000
 
@@ -31,6 +29,7 @@ export default function App() {
   const [error, setError] = useState(false)
   const [nowMs, setNowMs] = useState(Date.now())
   const [path, setPath] = useState(window.location.pathname)
+  const [search, setSearch] = useState(window.location.search)
   const [toast, setToast] = useState<string | null>(null)
   const [pulseNode, setPulseNode] = useState<string | null>(null)
   const [drafts, setDrafts] = useState(0)
@@ -38,14 +37,9 @@ export default function App() {
   const [focusId, setFocusId] = useState<string | null>(null)
   const [done, setDone] = useState<DoneInfo | null>(null)
   const decidedHere = useRef(new Set<string>())
-  // Plan: the full list and pane.
-  const [selectedId, setSelectedId] = useState<string | null>(() => new URLSearchParams(window.location.search).get('card'))
-  const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [mapSel, setMapSel] = useState<MapSelection>({})
   const [drawer, setDrawer] = useState<DrawerView>(null)
-  const [fresh, setFresh] = useState<Set<string>>(new Set())
   const seenEvents = useRef<Set<string> | null>(null)
-  const seenCards = useRef<Set<string> | null>(null)
   const lastStatus = useRef<Map<string, string> | null>(null)
   const offset = useRef(0)
   const phone = !useMedia('(min-width: 1024px)')
@@ -59,8 +53,7 @@ export default function App() {
   const go = useCallback((to: string) => {
     window.history.pushState(null, '', to)
     setPath(window.location.pathname)
-    const card = new URLSearchParams(window.location.search).get('card')
-    if (card) setSelectedId(card)
+    setSearch(window.location.search)
     window.scrollTo(0, 0)
   }, [])
 
@@ -90,16 +83,6 @@ export default function App() {
       }
       seenEvents.current = ev
 
-      const ids = new Set(s.cards.filter((c) => c.status === 'open').map((c) => c.id))
-      if (seenCards.current) {
-        const added = [...ids].filter((id) => !seenCards.current!.has(id))
-        if (added.length) {
-          setFresh((f) => new Set([...f, ...added]))
-          window.setTimeout(() => setFresh((f) => new Set([...f].filter((x) => !added.includes(x)))), 2500)
-        }
-      }
-      seenCards.current = ids
-
       // Decided elsewhere (on a call): show "Done" for it too, unless a routine did it.
       const prev = lastStatus.current
       if (prev) {
@@ -123,16 +106,26 @@ export default function App() {
   }, [])
 
   async function finish(s: State, d: { card: Card; text: string; sub: string; actionId: string | null }) {
+    const k = Date.now()
     const more = lookAlikes(d.card, s).length
-    const offer = more > 0 && !(await hasRoutine(d.card.id)) ? more : 0
-    setDone({ ...d, offer, k: Date.now() })
+    if (more > 0) {
+      setDone({ ...d, offer: (await hasRoutine(d.card.id)) ? 0 : more, k })
+      return
+    }
+    // Show Done at once; a repeat offer follows when the server counts this decision as a repeat.
+    setDone({ ...d, offer: 0, k })
+    await refreshNow()
+    const sg = suggestionFor(d.card.id)
+    if (!sg || sg.count < 2) return
+    const repeat = { n: sg.count, words: repeatWords(sg.decision, sg.action, d.card) }
+    setDone((cur) => (cur && cur.k === k ? { ...cur, repeat } : cur))
   }
 
   useEffect(() => {
     void load()
     const poll = window.setInterval(load, POLL_MS)
     const tick = window.setInterval(() => setNowMs(Date.now() + offset.current), 15000)
-    const nav = () => setPath(window.location.pathname)
+    const nav = () => { setPath(window.location.pathname); setSearch(window.location.search) }
     window.addEventListener('popstate', nav)
     return () => { clearInterval(poll); clearInterval(tick); window.removeEventListener('popstate', nav) }
   }, [load])
@@ -150,38 +143,21 @@ export default function App() {
     return () => clearInterval(t)
   }, [])
 
-  const sec = useMemo(() => (state ? sections(state) : null), [state])
-  const order = useMemo(() => (sec ? visibleOrder(sec, expanded) : []), [sec, expanded])
   const today = useMemo(() => (state ? todayOrder(state) : []), [state])
+  // Plan opens a case on Today, with a quiet way back.
+  const openCase = useCallback((id: string) => {
+    setDone(null)
+    go(`/d/${encodeURIComponent(id)}?from=plan`)
+  }, [go])
 
-  // Plan (desk): j / k / arrows walk the list, the pane follows.
-  const onPlan = path.startsWith('/plan')
+  // Old links (/plan?card=<id>) now open the case on Today.
+  const oldCard = path.startsWith('/plan') ? new URLSearchParams(search).get('card') : null
   useEffect(() => {
-    if (narrow || !onPlan || !sec) return
-    const onKey = (e: KeyboardEvent) => {
-      const t = e.target
-      if (t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return
-      if (e.metaKey || e.ctrlKey || e.altKey || drawer) return
-      const k = e.key
-      const down = k === 'j' || k === 'J' || k === 'ArrowDown'
-      const up = k === 'k' || k === 'K' || k === 'ArrowUp'
-      if (!down && !up) return
-      e.preventDefault()
-      const cur = selectedId ?? order[0] ?? null
-      const i = cur ? order.indexOf(cur) : -1
-      const n = i < 0 ? 0 : Math.min(order.length - 1, Math.max(0, i + (down ? 1 : -1)))
-      const id = order[n]
-      if (!id) return
-      setSelectedId(id)
-      const g = sec.needs.find((x) => x.cards.length > 1 && x.lead.id !== id && x.cards.some((c) => c.id === id))
-      if (g) setExpanded((ex) => new Set([...ex, g.key]))
-      document.getElementById(`row-${id}`)?.scrollIntoView({ block: 'nearest' })
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [narrow, onPlan, sec, order, selectedId, drawer])
+    if (oldCard) window.history.replaceState(null, '', `/d/${encodeURIComponent(oldCard)}?from=plan`)
+    if (oldCard) { setPath(window.location.pathname); setSearch(window.location.search) }
+  }, [oldCard])
 
-  if (!state || !sec) {
+  if (!state) {
     return <div className="grid h-full place-items-center text-[15px] text-ink-3">{error ? 'Cannot reach the server.' : 'Loading…'}</div>
   }
 
@@ -231,9 +207,12 @@ export default function App() {
   if (page === 'today') {
     const pinned = single ? state.cards.find((c) => c.id === decodeURIComponent(single[1])) ?? null : null
     const pinnedOpen = pinned && pinned.status !== 'open' ? null : pinned
+    // A case opened by link that is no longer open is shown as it stands (unless just decided here).
+    const caseCard = pinned && !pinnedOpen && done?.card.id !== pinned.id ? pinned : null
     const card = single
       ? pinnedOpen ?? (done ? null : today[0] ?? null)
       : today.find((c) => c.id === focusId) ?? today[0] ?? null
+    const fromPlan = !!single && new URLSearchParams(search).get('from') === 'plan'
     return (
       <div className="flex min-h-full flex-col bg-ground">
         {bar}
@@ -253,6 +232,9 @@ export default function App() {
           ringing={ringing && !!pinnedOpen && card?.id === pinnedOpen.id}
           onRingingDone={stopRinging}
           pending={pending}
+          caseCard={caseCard}
+          onBack={fromPlan ? () => go('/plan') : null}
+          onDrawer={(c, tab) => setDrawer({ card: c, tab })}
         />
         {overlays}
       </div>
@@ -273,7 +255,7 @@ export default function App() {
   // ------------------------------------------------------------ Suppliers
   if (page === 'suppliers') {
     const list = (
-      <SupplierList state={state} nowMs={nowMs} selection={mapSel} onSelect={setMapSel} onOpen={(id) => go(`/plan?card=${encodeURIComponent(id)}`)} />
+      <SupplierList state={state} nowMs={nowMs} selection={mapSel} onSelect={setMapSel} onOpen={(id) => go(`/d/${encodeURIComponent(id)}`)} />
     )
     if (narrow) {
       return (
@@ -305,81 +287,11 @@ export default function App() {
     )
   }
 
-  // ------------------------------------------------------------ Plan: timeline and every decision
-  const groupOf = (c: Card) => sec.needs.find((g) => g.cards.some((x) => x.id === c.id)) ?? null
-  const selected = selectedId ? state.cards.find((c) => c.id === selectedId) ?? null : null
-  const offerFor = (c: Card): Offer | null => {
-    if (done?.card.id !== c.id || !done.offer) return null
-    const k = groupKey(c)
-    return {
-      more: state.cards.filter((x) => x.id !== c.id && x.status === 'open' && groupKey(x) === k).length,
-      onYes: () => { openRoutines({ cardId: c.id, k: Date.now() }); setDone(null) },
-      onNext: () => setDone(null),
-    }
-  }
-  const select = (id: string | null) => {
-    setSelectedId(id)
-    if (!id) return
-    const g = sec.needs.find((x) => x.cards.length > 1 && x.lead.id !== id && x.cards.some((c) => c.id === id))
-    if (g) setExpanded((e) => new Set([...e, g.key]))
-  }
-  const toggle = (key: string) =>
-    setExpanded((e) => { const n = new Set(e); if (n.has(key)) n.delete(key); else n.add(key); return n })
-  const openOnPhone = (id: string) => go(`/d/${encodeURIComponent(id)}`)
-  const timeline = (
-    <LaunchTimeline state={state} nowMs={nowMs} selectedId={selectedId} onSelect={(id) => (narrow ? openOnPhone(id) : select(id))} compact={narrow} />
-  )
-  const list = (
-    <DecisionList
-      state={state}
-      nowMs={nowMs}
-      sec={sec}
-      selectedId={narrow ? null : selectedId ?? order[0] ?? null}
-      onSelect={narrow ? openOnPhone : select}
-      expanded={expanded}
-      onToggle={toggle}
-      fresh={fresh}
-    />
-  )
-
-  if (narrow) {
-    return (
-      <div className="flex min-h-full flex-col bg-ground">
-        {bar}
-        <div className="border-b border-hair px-6 pb-2 pt-2">{timeline}</div>
-        <div className="px-3">{list}</div>
-        {overlays}
-      </div>
-    )
-  }
-  const first = order[0] ?? null
-  const shown = selected ?? (first ? state.cards.find((c) => c.id === first) ?? null : null)
+  // ------------------------------------------------------------ Plan: the overview, no decisions
   return (
-    <div className="flex h-full flex-col bg-ground">
+    <div className="flex min-h-full flex-col bg-ground">
       {bar}
-      <div className="shrink-0 border-b border-hair px-8 pb-4 xl:px-12">{timeline}</div>
-      <div className="flex min-h-0 flex-1">
-        <aside className="scroll-thin w-[340px] shrink-0 overflow-y-auto pl-5 pr-3 xl:w-[380px] xl:pl-9" aria-label="All decisions">{list}</aside>
-        <main className="scroll-thin min-w-0 flex-1 overflow-y-auto">
-          <div className="max-w-[720px] px-10 pb-24 pt-10 xl:ml-[4vw] xl:px-12">
-            {shown ? (
-              <DecisionPane
-                key={shown.id}
-                card={shown}
-                state={state}
-                nowMs={nowMs}
-                group={groupOf(shown)}
-                onChanged={load}
-                onDrawer={(card, tab) => setDrawer({ card, tab })}
-                offer={offerFor(shown)}
-                keys
-              />
-            ) : (
-              <p className="t-body pt-24 text-ink-2">Nothing here yet.</p>
-            )}
-          </div>
-        </main>
-      </div>
+      <Plan state={state} nowMs={nowMs} phone={narrow} onOpen={openCase} onChanged={load} />
       {overlays}
     </div>
   )
