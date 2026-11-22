@@ -62,3 +62,6 @@ def start() -> None:
             threading.Thread(target=_guard(loop), daemon=True, name=loop.__name__).start()
         os.environ.setdefault("ASK_REPLY_POLL", "on")
     replies.start_background()
+    from ask_soony import teams
+
+    teams.start_background()  # ASK_TEAMS=on: post new launch alerts to a Teams channel

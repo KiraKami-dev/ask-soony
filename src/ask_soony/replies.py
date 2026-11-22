@@ -196,6 +196,9 @@ def check_once() -> list[dict]:
                     push.send(f"📨 {who} replied", summary, card_id)
                 except Exception:  # no devices: the reply is on the card anyway
                     pass
+                from ask_soony import teams
+
+                teams.notify_reply(card_id, who, summary)
                 attached.append({"card_id": card_id, "from": who, "summary": summary})
         finally:
             try:
