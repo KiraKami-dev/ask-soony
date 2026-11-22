@@ -71,6 +71,20 @@ TOOLS = [
     },
     {
         "type": "function",
+        "name": "show_on_screen",
+        "description": "On the website, show the person what you are talking about: the "
+        "document side with its highlighted line, the system side (SAP row), the other options, "
+        "or the email that would be sent. Has no effect on a phone call.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "what": {"type": "string", "enum": ["document", "system", "options", "email"]}
+            },
+            "required": ["what"],
+        },
+    },
+    {
+        "type": "function",
         "name": "teach_routine",
         "description": "The person wants cases like this handled automatically next time (for "
         "example 'next time just do that'). Drafts a routine from the decision on this card for "
@@ -272,6 +286,8 @@ def run_tool(card_id: str, call: ToolCall):
         return _details(card)
     if call.name == "teach_routine":
         return teach_routine(card, str(args.get("instruction") or "").strip()[:300])
+    if call.name == "show_on_screen":  # handled by the browser; harmless if relayed here
+        return {"ok": True, "shown": str(args.get("what") or "")}
     if call.name not in ("prepare_decision", "decide"):
         raise HTTPException(400, f"unknown tool {call.name}")
 
