@@ -71,9 +71,10 @@ def now() -> str:
 
 WRITER_PROMPT = """You write small automation routines for a procurement decision inbox.
 A buyer just decided a card by hand. Write a routine that handles SIMILAR future cards the same
-way, so they do not have to do it again. Generalise from this card: match on kind, level,
-channel, routine_type, wording of the option or evidence, never on this card's id, part or
-supplier unless the buyer's decision clearly depends on them.
+way, so they do not have to do it again. Generalise from this card: match on the situation
+(wording of the evidence and the option, its channel and recipient role, kind), never on this
+card's id, part or supplier unless the buyer's decision clearly depends on them. Do not match on
+level: it is only the current urgency colour and changes over time.
 
 The routine is plain Python run in a sandbox. It may only `from soony import ...` these
 functions (their stubs):
@@ -94,7 +95,12 @@ The card the buyer decided:
 What the buyer did: {action}
 
 Answer with JSON only: {{"name": "<4-7 words>", "description": "<one or two plain sentences a
-buyer understands: when it triggers and what it does>", "code": "<the routine>"}}"""
+buyer understands: when it triggers and what it does>", "code": "<the routine>"}}
+
+Name and description are read by a buyer, not a developer: describe the business situation and
+the action ("When a container sits at the port ready for pick-up, tell the DC site lead to
+collect it"). Never use internal field names or codes such as amber, red, level, kind, mismatch,
+routine_type, channel, card or option index."""
 
 
 # ---------------------------------------------------------------- storage
