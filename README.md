@@ -20,6 +20,7 @@ Work in progress. The product direction is being decided; this README will descr
    |---|---|---|
    | `SOONY_PORTAL_TOKEN` | Portal → Settings → API token | Everything (download, poll, watch) |
    | `ANTHROPIC_API_KEY` | [Claude Console](https://console.anthropic.com/) → API keys | `analyze` and `watch` with the default Claude backend |
+   | `OPENAI_API_KEY` | [OpenAI Platform](https://platform.openai.com/api-keys) → API keys | Reading new documents (image recognizer, `gpt-5.4-mini`) |
    | `ASK_LLM_PROVIDER` + `ASK_LLM_API_KEY` | OpenAI key, or empty for a local llama.cpp server | Only if you use another backend (see below) |
 
    `SOONY_PORTAL_URL` is already filled in by the template.
@@ -48,7 +49,7 @@ uv run ask-soony drop suppliers/<id>/notices/x.pdf [--from local.pdf]   # rehear
 uv run python scripts/seed_demo_state.py [--calm | --drop]   # dev only: placeholder state from the portal files
 ```
 
-The UI reads the pipeline's `data/state/dispatch.json` (verifier decisions, editions, parts), the predictor's `data/state/impacts.json` and the shared shapes in `data/state/`. Source documents come from the image recognizer's readings in `data/store/image_recognizer/` (without them the art-book and statue findings cannot be made: run `python -m ask_soony.verifier.image_recognizer` first, or copy a teammate's readings). Each ready message in a decision becomes an action; one that commits money goes to the policy's approver of exceptions, routine supplier questions stay with the buyer. The seed script is only a fallback when no pipeline output exists. Slack and the time a line stops come from the launch plan's shift table, read at runtime (`src/ask_soony/launch.py`). Clicks write only to `data/state/` (`actions.json`, `decision_status.json`, `trust.json`); nothing is sent from the UI.
+The UI reads the pipeline's `data/state/dispatch.json` (verifier decisions, editions, parts), the predictor's `data/state/impacts.json` and the shared shapes in `data/state/`. Source documents come from the image recognizer's readings: a frozen baseline committed in `src/ask_soony/verifier/baseline_sonnet/` (289 of 290 documents, so every clone has the art-book and statue findings without a run), plus `data/store/image_recognizer/` for new drops, read with `gpt-5.4-mini` (`python -m ask_soony.verifier.image_recognizer` reads only what the baseline lacks). A model change has to pass the gate first: `python -m ask_soony.verifier.image_recognizer.gate --model <model>` scores it on 11 hand-checked must-catch documents (see `src/ask_soony/verifier/image_recognizer/README.md`). Each ready message in a decision becomes an action; one that commits money goes to the policy's approver of exceptions, routine supplier questions stay with the buyer. The seed script is only a fallback when no pipeline output exists. Slack and the time a line stops come from the launch plan's shift table, read at runtime (`src/ask_soony/launch.py`). Clicks write only to `data/state/` (`actions.json`, `decision_status.json`, `trust.json`); nothing is sent from the UI.
 
 ### Deploy
 
