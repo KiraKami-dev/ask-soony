@@ -1,0 +1,9 @@
+"/Users/jonasstenglein/Downloads/Recording\ update:explanation:sync.txt" can you clean this up a bit?
+
+---
+
+also not to commit but is the escalation request / approval actually showing up for Maren?
+
+---
+
+or you can commit but not push
