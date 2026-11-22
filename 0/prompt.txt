@@ -1,0 +1,41 @@
+so now what? please resolve the conflicts and update the merge request? or a new one into main?
+
+---
+
+"Still open: the uncommitted basic_auth.py change from the other session is still in the checkout. I'm leaving it alone until you know what that session is doing." all other sessions are stopped
+
+---
+
+And now where do we need to merge it in?
+
+---
+
+what is our usp?
+
+---
+
+can/should we use some db or a graph db like neo4j.com?
+
+---
+
+would some reasoning / sources make sense? like we make this prediction based on file x and y and in pdf and anchor it?
+
+---
+
+and with a network or without one?
+
+---
+
+And one can open each file and gets shown / highlighted the entries? is this already working for e.g. jpeg or pdf?
+
+---
+
+can you build it? either with agents or some other (local)?ocr?model? and have that anchoring part
+
+---
+
+can you create an example witha  pdf. and tbh from teh current desinga dn soruces it is super unlear what point we are trying to make
+
+---
+
+maybe the links should be within the text or so? so written in text and clickable as chips?
