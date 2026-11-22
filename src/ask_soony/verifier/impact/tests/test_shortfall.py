@@ -383,3 +383,38 @@ def test_overdue_shipment_without_receipt_is_not_supply(tmp_path):
     assert late["quantity"] == 300  # the open PO line 9100000001/2
     assert "passed before the 2026-02-28 stock figure" in late["reason"]
     assert part_b.arriving == []
+
+
+def test_a_held_shipment_is_not_supply():
+    from ask_soony.verifier.impact.shortfall import _skips
+
+    for status in ("held_port_strike", "on hold", "customs hold", "blocked", "STUCK at terminal"):
+        assert _skips(status).startswith("not moving"), status
+    assert _skips("in_transit") is None
+    assert _skips("arrived_port") == "at the port, needs collecting"
+
+
+def test_port_pickup_is_no_fix_when_the_newer_erp_says_held(tmp_path):
+    root = portal_with_plan(tmp_path)
+    inbound_plan(
+        root, [("CMP-A", 5000, "sea", "CONT001", "2026-01-20", "2026-02-02", "arrived_port")]
+    )
+    part_a = next(p for p in compute(*_graph(root)).parts if p.part == "CMP-A")
+    assert [s["kind"] for s in part_a.supply] == ["at_port"]  # ERP says in_transit: offered
+
+    shipments = (root / "soony/erp/open_shipments.csv").read_text()
+    write(
+        root,
+        "soony/erp/open_shipments.csv",
+        shipments.replace(
+            "2026-02-02,in_transit,,,,", "2026-02-02,held_port_strike,,,2026-02-27T09:00:00+01:00,"
+        ),
+    )
+    part_a = next(p for p in compute(*_graph(root)).parts if p.part == "CMP-A")
+    assert part_a.supply == []  # held: no collect fix, both sides shown instead
+    assert any("held_port_strike" in n["reason"] for n in part_a.not_counted)
+
+
+def _graph(root):
+    graph = build(root)
+    return graph.records, graph.issues

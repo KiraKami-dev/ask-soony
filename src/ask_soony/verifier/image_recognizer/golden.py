@@ -12,6 +12,7 @@ Check kinds:
   {"no_marks": prefix}  negative control: no value of that field is crossed out or handwritten
   {"standing": N, "field": prefix}  N is a value that stands (not crossed out) for that field
   {"reference": "X"}  a reference on the document has value X
+  {"delivery_note": "X"}  the linker gets delivery note number X from the reading (its join key)
   {"decision": "fail"}  a decision's outcome contains this text
   {"text": regex}  the regex matches somewhere in the reading's text (values, statements, flags)
 """
@@ -21,7 +22,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from ask_soony.verifier.linker.adapters.readings import _value, final_values
+from ask_soony.verifier.linker.adapters.readings import _references, _value, final_values
 
 GOLDEN_FILE = Path(__file__).parent / "golden.json"
 
@@ -79,6 +80,8 @@ def passes(check: dict, verdict: dict) -> bool:
     if "reference" in check:
         wanted = check["reference"]
         return any(wanted in str(r.get("value") or "") for r in verdict.get("references") or [])
+    if "delivery_note" in check:  # the key the linker joins on, after its fixes
+        return _references(verdict).get("delivery_note") == check["delivery_note"]
     if "decision" in check:
         return any(
             check["decision"].lower() in str(d.get("outcome") or "").lower()

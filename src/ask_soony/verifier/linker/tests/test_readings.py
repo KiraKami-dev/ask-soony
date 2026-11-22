@@ -296,3 +296,21 @@ def test_only_the_reading_of_the_current_file_version_is_used(portal, tmp_path):
     graph = build(portal, readings)
     assert (graph.records.kind == "reading").sum() == 1  # the old one is not loaded
     assert issues(graph, "delivery_vs_receipt").empty  # 500 = 500, the 999 never counted
+
+
+def test_a_delivery_notes_own_number_is_its_key_when_references_lack_it():
+    from ask_soony.verifier.linker.adapters.readings import _references
+
+    note = {
+        "document_type": "delivery_note",
+        "document_number": "WZ-260202-002",
+        "references": [{"type": "po_number", "value": "9100000001"}],
+    }
+    assert _references(note)["delivery_note"] == "WZ-260202-002"
+    listed = {
+        **note,
+        "references": note["references"] + [{"type": "delivery_note", "value": "WZ-260202-999"}],
+    }
+    assert _references(listed)["delivery_note"] == "WZ-260202-999"  # the paper's reference wins
+    other = {**note, "document_type": "order_confirmation"}
+    assert "delivery_note" not in _references(other)

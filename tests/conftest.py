@@ -86,3 +86,9 @@ def voice_decide(client, card="gap-X", decision="approve", option=0) -> dict:
     return client.post(
         tool, json={"name": "decide", "arguments": {**args, "token": token, "confirmed": True}}
     ).json()
+
+
+@pytest.fixture(autouse=True)
+def _no_live_reading(monkeypatch):
+    """Tests never call a model: live document reading (verifier.image_recognizer.live) is off."""
+    monkeypatch.setenv("ASK_READER", "off")

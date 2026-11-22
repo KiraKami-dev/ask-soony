@@ -12,7 +12,8 @@
         {"value": 80000, "field": "quantity", "crossed_out": true},
         {"value": 8000, "field": "quantity", "written": "handwritten", "crossed_out": false},
         {"standing": 8000, "field": "quantity"},
-        {"reference": "4500318768"}
+        {"reference": "4500318768"},
+        {"delivery_note": "WZ-261116-473"}
       ]
     },
     {
@@ -25,7 +26,8 @@
       "checks": [
         {"value": 20000, "field": "quantity", "crossed_out": false},
         {"text": "GH5"},
-        {"reference": "4500318775"}
+        {"reference": "4500318775"},
+        {"delivery_note": "WZ-261120-732"}
       ]
     },
     {
@@ -83,7 +85,8 @@
         {"value": 5000, "field": "quantity"},
         {"value": 5500, "field": "quantity"},
         {"reference": "4500318766"},
-        {"reference": "4500318769"}
+        {"reference": "4500318769"},
+        {"delivery_note": "DN-261119-197"}
       ]
     },
     {
@@ -95,7 +98,8 @@
       "confirmed": true,
       "checks": [
         {"value": 134000, "field": "quantity"},
-        {"value": 23000, "field": "quantity"}
+        {"value": 23000, "field": "quantity"},
+        {"delivery_note": "SN-260730-216"}
       ]
     },
     {
@@ -120,7 +124,8 @@
       "confirmed": true,
       "checks": [
         {"value": 270000, "field": "quantity", "crossed_out": false},
-        {"no_marks": "quantity"}
+        {"no_marks": "quantity"},
+        {"delivery_note": "WZ-261108-879"}
       ]
     },
     {
@@ -132,7 +137,8 @@
       "confirmed": true,
       "checks": [
         {"value": 21800, "field": "quantity", "crossed_out": false},
-        {"no_marks": "quantity"}
+        {"no_marks": "quantity"},
+        {"delivery_note": "SN-261007-850"}
       ]
     },
     {
@@ -144,7 +150,8 @@
       "confirmed": true,
       "checks": [
         {"value": 96000, "field": "quantity", "crossed_out": false},
-        {"no_marks": "quantity"}
+        {"no_marks": "quantity"},
+        {"delivery_note": "DN-261101-479"}
       ]
     }
   ]

@@ -8,6 +8,7 @@ from pathlib import Path
 from ask_soony.dispatch.decisions import to_payload
 from ask_soony.dispatch.decisions.cards import build_cards
 from ask_soony.predictor import ImpactAgent, is_predictor_path
+from ask_soony.verifier.image_recognizer.live import read_unread
 from ask_soony.verifier.impact.shortfall import compute
 from ask_soony.verifier.linker import build
 
@@ -41,7 +42,13 @@ def refresh(
             predictions = predictor.run(predictor.events_for_paths(paths), force=True)
         except Exception as e:  # a failed model call must not stop the verifier refresh
             print(f"dispatch: predictor failed: {e!r}", file=sys.stderr)
+    reading = None
     if routes.verifier:
+        try:  # read new documents first, so the verifier sees what is on the paper
+            reading = read_unread(paths, root, readings).as_dict()
+        except Exception as e:  # reading must never stop the verifier
+            print(f"dispatch: live reading failed: {e!r}", file=sys.stderr)
+            reading = {"read": [], "failed": [], "unread": [], "error": repr(e)}
         graph = build(root, readings)
         result = compute(graph.records, graph.issues)
         decisions = build_cards(result, graph.issues, graph.records)
@@ -52,7 +59,9 @@ def refresh(
                 "channel": "email" if has_recipient else "notify",
                 "status": "pending_approval",
             }
-        payload.update(changed_paths=paths, routes=asdict(routes), predictor=predictions)
+        payload.update(
+            changed_paths=paths, routes=asdict(routes), predictor=predictions, reading=reading
+        )
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(
             json.dumps(
