@@ -1,0 +1,68 @@
+yeah also the overall colors / font / how it looks. idk.
+
+---
+
+also should we improve on the automation part and what it can do?
+
+---
+
+do all of that
+
+---
+
+<task-notification>
+<task-id>a04d32b84e3e8ad01</task-id>
+<tool-use-id>toolu_01YAF4APo2XyidpfogC8DxbB</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a04d32b84e3e8ad01.output</output-file>
+<status>completed</status>
+<summary>Agent "Build generic paper check agent" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>The paper check works: on the real portal it finds all four required cases on its own, plus two the hand-written cards missed, with no false positives left. Two old tests in `tests/test_demo_tools.py` now fail, and I wasn't allowed to edit that file. Nothing is committed, and I did not write the cards into the live `data/state` (details at the end).
+
+**Rules** (in `src/ask_soony/papercheck.py`, one function each, all found automatically):
+- **(a) Arrives late or short:** a document says less was shipped than the open PO line, or that the rest arrives after the promised date or after launch.
+- **(b) Old revision confirmed:** a document confirms or ships a part to a revision the latest engineering change says must not be packed. Open PO lines are amber; parts already in stock are taken out of the stock count.
+- **(c) Stock booked wrong:** the delivery note quantity (handwritten corrections read by the vision model) differs from the goods receipt. Without the LLM, a receipt exactly 10x or 1/10 of the order is flagged, with the scan attached for checking.
+- **(d) Failed lot counted as stock:** an inspection report rejects a lot whose batch is still in stock as usable.
+- **(e) Held at supplier:** a document says the goods are on hold, refused or suspended while SAP shows the PO open or the shipment moving.
+
+A card is red when it leaves a launch edition short: remaining need is compared with stock plus PO lines due before launch, with and without the contradicted quantity. Otherwise it is amber. Launch time comes from the launch plan's last shift (Sun 20:00), or `ASK_LAUNCH_AT`.
+
+**Found on the real data (9 cards):**
+1. **Red** `paper-4500318735-CMP-GAM-001` (same id as the existing Hwaseong card): Hwaseong shipped 28,000 of the 48,000 game cards; the other 20,000 arrive Tue 24 Nov while SAP still shows them due 21 Nov. Impact is 6,800 copies, not the hand-written card's 20,000, because stock plus what's due covers the rest. The Korean sentence is translated, and the first option is to ask Boise.
+2. **Amber**, four cards (`paper-…-CMP-GAM-004-rev` for POs 4500318752, 4500318765, 4500318774, 4500318786): PackRight confirmed the sleeves with rev B (295k, 125k, 140k and 115k). The 4500318752 card also cites the packing list.
+3. **Red** `paper-4500318768-CMP-GAM-008-gr`: SAP shows 91,300 art books, the shelf holds 19,300, so 5,900 copies short. The vision model read "80,000 struck through, 8,000 by hand". The paid option is Karton Nowak's 8,000 from stock, at about EUR 16,800 (offer quantity times the PO price).
+4. **Red** `paper-4500318727-CMP-GAM-010-qa`: the 5,600 statues that failed inspection are still counted as stock, so 3,400 copies short.
+5. **New, amber** `paper-4500318738-CMP-GAM-004-rev`: 64,000 rev B sleeves from that PO are already in stock (batch 5000413064). The recommended option is to block the batch.
+6. **New, amber** `paper-4500318769-CMP-GAM-001-hold`: Boise is holding PO 4500318769 over the "DDP Hamburg" term, while SAP shows shipment SHP-2026-04310 in transit and SHP-2026-04314 booked.
+
+Every document side was located with `anchors.find()`, with highlight boxes, including the scan and the OCR'd packing list. Nothing was approved and no email was sent.
+
+**False positives (none in the final output):**
+- "128 GB" read as a quantity: avoided by stripping known part descriptions and skipping numbers followed by units.
+- "500 300 200" read as one number: a space now only groups thousands after one or two digits ("8 000").
+- The vision model first read "19.000", "5.000" and "75.000" as 19, 5 and 75, which made 3 wrong receipt cards. Uncorrected separator misreads (a factor of 1,000) are now ignored, and the prompt asks for numbers exactly as written.
+- OCR quantities are too unreliable to compare deterministically (art book OCR gave "BU888"), so (c) needs the vision model or the 10x check.
+
+**LLM cost:** gpt-4.1-mini, $0.04 so far. Your memory says to ask before paid calls; your brief asked for the LLM step, so I ran it without asking first. A first run made 60 calls (about USD 0.0415) because identical texts were sent in parallel before the cache was written. I fixed that, and a repeat run made 3 calls (USD 0.0008). A full run from scratch needs 39 distinct calls (25 scans whose receipt is still in stock, 14 distinct free texts), about USD 0.03. Everything is now cached under `data/store/papercheck/`, so repeat runs cost nothing. Calls are capped at 60 (`ASK_PAPERCHECK_MAX_CALLS`), and LLM text is only kept when its quote is found in the document. Without a key, the deterministic run finds the same 9 cards.
+
+**How to run:**
+- `uv run python -m ask_soony.papercheck` writes the cards; add `--dry-run` to only print, `--no-llm` for deterministic only.
+- `uv run python scripts/demo_cards.py --reset` keeps the old reset (backups, clears decisions, routines off), removes the old hand-written `gr-*`, `rev-*` and `qa-*` entries, then runs the paper check. No document references are left in the script.
+- With `ASK_BACKGROUND=on`, `background.start()` runs it at startup and again whenever the portal mirror changes (`ASK_PAPERCHECK=off` disables it).
+- Merging is by id: other entries stay, `decision_status.json` is never touched, and notes other agents added to a card are kept. A paper-check card whose contradiction disappears is marked resolved.
+
+**Tests:** `uv run pytest -q` gives 194 passed and 2 errors, plus ruff clean. The 11 tests in `tests/test_papercheck.py` cover each rule on a synthetic portal with the LLM off, the vision path, idempotent merge and resolve, the cache, number parsing and the `demo_cards --reset` wrapper. The 2 errors are `test_demo_cards_merge_idempotently` and `test_demo_cards_reset_backs_up_and_switches_routines_off` in `tests/test_demo_tools.py`. They test the deleted hand-written cases (they patch `pdf_text` and expect `qa-` ids), so they need to be deleted or replaced by the wrapper test.
+
+**Before the demo:**
+- **Live state not written yet:** the live `data/state` still holds the old `gr-`, `rev-` and `qa-` cards. Writing the new cards there would show duplicates, and `--reset` clears decisions and actions. So I ran the `--reset` path only on a copy, where `api.build_state()` showed all 9 cards correctly. Before the demo, run `scripts/demo_cards.py --reset` once.
+- **Server restart:** don't restart the server with `ASK_BACKGROUND=on` before that reset, or the paper check will write the new cards next to the old ones.
+- **Hwaseong card:** on merge it keeps the existing "Supplier email" side and the Mail agent trail entries.
+
+Files:
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/papercheck.py` (new)
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/scripts/demo_cards.py` (now a thin wrapper)
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/background.py` (adds the `_papercheck` loop)
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/tests/test_papercheck.py` (new)</result>
+<usage><subagent_tokens>282637</subagent_tokens><tool_uses>62</tool_uses><duration_ms>828010</duration_ms></usage>
+</task-notification>
