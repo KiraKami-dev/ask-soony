@@ -11,7 +11,7 @@ Our entry for the Lio challenge "Keep the Line Running" at START Hack Munich 202
 - Still open at kickoff: 128,000 Standard Editions (4 parts each) and 25,200 numbered Collector's Editions (7 parts each)
 - Packing time left: Sat 06:00 to 22:00, Sun 06:00 to 20:00
 
-The product direction and who owns which part are in [`plan.md`](plan.md): read it before you start work.
+The product direction and who owns which part are in [`docs/plan.md`](docs/plan.md): read it before you start work.
 
 **Read [`docs/challenge.md`](docs/challenge.md) before any substantive task.** It is the full challenge brief: the end goal, the one rule, judging criteria, deliverables and deadlines. It describes the problem only; solutions are the team's work and do not go in that file. Keep every change pointed at what it asks for.
 

@@ -761,7 +761,7 @@ def verifier_cards(
     """The verifier's decisions (dispatch.json `decisions`, or decision_cards.json `cards`) as UI cards.
 
     Each ready message becomes an option (send it); the verifier's own option lines are facts about
-    supply and timing and go into the recommended option's effect. Routing (plan.md §5): a card
+    supply and timing and go into the recommended option's effect. Routing (docs/plan.md §5): a card
     whose recommended action costs money, or whose recommendation is a decision message, goes to
     the person who must decide; routine supplier questions and internal notes stay with the buyer.
     """

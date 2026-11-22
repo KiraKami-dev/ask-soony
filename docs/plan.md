@@ -1,6 +1,6 @@
 # Plan
 
-_Last updated: 2026-11-21. Owner of this file: Akshat. Read with [`docs/challenge.md`](docs/challenge.md) and [`strategy.md`](strategy.md)._
+_Last updated: 2026-11-21. Owner of this file: Akshat. Read with [`challenge.md`](challenge.md) and [`strategy.md`](strategy.md)._
 
 ## 1. The idea in one line
 
