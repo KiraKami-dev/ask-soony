@@ -43,7 +43,7 @@ def test_card_shows_the_mismatch_and_opens_the_app(agent_env, monkeypatch):
     card = api._card("f-1")
     content = teams.card_payload(card)["attachments"][0]["content"]
     text = json.dumps(content)
-    assert "THE SYSTEM SAYS" in text and "48,000 due Sat" in text and "20,000 arrive Tue" in text
+    assert "The system says" in text and "48,000 due Sat" in text and "20,000 arrive Tue" in text
     assert "Ask another supplier" in text
     urls = [a["url"] for a in content["actions"]]
     assert urls == ["https://app.example.com/d/f-1", "https://app.example.com/d/f-1?talk=1"]

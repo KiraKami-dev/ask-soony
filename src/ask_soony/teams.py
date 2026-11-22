@@ -27,7 +27,8 @@ from ask_soony.config import load_dotenv
 
 log = logging.getLogger("ask_soony.teams")
 router = APIRouter()
-LEVEL_COLOR = {"red": "Attention", "amber": "Warning", "grey": "Default", "blue": "Accent"}
+# The app's colours: red (Attention) only for what misses the trucks, the rest stays quiet.
+LEVEL_COLOR = {"red": "Attention", "amber": "Default", "grey": "Default", "blue": "Default"}
 
 
 def _webhook() -> str:
@@ -71,8 +72,8 @@ def card_payload(card: dict, reply: dict | None = None) -> dict:
                 if level == "red"
                 else "Needs a decision"
             ),
-            "weight": "Bolder",
-            "color": "Good" if reply else LEVEL_COLOR.get(level, "Default"),
+            "color": "Default" if reply else LEVEL_COLOR.get(level, "Default"),
+            "isSubtle": bool(reply) or level != "red",
             "size": "Small",
         },
         {
@@ -116,7 +117,7 @@ def card_payload(card: dict, reply: dict | None = None) -> dict:
                             "items": [
                                 {
                                     "type": "TextBlock",
-                                    "text": "THE SYSTEM SAYS",
+                                    "text": "The system says",
                                     "size": "Small",
                                     "isSubtle": True,
                                 },
@@ -134,17 +135,16 @@ def card_payload(card: dict, reply: dict | None = None) -> dict:
                             "items": [
                                 {
                                     "type": "TextBlock",
-                                    "text": "THE DOCUMENT SAYS",
+                                    "text": "The document says",
                                     "size": "Small",
                                     "isSubtle": True,
-                                    "color": "Attention",
                                 },
                                 {
                                     "type": "TextBlock",
                                     "text": str(paper.get("value", "")),
                                     "weight": "Bolder",
                                     "wrap": True,
-                                    "color": "Attention",
+                                    "color": LEVEL_COLOR.get(level, "Default"),
                                 },
                             ],
                         },
@@ -158,7 +158,7 @@ def card_payload(card: dict, reply: dict | None = None) -> dict:
                     "type": "TextBlock",
                     "wrap": True,
                     "spacing": "Medium",
-                    "text": f"**Recommended:** {rec.get('action', '')}"
+                    "text": f"**We recommend:** {rec.get('action', '')}"
                     + (f" · {rec['cost']}" if rec.get("cost") else ""),
                 }
             )

@@ -27,16 +27,30 @@ COOKIE_DAYS = 30
 
 LOGIN_PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0f172a"><title>Ask Soony</title>
-<style>body{{font-family:system-ui,sans-serif;background:#f8fafc;color:#0f172a;display:grid;
-place-items:center;min-height:100vh;margin:0}}form{{background:#fff;border:1px solid #e2e8f0;
-border-radius:12px;padding:24px;width:min(320px,calc(100vw - 32px));box-sizing:border-box}}
-input,button{{width:100%;box-sizing:border-box;font-size:16px;padding:10px;border-radius:8px;
-margin-top:12px}}input{{border:1px solid #cbd5e1}}button{{background:#0f172a;color:#fff;border:0}}
-.err{{color:#b91c1c;font-size:14px}}</style></head><body>
-<form method="post" action="/login"><strong>Ask Soony</strong>{error}
+<meta name="theme-color" content="#fbfbfa"><title>Ask Soony</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet"
+href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>*{{box-sizing:border-box}}body{{margin:0;min-height:100vh;display:grid;place-items:center;
+background:#fbfbfa;color:#18181a;-webkit-font-smoothing:antialiased;
+font-family:"Instrument Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}}
+form{{width:min(340px,calc(100vw - 48px));padding-bottom:12vh}}svg{{display:block}}
+h1{{margin:28px 0 0;font-size:27px;line-height:1.2;font-weight:600;letter-spacing:-.025em}}
+p{{margin:10px 0 0;font-size:15px;line-height:1.5;color:#5d5d63}}
+input,button{{width:100%;height:52px;font:inherit;font-size:17px;border:0;border-radius:14px}}
+input{{margin-top:32px;padding:0 16px;background:#f3f3f1;color:#18181a}}
+input:focus,button:focus-visible{{outline:2px solid #2348d0;outline-offset:2px}}
+button{{margin-top:12px;background:#2348d0;color:#fff;font-weight:500;cursor:pointer;
+box-shadow:0 1px 2px rgba(35,72,208,.25)}}button:hover{{background:#1d3db5}}
+.err{{color:#c8321f}}</style></head><body>
+<form method="post" action="/login">
+<svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path
+d="M2.5 8V2.5H8M16 2.5h5.5V8M21.5 16v5.5H16M8 21.5H2.5V16" fill="none" stroke="#18181a"
+stroke-width="2.4" stroke-linecap="square"/><rect x="6.5" y="9.5" width="11" height="5" rx="1"
+fill="#ffe066"/></svg>
+<h1>Ask Soony</h1><p>Sign in to see what needs you today.</p>{error}
 <input type="hidden" name="next" value="{next}">
-<input type="password" name="password" placeholder="Password" autofocus
+<input type="password" name="password" placeholder="Password" aria-label="Password" autofocus
 autocomplete="current-password">
 <button>Sign in</button></form></body></html>"""
 
