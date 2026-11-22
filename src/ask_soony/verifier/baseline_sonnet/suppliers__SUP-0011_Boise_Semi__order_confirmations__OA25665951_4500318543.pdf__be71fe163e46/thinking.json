@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 57,
-    "thinking": "I've gone through the document and it has two order lines: item 00020 for 8,500 units confirmed on 2025-09-22, and item 00010 for 8,000 units confirmed on 2025-09-17. The terms say EXW Boise with DDP not agreed, yet also say the seller prepays freight, insurance and duties, which doesn't square with EXW, so I need to flag that.\n\nThe unit price is 6.11 USD, and the quantities are the confirmed amounts. Item 00020 comes before item 00010 in the order. No total price is stated. The order date is 2025-08-19, and since there's no other document date, I'll leave that as null. The description reads \"Game Card 64 GB – Grand Heist 5\".\n\n"
-  }
-]

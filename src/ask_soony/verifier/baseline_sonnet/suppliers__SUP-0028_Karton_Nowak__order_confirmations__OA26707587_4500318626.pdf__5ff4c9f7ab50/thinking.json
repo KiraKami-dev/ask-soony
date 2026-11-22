@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 41,
-    "thinking": "I've got the document read, so now I'm pulling out the structured fields. The quantity is 130,000, which I'll record as 130000, with a unit price of 0.06 EUR. The confirmed date, 2026-03-18, maps to date_confirmed, and I'm weighing whether to include the order date of 2026-02-17 as date_ordered on the line, since it sits at header level.\n\nI'm noting that the delivery terms are DAP Hamburg and the payment terms are NET30, and since the total price isn't shown in the document, I won't calculate it.\n\n"
-  }
-]

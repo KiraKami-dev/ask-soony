@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 100,
-    "thinking": "I'm reading through the Chinese delivery note from Guangzhou PackRight Packaging, which is addressed to the Soony Distribution Center in Hamburg. The document is SN-260831-130, dated 2026/08/31, under PO 4500318711, and the line item is PR-CC-0312, a clear Game Card Case, quantity 150,000.\n\nI'm working out the field mapping now: PR-CC-0312 sits under the material number, so I'll record it as the material ID, with quantity 150,000 pieces across 300 packages and a gross weight of 6600 kg. The handwritten receiver signature from Meyer K. is a signature rather than a correction, so I'll note it in the observations and leave the corrections empty.\n\nThe remaining checks are on the document's status: there's no receiving date stamp, and the handwritten signature only marks receipt, so the record reads as clean. The weight works out to about 44 g per piece, which I don't need to record. I'm also noting the date as 2026-08-31, the languages as Chinese and English, and the 备注 line about keeping it dry and upright, which I'll file under other terms.\n\n"
-  }
-]

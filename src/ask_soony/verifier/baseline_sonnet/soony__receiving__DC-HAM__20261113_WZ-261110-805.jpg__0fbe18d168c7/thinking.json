@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 70,
-    "thinking": "I'm structuring the extracted values from this Polish WZ delivery note: the quantity of 74.000 pcs read as 74000 under Polish number formatting, 74 packages, a weight of 1110 kg, the document date of 10.11.2026, and the receipt stamp dated 13.11.2026. I'm also noting the handwritten signature, the carrier reference and the order number 4500318768, and I'm starting to consider how the quantity note should be recorded.\n\nI'm checking the remaining details: 74 packages and 1110 kg, with the description line cut off before its closing parenthesis and the remarks field empty. The receipt stamp is dated 13.11.2026, and the document date of 10.11.2026 doesn't clearly map to a shipped date, so I'm leaving it under document date. I don't see any statements, decisions, or corrections to record, so the verdict is clean.\n\n"
-  }
-]

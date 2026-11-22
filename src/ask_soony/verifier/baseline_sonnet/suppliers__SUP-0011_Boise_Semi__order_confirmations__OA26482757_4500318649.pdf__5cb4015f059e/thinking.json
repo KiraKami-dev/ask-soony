@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 45,
-    "thinking": "I'm noticing that line 00020 comes before 00010, and the terms conflict: the quote says EXW Boise but then says freight, insurance and duties are prepaid by the seller and added to the invoice, which doesn't fit EXW where the buyer arranges freight. That's a red flag worth flagging. I'm also checking the two lines with the same material, where the quantities are 9,500 and 8,500 in English number format, at a unit price of 6.11 USD.\n\nI'm noting the order date as 2026-04-15, with no document date given, and the references PO 4500318649 and contract PC-0011-2023. The document is in English.\n\n"
-  }
-]

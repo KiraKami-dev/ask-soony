@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 30,
-    "thinking": "I'm settling on a plain structured layout for this order confirmation. The quantity of 110,000 uses English comma separators since the document is mostly in English, so I'll read it as 110000 units at 0.03 EUR each. The order was placed on 2025-12-30 and confirmed on 2026-01-27, and no total is shown.\n\n"
-  }
-]

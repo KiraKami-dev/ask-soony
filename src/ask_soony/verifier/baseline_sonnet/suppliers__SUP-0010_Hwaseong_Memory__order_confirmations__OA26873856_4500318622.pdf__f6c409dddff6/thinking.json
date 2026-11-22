@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 56,
-    "thinking": "I've read the document, so now I'm moving on to structuring it. The order confirmation OA26873856 is from Soony Interactive GmbH against PO 4500318622, with FOB Busan and NET45 terms. Two lines share a material, at 22,000 and 21,000 units, each priced at 5.4 USD with confirmed dates in mid-April.\n\nI'm settling on quantity_confirmed for the field name, since the quantities here are the confirmed amounts on each line, and I'm leaving the unit unstated. The two lines add up to a total of 43,000, but that sum isn't stated in the document, and the repeated material with split delivery dates is normal for this kind of order, so I'm not flagging it or changing anything.\n\n"
-  }
-]

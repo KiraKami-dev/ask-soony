@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 103,
-    "thinking": "I'm pulling the key fields from this Chinese delivery note: the issuer is Guangzhou PackRight Packaging, the recipient is Soony Distribution Center in Hamburg, and it's document SN-261007-850 dated 2026-10-07. The PO is 4500318726, with line PR-RB-2207 for 21,800 pieces of the \"Collector's Box Grand Heist 6\" item, whose description is cut off.\n\nNext I'm listing the remaining header fields: four packages, gross weight of 80 kg, carrier Nordhav Shipping A/S, and the remarks and receiving signature both blank. The stamps are a red shipping seal and a blue receipt stamp dated 11.11.2026. I'm also noting that the description is cut off, the red stamp overlaps the table headers, and 80 kg for 21,800 pieces looks implausibly light, so I'll flag that as a possible inconsistency rather than correct it.\n\nI'm deciding on the date fields now: the document is dated 2026-10-07, and the 11.11.2026 stamp looks like the receipt date, so I'll keep those separate. I'm leaning toward a \"has_warnings\" status because of the blank signature and the cut-off description, though the document is otherwise mostly clean.\n\nI can't compare the totals to the purchase order, since the ordered quantity isn't on the note.\n\n"
-  }
-]

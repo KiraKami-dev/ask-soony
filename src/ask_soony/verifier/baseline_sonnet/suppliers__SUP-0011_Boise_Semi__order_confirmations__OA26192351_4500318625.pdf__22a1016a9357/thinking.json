@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 61,
-    "thinking": "I'm pulling the key facts from this order acknowledgement: it's OA26192351 from Boise Semiconductor to Soony Interactive GmbH, against PO 4500318625, with two lines for material CMP-GAM-002 at 6.11 USD. I'm now checking the incoterms, since the terms appear to clash with something else in the document.\n\nI'm checking the freight and duties wording, since the seller is described as prepaying them and adding them to the invoice, which doesn't fit EXW. I'm also noting that the lines are out of order and that the document states DDP isn't agreed. For the quantities I'll use plain numbers, so 9,000 becomes 9000, mapped to quantity_confirmed, with the confirmation date going to date_confirmed.\n\n"
-  }
-]

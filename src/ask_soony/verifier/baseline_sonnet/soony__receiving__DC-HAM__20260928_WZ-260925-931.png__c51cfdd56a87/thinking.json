@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 62,
-    "thinking": "I've finished reading the image, so now I need to turn the details into structured output. This is a Polish delivery note with number WZ-260925-931 dated 25.09.2026, tied to order 4500318724. I'm pulling the line item for CMP-GAM-005 and working out the quantity, 65,000 pieces, along with the gross weight of 1105 kg.\n\nI'm checking the remaining fields now: the packages total 65, the weight is 1105 kg, and the carrier reference PO 55734 goes under \"other.\" The handwritten signature \"Yilmaz D.\" counts as a handwritten note to include, and I'm treating the truncated description as an observation rather than a correction.\n\n"
-  }
-]

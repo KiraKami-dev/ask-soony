@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 56,
-    "thinking": "I'm checking the order terms and see a conflict: the sale is EXW Boise, which would put freight on the buyer, but the text says the seller prepays freight, insurance and duties and adds them to the invoice, so I'll flag that. I'm also wondering whether the 9,000 quantity is the confirmed figure or just the ordered one.\n\nI'm settling on the date fields here: the \"confirmed\" column maps to date_confirmed, and the 9,000 goes in as quantity_confirmed. The order date is 2026-06-23, and the unit price is 6.11 USD. There's no explicit document date, so that one stays null.\n\n"
-  }
-]

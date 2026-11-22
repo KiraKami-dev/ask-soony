@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 48,
-    "thinking": "I'm going through the order confirmation now, and I've spotted a contradiction in the terms: it names EXW Boise while also saying the seller prepays freight, insurance and duties and adds them to the invoice, which doesn't fit with EXW. I'll note that. I'm also checking whether the quantity of 8,500 is actually confirmed.\n\nI'm checking which date and quantity fields to record: the confirmed date goes in as the confirmation date, and the 8,500 quantity looks like it belongs under confirmed quantity, though ordered quantity is also possible. The order date is worth capturing too.\n\n"
-  }
-]

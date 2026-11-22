@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 66,
-    "thinking": "I've finished reading the document and am moving on to the structured output. There's an inconsistency in the shipping terms: it says EXW Boise, with DDP not agreed, yet also says freight, insurance and duties are prepaid by the Seller and added to the invoice. Under EXW the buyer normally arranges freight, so I'll note this as a statement. I'm also starting on the line items, beginning with item 00010 for CMP-GAM-002 at a quantity of 9,000, and checking whether that quantity is confirmed.\n\nI'm filling in the line values: quantity 9,000 as the confirmed quantity, unit price 6.11 USD, and the confirmed date 2026-06-12. The order reference 4500318660 is dated 2026-05-12, so I'll record that as the order date, and I'm leaving the total unstated since the document doesn't give one.\n\n"
-  }
-]

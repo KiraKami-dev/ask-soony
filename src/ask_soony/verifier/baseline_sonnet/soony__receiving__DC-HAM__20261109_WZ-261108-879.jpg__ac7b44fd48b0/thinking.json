@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 57,
-    "thinking": "I'm putting the structured output together now. The document is a Polish WZ delivery note, so I'm reading the quantity as 270,000 pieces, with 540 packages and a total weight of 10,800 kg. The carrier field reads \"PO 99724,\" which looks odd to me, and I'm noting the order number, the date, and the received stamp from the 9th.\n\nI'm checking the remaining fields for anything unusual: the packages come to about 500 pieces each and roughly 20 kg per package, which look reasonable. The carrier entry \"PO 99724\" reads more like a purchase order reference, so I'll flag it, and I don't see any corrections, since the handwritten signature doesn't count as one.\n\n"
-  }
-]

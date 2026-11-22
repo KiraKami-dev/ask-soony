@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 93,
-    "thinking": "I've already got the image read, so I'm moving on to putting together the structured output. This is a delivery note from Dongguan Precision Housings to Soony's Hamburg distribution center, document SN-260818-893 dated 2026-08-18, with no PO number. The line is the pre-order pin \"GH6\" in enamel, 24 pieces across 12 packages, and I'm now noting the gross weight of 228 kg.\n\nI'm reading the carrier as Nordhav Shipping A/S, with the remarks and receiving signature both blank. The red shipping seal and the blue RECEIVED stamp from 21.09.2026 are on the page. I'm reading the quantity as 24,000 pieces rather than 24, since 228 kg across 12 packages only works out for pins of about 9.5 g each, and I'll note that convention in the output. The red stamp also covers part of the \"12\" in the packages column.\n\nI've settled that there are no statements, decisions, or corrections to record, and I'm marking the status as having warnings because the PO reference is missing and the signature line is blank. I'm leaving out any comparison with today's date, and I'm noting the 228 kg gross weight as a line value in kilograms and the 12 packages as both a table figure and the 件数 count.\n\n"
-  }
-]

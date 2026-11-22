@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 56,
-    "thinking": "I've finished reading the document, so now I need to put together the structured output. The terms section looks contradictory: it says DDP isn't agreed, yet freight and duties are prepaid by the seller and added to the invoice, which doesn't fit EXW, so I'll flag it. I'm also normalizing the figures: the quantity is 5,500 units at a unit price of 6.11 USD, with a confirmed date of 2026-10-09.\n\nI'm mapping the dates now: the confirmed date goes to date_confirmed and the order date of 2026-09-08 goes to date_ordered. The document doesn't state a separate document date, so that field stays empty.\n\n"
-  }
-]

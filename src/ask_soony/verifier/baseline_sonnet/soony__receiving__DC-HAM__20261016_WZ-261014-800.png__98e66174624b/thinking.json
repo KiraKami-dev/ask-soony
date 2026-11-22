@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 56,
-    "thinking": "I'm pulling the key fields from this Polish delivery note: 65,000 pieces across 32 packages weighing 480 kg, with the carrier's reference number, and a handwritten signature under the receipt line. The product description is cut off partway through, so I'll note that and move on to the date.\n\nI'm checking the file name's date against the document, which doesn't show one, and I'm noting that the receiver's handwritten signature is a name rather than a date and the remarks field is empty. The weight is 480 kg, and the 32 packages appear in both the table and a separate line.\n\n"
-  }
-]

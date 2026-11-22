@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 47,
-    "thinking": "I'm pulling together the order acknowledgement details: OA26969088 from Boise Semiconductor to Soony Interactive, tied to PO 4500318710, with two lines of CMP-GAM-002 at 6.11 USD. I'm also noting that the terms are EXW Boise, with DDP not agreed.\n\nI'm weighing the stated terms: EXW Boise, yet the seller prepays freight, insurance and duties and adds them to the invoice, which doesn't fit plain EXW, so I'm flagging that. For the quantities I'll use the confirmed values, and the two lines for the same material carry different dates, which I'm noting.\n\n"
-  }
-]

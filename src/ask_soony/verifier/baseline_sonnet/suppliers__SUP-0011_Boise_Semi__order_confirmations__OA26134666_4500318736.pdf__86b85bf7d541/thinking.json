@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 51,
-    "thinking": "I'm flagging a contradiction in the terms: the quote says EXW Boise with DDP not agreed, yet the seller prepays freight, insurance and duties and adds them to the invoice, which doesn't fit EXW. Two lines share the same material with different confirmed dates, and their quantities of 5,000 and 6,000 add up to 11,000, so I'm checking the order quantity against that total.\n\nI'm mapping the order details to their fields: the quantity is the confirmed order quantity, the unit price is 6.11 USD, and the order date is 2026-09-15. The document date isn't stated, so I'm leaving that empty, and I'm writing the numbers in plain digits.\n\n"
-  }
-]

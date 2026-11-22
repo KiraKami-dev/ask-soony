@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 36,
-    "thinking": "I'm checking the shipping terms, since the quote says EXW Boise but also that the seller prepays freight, insurance and duties and adds them to the invoice, which doesn't fit EXW, so I'll flag it. I'm also noting the quantity as 10000, the unit price as 6.11 USD, and the confirmed date as 2025-09-11.\n\nI'm noting the order date as 2025-08-08, and I'm leaving the total price out since it isn't stated, so I won't calculate it.\n\n"
-  }
-]

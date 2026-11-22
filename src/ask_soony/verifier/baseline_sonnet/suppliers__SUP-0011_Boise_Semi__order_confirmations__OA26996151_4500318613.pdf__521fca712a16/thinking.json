@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 53,
-    "thinking": "I've finished reading the document and am turning to the structured output. One thing stands out: the terms say EXW Boise, yet also that freight, insurance and duties are prepaid by the seller and added to the invoice. Those two don't quite fit together, so I'll flag that. I'm also noting the quantity of 9,500 in English number convention and the unit price of 6.11 USD.\n\nI'm confirming the date is 2026-02-20, and noting the order date of 2026-01-20 as well, though I'm unsure whether it belongs in the header or the line values. There's no total stated in the document, so I'll need to work that out myself.\n\n"
-  }
-]

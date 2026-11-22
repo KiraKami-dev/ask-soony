@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 56,
-    "thinking": "I've got the image read, so now I'm turning it into structured output. The delivery note is DN-261008-142 dated 10/08/2026, which is ambiguous, but the stamp reads 12.10.2026 in German format and the reference suggests October 8, so I'm recording it as written. I'm also working out how the quantity of 5.500 should be read, since it depends on the document's number convention.\n\nI'm settling on 5500 for the quantity, since 5.5 pieces doesn't make sense for PCS and five packages at 75 kg fits that reading better. The received-by signature line is blank, and with no PO quantity to compare against, I'm flagging the unsigned receipt and the date ambiguity as warnings.\n\n"
-  }
-]

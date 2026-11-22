@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 54,
-    "thinking": "I'm reading the quantity \"8.500\" as 8500 pieces, since the unit is PCS and the English document points to a thousands separator, though the dot could also mean 8.5. I'm converting the date 09/13/2026 from US format to 16.09.2026 for the German stamp. Gross weight is 76 kg.\n\nI'm checking the carrier name, the empty remarks, and the handwritten \"Meyer K.\" signature. The quantities, weight, and both dates are already read as printed or stamped, so I'm putting the document date in directly. The handwritten signature doesn't alter any value, but I'll note it under corrections as a handwritten entry with no original value.\n\n"
-  }
-]

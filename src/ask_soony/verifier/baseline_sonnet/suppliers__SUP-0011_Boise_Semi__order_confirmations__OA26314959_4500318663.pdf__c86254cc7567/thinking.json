@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 51,
-    "thinking": "I've finished reading the document, so now I'll turn it into structured output. One thing stands out: the terms say EXW Boise but also that freight, insurance and duties are prepaid by the seller and added to the invoice, which conflicts with EXW, where the buyer normally arranges transport. I should flag that. The quantity is 8,500 in English notation and the unit price is 6.11 USD.\n\nI'm settling the dates now: the confirmed date is 2026-06-25 and the order date is 2026-05-19, and I'll record the order date at the document level. I'm also mapping the quantity to quantity_confirmed and the delivery date to date_confirmed. The total price isn't stated in the document, so I won't compute it.\n\n"
-  }
-]

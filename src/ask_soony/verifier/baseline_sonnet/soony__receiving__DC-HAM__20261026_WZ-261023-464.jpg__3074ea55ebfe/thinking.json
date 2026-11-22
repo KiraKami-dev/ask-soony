@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 59,
-    "thinking": "I'm filling in the structured output from this Polish WZ delivery note: the quantity comes to 65000 pieces across 65 packages, weighing 650 kg, with the carrier listed as PO 43026. The product description is cut off partway through, and the document carries a handwritten \"Schulz P.\" signature along with a RECEIVED stamp dated 26.10.2026.\n\nI'm weighing whether the handwritten \"Schulz P.\" signature counts as a correction, and deciding it doesn't, so corrections stay empty. The remaining notes cover the stamp and the dates, with the receipt stamp at 26.10.2026 recorded on the line, while the carrier PO 43026 goes under other references.\n\n"
-  }
-]

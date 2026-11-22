@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 43,
-    "thinking": "The document has been read, so I'm moving on to building the structured output. One thing stands out: the terms say EXW Boise, yet the seller is prepaying freight, insurance and duties and adding them to the invoice, which doesn't quite line up with EXW. I'll note that as a flag rather than try to fix it. The quantity is 10,000, which I'll write as 10000, and the unit price is 6.11 in US dollars.\n\nI'm matching the confirmed date, 2026-02-10, to date_confirmed, and the order date, 2026-01-13, to date_ordered, and I'll include both.\n\n"
-  }
-]

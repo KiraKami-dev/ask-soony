@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 54,
-    "thinking": "I've read the document and have the line items: two products, with quantities, unit prices, and confirmed dates. The order date is 2026-09-15, and the document doesn't state its own date, so that field stays null. I'm converting the quantity of 48,000 to the plain number 48000, and mapping the confirmed date to date_confirmed.\n\nI'm weighing whether quantity_confirmed fits the Qty column of an order confirmation. The order date of 2026-09-15 is header-level, so I'm keeping it in the statements rather than on each line. The 00020 line appears before 00010, which is unusual, so I'll note it without changing anything.\n\n"
-  }
-]

@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 16,
-    "thinking": "The PDF read failed because pdftoppm isn't installed, so I'll drop the pages parameter and try reading the file again without it.\n\n"
-  }
-]

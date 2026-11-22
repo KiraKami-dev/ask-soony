@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 55,
-    "thinking": "I'm checking the document for contradictions, and the shipping terms look off: it says EXW Boise, but also says the seller prepays freight, insurance and duties, which doesn't fit EXW. DDP isn't agreed, so I'll flag that. Quantity is 9,500, unit price 6.11 USD, with no total given and a confirmed date of 2026-07-16.\n\nI'm mapping the dates to their fields: the 2026-07-16 confirmed date goes to date_confirmed, and the 2026-06-12 order date goes to date_ordered. For quantity, the confirmed figure goes to quantity_confirmed. There's no document date beyond the order date, so that one stays null.\n\n"
-  }
-]

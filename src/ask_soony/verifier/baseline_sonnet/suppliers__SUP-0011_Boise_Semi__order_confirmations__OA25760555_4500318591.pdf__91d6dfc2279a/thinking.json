@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 46,
-    "thinking": "I've finished reading the document, so now I'll turn it into structured output. The terms say EXW Boise, but also that freight, insurance and duties are prepaid by the seller and added to the invoice, which doesn't fit with EXW. I'll flag that as an observation rather than fix it. The quantity of 8,500 and the unit price of 6.11 USD both check out.\n\nI'm mapping the confirmed date to date_confirmed and weighing whether the 2025-12-04 order date belongs in the lines too, since it appears in the header. I'll treat the \"Qty\" column as quantity_confirmed on this order confirmation.\n\n"
-  }
-]

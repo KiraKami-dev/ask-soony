@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 50,
-    "thinking": "I'm treating this as an order acknowledgement: 10,500 units at $6.11 each, confirmed for 2026-03-09 with an order date of 2026-02-05. The terms look inconsistent, since they say EXW Boise while also saying the seller prepays freight, insurance and duties.\n\nI'm flagging the EXW versus prepaid-freight inconsistency, and I'm settling on quantity_confirmed for the 10,500 units and 2026-03-09 as the confirmed date. The order date of 2026-02-05 sits in the header, so I could include it as a value too, and the unit price is 6.11 USD.\n\n"
-  }
-]

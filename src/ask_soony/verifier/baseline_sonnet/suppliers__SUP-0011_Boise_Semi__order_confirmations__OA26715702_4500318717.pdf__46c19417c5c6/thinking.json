@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 45,
-    "thinking": "I'm going to put together the structured output now. One thing stands out: the terms say EXW Boise, which normally leaves freight to the buyer, but they also say the seller prepays freight, insurance and duties and adds them to the invoice. That's a mild contradiction worth flagging. I'm also checking the 15,000 total against the quantities of 10,000 and 5,000, since I don't know the ordered quantity yet.\n\nI'm settling on the order date as 2026-08-24, and since the document itself gives no explicit date, I'm leaning toward leaving the document date as null.\n\n"
-  }
-]

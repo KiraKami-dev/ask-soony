@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 45,
-    "thinking": "I'm noticing the terms conflict here: the document says EXW Boise, but also that freight, insurance and duties are prepaid by the seller and added to the invoice, which doesn't fit EXW. I'll flag that. I'm also checking the quantity of 9,500 and whether it's confirmed or just ordered.\n\nI'm weighing whether the quantity should be recorded as confirmed or as ordered, since the column is ambiguous. I'll note the choice, keep the 2026-03-02 order date as a reference value, and leave the total price out because it isn't stated.\n\n"
-  }
-]

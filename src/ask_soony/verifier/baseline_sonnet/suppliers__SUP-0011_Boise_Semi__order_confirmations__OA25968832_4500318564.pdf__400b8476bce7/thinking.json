@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 37,
-    "thinking": "I've read the document, so now I'll turn it into structured output. The EXW term conflicts with the statement that the seller prepays freight, insurance and duties and adds them to the invoice, since under EXW the buyer normally arranges transport, so I'll flag that. The total price isn't stated, and the quantity is 8,000 at a unit price of 6.11.\n\nI'm mapping the confirmed date, 2025-11-27, to date_confirmed, and the order date, 2025-10-15, to date_ordered.\n\n"
-  }
-]

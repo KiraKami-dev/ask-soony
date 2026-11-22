@@ -1,6 +1,0 @@
-[
-  {
-    "turn": 55,
-    "thinking": "I've got the image, so now I'm turning the Polish WZ delivery note into structured output. The values are 22,600 and 34,000 pieces, across 4 and 6 packages, with 10 packages in total and a gross weight of 170 kg. The carrier is listed as PO 50466, and there's a handwritten \"Meyer K.\" signature under the receipt line.\n\nI'm checking the remaining fields: there's no receiving date stamp and no corrections to record, so I'll note the handwritten signature in the observations rather than as a correction. The reference numbers are PO 4500318731 and delivery note WZ-261007-399, and the date 07.10.2026 reads as 2026-10-07, while the file name's 20261009 doesn't appear on the document itself.\n\n"
-  }
-]
