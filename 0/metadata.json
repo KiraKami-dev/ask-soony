@@ -1,0 +1,170 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M818T17Y1ET62776940CKTY1",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T09:19:07.539878Z",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "e21f98f32023",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 11,
+    "cache_creation_tokens": 8064,
+    "cache_read_tokens": 3793090,
+    "output_tokens": 3724,
+    "api_call_count": 5
+  },
+  "session_token_usage": {
+    "input_tokens": 3187,
+    "cache_creation_tokens": 3130545,
+    "cache_read_tokens": 714859284,
+    "output_tokens": 1289993,
+    "api_call_count": 1384,
+    "subagent_tokens": {
+      "input_tokens": 3272,
+      "cache_creation_tokens": 6933636,
+      "cache_read_tokens": 240297832,
+      "output_tokens": 1890839,
+      "api_call_count": 1565
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 2258,
+    "layers": {
+      "betterleaks": 34,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 88,
+      "credentialed_uri": 0,
+      "entropy": 755,
+      "goredact": 8,
+      "key_context": 0,
+      "pii": 1387,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1250,
+      "IP": 72,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 275
+  },
+  "summary": {
+    "intent": "Take the Lio 'Keep the Line Running' hackathon challenge for Soony's launch: analyze the supplier/ERP data, then build and polish an agent product (poller, extraction, recheck-and-act, approvals, phone calls) with a demo and pitch ready for the 12:00 Sunday hand-in.",
+    "outcome": "Found that the plan said 'ok' while the Collector's Edition misses Sunday (art book overbooking, failed statues, packing speed) and built a working ask-soony app (live and demo instances, UI polish, J/K and Cmd+Enter keys, column mapping, phone-call bridge, demo script). Rehearsed all three demo stories successfully; realtime voice calls were still unreliable and the demo's automatic phone-alert trigger was unresolved.",
+    "learnings": {
+      "repo": [
+        "data/ is gitignored and holds confidential portal data; .env is gitignored, .env.example is committed; never put data values in code.",
+        "Portal API only has GET /api/v1/files, /files/{path} and /archive.zip; no webhooks or notifications. Files are replaced under the same name, so poll and compare SHA-256.",
+        "Live (ask-soony.stenglein.dev) and demo (ask-soony-demo.stenglein.dev) instances share one alert database; the alert-to-case link is stored per state folder.",
+        "Calls default to ASK_CALL_PROVIDER=dry_run; real calls via `CALLS=twilio ASK_CALL_AFTER_MIN=1 scripts/demo.sh reset` or `CALLS=openai`, ~$0.38/min Twilio plus OpenAI Realtime. ASK_CARD_ALERTS=off disables the case-to-phone bridge (set on live).",
+        "OpenAI realtime webhook is configured in the OpenAI project and pointed at the live server; it was switched to the demo address for testing, so calls from demo hit the correct instance only after that change.",
+        "The web UI polls state every 5 s (POLL_MS = 5000) and routine data every 15 s at app level (App.tsx), so phone decisions show on Today and Launch within 5 s.",
+        "The team workflow lives in CLAUDE.md and PROGRESS.md; claim tasks via a 'Now' line in PROGRESS.md. Entire hooks only checkpoint when repo files change.",
+        "columns.py maps English/German/SAP column synonyms to canonical fields, with a cached gpt-4.1-mini fallback for unknown headers; the paper check keeps one row per PO line with the newer file winning."
+      ],
+      "code": [
+        {
+          "path": "src/ask_soony/card_alerts.py",
+          "finding": "New bridge that raises one phone alert for red or soon-due untouched cases (every 30 s, one at a time) and applies phone decisions to the case exactly once."
+        },
+        {
+          "path": "src/ask_soony/openai_calls.py",
+          "finding": "Twilio to SIP to OpenAI Realtime voice agent; was changed to semantic VAD (low eagerness), no overlapping responses, and up to two reconnects of the sideband after noise caused error loops and a dropped call."
+        },
+        {
+          "path": "scripts/demo.sh",
+          "finding": "Supports reset, restart (keep state), stop, and CALLS=twilio|openai; reset also clears demo phone alerts."
+        }
+      ],
+      "workflow": null
+    },
+    "friction": [
+      "Portal token was initially empty, blocking data access.",
+      "Cloudflare 1033 error on the demo host came from a DNS record briefly pointing to the wrong tunnel.",
+      "Safari caches favicons stubbornly; cache-busting version query was needed.",
+      "The J/K handler walked folded look-alike cases individually, so the highlight vanished and ordering seemed to jump.",
+      "gpt-realtime test call failed: background noise triggered false speech, overlapping responses caused 'conversation already has an active response' errors, and the connection dropped after ~20 s.",
+      "Demo's background loop does not raise phone alerts automatically; the call had to be started by hand.",
+      "An edit to demo.sh didn't apply as expected, so a restart silently did not happen.",
+      "New drop CSVs had differing encodings and rows with extra fields, breaking the CSV reader and verifier until made robust."
+    ],
+    "open_items": [
+      "Fix why the demo server's escalation loop never raises phone alerts on its own.",
+      "Re-test realtime voice call with the new semantic VAD settings (~$1) or fall back to keypad calls on stage; switch calls off on demo afterwards (`scripts/demo.sh restart` without CALLS).",
+      "Several commits remain unpushed on jonas/today-flow; push when asked.",
+      "Register sender email addresses in the portal Settings and send the Karton Nowak art-book order for real.",
+      "Produce the video and the pitch deck before the 12:00 hand-in.",
+      "Optional demo features: replay supplier replies on demo, fold count questions, 'what still saves it' on Launch, top bar for Maren.",
+      "Show the mapped-column notes in the data-health UI (needs frontend change); the contract redline PDF was not reviewed.",
+      "The earlier Claude doc artifact still exists next to the briefing page; decide whether to delete it.",
+      "Consider changing the shared portal password exposed in Discord after the hack.",
+      "Phone-secondary-actions button change was made and screenshotted but not yet confirmed committed."
+    ]
+  }
+}
