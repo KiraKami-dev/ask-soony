@@ -14,6 +14,7 @@ import {
   recommendedIndex, routineCount, shortName, shortTitle, summaryLine, type Claim,
 } from '@/lib/today'
 import { resendSignoff, sentSub, signoffLine, signoffOpen } from '@/lib/signoff'
+import { savedRole } from '@/lib/role'
 import { cn } from '@/lib/utils'
 
 // The Sunday flow: one decision at a time, the source one tap away, then "Done" and what's next.
@@ -572,7 +573,9 @@ function Focus(p: Props & {
   }
   const voicePrepared = !!prepared && !p.doneText
   const emailPrepared = voicePrepared && prepared!.decision === 'approve' && emails && sel === prepared!.option_index
-  const signer = card.signoff ? firstWord(card.signoff) : ''
+  // The person who signs is using this device: she approves herself instead of asking herself.
+  const iSign = savedRole() === 'approver' && !!card.signoff && firstWord(card.signoff) === firstWord(state.launch?.money?.approver ?? '')
+  const signer = card.signoff && !iSign ? firstWord(card.signoff) : ''
   const escalate = (text: string = note, option?: number) =>
     act(async () => {
       const r = await post<{ id?: string; channels?: string[] }>(`/api/cards/${encodeURIComponent(card.id)}/escalate`, { note: text, ...(option != null ? { option } : {}) })

@@ -65,7 +65,6 @@ autocomplete="current-password">
 
 
 ROLES = ("buyer", "approver")
-_TITLES = {"buyer": "Every case, the routines", "approver": "Signs what costs money"}
 _DEFAULT = {"buyer": "Buyer", "approver": "Approver"}
 
 
@@ -86,19 +85,18 @@ def _people() -> dict[str, str]:
 
 
 def _who_field(chosen: str = "") -> str:
-    """The two roles by title, not name: the title after the comma when the data gives one."""
+    """Each person with their role: the title after the comma in the data, else the role's name."""
     names = _people()
     chosen = chosen if chosen in ROLES else "buyer"
     rows = []
     for role in ROLES:
-        _, _, title = (names.get(role) or "").partition(",")
+        name, _, title = (names.get(role) or "").partition(",")
         title = title.strip() or _DEFAULT[role]
+        name = html.escape(name.strip())
+        text = f"{name} <span>{html.escape(title)}</span>" if name else html.escape(title)
         checked = " checked" if role == chosen else ""
-        rows.append(
-            f'<label><input type="radio" name="as" value="{role}"{checked}>'
-            f"{html.escape(title)} <span>{_TITLES[role]}</span></label>"
-        )
-    return "<fieldset><legend>Sign in as</legend>" + "".join(rows) + "</fieldset>"
+        rows.append(f'<label><input type="radio" name="as" value="{role}"{checked}>{text}</label>')
+    return "<fieldset><legend>Who is signing in</legend>" + "".join(rows) + "</fieldset>"
 
 
 class BasicAuth(BaseHTTPMiddleware):

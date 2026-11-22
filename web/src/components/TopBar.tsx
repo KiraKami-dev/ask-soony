@@ -1,6 +1,6 @@
 import { Check, Menu, UserRound } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { roleTitle, type Role } from '@/lib/role'
+import { firstNameOf, roleTitle, type Role } from '@/lib/role'
 import { cn } from '@/lib/utils'
 
 export type Page = 'today' | 'launch' | 'suppliers' | 'routines' | 'history'
@@ -34,11 +34,11 @@ interface Props {
 
 interface RoleProps { role: Role | null; onRole: (r: Role | null) => void; people: { buyer?: string | null; approver?: string | null } }
 
-/** The two roles this device can be, by title: "Head of Procurement · what needs a signature". */
+/** The two people this device can be, with their role: "I'm Maren · Head of Procurement". */
 function roleChoices({ people }: Pick<RoleProps, 'people'>): { role: Role; label: string; lands: string }[] {
   const out: { role: Role; label: string; lands: string }[] = []
-  if (people.buyer) out.push({ role: 'buyer', label: roleTitle('buyer', people.buyer), lands: 'every case' })
-  if (people.approver) out.push({ role: 'approver', label: roleTitle('approver', people.approver), lands: 'what needs a signature' })
+  if (people.buyer) out.push({ role: 'buyer', label: `I'm ${firstNameOf(people.buyer)}`, lands: roleTitle('buyer', people.buyer) })
+  if (people.approver) out.push({ role: 'approver', label: `I'm ${firstNameOf(people.approver)}`, lands: roleTitle('approver', people.approver) })
   return out
 }
 
@@ -186,7 +186,8 @@ function RoleMenu({ role, onRole, people }: RoleProps) {
     document.addEventListener('keydown', esc)
     return () => { document.removeEventListener('mousedown', off); document.removeEventListener('keydown', esc) }
   }, [open])
-  const name = role ? roleTitle(role, role === 'approver' ? people.approver : people.buyer) : null
+  const label = role === 'approver' ? people.approver : role === 'buyer' ? people.buyer : null
+  const name = role && label ? `${firstNameOf(label)} · ${roleTitle(role, label)}` : null
   return (
     <div ref={ref} className="relative">
       <button
