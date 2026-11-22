@@ -1,0 +1,49 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "85b36fcba60f",
+  "strategy": "manual-commit",
+  "branch": "image-plugin-pipeline",
+  "checkpoints_count": 4,
+  "files_touched": [
+    "src/ask_soony/verifier/impact/shortfall.py",
+    "src/ask_soony/verifier/impact/tests/test_shortfall.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/85/b36fcba60f/0/metadata.json",
+      "transcript": "/85/b36fcba60f/0/full.jsonl",
+      "compact_transcript": "/85/b36fcba60f/0/transcript.jsonl",
+      "content_hash": "/85/b36fcba60f/0/content_hash.txt",
+      "prompt": "/85/b36fcba60f/0/prompt.txt",
+      "assets_manifest": "/85/b36fcba60f/0/assets/manifest.json"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 82,
+    "cache_creation_tokens": 49973,
+    "cache_read_tokens": 12189825,
+    "output_tokens": 29712,
+    "api_call_count": 38
+  },
+  "redaction": {
+    "replacements": 88789,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 21,
+      "credentialed_uri": 0,
+      "entropy": 88639,
+      "goredact": 0,
+      "key_context": 101,
+      "pii": 28,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 26,
+      "IP": 0,
+      "PHONE": 2
+    }
+  }
+}
