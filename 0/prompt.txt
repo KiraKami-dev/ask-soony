@@ -1,0 +1,985 @@
+"Two open decisions for you:
+1. Farhan / 34,800: should I send him the calculation (34,800 vs 6,800, because the verifier doesn't count deliveries before the end of packing), and build the fallback so the demo stays consistent?" he is at sleep. so if there is sth off, we should fix it I think
+
+---
+
+<task-notification>
+<task-id>a32203f8012f007ef</task-id>
+<tool-use-id>toolu_01HUtqxQBFjK5eQdz4StDSqK</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a32203f8012f007ef.output</output-file>
+<status>completed</status>
+<summary>Agent "Critique identity and build alternative" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I've built the minimal phone flow 20 to 24 and the desktop screen 25, and checked each one in headless Chrome. I skipped 10 to 14 as the new brief allowed.
+
+**Rules applied on every screen**
+- One typeface, Instrument Sans, in three sizes (34/18/13.5 on desktop, 27/17/13 on phone).
+- No boxes, chips, timelines or KPI numbers.
+- One blue for the main button.
+- Red appears only on the late "20,000 arrive Tue 24 Nov".
+- The highlighter appears only on the source crop.
+- Routine green appears only on the one routine line.
+- The only borders are the button and the bottom sheet.
+
+**The screens**
+- **20 Push:** only the notification card on a plain grey ground: "One decision before 10:00 · 20,000 game cards arrive after launch."
+- **21 Decision:** "Trucks leave in 13 h 30 min · 1 decision" at the top, then:
+  - a plain headline;
+  - one sentence with two tappable figures: "SAP expects 48,000 by Saturday", then the late "20,000 arrive Tue 24 Nov" in red;
+  - "For today: Standard runs out of cards at 17:00, three hours before the trucks";
+  - the recommendation with its cost, a big Approve, and quiet "Talk it through" and "Other options" links.
+- **22 Source sheet:** the Korean lines with 20,000 and 2026-11-24 highlighted, the English translation, "SAP says 48,000 due Sat 21 Nov · Purchase order, line 2", and one Back button. The decision stays dimmed behind it.
+- **23 Done:** "Done. Asked Boise for 20,000 cards." with an Undo link, then "3 more like this from PackRight. Handle them the same way?" One green line says there will be a test run first and that money still comes to you.
+- **24 All clear:** "Nothing needs you. On track for the trucks at 20:00." with "Watching 25 shipments · see" and the green "3 handled by your routines overnight · see · undo".
+- **25 Desktop:** a quiet "Needs you" list of three one-line items, the same decision in one column, and the routine line at the bottom.
+
+**Decision for you:** screen 23 doesn't quite add up. Approving Boise air freight doesn't create "3 more like this from PackRight"; that offer belongs to Saturday's artwork decision. For the demo, either reword it as "Next time a part lands after the trucks, ask the other supplier first, the price still comes to you", or make 23 the PackRight decision. I left the wording you specified.
+
+**Made up for the demo:** the Korean balance line in the crop, "25 shipments" and the Yantian item in the desktop list.
+
+Files are in `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/brand/`:
+- screens/20-lockscreen-push.html
+- screens/21-decision.html
+- screens/22-source-open.html
+- screens/23-done.html
+- screens/24-all-clear.html
+- screens/25-desktop-focus.html
+- shots/20 to 25 PNGs (phone at 2x)
+- gen/minimal.py (generates all six)</result>
+<usage><subagent_tokens>225019</subagent_tokens><tool_uses>9</tool_uses><duration_ms>150936</duration_ms></usage>
+</task-notification>
+
+---
+
+ok, build this for now
+
+---
+
+is there also an n8n style diagram showing?
+
+---
+
+"~/.claude/jobs/3021cc1a/tmp/routines-more/wide-6-expanded-flow.png" that probably could/should read nicer. like e.g. not just one line? (or kee pit in a line before doing turns)
+
+---
+
+"~/.claude/jobs/3021cc1a/tmp/routines-more/wide-6-expanded-flow.png" that probably could/should read nicer. like e.g. not just one line? (or kee pit in a line before doing turns)?
+
+---
+
+<task-notification>
+<task-id>a564793287b5d9833</task-id>
+<tool-use-id>toolu_011mVP9TMMu9yPscV3zrf7rx</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a564793287b5d9833.output</output-file>
+<status>completed</status>
+<summary>Agent "Fix verifier shortfall for arrivals" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I made the fix, but on this Mac the game card gap still shows 34,800. The rule needs a reading of Hwaseong's shipping advice, and there is none locally (`data/store/image_recognizer` doesn't exist). With a reading of that one PDF the same run gives 6,800 short, exactly what the paper check computes. Nothing is committed or pushed.
+
+**The change**
+- **`shortfall.py`:** each part now carries two new lists. `arriving` holds inbound that is counted, with reference, quantity, ETA and basis. `not_counted` holds inbound that is skipped, with the reason. `gap` is now needed − usable − arriving. `gap_if_acted`, `at_risk` and the cards pick this up automatically.
+- **What counts as arriving:** a launch-plan inbound row, or an ERP shipment (quantity from its open PO lines), if all of these hold:
+  - ETA is on or before launch day.
+  - It is not cancelled, and not "arrived" at the port (that stays a collect fix).
+  - It has no goods receipt dated between its ETD and the stock date (that would already be in stock). A receipt after the stock date counts at the received quantity.
+  - It is not overdue (ETA before the stock date with no receipt).
+  - The supplier's shipping document doesn't say less. If it does, only the shipped quantity counts and the balance goes to `not_counted` with its expected date.
+- **Unread documents:** if a shipping document exists for the reference but nobody has read it yet, the inbound is not counted. That is the conservative choice: counting the plan's 48,000 would have shown no gap at all, when the paper actually says short.
+- **The Hwaseong balance:** the 20,000 arriving Tue 24 Nov is never counted.
+- **`cards.py` (allocate card only):** the "what the paper says" line, the decision question and the approver message now use stock plus arriving. The evidence lists what was counted and what wasn't, and why.
+
+**Before and after on the real data**
+
+| Part | Before | No reading (this Mac) | With a reading of the advice |
+|---|---|---|---|
+| CMP-GAM-001 game card | 34,800 short | 34,800 short; the 48,000 is listed as not counted, "not read yet" | 6,800 short (118,400 stock + 28,000 arriving; 20,000 balance not counted) |
+| CMP-GAM-004 | gap 0 | gap 0; Karton Nowak's 20,000 (PO 7K21M) now counted as arriving | gap 0 |
+| CMP-GAM-003 | 32,000 short | unchanged; the 350,000 at the port is still a collect fix | unchanged |
+
+- **Allocate card:** it still appears in both runs because a gap remains. With the reading its title reads "6,800 short across 2 editions". A test confirms the card disappears once the gap closes.
+- **Paper check difference:** none once the advice is read. The paper check does 153,200 − (118,400 + 48,000 due − 20,000 late) = 6,800, which is the same number. Without the reading, the whole difference is the 28,000 the verifier can't confirm.
+
+The "with a reading" run used a reading I transcribed by hand from the PDF's text into the scratch folder. It is not in the repo and is not a real reader output. The dispatch output is at `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/verifier-fix/dispatch.json`, and the reading-based one is `dispatch_with_reading.json` next to it. Nothing was written to `data/state`.
+
+**Tests:** I added 5 tests to `src/ask_soony/verifier/impact/tests/test_shortfall.py`. `uv run pytest -q` gives 219 passed, and `ruff check` is clean. `ruff format --check` flags two files in `dispatch/decisions` that I didn't edit; they were already like that.
+
+**Decision for you:** to get 6,800 on the live dashboard, the advice needs a real reading. That means one paid OpenAI run of the image recognizer on that file (`--only Shipping_advice_020-48113256`), which I did not do without your OK.
+
+**Left for Farhan** (all in his note):
+- The "runs dry" time, and so the allocate card's act-by time, still uses stock on hand only and ignores arrivals.
+- `impact/__main__.py` doesn't print the arriving list yet.
+
+Files:
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/verifier/impact/shortfall.py`
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/dispatch/decisions/cards.py`
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/verifier/impact/tests/test_shortfall.py`
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/verifier/NOTE_FOR_FARHAN.md`</result>
+<usage><subagent_tokens>174999</subagent_tokens><tool_uses>47</tool_uses><duration_ms>530224</duration_ms></usage>
+</task-notification>
+
+---
+
+"One thing still needs your OK: on this Mac, the dashboard still shows 34,800. The verifier only counts the 28,000 cards once its own image recognizer has read Hwaseong's shipping advice, and that reading doesn't exist locally yet. That takes one OpenAI call on this one PDF (well under a cent). Since your rule is to ask before anything paid: may I run it? After that, the dashboard shows 6,800 short, consistent with the paper check, and "Standard stopped Sat 21:32" goes away." yeah that is totally fine
+
+---
+
+<task-notification>
+<task-id>af4dd81f3d1bec8c9</task-id>
+<tool-use-id>toolu_01BsxZxvjnCJjJx7SDaa216c</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/af4dd81f3d1bec8c9.output</output-file>
+<status>completed</status>
+<summary>Agent "Rebuild app as calm Today flow" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>The Today screen is rebuilt to the Sunday flow design and is live on :8000; the build in `web/dist` is up to date. The typecheck (`tsc --noEmit -p tsconfig.app.json`) and `npm run build` both pass. Lint shows warnings only, the same patterns the existing code already has. Nothing is committed or pushed.
+
+In my checks I never approved, escalated or dismissed anything on real data. Playwright mocked `/api/state` and every POST; the only POSTs fired were the mocked approve and undo. Source crops are the real anchors and page images, fetched with GET only.
+
+**The five screens**
+- **Today (phone and desktop):**
+  - The top line reads "Trucks leave in 13 h 30 min · 11 decisions"; on phone the count links to Plan.
+  - The decision shown is the most urgent open one for you: server inbox order first, then level and deadline.
+  - The headline is rebuilt in plain words, e.g. "20,000 game cards will arrive after launch." and "We have 19,300 art books, not 91,300." Part codes, product titles and PO numbers are dropped.
+  - The contradiction is one sentence built from the system and document evidence, e.g. "SAP expects 48,000 by Sat 21 Nov, but Hwaseong's shipping advice says 20,000 arrive Tue 24 Nov". Both values are tappable citations, and the document side is red only when the card is red.
+  - Then "For today: …" from the edition's packing clock, "We recommend" with the action and cost, and a single blue Approve. Next to it sit "Talk it through" and "Other options" (the alternatives, pass it on with brief and note, dismiss, and a link to Plan for editing the draft).
+  - Approve asks for confirmation only when the option costs money: "Approve: … (About EUR 16,800)".
+  - Desktop keys: j/k move between decisions, a then Enter approves, Esc cancels.
+- **Source sheet:** a bottom sheet on phone and a centred panel on desktop. It shows the highlighted crop of the page, scan or table row in the design's yellow, the English translation, the other side as a row you can tap to switch, "Open original" and Back.
+- **Done:** after a button or voice decision it says "Done. Asked PackRight to make the order to rev C." with an Undo. If the server refuses the undo, its reason is shown.
+  - With open look-alikes it offers "4 more like this from PackRight. Handle them the same way?" plus the green routine line. "Show me how" opens Routines and starts drafting a routine; "Not now" moves on.
+  - Otherwise it shows "Next: &lt;headline&gt;" or that nothing else is due.
+- **All clear:** "Nothing needs you." with "On track for the trucks at 20:00." (or an honest line when an edition stops), "Watching 25 shipments · see" and "3 handled by your routines overnight · see · undo".
+- **Desktop:** a quiet "Needs you" list on the left with at most 5 lines; look-alikes fold into one line with a count, then "+N more". The decision sits in a 640 px column, with the routine line fixed at the bottom.
+
+**Navigation**
+- The top bar has the mark and "Ask Soony" on the left. Desktop has text links Today · Plan · Routines · Suppliers plus the alerts bell; phone has a menu holding the same links and the alerts toggle.
+- When routines have proposals or call drafts waiting, a line reads "Your routines want to do N things · review" and opens Routines.
+- The `/d/&lt;id&gt;` link now opens the Today decision view. With `?talk=1` it rings: "Answer" becomes the one blue button and Approve turns quiet.
+
+**Removed from the main screen, and where it lives now**
+| What | Where |
+|---|---|
+| Launch timeline, full decision list with groups, Waiting, Handled (with per-item undo), Decided by you, detailed decision pane (Edit, Escalate, all evidence, trail) | `/plan` |
+| Supply map and legend | `/suppliers` |
+| Routines sheet (all features kept) | Routines link or menu; it no longer has its own button |
+| Verdict banner and the old header | removed; the old `Header.tsx` is deleted |
+
+**Files**
+- New: `web/src/components/Today.tsx`, `web/src/components/TopBar.tsx`, `web/src/lib/today.ts` (all the wording, built from card fields with nothing hardcoded).
+- Rewritten: `web/src/App.tsx` (routes `/`, `/d/&lt;id&gt;`, `/plan`, `/suppliers`).
+- Small changes:
+  - `Routines.tsx`: can now be opened from the top bar.
+  - `VoiceCall.tsx`: a quiet "Talk it through" variant plus a calmer ringing block.
+  - `SourceAnchors.tsx`: exports the crop on its own, and highlights use the design's yellow.
+  - `AlertsButton.tsx`: now a plain bell icon.
+  - `DecisionList.tsx`: plainer headlines.
+- Global look:
+  - `index.css`: the design's colours, three text sizes per viewport, and the routine colour is now green.
+  - `index.html`: Instrument Sans from Google Fonts with a system fallback.
+  - `favicon.svg`: the logo mark.
+- I did not touch `FlowGraph.tsx` or any Python.
+
+**Things to know before the demo**
+- On phone, approving an option with no cost sends straight away with no confirmation, as the brief asked. On real data that means a real supplier email; desktop asks only when you press `a`.
+- When an edition is already stopped, the "For today" line reads in the past tense. With the current real data that gives "Standard is out of game cards since Sat 21:32".
+- Plan only got the new colours and font, not a calmer layout, so it is still the dense view.
+
+**Screenshots** are in `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/today/`, as `phone-*` (390x844 at 2x) and `desk-*` (1440x900). The numbers mean: 1 Today, 2 source open, 3 a PackRight card, 4 done with the routine offer, 4b undo refused, 5 all clear, 6 Plan, 7 Routines (7a phone menu), 8 ringing deep link, 9 other options, 10 keyboard confirm. Next to them are the screenshot script (`tools/shoot.py`) and `data/state.json`, a snapshot of real state used for the mocks. It is portal data, so delete it after the hack.</result>
+<usage><subagent_tokens>261065</subagent_tokens><tool_uses>61</tool_uses><duration_ms>832725</duration_ms></usage>
+</task-notification>
+
+---
+
+"The email is out. You'll see the reply here. Undo
+" how is an undo working here? and shouldn't one see the mail (e.g. on mail as popup) before sending?
+
+---
+
+"Be careful in the demo: on the phone, Approve without a price goes out immediately (that's the "one tap" concept). On real data, that sends a real email to the supplier." is it a good idea?
+
+---
+
+Ok for now can you create a branch for it and push?
+
+---
+
+And I guess we have to bring the automation usggestions in it and also the visual design on the others on board?
+
+---
+
+Also where does it show the n8n-style graph now?
+
+---
+
+"[Image #18] " it does nto show it yet?
+
+---
+
+ok for new one I see but one sees flow / steps / expanded and all is a bit redundant
+
+---
+
+the latest voice chat says it will outlie what happens and then proceeded but it was just "done" then
+
+---
+
+"A new prepare_decision tool will return the summary to read out along with a one-time token valid for 10 minutes, and decide will only accept that token for the exact prepared decision and option. I'm wiring up the server side next. · summary" maybe it could also update the ui on the fly via tool calls or so for the connection (if not via phone but website) but idk
+
+---
+
+also maybe routines should get an own page rather than a flyout so it is the same as the rest?
+
+---
+
+also where is the verification part now plugged in? or is that what creates the things on today (together with the delayed stuff etc.)?
+
+---
+
+<task-notification>
+<task-id>a1852ea2dac6f8c35</task-id>
+<tool-use-id>toolu_01JywiuJN9pariQ7YnYgXuQY</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a1852ea2dac6f8c35.output</output-file>
+<status>completed</status>
+<summary>Agent "Restyle Plan, Suppliers, evidence, login" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Plan, Suppliers, the evidence drawer, source views, login page, PWA icon/manifest and Teams card are all restyled to match Today. Nothing is committed or pushed.
+
+**Verification:**
+- **Isolated build:** `npm run build` doesn't pass in the shared repo right now. The other engineer's in-progress routines files fail typecheck (`ProposalItem` and `RoutineFlow` missing exports), and the dev server shows a blank page because of them. So I checked my files in a copy of HEAD with only my files on top. There, `tsc --noEmit -p tsconfig.app.json` passes and `vite build` succeeds. The same tsc command on the repo shows no errors in my files.
+- **Tests:** `uv run pytest -q` passes (220).
+- **Live app not updated yet:** the app on :8000 still serves the old `web/dist` and the old login page. It needs a rebuild once the routines work compiles, plus a server restart for the login page.
+- **No real actions:** the screenshot scripts blocked every POST; the log shows none were sent. The decided states are mocked through `page.route` on `/api/state`.
+
+**Plan**
+- **Timeline:**
+  - Hairlines, and thin bars in quiet grey.
+  - A stopped stretch is a light red tint with one 1.5 px red line; the hatching is gone.
+  - Red is used only for stop and short labels, runs-dry markers and the "Too late" gutter.
+  - The truck line is 2 px; "now" is a plain ink line.
+- **List:** quiet rows of dot, short headline and time. The dot is blue when selected, red when the item misses the trucks, grey otherwise. Sections are "Needs you", "Waiting on others", "Handled for you" (green routine line with Undo) and "Decided by you" (show/hide). Look-alikes fold behind "N more like this".
+- **Detail pane:** laid out like Today's decision: meta line, headline, the contradiction sentence with dotted citations, the "For today" line, "We recommend", the other options as "Or …" lines, a blue Approve button and Talk it through. Tapping a citation opens the highlighted source crop under the sentence. Below a hairline are quiet folds: All evidence, How we know, Edit the message (Approve then sends the edited text), Escalate, and a "Dismiss it" link.
+- **Keyboard:**
+  - j/k had been lost in the Today rebuild; I restored it in `App.tsx`, and the list row follows.
+  - In the pane, `a` asks to approve, Enter confirms, Esc cancels.
+- **Behaviour change:** approving an email or a costed option in Plan now takes one confirming press ("Yes, send it" / "Yes, approve"), as Today does.
+
+**Suppliers**
+- The map has muted warm land and hairline routes.
+- Red marks only late routes and suppliers; silent shipments are hollow ink rings; supplier dots are solid ink.
+- The old count badges are gone; the Europe inset is quiet, and the legend is one quiet line.
+- A supplier list sits beside the map (below it on phone). Each supplier shows its shipment count, a "No news on … for N h" line, and its open issues with look-alikes grouped. An issue opens it in Plan.
+- On phone the inset is dropped and the map labels only the DC and late suppliers, because the labels collided.
+
+**Evidence drawer and sources**
+- The drawer is now a bottom sheet on phone and a 560 px side panel on desk, on the same ground and type.
+- Chips, heavy borders and uppercase labels are gone. Citations use Today's dotted `.cite` style; the highlighter appears only on source crops and table rows.
+- The exports Today uses are unchanged.
+
+**Login, PWA icon and Teams**
+- **Login:** Instrument Sans, the mark, "Ask Soony" and one blue Sign in button; behaviour unchanged.
+- **Icons and manifest:** `icon-192.png` and `icon-512.png` are re-rendered from the mark, sized to stay inside the maskable safe zone. The manifest is named "Ask Soony" with the new colours.
+- **Teams card:**
+  - Red ("Attention") appears only on red-level items; amber and blue are now neutral.
+  - "Supplier replied" no longer uses green.
+  - The labels read "The system says" / "We recommend:".
+  - I changed one assertion in `tests/test_teams.py` to match the new casing.
+
+As the coordinator asked, my `App.tsx` edits stay inside the /plan and /suppliers views: the imports, the Plan-only j/k effect, the two view bodies, and removing the old `Legend`. I did not touch routing, `Routines.tsx`, `TopBar` or `routines/*`.
+
+Files changed:
+- `web/src/components/DecisionList.tsx`
+- `web/src/components/DecisionPane.tsx`
+- `web/src/components/LaunchTimeline.tsx`
+- `web/src/components/EvidenceDrawer.tsx`
+- `web/src/components/SourceAnchors.tsx`
+- `web/src/components/SupplyMap.tsx`
+- `web/src/App.tsx`
+- `web/src/index.css` (only `--color-land` set to a warmer `#ededea`)
+- `web/public/manifest.webmanifest`, `icon-192.png`, `icon-512.png`
+- `src/ask_soony/basic_auth.py`
+- `src/ask_soony/teams.py`
+- `tests/test_teams.py`
+
+`AlertsButton.tsx` already fit the design, so I left it unchanged.
+
+Screenshots are in `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/restyle/`, all at 1440x900 (desk) and 390x844 (phone):
+- `v2-plan-desk.png`, `v2-plan-desk-jj.png` (after j, j), `v2-plan-desk-source.png`, `v2-plan-desk-folds.png`, `v2-plan-desk-folds-bottom.png`, `v2-plan-desk-decided.png`, `v2-plan-phone.png`
+- `v3-suppliers-desk.png`, `v2-suppliers-desk-selected.png`, `v3-suppliers-phone.png`
+- `v2-evidence-desk.png`, `v2-evidence-phone.png`
+- `v2-login-desk.png`, `v2-login-phone.png`
+- `before-*.png` for comparison
+- Scripts: `shoot.py`, `shoot2.py`</result>
+<usage><subagent_tokens>272226</subagent_tokens><tool_uses>83</tool_uses><duration_ms>775813</duration_ms></usage>
+</task-notification>
+
+---
+
+also why does it say 9 decisions when it is less on the sidebar? [Image #19]
+
+---
+
+<task-notification>
+<task-id>ab301f5e9aa8c2d6b</task-id>
+<tool-use-id>toolu_01LBmGmzbAhqTgW3roUAHcf4</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/ab301f5e9aa8c2d6b.output</output-file>
+<status>completed</status>
+<summary>Agent "Automation inside Today + routines restyle" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Everything you asked for is built. `npx tsc --noEmit -p tsconfig.app.json &amp;&amp; npm run build` passes, nothing is committed or pushed, and the voice flow is the one part I haven't run (no mic in my checks). Screenshots at 390x844 and 1440x900 are in `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/auto-today/`, with the script `shoot.py` beside them. Every send, accept and approve in those checks was mocked, and none reached the server.
+
+**Automation in Today** (one quiet green line each, no panels)
+- **On a decision:** up to three lines can show: "Your routine ‘X’ handles cases like this · let it · ask me first", "Your routine ‘X’ prepared 3 emails to PackRight · review", and "Drafted from your call: ‘…’ · review".
+- **Review sheet:** it follows the email review layout, with To, Subject and the text for each item. Long emails fold after a few lines. "Send all 3" stays pinned at the bottom, each item has "Send" / "Skip", and a sent item shows "Sent at HH:MM".
+  - The accept endpoint takes no edits, so the text is read-only and the sheet says so.
+  - A failed accept now shows as an error. Before, the server returned 200 with `ok: false` and the UI took that as success.
+- **"How it decided"** in that sheet goes to `/routines?routine=&lt;id&gt;`.
+- **Done view:** "Show me how" goes to `/routines?draft=&lt;cardId&gt;`. The line now reads "It starts by asking: it prepares them, you send with one tap."
+- **New routines start in "Ask me":** drafts save with that mode explicitly, and you can change it before turning one on.
+- **All clear:** "N handled by your routines · see · undo". Proposals from one routine get the named line; from several, one "N waiting for your OK · review" line.
+- **Needs you list:** the header now reads "Needs you · 9 decisions". A folded row shows "5 like this, one decision each" under its title.
+
+**Routines is now its own page**, `/routines`, in a centred column about 1040 px wide:
+- The order is: waiting for your OK, the draft from your decision, drafts from calls, your routines, then "Automate a decision you made".
+- Each routine is one view: the When/Then/Always diagram is also the editor. Phones get the vertical flow.
+  - Editing: × removes a condition or step, Then steps drag to reorder, and "+ add" offers the five steps you listed plus "Ask for a status".
+  - Every edit goes through test run, before/after on the diagram, then Apply or Keep as is.
+  - Below the diagram are "Change it in your words" and a collapsed "Show the code".
+- The Flow/Steps toggle, Expand and the flyout sheet are gone.
+- Proposals, would-handle and voice drafts live in one shared store (`routines/live.ts`), refreshed on every page.
+
+**Voice (`VoiceCall.tsx` + `Today.tsx`)**
+- **prepare_decision:** an email option opens the email review with "Say ‘yes’ or tap Send". Anything else shows the summary inline as "On the call: … Say ‘yes’ to go ahead". Both close when the call ends or the decision is made.
+- **show_on_screen** is answered in the browser, never relayed. It opens the document or system side of the source, the other options, or the email review.
+- **Guard:** `decide` is answered locally with "Wait for the person to answer first." unless the person spoke since the last prepare result. A turn whose transcript comes back empty doesn't count.
+- **Done waits for the call to end.** During the call, the decision stays on screen with "Done. …" in place of the buttons. If the person taps Send mid-call, the assistant is told it's done so it doesn't decide again.
+- **Not tested end to end:** no mic in my checks, and your restart for show_on_screen is still pending. A live call is the open check. Also, an email edited on screen and then confirmed by voice sends the original draft, because `decide` takes no text.
+
+**Outside my files**
+- `App.tsx`: the `/routines` route, "Show me how" now goes to that page, and the sheet state is gone.
+- `TopBar.tsx`: Routines is a normal link with its badge, and the unused prop was removed.
+- No new tokens were needed.
+
+Files are in `web/src/components/`:
+- Today.tsx
+- Routines.tsx
+- VoiceCall.tsx
+- routines/FlowGraph.tsx
+- routines/Proposals.tsx
+- routines/Diagram.tsx (new)
+- routines/RoutineCard.tsx
+- routines/RoutineFlow.tsx
+- routines/PaneHints.tsx
+- routines/Undo.tsx
+- routines/live.ts
+- routines/types.ts</result>
+<usage><subagent_tokens>308678</subagent_tokens><tool_uses>87</tool_uses><duration_ms>1122867</duration_ms></usage>
+</task-notification>
+
+---
+
+what is the difference of today and plan now tbh?
+
+---
+
+and are automations offered automatically?
+
+---
+
+and on suppliers what is the blinking stuff on there?
+
+---
+
+"- No (missing):
+  - Repetition over time. If you decide the same kind of case for the second time without an open look-alike, nothing is offered. That's exactly Felix's "flip the switch once you trust it" moment.
+  - A suggestion on the all-clear screen ("You did this 3 times this week · make it a routine")." should be there "Today vs Plan, honestly: they've grown very similar. Plan is currently "Today plus timeline plus more sections (waiting on others, decided) plus folded extras". The decision pane exists twice, almost identical. That's redundant. My suggestion for a clear split:
+- Today = the place to decide: one decision at a time, the source, Approve, done.
+- Plan = the overview, without its own decision pane: the launch timeline at the top, then all cases in groups (needs you, waiting on others, handled by routines, decided, with undo and history). A click on a case leads to Today, focused on that case. So Plan answers "where do we stand overall?", and Today answers "what do I do now?"." so how would you handle it?
+
+---
+
+<task-notification>
+<task-id>af61907b1528d4f2d</task-id>
+<tool-use-id>toolu_01G5Xn5SbTgAR7JaUiovAjwL</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/af61907b1528d4f2d.output</output-file>
+<status>completed</status>
+<summary>Agent "Plan as overview, repeat-based offers" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Plan is now an overview only, and every decision happens on Today. Repeated decisions now get an offer to become a routine. The typecheck and `npm run build` both pass, and `web/dist` is rebuilt, so the live app on :8000 already shows the change. I didn't commit or push anything.
+
+**1. Plan and Today**
+- **Plan** shows the launch timeline across the full width, then the list in a centred column of about 880 px. On a phone it stacks. The list has four groups:
+  - **Needs you:** look-alikes fold into one row with "N more like this".
+  - **Waiting on others.**
+  - **Handled for you:** green, with the routine's name and Undo where it works.
+  - **Decided by you:** history with Undo where it works. Sent emails get no Undo, since they can't be taken back. It shows 6 rows, then "Show all N".
+- **Each row** has a dot, the short headline, who and when underneath, and the status in words: "Misses the trucks" (red), "Your call", "Waiting for Maren", "Approved", "Sent". On a phone the status moves into the line underneath, and "Your call" is left out there because it adds nothing.
+- **Opening a case:** clicking a row or a timeline marker goes to `/d/&lt;id&gt;?from=plan`. On the desk, j/k move the selection and Enter opens it.
+- **"← Plan"** is a quiet link above the decision on Today when you arrive from Plan.
+- **Cases that are no longer open:** before, `/d/&lt;id&gt;` for a closed case quietly fell back to the next open decision. Now Today shows the case read-only: status, "By you" or "By your routine ‘X’", Undo where it works, the contradiction with clickable sources, and links to "All evidence · N" and "How we know".
+- **Deleted:** `DecisionPane.tsx`, plus `DecisionList.tsx` and `routines/PaneHints.tsx`, which only the old Plan pane used. The new list is in `web/src/components/Plan.tsx`.
+- **Old links** of the form `/plan?card=&lt;id&gt;` now open that case on Today, and the Suppliers list opens `/d/&lt;id&gt;`.
+- **Lost with the pane:** editing the text of a non-email message before approving. Email drafts can still be edited in the review sheet on Today. The Today link that used to say "Edit the message, all evidence and the trail in Plan" now opens the evidence drawer.
+
+**2. Offering automation**
+- **The endpoint already existed:** `GET /api/routines/suggestions` came in the previous commit (`src/ask_soony/routines.py`), so I only consumed it. It is now in the shared live store `routines/live.ts` on the same refresh as proposals and drafts.
+- **Done view:**
+  - If open look-alikes exist, the existing offer shows unchanged.
+  - Otherwise Done appears at once, then the store refreshes. If the decided card is in a suggestion, the view adds: "That's the third time you asked Supplier Quality for a concession or a 100% sort today. Handle it like this from now on? It will prepare them; you send with one tap." The buttons are "Show me how" (goes to `/routines?draft=&lt;cardId&gt;`) and "Not now".
+  - The action is turned into plain past-tense words, shortening supplier names and replacing order numbers with "the order".
+- **All clear:** one green line, "You did ‘&lt;short label&gt;’ N times · make it a routine", which opens `/routines?draft=&lt;last_card_id&gt;`. It shows only the newest suggestion.
+- **Today with open decisions** gets no extra line.
+
+**Screenshots** (desktop 1440x900 and phone 390x844). I used Playwright against the live app and answered every non-GET request in the script, so no real card was approved, escalated or dismissed. The repeat offer and All clear were mocked through `/api/state` and `/api/routines/suggestions`. Files are in `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/plan-split/`:
+- `plan-desktop.png`, `plan-desktop-full.png`, `plan-phone.png`
+- `today-from-plan-desktop.png` / `-phone.png`
+- `case-from-plan-desktop.png` / `-phone.png` (a decided case opened from Plan)
+- `done-repeat-desktop.png` / `-phone.png`
+- `all-clear-suggestion-desktop.png` / `-phone.png`
+
+The screenshot script is `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/shots-script/shots.py`.</result>
+<usage><subagent_tokens>190759</subagent_tokens><tool_uses>41</tool_uses><duration_ms>388769</duration_ms></usage>
+</task-notification>
+
+---
+
+still overlapping / kind of the same, right?
+
+---
+
+sure
+
+---
+
+but with this: how would it scale to other companies?
+
+---
+
+probably we should make it more general.
+
+---
+
+also would pipelines adapt if content changes? or we warn they need to be adapted?
+
+---
+
+One cannot click the recommended option but only "approve" 
+
+<pasted_content id="1dc7">
+5,600 statues "The Getaway" on the shelf failed inspection.
+SAP says 5,600, 27,400 in stock, but the inspection report says lot rejected.
+For today: Collector's runs out of statues "The Getaway" at 14:03, six hours before the trucks.
+We recommend
+Ask Supplier Quality for a concession or a 100% sort today.
+No cost. The good parts of the lot can be packed.
+Or tell Pune Diecast Works the lot failed and ask for replacements. No cost.
+Or pass it on to the approver
+Or dismiss: nothing to do
+All evidence · 2
+How we know
+Approve
+</pasted_content id="1dc7">
+
+---
+
+<task-notification>
+<task-id>a409b81ea8f0b0459</task-id>
+<tool-use-id>toolu_01Nf5h2jbmgxmJuEcK5x24fX</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a409b81ea8f0b0459.output</output-file>
+<status>completed</status>
+<summary>Agent "Launch page + Today full list" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Plan is gone. Today now answers "what do I do now?" and the new Launch page at `/launch` answers "will we make Sunday 20:00?". Every option on a decision can now be chosen. Type check, build and `uv run pytest -q` all pass (222 tests). Nothing is committed or pushed.
+
+**Before you look: restart the server on :8000.** It runs `uvicorn` without reload, so it doesn't yet send the new per-part data. Until you restart it, Launch shows "unknown" for the per-part numbers. The new web build is already in `web/dist`. I took the screenshots against my own server on port 8011 (now stopped). All non-GET requests were mocked, and none were made.
+
+**One risk:** something else is editing `src/ask_soony/api.py` at the same time; it is reformatting the file and has other uncommitted changes in it. I kept my change there to two lines (one import, one `"launch"` field in the `build_state()` response). Check that both lines survive whatever the other edit commits.
+
+**Today**
+- **Left list:** below "Needs you" there are now three folded groups: "Waiting on others", "Handled for you" (green) and "Decided by you". Each shows a count and "show"/"hide", and Undo where it works (none for sent emails). A row opens the case in focus; closed cases are read-only.
+- **Phone:** a quiet "All cases" link sits at the bottom, and the "N decisions" in the top bar opens it.
+- **Links:** "← Plan" is removed. The "see" and "undo" links on the all-clear screen now open the matching group instead of going to Plan.
+- **Options:**
+  - **Choosing:** the recommended option is preselected. Tapping any "Or …" line (another option, pass it on, dismiss) moves it into the slot as "You chose", with a "back to our recommendation" link.
+  - **Button:** it follows the choice: "Review email", "Approve" or "Pass it on" in blue, and "Dismiss" in quiet grey.
+  - **Keyboard:** 1–9 picks a line and A does the chosen action.
+  - Approve sends the chosen option's index.
+
+**Launch**
+- The top bar now reads Today · Launch · Routines · Suppliers.
+- `/plan` redirects to `/launch` and `/plan?card=X` to `/d/X` (both checked).
+- The page shows, top to bottom:
+  - **The verdict:** today it reads "Standard stopped Sat 21:50, 32,000 short, unless 3 decisions go through. Collector's stops 14:03, 3,400 short, unless 3 decisions go through."
+  - **The timeline**, full width.
+  - **Per edition:** packed, still to pack, pack rate, work left against shift time, and spare time.
+  - **Per part:** each edition's parts, the one that breaks first on top, with what is on its way and a "→ decide" link.
+
+**Where each Launch number comes from**
+
+| Number | Source |
+|---|---|
+| Stop/finish time, copies short, still to pack, pack rate | `strip` in /api/state (packing clock and cards) |
+| Packed | day-one demand from the packing plan, minus still to pack |
+| Work left | still to pack ÷ pack rate |
+| Shift time | new `launch.hours_left` from the packing clock |
+| Spare | shift time minus work left |
+| Part rows (stock, gap, what's arriving or not counted) | the verifier's `dispatch.json` parts, through the new `launch.parts` |
+| When a part runs dry | the line's stop time computed for that part's shortfall |
+| Shipment state (at the port, booked, silent N h) | joined from `open_shipments.csv` by reference |
+| Cases on a part | matched by part code or name |
+| "N decisions go through" | open or passed-on cases on that edition's short parts |
+
+**What is unknown or approximate**
+- **Game card:** it is shared by both editions, so it has no run-dry time. It shows "6,800 short, split between editions open", because the data doesn't say how the cards are split.
+- **Spare:** it is computed so the row adds up, so it can differ by about 0.1 h from the slack figure shown elsewhere (8.7 h here against 8.8 h). On a stopped line it is labelled "if every part were there".
+- **Packed counts** are projected at plan rate from the last count (Sat 20:50); the page says so.
+- **Cover sleeves** show "covered", because the verifier's count has no gap and those cases are counted in parts, not copies. Their three open cases are still linked.
+- Today nothing is waiting on others or handled by a routine, so only "Decided by you · 4" shows.
+
+Files are in `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony`:
+- `src/ask_soony/launch_view.py` (new)
+- `src/ask_soony/api.py` (two lines)
+- `tests/test_launch_view.py` (new)
+- `web/src/components/Launch.tsx` (new)
+- `web/src/components/Today.tsx`
+- `web/src/App.tsx`
+- `web/src/components/TopBar.tsx`
+- `web/src/lib/api.ts`
+- `web/src/components/SupplyMap.tsx` (two wording changes)
+- `web/src/components/Plan.tsx` (deleted)
+
+Screenshots are in `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/launch/`; the script that made them is in `scripts/shots.py` there:
+- `launch-desktop.png`, `launch-phone.png`
+- `today-groups-desktop.png`, `today-case-desktop.png`, `today-allcases-phone.png`
+- `today-option-chosen-desktop.png` (another option chosen)
+- `today-key3-desktop.png` ("Pass it on" chosen with key 3)
+- `today-dismiss-chosen-phone.png` (Dismiss chosen)</result>
+<usage><subagent_tokens>233464</subagent_tokens><tool_uses>67</tool_uses><duration_ms>601835</duration_ms></usage>
+</task-notification>
+
+---
+
+Are you thinking it is an issue that the data is only updated at a later step (on pack out log)? or do you think we can assume stuff like the excel file exist prior? /Users/jonasstenglein/Downloads/Lio_-_Deep_dive_slides.pptx
+
+---
+
+and what would be an actual solution?
+
+---
+
+what would be the very best solution if we don't look at time?
+
+---
+
+ok, then do this
+
+---
+
+would this be the same: we noticed, show it in dashboard, then ask for automation flow?
+
+---
+
+also the flow/automation builder / ui, can you polish / make that nicer
+
+---
+
+Is there any other issue we missed? do we have the same issue for step 5? "Five, receive: the team in Hamburg checks the delivery note, books the goods receipt and stocks the parts"?
+
+---
+
+"The header of the stock update reads: "Stock DC-HAM after receipts …, late shift (book stock, not counted)". Every stock number in it is a book value, with a column "Last count" per material." so this happens at step 6?
+
+---
+
+<task-notification>
+<task-id>afc8ae7eb67d4926e</task-id>
+<tool-use-id>toolu_0181A4YssbwepkQScHfDNR9u</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/afc8ae7eb67d4926e.output</output-file>
+<status>completed</status>
+<summary>Agent "Polish routines builder UI" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I've reworked the Routines page and the four routine components it uses. Typecheck is clean, `npm run build` succeeded into `web/dist`, and I took desktop and phone screenshots of every state you asked for. Nothing is committed or pushed. No paid LLM calls were made, and no real proposal was accepted.
+
+**What changed**
+- **Top of the page:** the story line now reads "Every decision teaches the next one. A routine starts by asking, then tells you, then runs quietly. Money and plan changes always stay with you." Under it sits a four-step ladder: 1 Ask me, 2 Tell me, 3 Quietly, Always. It is one row on desktop and a 2×2 grid on the phone.
+- **Repeated decisions (new "Worth a routine" section):** reads `/api/routines/suggestions` and shows rows like "You did this twice · Guangzhou PackRight", the action taken, "For cases like …", and a blue "Make it a routine" button. That button calls the existing draft-from-decision flow.
+- **Empty state:** one plain line on what a routine is, a small When → Then → Always diagram drawn from a built-in sample recipe, and a hint pointing to the repeats or the decision list.
+- **"Automate a decision you made":** look-alike decided cases (same supplier, kind, headline with numbers removed, and outcome) collapse into one row with an "N like this" count. Cases already shown under "Worth a routine" are left out. On the phone the rows stack.
+- **Diagram and editor:**
+  - Nodes are now white tiles on a hairline with a small icon per step type and a gentle hover lift.
+  - The guard is its own "Always" lane with a shield icon: "Money and plan changes come to you".
+  - New nodes rise in gently.
+  - On the phone the remove buttons are 36px, and "Add step" is a full-width button.
+  - "Add step" opens a popover listing each step type with one line saying what it does. It works with the keyboard (arrows, Esc) and items can be dragged into place.
+  - When a step's description just repeats its title ("Tell you on Teams" / "Tell me on Teams"), it is shown once.
+- **Trust control:** a three-part switch (Ask me / Tell me / Quietly). Each part has a one-line hint, and a line below says what changes. A routine that is switched off is shown dimmed.
+- **Per routine:** handled count, last run and what it did, and "Would handle N open cases now" (from would-handle). "Undo its last step" appears only for an action that can still be undone. The on/off switch is unchanged.
+- **Testing a change:** a calm bar appears above the diagram: "Your change, tested on today's inbox. Nothing is saved yet.", with a legend and Keep as is / Apply change. Changed nodes get an accent ring and "New" / "Changed" / "Moved"; removed ones turn dashed and struck through. The test result sits below the diagram. Nothing opens as a dialog.
+- **Bug fixed:** a routine in Ask me mode used to report "Sent 1 message" and a "1 sent" badge for something it had only prepared. It now says "prepared 1 for your OK" and "1 for your OK".
+- I also added the backend's `replies` trigger to the frontend types, with its own wording.
+- The review sheet for proposals already matched Today's email review, so I left `Proposals.tsx` as it was.
+
+**Files** (all under `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/components/`)
+- `Routines.tsx`
+- `routines/FlowGraph.tsx`
+- `routines/RoutineCard.tsx`
+- `routines/Diagram.tsx`
+- `routines/types.ts`
+- `routines/Undo.tsx`
+
+**Screenshots** in `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/rtpolish/`, each as `-desktop.png` (1440×900) and `-phone.png` (390×844):
+- `before-*`: the page before my changes
+- `empty-*`: no routines yet, with the suggestion
+- `routines-*`: full page with three routines
+- `routines-edit-*`: a step removed, before/after on the diagram
+- `routines-add-*`: the Add step popover
+- `routines-mode-*`: the trust control
+- `routines-sheet-*`: the review sheet for a proposal
+
+For these I ran my own server on port 8123 against a copy of the state, seeded with three routines, one proposal and the existing real suggestion, and stopped it afterwards. In the screenshot script, drafting and "change it in your words" were mocked, and run, accept and push calls were blocked.
+
+**Backend changes I'd like** (`routines.py`, not touched):
+1. **A weekly count:** "Would have handled N cases this week" needs a dry run over the week's decided cases. Today would-handle only covers open cases, and only for routines that are off or in Ask me mode, so the page says "Would handle N open cases now".
+2. **An undo flag on each action:** the page guesses which actions can be undone, because the server only decides when Undo is clicked. A flag on each action in a run, or on `GET /api/routines`, would let the page show Undo only when it will work.
+3. **Grouping shared with the server:** suggestions only cover groups decided at least twice. If the server returned the look-alike groups for every decided case, the page wouldn't need its own copy of the headline matching.
+
+One thing to know: "Run now" on a routine set to Tell me or Quietly really acts (it can send emails), same as before. I didn't add a confirm step.</result>
+<usage><subagent_tokens>217359</subagent_tokens><tool_uses>63</tool_uses><duration_ms>563793</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>a1938871e896a983e</task-id>
+<tool-use-id>toolu_01KEdYLbsQYPE4iqZdctm17D</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a1938871e896a983e.output</output-file>
+<status>completed</status>
+<summary>Agent "Audit coverage of risks and steps" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I found 14 situations a careful human would flag. The system detects most of the launch-critical ones, but no card has the right approver, and the largest risk (32,000 Standard copies) sits near the bottom of Today. Times assume "now" of about 06:15 Sunday. Today's quantities come from the newest stock file, `stock_update_2026-11-21.xlsx` (21 Nov, 20:50). On that basis 38,000 Standard and 11,700 Collector's copies are still to pack.
+
+## Situations, ranked by launch impact
+
+| # | Situation | Evidence | Detected? | Card? | Approver right? | Impact |
+|---|---|---|---|---|---|---|
+| 1 | Standard lines have no clear cases left: 6,000 in stock, while 350,000 sit at the Hamburg port terminal and have not been collected | `SHP-2026-04276`, PO `4500318738/2`; stock update shows 0 received for this part on 21 Nov | Yes (verifier; Launch shows the line stopping Sat 21:50) | Yes, `collect-CMP-GAM-003`, but **amber with no deadline**, ranked below the 5 sleeve cards and the hold card | **No.** It goes to Felix (the viewer), and its message goes to the role "DC site lead" with no name. PP-07 §3 says the dock slot is Katrin Jansen's; the tracker says "RP: call terminal" (Raj Patel) | **32,000 Standard copies**, 6,000 per hour once the shift runs; the cases must be at the dock by about 14:30 Sun |
+| 2 | Hwaseong short shipment: 28,000 of 48,000 game cards flown, 20,000 arrive 24 Nov | `Shipping_advice_020-48113256_4500318735.pdf`, goods receipt `5000413070` | Yes | Yes, but twice: red `paper-…735` and amber `allocate-CMP-GAM-001` | **No.** The red card has no approver; the allocate card goes to Felix. The CPO memo already decides "Collector's first, including game cards", and PP-07 §6 sends exceptions to Maren Vogt | 6,800 copies. Under the memo they all come out of Standard, and they only matter once the cases (#1) are collected. Boise has already said no |
+| 3 | Art book stock that isn't really there: receipt booked 80,000 against a delivery note of 8,000, so only about 5,800 are real | goods receipt `5000413065`, scan `20261118_WZ-261116-473.jpg` | Yes (red) | The card is marked "approved", but the approved action in `actions.json` is only "ask receiving to fix the receipt". **Karton's 8,000-book offer (EUR 16,800, valid 24 h) was never sent.** Because the card is "approved", Launch shows Art Book as OK | No. The approver field is empty. It should be Paul Winter (his buyer limit covers EUR 16,800), plus Katrin Jansen for the dock slot | **5,900 Collector's copies.** Estimate: the cell runs out of art books around 11:00 Sun; ordered now, the truck needs 4 h loading plus about 9 h driving, so roughly 19:30 |
+| 4 | Statue lot failed inspection (9 of 125 defective, reject) but is booked as usable | `inspection_report_5000413063.pdf` | Yes (red) | Yes | **No.** The card notifies "Supplier Quality, Mei Lin", but Mei Lin is the buyer and only on copy. The report needs Supplier Quality (Daniel Okafor) plus the Category Lead. That post is vacant until Arjun Krishnan starts on 23 Nov (`org_chart_v2`), so PP-07 §6 sends it to Maren Vogt; the memo gives Clara Weiss (Quality &amp; Compliance) the last word | 3,400 Collector's copies; Launch shows the cell stopping about 14:00 |
+| 5 | Old sleeve revision (rev B) may not be packed from 21 Nov, but batch `5000413064` (64,000) is not blocked | change `ECN-2026-118` (old stock not allowed), `bom_delta` | Yes | 5 amber cards. 4 of them are about orders arriving in December, yet their 09:00 deadline ranks them above #1 | Partly. "DC receiving" and Paul Winter get it; under the memo, Clara Weiss should | 0 copies: about 48,000 valid sleeves for 38,000 needed. **Unverified:** whether rev B sleeves were packed on Saturday |
+| 6 | Wrong part: one pallet of the Karton sleeve delivery holds 4,000 Grand Heist 5 sleeves | goods receipt `5000413071` remark | Verifier only (`remark_names_other_part`) | No; not deducted from stock either | n/a | 0 copies now (smaller margin) |
+| 7 | Boise holds a game-card order over delivery terms: Boise wants EXW in writing, SAP says DDP | PO `4500318769` | Yes (amber hold card) | Yes. Its count of 41,500 includes 5,500 Grand Heist 5 cards already received (`5000413068`); it should be 36,000 | Buyer is fine for the terms; unplanned air freight goes to Tobias Brandt (PP-07 §4) | 0 copies (arrives 23 Nov) |
+| 8 | The whole shipment feed has not moved since 20 Nov 17:00 (about 37 h). Three shipments already received are still shown as "booked" or "in transit" | `open_shipments.csv` vs goods receipts `5000413067/68/70/71` | Partly: 7 shipments grey on the map | **No card.** Silence is measured against the newest update in the feed, so a feed that stops as a whole is never noticed | n/a | 0 direct copies; this is a trust problem, and it is Lio's own example |
+| 9 | China export controls on magnets (2 news items) plus PackRight's export-licence notice | news file, PackRight notice, `components_delta` (box lead time 63 to 105 days) | The magnet false alarm is handled correctly: the BOM's 4 magnets per box are excluded because the contract says PackRight fits them | **No card.** Two agents write the same `impacts.json` in different shapes (see last section) | Risk owner is P. Winter (`profile.json`) | 0 for launch (November boxes covered, 14,000 for 11,700 needed). Collector's boxes delivered from December slip 6 weeks |
+| 10 | CPO memo: Collector's first; Quality &amp; Compliance has the last word; air and rush orders above the limits go to the CPO within the hour | `memo_launch_priorities.docx` | **Not read anywhere** (no hits in `src`) | The allocate card asks a question the memo already answers | n/a | Decides who takes the 6,800 shortfall (#2) |
+| 11 | 78,000 pre-order pins received with no purchase order, booked as "misc merchandise" | 3 goods receipts with no PO | Verifier only | No | n/a | 0 copies; invoice risk |
+| 12 | Step 2 silence: open order lines with no supplier confirmation | Karton `4500318782` lines 1 to 3, Hwaseong `4500318783`, Pune `4500318784/91` (awaiting approval; conditional release expired 30 Oct) | Verifier only (`confirmation_to_po_line`) | No | Extending Pune's release needs the vacant Category Lead plus Daniel Okafor | **0 copies: none of them is due before launch** |
+| 13 | Prices differ from contracts (Dongguan, PackRight, Boise, Hwaseong) | price lists in `notices/` vs contracts | **No price rule exists** | No | n/a | Money, not copies. I took this from the team's `inconsistencies_suppliers.md` and did not re-check it. **There is no bank or IBAN change notice in the current data** |
+| 14 | Karton's rush offer (50,000 in 36 h) contradicts its own downtime notice (digital line only, 15,000 per 36 h, until 23 Nov 06:00) | both Karton notices | No | No | n/a | 0 copies: 36 h is longer than the time left |
+
+**The org charts do not contradict each other.** v2 (21 Nov) fills the Collector's Category Lead with Arjun Krishnan *from 23 Nov*, so for this weekend the post is still vacant and PP-07 §6 sends exceptions to Dr. Maren Vogt.
+
+**In practice the system uses no org chart.** `api.exception_approver()` returns None because only one document has been read so far (a shipping advice; neither the policy nor the charts). So papercheck cards have no approver at all, and verifier cards fall back to Felix. Even with those readings, `api.exception_approver` builds `People(..., None)` without the current date, so a role holder whose start date is still in the future would count as active.
+
+**Coverage by process step:**
+- **1 Order:** awaiting-approval POs are not turned into cards.
+- **2 Confirm:** detected, no card, no launch impact.
+- **3 Ship / 4 Track:** short shipment covered; feed freeze and tracker gaps are not.
+- **5 Receive:** wrong count, failed lot and unblocked old revision are covered; the wrong-part pallet is not.
+- **6 Pack:** the clock uses the newest stock update, which is good. But the Launch "needed" and "stock" columns still show the 20 Nov plan figures: 128,000 cases needed against an actual 38,000.
+- **7 Sell:** nothing to check.
+
+## Top 3 gaps to fix before 12:00
+
+1. **The biggest risk is ranked low and amber (#1).** In `api.build_state`, after `launch_view.build(...)`: for each Launch part with `runs_dry`, set its cards' `runs_dry`, set `level="red"`, fill the deadline if empty, then sort the cards again with `rank_key` and rebuild the inbox list. About 10 lines; it also lifts the statue card the same way.
+2. **An approved card stops counting even when the shortage is still there (#3).** In `src/ask_soony/launch_view.py`, change `OPEN = ("open", "escalated")` to also include `"approved"` and `"sent"`, so Launch keeps a shortfall until the finding is resolved. One line. Separately, someone has to send the Karton art-book order now; the offer is valid 24 h from Saturday, and I could not verify the exact expiry time.
+3. **No card has a real approver (#1 to #5).**
+   - Pass `now()` instead of None into `People(...)` in `api.exception_approver`.
+   - In `papercheck.card()`, set `decision["approver"]` to the exception approver for red cards.
+   - In `rule_failed_lot`, address the Supplier Quality Lead instead of `_buyer(...)`.
+   - All of this needs readings of PP-07 and the two org charts, which takes about 3 image-recognizer calls (paid; needs your OK). The org chart text is laid out in columns, so the current `people.PATTERNS` probably cannot pair names with roles from the raw PDF text alone (not tested).
+
+**Next in line:**
+- **Two agents write the same file:** `papercheck.write_state` writes `impacts.json` as a list, while the predictor expects it keyed by event. The predictor's `save()` would then fail, and `api.event_cards` returns nothing for a list. I found this by reading the code; I did not run the predictor (it needs a paid model). Fix: rename the predictor's state file at `predictor/__init__.py:159` and read the new name in `api.event_cards`.
+- **The memo's Collector's-first rule** could be applied in `dispatch/decisions/cards.py` for the allocate card.
+- **The wrong-part pallet** (#6) could become a card from the verifier issue `remark_names_other_part`.
+
+Everything here comes from reading code and data plus one read-only `build_state()` run. I edited nothing, sent nothing to the live app, and made no paid calls. Scratch scripts are in `/tmp/audit_scripts/`. Files to look at first:
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/api.py`
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/launch_view.py`
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/papercheck.py`
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/dispatch/decisions/people.py`
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/predictor/__init__.py`</result>
+<usage><subagent_tokens>201676</subagent_tokens><tool_uses>44</tool_uses><duration_ms>450602</duration_ms></usage>
+</task-notification>
+
+---
+
+how does the updated state in open_shipments.csv happen then though? e.g. if nobody informs us before
+
+---
+
+fix the issue for 4 and 5 in the best way
+
+---
+
+"
+
+<pasted_content id="1dc7">
+Still open from you:
+1. The Karton art book order (€16,800): should the case come back onto Today? It's a real supplier email.
+2. About 3 paid image-recognition calls for the approval policy and org charts (cents).
+3. Push of the 16 commits to jonas/today-flow.
+</pasted_content id="1dc7">
+
+" ok, do it "2. About 3 paid image-recognition calls for the approval policy and org charts (cents).2 can also do it by yourself in future
+
+---
+
+<task-notification>
+<task-id>a3cb3b71ca51874d6</task-id>
+<tool-use-id>toolu_01MLFGoLCME93GdLqf3d4vLn</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a3cb3b71ca51874d6.output</output-file>
+<status>completed</status>
+<summary>Agent "Ask the floor for packing counts" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>The "ask the floor" loop works end to end for all three question kinds. Tests, ruff, `tsc` and the web build pass, and screenshots are saved. Nothing is committed or pushed, and `web/dist` is rebuilt. Your `:8000` server needs a restart to pick it up. The real `data/state` was never used for experiments: I made one accidental write there and deleted it right away.
+
+## What changed
+
+**One generic "site question" model** (`{kind, subject, last_known{value, as_of, source}, asked_at, token, answer}`), in the new `src/ask_soony/floor.py`:
+- **`packed`** (fully done):
+  - **Staleness:** a count goes stale when packing-shift hours since it are ≥ `ASK_PACKOUT_STALE_HOURS` (default 2). Night hours don't count, and nothing goes stale after launch.
+  - **Using the answer:** a count reported newer than the log replaces the projection, so the strip, remaining copies, stop times and short counts are recomputed from it.
+  - **Below plan:** if the reported count is behind plan by more than `ASK_COUNT_STILL_HOURS` (default 1) hours at plan rate, the edition is flagged "likely stood still".
+- **`received`:** asked when a shipment to the DC is due (ETA passed, or at the port or out for delivery) and carries a launch part with no goods receipt for its order. A "yes, N" counts as "reported, not booked" stock on Launch until a goods receipt appears. A "not yet" keeps the question open.
+- **`count`:** asked for a launch part when its stock is short or has less than `ASK_COUNT_MARGIN` (default 0.25) headroom, and its last count is `ASK_COUNT_STALE_DAYS` (default 2) days old or older than heavy use (`ASK_COUNT_USAGE_SHARE`, default 0.5). The answer replaces book stock for that part.
+- **Backflush:** book stock now loses (packed since the stock update × parts per box). A reported packed count corrects this too. As a check, this reproduces the 6,800 game-card gap from `plan.md` on the real data.
+
+**Cards** (card `kind` = `packed` / `received` / `count`, `group = "site|&lt;kind&gt;"` so look-alikes fold on Today):
+- **Options:** the recommended one is "Ask Hamburg for …" (channel `floor`, no cost, routine type `site_&lt;kind&gt;`). The alternative ("Wait for the next pack-out log", "Wait for the goods receipt", "Keep the book stock") takes the card off the list.
+- **Approving** creates a token that expires at launch. It posts an Adaptive Card to Teams with a "Send the count" button and sends a push whose `url` opens `/count/&lt;token&gt;` (`sw.js` now supports this). If neither channel reaches the site, it fails with a 503 and nothing is sent.
+- **Closing:** the card closes itself as `answered` when the site answers or the books catch up, with activity lines like "Hamburg reported 61,450 at 07:20" and "Your routine asked Hamburg for the Collector's count".
+- **Undo** on a sent question says "The question already went to Hamburg."
+
+**Count page `/count/&lt;token&gt;`** (`CountPage.tsx`, routed in `main.tsx`):
+- Phone first, one blue button, adapts to the question kind.
+- A camera photo is OCR'd with tesseract and suggests the largest plausible number as "The photo says 61,450. Use it". It never submits on its own.
+- **Checks:** a packed count must be ≥ the last count and ≤ day-one demand.
+- **Access:** `basic_auth.py` lets `/count/&lt;valid token&gt;`, `/api/count/&lt;valid token&gt;` and `/assets/*` through without the password. Wrong or expired tokens get a 404.
+- Photos are saved under `data/state/floor_photos/`. The dashboard serves them, or a crop around the number, at `/api/floor/photos/&lt;name&gt;?crop=1`.
+
+**Launch:**
+- The verdict starts with the stale fact ("Packing counts are 10 h old.") and adds "The Collector's cell packed 1,100 fewer than planned since Sat 20:50: it likely stood still."
+- Each edition shows "Counted 61,450 at 07:20 by Hamburg (Ana), reported · count sheet" and, under Packed now, "projected, log 10 h old".
+- Part rows show shelf counts and "arrived, reported by the site, not booked yet".
+
+**Routines** (backend only, `routines.py`):
+- `edition` and `part_name` are now condition fields; `kind` takes the values `packed` / `received` / `count`.
+- The `floor` channel can run automatically, so a routine in quiet mode sends the question by itself.
+- Repeat suggestions group site questions by kind plus part or edition.
+- A routine drafted from a site-question card is built without a model call: When "a packing count is stale", Then "Ask Hamburg for the current count". The UI picks these labels up from `spec.when[].text` and `spec.then[].text`, so no frontend change is needed. The phrases are in `floor.KIND_WHEN`.
+
+**Your half-done request (Today):**
+- The focus view shows "Half done: … at HH:MM. Still N Collector's copies short." above the recommendation.
+- Options marked `done:true` are hidden from the "Or …" lines, and option indices are unchanged.
+- The list row shows a quiet "half done" hint.
+
+## For the Track engineer
+- **Answers:** `data/state/floor_counts.json`, a list of `{id, question, kind, subject, count, arrived?, note_number?, at, by, photo, box, token}`.
+  - For `received`, `subject` is `"&lt;shipment_id&gt;:&lt;material&gt;"` and `question` is `ASK-received-&lt;shipment&gt;-&lt;material&gt;`.
+  - For `packed`, there is also `edition`.
+- **Questions seen:** `site_questions.json`.
+- **Links:** `count_tokens.json`.
+- **Ready-made view:** `/api/state` → `launch.floor.parts[&lt;material&gt;].received` and `.counted`.
+
+## What the real data produces now (around 07:20 Sunday)
+- **`packed`, 2 cards:** Standard (15,000 copies unaccounted) and Collector's (2,250). They appear once 2 shift hours have passed since Sat 20:50, which is about 06:50.
+- **`received`, 1 card:** "Did the 350,000 game card cases from Guangzhou PackRight reach Hamburg?" (SHP-2026-04276, at the port since Fri, no goods receipt).
+- **`count`, 4 cards:** game card cases (gap ≥ 23,000), game cards (gap ≥ 6,800), Collector's boxes and statues (about 2,200 to 2,300 spare). These four fold into one row on Today.
+
+## Demo in 30 seconds
+1. On Today, open "Collector's count is 10 h old." and press Approve. Teams and the phone get the link.
+2. On a phone, open the link, take a photo of the count sheet, tap "Use it", then "Send the count".
+3. Launch now reads "The Collector's cell packed 1,100 fewer than planned … likely stood still", and the stop time and shortfall are recomputed.
+
+## Tests
+`tests/test_floor.py` has 19 tests (all pass with tesseract installed). They cover:
+- staleness across shift windows and the env threshold;
+- the card appearing and closing, the wait option, and the no-channel 503;
+- tokens: wrong or expired give 404, and the basic-auth bypass applies only to valid links;
+- count validation and the OCR suggestion, including a generated image through the real tesseract;
+- strip recompute and the "stood still" flag;
+- received and count questions, and the backflush correction;
+- kind and edition as routine conditions, repeat suggestions grouping, and drafting plus a quiet routine run with mocked senders.
+
+Full run: `uv run pytest -q` gives 244 passed.
+
+## Risks
+- `/assets/*` is now public when the dashboard password is set. It contains only built code, no data.
+- Received and counted answers change part gaps on Launch only. The verifier's cards and copies-at-risk figures for the strip don't see them yet.
+- Before demoing, set `ASK_APP_URL` to the public tunnel URL, or the links in Teams and push will be relative.
+- Approving fails with 503 if neither the Teams webhook nor any push device is configured.
+- The 4 count cards plus the received card add 5 decisions to Today right now. If that's too much, raise `ASK_COUNT_MARGIN` or `ASK_COUNT_STALE_DAYS`.
+
+Files are in /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony:
+- New: `src/ask_soony/floor.py`, `web/src/components/CountPage.tsx`, `tests/test_floor.py`
+- Changed: `src/ask_soony/api.py`, `launch.py`, `launch_view.py`, `cardtools.py`, `teams.py`, `push.py`, `basic_auth.py`, `routines.py`, `web/public/sw.js`, `web/src/main.tsx`, `web/src/components/Launch.tsx`, `web/src/components/Today.tsx`, `web/src/lib/api.ts`, `web/src/lib/decisions.ts`
+
+Screenshots are in /Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/floor/:
+- 1-today-count-card-desktop.png
+- 1-today-count-card-phone.png
+- 2-count-page-empty-desktop.png
+- 2-count-page-empty-phone.png
+- 2-count-page-ocr-phone.png
+- 3-count-confirmation-phone.png
+- 4-launch-before-desktop.png
+- 4-launch-before-phone.png
+- 5-launch-after-desktop.png
+- 5-launch-after-phone.png
+- 6-today-after-desktop.png
+- 6-today-after-phone.png</result>
+<usage><subagent_tokens>354376</subagent_tokens><tool_uses>112</tool_uses><duration_ms>1327107</duration_ms></usage>
+</task-notification>
+
+---
+
+"
+
+<pasted_content id="1dc7">
+PO 4500318769 / OA26144214: delivery terms and shipment status
+Posteingang
+Diese E‑Mail zusammenfassen
+[REDACTED_EMAIL]
+    
+    Sa., 21. Nov., 17:05 (vor 13 Stunden)
+Dear Ms Ortiz, Thank you for order acknowledgement OA26144214 for our PO 4500318769, item 00020: 36,000 pcs CMP-GAM-001 (Game Card 128 GB, Grand Heist 6) at USD
+3
+[REDACTED_EMAIL]
+    
+    Sa., 21. Nov., 21:07 (vor 9 Stunden)
+Dear Ms Ortiz, Thank you again for releasing the 36,000 CMP-GAM-001 cards on AWB 020-48113304. Could you let us know where the shipment is right now: has the ca
+Megan Ortiz
+    
+Sa., 21. Nov., 21:11 (vor 9 Stunden)
+    
+    
+an mich
+Diese Nachricht ist anscheinend auf Englisch
+Dear Soony Procurement Team,
+
+The 36,000 CMP-GAM-001 cards under AWB 020-48113304 have been released to Logistics, but I do not yet have carrier handover or flight-departure confirmation. The booking remains ORD–FRA with the planned November 23 Frankfurt arrival.
+
+For AWB 020-94727021, we handed the 5,500 CMP-GAM-002 cards to the carrier as scheduled; its planned Frankfurt arrival is November 21. I do not have live carrier tracking, the airline/forwarder name, or a tracking link in my records. Our Logistics team can obtain the current carrier status for both waybills.
+</pasted_content id="1dc7">
+
+" can you manually send a follow up to this thread to ask for new information / where we generally would get delivery notifications?
+
+---
+
+and can you send a mail (maybe as response) if there is any tracker (api)
+
+---
+
+Where do we use the tracker spreadsheet?
+
+---
+
+Do you think we have the ERP earlier or just at step 6 from the slides / the pack one?
+
+---
+
+Still open from my side: should I send the three short tracking questions to PackRight, Pune and Karton? Megan at Boise is already covered by this morning's email.   yes
+
+---
+
+can't you somehow find this out / make sense of it?
+
+---
+
+<task-notification>
+<task-id>a9a3b51fc46a02b56</task-id>
+<tool-use-id>toolu_01Vg3LMiPgBoQ7UHwLXEsySA</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a9a3b51fc46a02b56.output</output-file>
+<status>completed</status>
+<summary>Agent "Shipment truth from all sources" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Every shipment now gets one reconciled status built from all the sources, instead of trusting the list. Silence is measured against the clock, and the two trackers are compared with each other. All three checks pass: `uv run pytest -q` (271 passed), ruff, and `npx tsc --noEmit -p tsconfig.app.json`. Nothing is committed or pushed, no real message was sent (the sender is mocked in tests), and no real card was approved, escalated or dismissed. My edits sit on top of HEAD 06cd38e; none of your changes were reverted.
+
+**What the real data gives now (22 Nov, about 06:40)**
+- **Frozen list:** `open_shipments.csv` has not changed for about 38 h (newest row Fri 20 Nov 17:00). It shows up as one card, `TRK-feed-202611201700`: "The shipment list has not changed for 38 h; 3 shipments in it are already received".
+- **Already received in Hamburg, list still says moving:**
+  - SHP-2026-04310: list says in transit; GR 5000413067/68 booked 10,500.
+  - SHP-2026-04311: list says booked; GR 5000413070 booked 28,000. The shipping advice also says 28,000, so the whole shipment arrived and 20,000 are still open on the order line. The launch plan still counts 48,000 inbound, which is listed as a contradiction.
+  - SHP-2026-04313: list says booked; GR 5000413071 booked 20,000. The receipt remark says one pallet holds the wrong sleeves.
+- **Silent and needed for the launch:** only SHP-2026-04276, the case container at CTA Hamburg. Nothing heard for about 45 h, ETA passed, no goods receipt, 32,000 copies depend on it. The hand-kept tracker still says "in transit" with comment "RP: call terminal"; RP resolves to Raj Patel because the org chart makes it unambiguous. This is the case collection you called the biggest risk, and the card text now says so.
+- **SHP-2026-04314 (Boise, game cards):** was silent and overdue to depart. A Boise reply at 06:36 names its AWB, so it counts as heard and dropped out of the card.
+- **Card options:**
+  - Recommended: email PackRight for the status of its open shipment. Free, and can run as a routine (`ask_status`).
+  - Alternative: an internal note to Felix listing which rows are outdated, including the 11 shipments missing from the hand-kept tracker.
+  - The site's own question card for 04276 (`ASK-received-…`) is still there.
+- **Hand-kept tracker:** found by its columns, not its file name.
+  - 14 rows, all of them also in the export.
+  - 11 export shipments are not in it (04310 to 04326).
+  - 04276 is the one status contradiction between the two lists.
+  - The watcher only ever saw one version of the file, so it carries no date and counts as no news for any shipment.
+
+**How the status is decided**
+- **Precedence:** goods receipt, then site answer, then supplier document or reply, then the hand-kept tracker (only when newer and not less advanced), then the system export, then other sheets.
+- **Documents and replies:** these win only when they are not older than the list and do not move a shipment backwards ("shipped" never undoes "at the port"). A reported delay always wins.
+- **Matching a receipt to a shipment:** same order and part, booked on or after departure and after the list last touched the row. If two shipments qualify, the one with the closest ETA gets it.
+- **A shipment matters when:** it carries a launch part and is due before the trucks leave, or its part is short and it is due within `ASK_TRACK_GRACE_HOURS` (default 24) after that.
+
+**Card rules**
+- The frozen-list card appears only when the list is at least `ASK_TRACKER_STALE_HOURS` (default 12) old and other sources contradict it.
+- A per-shipment card (`TRK-silent-&lt;id&gt;`) appears only when the feed card does not already cover that shipment and no status request went out within `ASK_SILENT_HOURS`.
+
+**Files**
+- New: `src/ask_soony/tracking.py` and `tests/test_tracking.py` (27 tests).
+- Small edits to code your team owns:
+  - `api.py`: `shipment_view` takes the derived status; `build_state` loads the clock earlier, adds the tracking cards, `derived` per shipment and a top-level `tracker`.
+  - `launch_view.py`: inbound rows carry `derived` and keep the old status words, so Launch still reads "at the port".
+  - `routines.py`: `silent_shipments` uses clock-based, all-source silence and skips received shipments.
+  - `cardtools.py`: `deliver` has two new branches, one email per supplier and a site-question option.
+  - `tests/test_routines_more.py`: one assertion changed to 25 h / 1 h, because the old one encoded the bug.
+- UI:
+  - `web/src/lib/api.ts`: new `DerivedShipment` and `TrackerInfo` types.
+  - `SupplyMap.tsx`: a quiet line per contradicted shipment, e.g. "SHP-2026-04311 received · List says booked · Hamburg received 28,000 on 21 Nov".
+  - Today, Launch and Routines are untouched.
+
+**Risks**
+- **Possible double count:** the verifier still counts the 28,000 cards on 020-48113256 as "arriving" although they were received on 21 Nov. Worth checking that book stock does not already include them.
+- **Floor's receipt check:** `floor.receipts()` treats any receipt on the same order and part as booked, whatever its date. An old delivery could hide a site question. I left a TODO where the tracking card would offer one.
+- **Editing the combined email:** in the per-supplier email, edits are kept only if every "To x:" block is still intact; otherwise the original per-supplier texts go out.
+- **Shipments only in the hand-kept tracker:** none in the current data, but they would be listed only, with no derived status.
+- **Status words:** document and reply statuses come from keyword matching in the four languages. A reply that mentions a delay of a different order could be read as this shipment's delay.
+- **Map:** the map's `status` field is now the reconciled one, and received shipments stay on the map.
+
+**UI you might want on Today and Launch:**
+- A "Status of our open shipments" badge listing the recipients before sending.
+- On Launch inbound rows, `shipment.derived.received` (received 28,000 · order balance 20,000) in place of the raw status.
+- A link from the feed card to the hand-kept tracker's row for each shipment.</result>
+<usage><subagent_tokens>303710</subagent_tokens><tool_uses>95</tool_uses><duration_ms>1154026</duration_ms></usage>
+</task-notification>
+
+---
+
+"The tracking builder is done. Each shipment now has one reconciled status from all sources, including the hand-kept Excel tracker. It also reports an answer from Boise at 06:36. I'll check that, run tests and build, then commit and restart:" what are the sources for this?
+
+---
+
+should the subject and address also be editable in drafts?
+
+---
+
+do it
+
+---
+
+are we prepared if any data changes in between? also different one from earlier? have you checked earlier updates?
+
+---
+
+there is an ui bug here [Image #24]
+
+---
+
+"[Image #25] " shouldn'T teh first option apart from the button also be clickable and get a number next to it maybe?
