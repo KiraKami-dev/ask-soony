@@ -102,3 +102,46 @@ def test_sandbox_rejects_anything_but_the_building_blocks(agent_env):
     for bad in ("import os\nos.listdir('.')", "from soony import open_cards\nopen_cards(1)"):
         rec = routines.run({"id": "x", "name": "x", "code": bad}, dry=True)
         assert rec["ok"] is False and rec["error"]
+
+
+PICKUP = {
+    "when": [
+        {
+            "field": "option_action",
+            "op": "contains",
+            "value": "email supplier",
+            "text": "we ask a supplier for an earlier delivery",
+        }
+    ],
+    "then": [
+        {"do": "carry_out", "match": {"to": "supplier.example.com"}, "text": "Send the question"},
+        {"do": "notify", "channel": "teams", "message": "Asked: {headline}", "text": "Tell me"},
+    ],
+}
+
+
+def test_recipe_compiles_and_acts_once(agent_env):
+    from ask_soony.routines import compile_spec
+
+    r = {"id": "s1", "name": "Ask for earlier trucks", "code": compile_spec(PICKUP)}
+    first = routines.run(r)
+    assert first["ok"] and first["result"] == 1 and len(agent_env["sent"]) == 1
+    assert [d["do"] for d in first["did"]] == ["carry_out", "notify"]
+    assert first["did"][1]["channel"] == "teams" and "300 copies short" in first["did"][1]["text"]
+    assert routines.run(r)["result"] == 0
+
+
+def test_bad_recipes_are_refused_with_a_reason():
+    from ask_soony.routines import clean_spec
+
+    for bad, word in (
+        ({"when": [], "then": [{"do": "log"}]}, "condition"),
+        ({"when": [{"field": "password", "value": "x"}], "then": [{"do": "log"}]}, "condition 1"),
+        ({"when": [{"field": "kind", "value": "x"}], "then": [{"do": "rm -rf"}]}, "step 1"),
+    ):
+        try:
+            clean_spec(bad)
+        except ValueError as exc:
+            assert word in str(exc)
+        else:
+            raise AssertionError("accepted a bad recipe")
