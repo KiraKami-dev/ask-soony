@@ -55,6 +55,13 @@ def _escalation_loop(settings: Settings, every: int = 30) -> None:
                 Mailer.from_env(),
                 settings.public_url,
             )
+            if os.environ.get("ASK_CARD_ALERTS", "on").lower() in ("1", "on", "true", "yes"):
+                from ask_soony import card_alerts
+
+                try:  # today's cases: raise, apply phone decisions, close what was decided
+                    card_alerts.tick(escalator.book, escalator.policy, escalator.notify)
+                except Exception as e:
+                    print(f"case alerts: {e}", file=sys.stderr)
             escalator.tick()
             store.db.close()
         except Exception as e:  # keep the loop alive; problems show up in the log

@@ -374,10 +374,11 @@ export const DONE_WORD: Record<string, string> = {
 export const DECIDED = Object.keys(DONE_WORD)
 
 /** What handled an activity item, read from its `via` field. */
-export function viaOf(a: ActivityItem): { kind: 'routine'; name: string } | { kind: 'voice' } | null {
+export function viaOf(a: ActivityItem): { kind: 'routine'; name: string } | { kind: 'voice' } | { kind: 'call' } | null {
   const v = (a.via ?? '').trim()
   if (/^routine\s*:/i.test(v)) return { kind: 'routine', name: v.replace(/^routine\s*:\s*/i, '') }
   if (/^voice$/i.test(v)) return { kind: 'voice' }
+  if (/^call$/i.test(v)) return { kind: 'call' }
   return null
 }
 

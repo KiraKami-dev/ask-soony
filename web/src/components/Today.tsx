@@ -7,7 +7,7 @@ import { pendingOf, undoAction, useLive } from '@/components/routines/live'
 import { UndoAction } from '@/components/routines/Undo'
 import { ProposalLines, ProposalSheet, RoutineLine, WouldLine, groupProposals } from '@/components/routines/Proposals'
 import type { Proposal } from '@/components/routines/types'
-import { DONE_WORD, fmtNum, fmtTime, post, sentence, tidy, type Card, type Evidence, type State } from '@/lib/api'
+import { DONE_WORD, fmtNum, fmtTime, post, sentence, tidy, type Card, type Evidence, type State, viaOf } from '@/lib/api'
 import { actionIdOf, languageOf, replyFacts, routineActionOf, routineOf, sections, splitValue, when, type Handled } from '@/lib/decisions'
 import {
   actionText, claimOf, costLine, costsMoney, docKind, forToday, headlineOf, launchStatus, ordinal, plural,
@@ -356,9 +356,10 @@ function CaseGroups({
       rows: sec.done.map((c) => {
         // A sent email cannot be taken back, so no Undo for it.
         const undo = c.status !== 'sent' ? actionIdOf(state.activity.find((x) => x.card === c.id)) : null
+        const phone = state.activity.some((x) => x.card === c.id && viaOf(x)?.kind === 'call') ? 'On the phone' : ''
         return (
           <CaseRow key={c.id} {...row} card={c} title={shortTitle(c, state)} dot="quiet"
-            sub={signoffLine(c, nowMs) && c.signoff_request?.kind === 'escalation' ? [signoffLine(c, nowMs)!] : [DONE_WORD[c.status] ?? 'Done', c.ui?.at ? when(c.ui.at, nowMs) : '', signoffLine(c, nowMs) ?? '']}
+            sub={signoffLine(c, nowMs) && c.signoff_request?.kind === 'escalation' ? [signoffLine(c, nowMs)!, phone] : [DONE_WORD[c.status] ?? 'Done', phone, c.ui?.at ? when(c.ui.at, nowMs) : '', signoffLine(c, nowMs) ?? '']}
             undo={undo ? <UndoAction actionId={undo} onUndone={onChanged} /> : null} />
         )
       }),

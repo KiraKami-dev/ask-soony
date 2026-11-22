@@ -1431,6 +1431,9 @@ def build_state() -> dict:
         open_cards = [c for c in cards if c["status"] == "open"]
         inbox = [c for c in open_cards if not c["routed_to_other"]]
     signoff.attach(cards)  # who a passed-on case or internal message reached, and their answer
+    from ask_soony import card_alerts
+
+    card_alerts.attach(cards)  # decided on a phone call: a line on the case's trail
     launch["money"] = launch_view.money(
         cards, read_list("actions.json"), cur, viewer_name(root), exception_approver()
     )

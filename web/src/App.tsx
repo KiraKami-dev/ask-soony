@@ -95,12 +95,12 @@ export default function App() {
         const c = s.cards.find((x) => prev.get(x.id) === 'open' && DECIDED.includes(x.status) && !decidedHere.current.has(x.id))
         const acts = c ? s.activity.filter((a) => a.card === c.id) : []
         if (c && !acts.some((a) => viaOf(a)?.kind === 'routine')) {
-          const a = acts.find((x) => viaOf(x)?.kind === 'voice') ?? acts[0]
+          const a = acts.find((x) => viaOf(x)?.kind === 'voice' || viaOf(x)?.kind === 'call') ?? acts[0]
           decidedHere.current.add(c.id)
           void finish(s, {
             card: c,
             text: a ? stop(tidy(a.text)) : `${DONE_WORD[c.status] ?? 'Done'}.`,
-            sub: viaOf(a ?? { text: '', kind: '' })?.kind === 'voice' ? 'Decided on the call.' : 'Decided elsewhere.',
+            sub: ({ voice: 'Decided on the call.', call: 'Decided on the phone.' } as Record<string, string>)[viaOf(a ?? { text: '', kind: '' })?.kind ?? ''] ?? 'Decided elsewhere.',
             actionId: actionIdOf(a),
           })
         }

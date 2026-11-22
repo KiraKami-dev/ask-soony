@@ -48,12 +48,13 @@ reset() {
   [ -d "$SNAP" ] || snapshot
   stop
   rm -rf "$STATE" && mkdir -p "$STATE" && cp -R "$SNAP"/. "$STATE"/
+  uv run python -m ask_soony.card_alerts forget "$STATE"  # phone alerts start afresh too
   PW="$(grep '^ASK_DASHBOARD_PASSWORD=' .env | cut -d= -f2-)"
   tmux new-session -d -s ask-soony-demo "cd $PWD && \
     ASK_STATE_DIR=$STATE ASK_MAIL_DRY=on ASK_OUTBOX=off ASK_REPLY_POLL=off ASK_TEAMS=off \
     ASK_CALL_PROVIDER=${CALLS:-dry_run} SOONY_PORTAL_TOKEN= ASK_BACKGROUND=on ASK_LLM_PROVIDER=none \
     ASK_DASHBOARD_PASSWORD='$PW' ASK_APP_URL=https://ask-soony-demo.stenglein.dev \
-    ASK_PUSH_CONTACT=https://ask-soony-demo.stenglein.dev \
+    ASK_PUSH_CONTACT=https://ask-soony-demo.stenglein.dev ASK_PUBLIC_URL=https://ask-soony-demo.stenglein.dev \
     uv run uvicorn ask_soony.api:app --port $PORT 2>&1 | tee -a data/logs/demo.log"
   echo "demo: http://127.0.0.1:$PORT (state reset from $SNAP)"
 }
