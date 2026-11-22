@@ -129,7 +129,7 @@ def push_test(body: TestPush):
     if not subscriptions():
         raise HTTPException(409, "no device has enabled alerts yet")
     if card is None:
-        return send("Ask Soony", "Test alert: alerts are on for this device.", None)
+        return send("Lighthouse", "Test alert: alerts are on for this device.", None)
     return send(decision_title(card), card["headline"], card["id"])
 
 

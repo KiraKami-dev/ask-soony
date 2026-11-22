@@ -67,7 +67,7 @@ export function OkPage({ token }: { token: string }) {
       .then(async (r) => (r.ok ? setPage(await r.json()) : setGone(true)))
       .catch(() => setGone(true))
   useEffect(() => {
-    document.title = 'Your OK · Ask Soony'
+    document.title = 'Your OK · Lighthouse'
     void load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token])
@@ -96,7 +96,7 @@ export function OkPage({ token }: { token: string }) {
         {children}
         {page && (
           <p className="t-small mt-10 text-center">
-            <a href={appLink} className="text-ink-3 hover:text-ink">Open in Ask Soony{asWho ? ': where the launch stands' : ''}</a>
+            <a href={appLink} className="text-ink-3 hover:text-ink">Open in Lighthouse{asWho ? ': where the launch stands' : ''}</a>
           </p>
         )}
       </div>

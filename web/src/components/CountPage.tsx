@@ -64,7 +64,7 @@ export function CountPage({ token }: { token: string }) {
   const camera = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    document.title = 'Count · Ask Soony'
+    document.title = 'Count · Lighthouse'
     fetch(api(token))
       .then(async (r) => (r.ok ? setForm(await r.json()) : setGone(true)))
       .catch(() => setGone(true))

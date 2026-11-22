@@ -1,4 +1,4 @@
-# ask-soony
+# Lighthouse
 
 Our entry for the **Lio challenge "Keep the Line Running"** at START Hack Munich 2026.
 
@@ -8,7 +8,7 @@ We build agents that read that data, decide what is at risk and act on it before
 
 ## What it is
 
-**Ask Soony is an AI procurement team for the last mile of a launch.** Agents read everything the customer has (SAP exports, spreadsheets, supplier PDFs and scans in four languages, emails, news), find where the paperwork and the plan disagree, work out what that costs in copies and hours, and act: they write to suppliers, ask the warehouse, chase, and pass decisions to the person who signs. A human decides anything that costs money or changes the plan, with one tap.
+**Lighthouse is an AI procurement team for the last mile of a launch.** Agents read everything the customer has (SAP exports, spreadsheets, supplier PDFs and scans in four languages, emails, news), find where the paperwork and the plan disagree, work out what that costs in copies and hours, and act: they write to suppliers, ask the warehouse, chase, and pass decisions to the person who signs. A human decides anything that costs money or changes the plan, with one tap.
 
 Live: `https://ask-soony.stenglein.dev` (password protected; ask the team).
 

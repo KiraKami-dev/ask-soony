@@ -27,7 +27,7 @@ COOKIE_DAYS = 30
 
 LOGIN_PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#fbfbfa"><title>Ask Soony</title>
+<meta name="theme-color" content="#fbfbfa"><title>Lighthouse</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
 <link rel="stylesheet"
 href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap">
@@ -57,7 +57,7 @@ fieldset+input{{margin-top:16px}}</style></head><body>
 d="M2.5 8V2.5H8M16 2.5h5.5V8M21.5 16v5.5H16M8 21.5H2.5V16" fill="none" stroke="#18181a"
 stroke-width="2.4" stroke-linecap="square"/><rect x="6.5" y="9.5" width="11" height="5" rx="1"
 fill="#18181a"/></svg>
-<h1>Ask Soony</h1><p>Sign in to see what needs you today.</p>{error}
+<h1>Lighthouse</h1><p>Sign in to see what needs you today.</p>{error}
 <input type="hidden" name="next" value="{next}">{who}
 <input type="password" name="password" placeholder="Password" aria-label="Password"
 autocomplete="current-password">

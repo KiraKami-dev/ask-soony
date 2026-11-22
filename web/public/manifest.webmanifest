@@ -1,6 +1,6 @@
 {
-  "name": "Ask Soony",
-  "short_name": "Ask Soony",
+  "name": "Lighthouse",
+  "short_name": "Lighthouse",
   "description": "What needs you today, before the trucks leave.",
   "start_url": "/",
   "scope": "/",

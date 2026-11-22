@@ -84,10 +84,10 @@ export function TopBar({ page, go, status, bell, phone, routinesBadge = 0, role 
         href="/"
         onClick={(e) => { e.preventDefault(); go('/') }}
         className="absolute left-4 top-1/2 flex -translate-y-1/2 items-center gap-2.5 text-ink lg:left-8"
-        aria-label="Ask Soony, today"
+        aria-label="Lighthouse, today"
       >
         <Mark />
-        {!phone && <span className="font-medium">Ask Soony</span>}
+        {!phone && <span className="font-medium">Lighthouse</span>}
       </a>
       {!phone && checkedAt && <Heartbeat at={checkedAt} nowMs={nowMs} />}
       <p className={cn('min-w-0 truncate text-center', phone && 'max-w-[calc(100%-88px)]')} aria-live="polite">{status}</p>
