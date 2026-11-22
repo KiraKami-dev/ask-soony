@@ -280,7 +280,8 @@ function PartRow({ p, state, nowMs, phone, onOpen }: { p: LaunchPart; state: Sta
       {cases.length > 1 ? ` · ${cases.length} cases` : ''}
     </button>
   )
-  const inbound = p.inbound.slice(0, 2)
+  // Confirmed orders first: where an order stands matters more than a row that already counts.
+  const inbound = [...p.inbound].sort((a, b) => Number(!!b.commitment) - Number(!!a.commitment)).slice(0, 2)
   return (
     <li className={cn('grid items-baseline gap-x-6 border-t border-hair py-3.5', phone ? 'grid-cols-[minmax(0,1fr)_auto]' : 'grid-cols-[220px_minmax(0,1fr)_auto]')}>
       <span className={cn('t-small', short ? 'text-ink' : 'text-ink-2')}>{p.short_name}</span>
@@ -304,6 +305,7 @@ const MOVING: Record<string, string> = { sea: 'on the water', air: 'in the air',
 
 /** "350,000 at the port, not counted: needs collecting". */
 function inboundLine(i: Inbound, launchMs: number, nowMs: number): string {
+  if (i.commitment) return i.commitment.line
   const qty = i.quantity != null ? fmtNum(i.quantity) : 'Unknown quantity'
   if (i.reason === 'reported, not booked') return `${qty} arrived (${i.reference}), reported by the site, not booked yet`
   const sh = i.shipment

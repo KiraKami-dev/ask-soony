@@ -152,11 +152,14 @@ def build(
     strip: list[dict],
     site=None,
     tracked: dict | None = None,
+    commits: list[dict] | None = None,
 ) -> dict:
     """{hours_left, editions: [...], parts: [...], floor} for the Launch page. `site` is the
     floor's picture (floor.prepare): reported counts per edition and per part. `tracked`: the
-    reconciled shipments (tracking.py), so an inbound row shows what really happened to it."""
-    from ask_soony import floor
+    reconciled shipments (tracking.py), so an inbound row shows what really happened to it.
+    `commits`: confirmed orders (commitments.build); they count as inbound for the copies they can
+    still save, and a decided case they belong to keeps its copies at risk until they arrive."""
+    from ask_soony import commitments, floor
     from ask_soony.api import part_names, portal_root, rank_key
 
     data = _dispatch()
@@ -176,6 +179,10 @@ def build(
         )
 
     live = [c for c in cards if c.get("status") in OPEN]
+    # A decided case whose order is still on its way: its shortfall stands until the parts arrive.
+    pending = {c["card_id"] for c in commits or [] if c["status"] != "delivered"}
+    waiting = [c for c in cards if c.get("status") not in OPEN and c["id"] in pending]
+    cutoff = os.environ.get("ASK_CUTOFF_NAME", "the trucks")
     parts = []
     short_names = part_names(portal_root())
     ships = _ships_by_ref(ships_raw, cur, tracked)
@@ -184,6 +191,7 @@ def build(
             continue
         eds = [str(e) for e in p.get("editions") or []]
         mine = _cards_for(p, live)
+        ordered = _cards_for(p, waiting)
         per_copy = max([_num(v) or 0 for v in (p.get("per_copy") or {}).values()] or [0]) or 1
         gap = _num(p.get("gap"))
         reported = (
@@ -193,7 +201,11 @@ def build(
         )
         if reported:
             gap = reported["gap"]
-        copies = [c.get("number") or 0 for c in mine if c.get("number_label") == "copies at risk"]
+        copies = [
+            c.get("number") or 0
+            for c in [*mine, *ordered]
+            if c.get("number_label") == "copies at risk"
+        ]
         if reported and reported["counted"]:
             copies = []  # a count on the shelf replaces what the cases inferred from book stock
         # Copies this part cannot cover: the verifier's gap, or a case's copies at risk if higher
@@ -203,7 +215,7 @@ def build(
         if short and len(eds) == 1:
             t = clock.line_stops(cur, eds[0], short)
             runs_dry = t.isoformat() if t else None
-        parts.append(
+        row = (
             {
                 "part": p["part"],
                 "name": p.get("description") or p["part"],
@@ -238,8 +250,10 @@ def build(
                 ],
                 "counted": (reported or {}).get("counted"),
                 "cards": [c["id"] for c in sorted(mine, key=rank_key)],
+                "per_copy": p.get("per_copy") or {},
             }
         )
+        parts.append(commitments.apply(row, commits or [], clock, cur, cutoff))
     return {
         "hours_left": hours_left,
         "editions": editions,

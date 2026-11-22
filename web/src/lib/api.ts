@@ -72,6 +72,9 @@ export interface Card {
   group?: string
   /** A question to the people at the site (stale count, due shipment, uncounted stock). */
   site_question?: SiteQuestion
+  /** Where the order this case placed stands: 'Ordered 06:50 · Karton confirmed 8,000 at 07:13 · truck details pending'. */
+  commitment_line?: string | null
+  commitments?: string[]
 }
 
 export type SiteKind = 'packed' | 'received' | 'count'
@@ -197,6 +200,21 @@ export interface Inbound {
   after_launch: boolean
   supplier_id?: string | null
   shipment: { id: string; status: string; mode: string; eta?: string; silent: boolean; silent_hours: number | null; note?: string | null } | null
+  /** A confirmed order (commitments.py): its own row, or a note on the shipment a reply names. */
+  commitment?: Commitment | null
+}
+export interface Commitment {
+  id: string
+  card_id: string
+  supplier_name: string
+  quantity: number | null
+  status: 'offered' | 'confirmed' | 'loading' | 'shipped' | 'delivered' | 'declined'
+  eta: string | null
+  estimated: boolean
+  /** The whole row in words, arithmetic included. */
+  line: string
+  /** Copies it saves by the trucks; null when not worked out (shared part). */
+  saves: number | null
 }
 /** One part of an edition's bill of materials (verifier's dispatch.json, GET /api/state launch). */
 export interface LaunchPart {

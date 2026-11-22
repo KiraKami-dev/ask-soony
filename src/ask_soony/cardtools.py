@@ -273,7 +273,11 @@ def deliver(
         or "Soony procurement"
     )
     copy = [c for c in dict.fromkeys(copy) if c != to]
-    mid = _send_mail(to, subject, body, copy or None)
+    if option.get("in_reply_to") and not copy:  # an answer in the supplier's thread
+        refs = " ".join(r for r in (option.get("references") or [option["in_reply_to"]]) if r)
+        mid = _send_mail_in_thread(to, subject, body, option["in_reply_to"], refs)
+    else:
+        mid = _send_mail(to, subject, body, copy or None)
     return {"message_id": mid, "to": to, "cc": copy, "subject": subject, "sent_body": body}
 
 

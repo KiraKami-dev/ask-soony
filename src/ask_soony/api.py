@@ -32,7 +32,7 @@ from fastapi import Body, FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from ask_soony import floor, launch_view, supplier_master, tracking
+from ask_soony import commitments, floor, launch_view, supplier_master, tracking
 from ask_soony import launch as launch_clock
 from ask_soony.launch import PackClock
 
@@ -1387,9 +1387,45 @@ def build_state() -> dict:
 
     inbox = [c for c in open_cards if not c["routed_to_other"]]
     strip = build_strip(cards, root, clock, cur)
+    # Confirmed orders become inbound: Launch counts what they can still save, a decided case shows
+    # where its order stands, and an order that lands too late opens its own decision.
+    try:
+        commits = commitments.build(cards, net, clock, cur)
+    except Exception as e:  # a reply we cannot read must not take Today down
+        print(f"commitments failed: {e!r}", file=sys.stderr)
+        commits = []
     launch = launch_view.build(
-        cards, net["shipments_raw"], clock, cur, strip, site, tracked=tracked["shipments"]
+        cards,
+        net["shipments_raw"],
+        clock,
+        cur,
+        strip,
+        site,
+        tracked=tracked["shipments"],
+        commits=commits,
     )
+    for c in cards:
+        mine = [x for x in commits if x["card_id"] == c["id"]]
+        if mine:
+            c["commitment_line"] = commitments.status_line(mine, cur)
+            c["commitments"] = [x["id"] for x in mine]
+    late = commitments.late_cards(
+        commits,
+        launch["parts"],
+        clock,
+        cur,
+        net,
+        read_json("decision_status.json", {}),
+        viewer_name(root),
+        os.environ.get("ASK_CUTOFF_NAME", "the trucks"),
+    )
+    if late:
+        cards += late
+        cards.sort(key=rank_key)
+        strip = build_strip(cards, root, clock, cur)
+    commitments.strip_adjust(strip, launch["parts"], clock, cur)
+    open_cards = [c for c in cards if c["status"] == "open"]
+    inbox = [c for c in open_cards if not c["routed_to_other"]]
     if _promote_by_launch(cards, launch, clock):
         cards.sort(key=rank_key)
         open_cards = [c for c in cards if c["status"] == "open"]

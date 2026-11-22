@@ -1290,6 +1290,7 @@ function CaseView({ card, state, nowMs, onChanged, onDrawer }: { card: Card; sta
         )}
         {undo && <UndoAction actionId={undo} onUndone={onChanged} />}
       </p>
+      {card.commitment_line && <p className="t-small mt-2 text-ink-3">{card.commitment_line}</p>}
       {waiting && card.reason && <p className="t-body mt-2 text-ink-2">{sentence(card.reason)}</p>}
 
       {facts && (
