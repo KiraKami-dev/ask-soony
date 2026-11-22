@@ -194,7 +194,7 @@ function RoleMenu({ role, onRole, people }: RoleProps) {
         onClick={() => setOpen(!open)}
         aria-label={name ? `Using this as ${name}` : 'Who is using this?'}
         aria-expanded={open}
-        className="flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-2 text-ink-3 hover:bg-soft hover:text-ink focus-visible:outline-2 focus-visible:outline-accent"
+        className={cn('flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-2.5 hover:bg-soft hover:text-ink focus-visible:outline-2 focus-visible:outline-accent', name ? 'bg-soft text-ink' : 'text-ink-3')}
       >
         <UserRound size={16} />
         {name && <span>{name}</span>}
