@@ -668,7 +668,7 @@ function Focus(p: Props & {
               <button onClick={() => setConfirm(false)} className="cursor-pointer text-ink-2 hover:text-ink">Cancel</button>
             ) : (
               <button onClick={() => setOthers(!others)} aria-expanded={others} className="cursor-pointer text-ink-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
-                {others ? 'Fewer options' : 'Other options'}
+                {others ? 'Fewer options' : `Other options · ${choices.length - 1}`}
               </button>
             )}
           </div>
