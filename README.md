@@ -49,6 +49,8 @@ Live: `https://ask-soony.stenglein.dev` (password protected; ask the team).
 
 Tests: `uv run pytest -q`. UI: `cd web && npm run build`.
 
+**Demo instance** (`scripts/demo.sh reset`): a second server on `:8001` (`ask-soony-demo.stenglein.dev`) with every case open again and no real supplier email (`ASK_MAIL_DRY=on` records mails in `dry_outbox.json`). Push still reaches subscribed phones, so the count page and the sign-off page can be shown. Run `reset` between rehearsals; `snapshot` rebuilds it from the live state.
+
 ## Getting started
 
 1. Clone the repo and install [uv](https://docs.astral.sh/uv/), then `uv sync --group dev`
