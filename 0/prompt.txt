@@ -1,0 +1,118 @@
+"Two open decisions for you:
+1. Farhan / 34,800: should I send him the calculation (34,800 vs 6,800, because the verifier doesn't count deliveries before the end of packing), and build the fallback so the demo stays consistent?" he is at sleep. so if there is sth off, we should fix it I think
+
+---
+
+<task-notification>
+<task-id>a32203f8012f007ef</task-id>
+<tool-use-id>toolu_01HUtqxQBFjK5eQdz4StDSqK</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a32203f8012f007ef.output</output-file>
+<status>completed</status>
+<summary>Agent "Critique identity and build alternative" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I've built the minimal phone flow 20 to 24 and the desktop screen 25, and checked each one in headless Chrome. I skipped 10 to 14 as the new brief allowed.
+
+**Rules applied on every screen**
+- One typeface, Instrument Sans, in three sizes (34/18/13.5 on desktop, 27/17/13 on phone).
+- No boxes, chips, timelines or KPI numbers.
+- One blue for the main button.
+- Red appears only on the late "20,000 arrive Tue 24 Nov".
+- The highlighter appears only on the source crop.
+- Routine green appears only on the one routine line.
+- The only borders are the button and the bottom sheet.
+
+**The screens**
+- **20 Push:** only the notification card on a plain grey ground: "One decision before 10:00 · 20,000 game cards arrive after launch."
+- **21 Decision:** "Trucks leave in 13 h 30 min · 1 decision" at the top, then:
+  - a plain headline;
+  - one sentence with two tappable figures: "SAP expects 48,000 by Saturday", then the late "20,000 arrive Tue 24 Nov" in red;
+  - "For today: Standard runs out of cards at 17:00, three hours before the trucks";
+  - the recommendation with its cost, a big Approve, and quiet "Talk it through" and "Other options" links.
+- **22 Source sheet:** the Korean lines with 20,000 and 2026-11-24 highlighted, the English translation, "SAP says 48,000 due Sat 21 Nov · Purchase order, line 2", and one Back button. The decision stays dimmed behind it.
+- **23 Done:** "Done. Asked Boise for 20,000 cards." with an Undo link, then "3 more like this from PackRight. Handle them the same way?" One green line says there will be a test run first and that money still comes to you.
+- **24 All clear:** "Nothing needs you. On track for the trucks at 20:00." with "Watching 25 shipments · see" and the green "3 handled by your routines overnight · see · undo".
+- **25 Desktop:** a quiet "Needs you" list of three one-line items, the same decision in one column, and the routine line at the bottom.
+
+**Decision for you:** screen 23 doesn't quite add up. Approving Boise air freight doesn't create "3 more like this from PackRight"; that offer belongs to Saturday's artwork decision. For the demo, either reword it as "Next time a part lands after the trucks, ask the other supplier first, the price still comes to you", or make 23 the PackRight decision. I left the wording you specified.
+
+**Made up for the demo:** the Korean balance line in the crop, "25 shipments" and the Yantian item in the desktop list.
+
+Files are in `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/brand/`:
+- screens/20-lockscreen-push.html
+- screens/21-decision.html
+- screens/22-source-open.html
+- screens/23-done.html
+- screens/24-all-clear.html
+- screens/25-desktop-focus.html
+- shots/20 to 25 PNGs (phone at 2x)
+- gen/minimal.py (generates all six)</result>
+<usage><subagent_tokens>225019</subagent_tokens><tool_uses>9</tool_uses><duration_ms>150936</duration_ms></usage>
+</task-notification>
+
+---
+
+ok, build this for now
+
+---
+
+is there also an n8n style diagram showing?
+
+---
+
+"~/.claude/jobs/3021cc1a/tmp/routines-more/wide-6-expanded-flow.png" that probably could/should read nicer. like e.g. not just one line? (or kee pit in a line before doing turns)
+
+---
+
+"~/.claude/jobs/3021cc1a/tmp/routines-more/wide-6-expanded-flow.png" that probably could/should read nicer. like e.g. not just one line? (or kee pit in a line before doing turns)?
+
+---
+
+<task-notification>
+<task-id>a564793287b5d9833</task-id>
+<tool-use-id>toolu_011mVP9TMMu9yPscV3zrf7rx</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a564793287b5d9833.output</output-file>
+<status>completed</status>
+<summary>Agent "Fix verifier shortfall for arrivals" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I made the fix, but on this Mac the game card gap still shows 34,800. The rule needs a reading of Hwaseong's shipping advice, and there is none locally (`data/store/image_recognizer` doesn't exist). With a reading of that one PDF the same run gives 6,800 short, exactly what the paper check computes. Nothing is committed or pushed.
+
+**The change**
+- **`shortfall.py`:** each part now carries two new lists. `arriving` holds inbound that is counted, with reference, quantity, ETA and basis. `not_counted` holds inbound that is skipped, with the reason. `gap` is now needed − usable − arriving. `gap_if_acted`, `at_risk` and the cards pick this up automatically.
+- **What counts as arriving:** a launch-plan inbound row, or an ERP shipment (quantity from its open PO lines), if all of these hold:
+  - ETA is on or before launch day.
+  - It is not cancelled, and not "arrived" at the port (that stays a collect fix).
+  - It has no goods receipt dated between its ETD and the stock date (that would already be in stock). A receipt after the stock date counts at the received quantity.
+  - It is not overdue (ETA before the stock date with no receipt).
+  - The supplier's shipping document doesn't say less. If it does, only the shipped quantity counts and the balance goes to `not_counted` with its expected date.
+- **Unread documents:** if a shipping document exists for the reference but nobody has read it yet, the inbound is not counted. That is the conservative choice: counting the plan's 48,000 would have shown no gap at all, when the paper actually says short.
+- **The Hwaseong balance:** the 20,000 arriving Tue 24 Nov is never counted.
+- **`cards.py` (allocate card only):** the "what the paper says" line, the decision question and the approver message now use stock plus arriving. The evidence lists what was counted and what wasn't, and why.
+
+**Before and after on the real data**
+
+| Part | Before | No reading (this Mac) | With a reading of the advice |
+|---|---|---|---|
+| CMP-GAM-001 game card | 34,800 short | 34,800 short; the 48,000 is listed as not counted, "not read yet" | 6,800 short (118,400 stock + 28,000 arriving; 20,000 balance not counted) |
+| CMP-GAM-004 | gap 0 | gap 0; Karton Nowak's 20,000 (PO 7K21M) now counted as arriving | gap 0 |
+| CMP-GAM-003 | 32,000 short | unchanged; the 350,000 at the port is still a collect fix | unchanged |
+
+- **Allocate card:** it still appears in both runs because a gap remains. With the reading its title reads "6,800 short across 2 editions". A test confirms the card disappears once the gap closes.
+- **Paper check difference:** none once the advice is read. The paper check does 153,200 − (118,400 + 48,000 due − 20,000 late) = 6,800, which is the same number. Without the reading, the whole difference is the 28,000 the verifier can't confirm.
+
+The "with a reading" run used a reading I transcribed by hand from the PDF's text into the scratch folder. It is not in the repo and is not a real reader output. The dispatch output is at `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/verifier-fix/dispatch.json`, and the reading-based one is `dispatch_with_reading.json` next to it. Nothing was written to `data/state`.
+
+**Tests:** I added 5 tests to `src/ask_soony/verifier/impact/tests/test_shortfall.py`. `uv run pytest -q` gives 219 passed, and `ruff check` is clean. `ruff format --check` flags two files in `dispatch/decisions` that I didn't edit; they were already like that.
+
+**Decision for you:** to get 6,800 on the live dashboard, the advice needs a real reading. That means one paid OpenAI run of the image recognizer on that file (`--only Shipping_advice_020-48113256`), which I did not do without your OK.
+
+**Left for Farhan** (all in his note):
+- The "runs dry" time, and so the allocate card's act-by time, still uses stock on hand only and ignores arrivals.
+- `impact/__main__.py` doesn't print the arriving list yet.
+
+Files:
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/verifier/impact/shortfall.py`
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/dispatch/decisions/cards.py`
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/verifier/impact/tests/test_shortfall.py`
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/verifier/NOTE_FOR_FARHAN.md`</result>
+<usage><subagent_tokens>174999</subagent_tokens><tool_uses>47</tool_uses><duration_ms>530224</duration_ms></usage>
+</task-notification>
