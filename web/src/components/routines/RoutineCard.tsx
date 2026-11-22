@@ -10,7 +10,7 @@ import { body, call, lastUndoable, modeOf, summarise, type Mode, type Routine, t
 
 // One routine in the Today style, one view, top to bottom: its name and what it did, how it works
 // (the When / Only if / Then diagram that is also the editor: × to remove, drag to reorder, "Add
-// step"), how much it may do on its own (the trust ladder), then "Change it in your words". A change is never saved straight
+// step"), "Change it in your words" right under it, then how much it may do on its own. A change is never saved straight
 // away: it is tested on today's inbox first and shown on the diagram as before/after, then the
 // buyer applies it or keeps the old version. The same block shows a suggested routine (draft)
 // before it is on, everywhere: in the sheet, after "Show me how" and from "How it decided".
@@ -198,14 +198,13 @@ export function RoutineCard({
         {busy === 'preview' && <Working text="Testing the change on today's inbox…" />}
         {busy === 'edit' && <Working text="The agent is changing the routine…" />}
 
-        {!review && trust}
         {review ? (
           <div className="mt-6 space-y-3">
             {review.note && <p className="t-small text-ink-2">{review.note}</p>}
             <TestResult run={review.preview} spec={review.after.spec} title="What this version would do on today's inbox" />
           </div>
         ) : (
-          <form onSubmit={askInWords} className="mt-8 flex items-center gap-2 rounded-xl border border-hair bg-white py-1 pl-3.5 pr-1 focus-within:border-ink-3/40">
+          <form onSubmit={askInWords} className="mt-6 flex items-center gap-2 rounded-xl border border-hair bg-white py-1 pl-3.5 pr-1 focus-within:border-ink-3/40">
             <label className="min-w-0 flex-1">
               <span className="sr-only">Change it in your words</span>
               <input
@@ -219,6 +218,7 @@ export function RoutineCard({
             <button type="submit" disabled={!words.trim() || !!busy} className="t-small h-9 shrink-0 cursor-pointer rounded-lg px-3 font-medium text-ink hover:bg-soft disabled:cursor-default disabled:text-ink-3 disabled:hover:bg-transparent">Change</button>
           </form>
         )}
+        {!review && trust}
       </>
     )
   }

@@ -6,16 +6,17 @@ import { funnel, lookAlikeConds, type Funnel } from './funnel'
 import { StepIcon, merge, type Mark, type Row } from './RoutineFlow'
 import { PALETTE, condWords, paletteKey, triggerText, type Cond, type Run, type Spec, type Step } from './types'
 
-// The routine as a calm editor, drawn from the recipe alone and edited in place. Three groups
-// with arrows only between them: WHEN (the trigger), ONLY IF (every condition as one checklist,
-// an AND list, not a sequence) and THEN (the steps, in order: the hero, the only boxes). The
-// fixed guard is a quiet ALWAYS line underneath. Each condition shows how many open cases are
-// still left after it right now (funnel.ts), so "why does nothing run" reads off the diagram.
-// With `onChange` the buyer edits it here: × on a condition or step (on hover or focus, always
-// on touch), steps drag to a new place, "Add step" opens a small picker, look-alike conditions
-// offer to drop the repeat. With `before` every line shows what a change does. Step counters
-// come from the latest run; a test run's stay ink-3, a real run's read in routine green.
-// Below `lg` (and without `wide`) the same groups stack into one thumb-friendly column.
+// The routine as a calm node editor (n8n-like), drawn from the recipe alone and edited in place.
+// Nodes only for the parts that stand on their own, connected by port-and-hairline links: one
+// WHEN node (the trigger), ONE "Only if" node holding every condition as a numbered checklist
+// (an AND list, so never links between conditions), and one node per THEN step, chained in order,
+// ending in a dashed "Add step" node. All on a faint dot-grid canvas; the fixed guard is a quiet
+// ALWAYS line underneath. Each condition shows how many open cases are still left after it right
+// now (funnel.ts), so "why does nothing run" reads off the diagram. With `onChange` the buyer
+// edits it here: × on a condition or step (on hover or focus, always on touch), steps drag to a
+// new place, look-alike conditions offer to drop the repeat. With `before` every line shows what
+// a change does. Step counters come from the latest run; a test run's stay ink-3, a real run's
+// read in routine green. Below `lg` (and without `wide`) the nodes form one vertical chain.
 
 const REFUSED = 'Needs you, it costs money or changes the plan'
 
@@ -82,9 +83,11 @@ type Edge = 'before' | 'after' | null
  * it a little; a change rings it in accent so the before/after reads at a glance.
  */
 function Node({
-  icon, title, text, was, badge, active, person, mark, moved, onRemove, edge, axis, grip,
+  icon, kicker, title, text, was, badge, active, person, mark, moved, onRemove, edge, axis, grip,
 }: {
   icon: ReactNode; title: string; text: string; badge?: string; active?: boolean
+  /** A small word above the title ("Then · 1"). */
+  kicker?: string
   /** The text before a change, struck through. */
   was?: string
   person?: boolean
@@ -105,8 +108,8 @@ function Node({
   return (
     <div
       className={cn(
-        'group relative w-full min-w-0 rounded-xl border bg-white px-3.5 pb-3 pt-2.5 transition-[border-color,box-shadow,opacity] duration-200',
-        'border-hair shadow-[0_1px_2px_rgba(24,24,26,.04)] hover:border-ink-3/35 hover:shadow-[0_6px_18px_-10px_rgba(24,24,26,.18)] focus-within:border-ink-3/35',
+        'group relative w-full min-w-0 rounded-xl border bg-white px-3.5 pb-3 pt-3 transition-[border-color,box-shadow,opacity] duration-200',
+        'border-hair shadow-[0_1px_2px_rgba(24,24,26,.04),0_6px_16px_-12px_rgba(24,24,26,.16)] hover:border-ink-3/35 hover:shadow-[0_6px_18px_-10px_rgba(24,24,26,.18)] focus-within:border-ink-3/35',
         onRemove && 'max-lg:pr-12',
         ringed && 'border-accent/45 bg-[color-mix(in_srgb,var(--color-accent)_3%,white)] shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-accent)_9%,transparent)]',
         mark === 'removed' && 'border-dashed bg-transparent opacity-60',
@@ -114,10 +117,13 @@ function Node({
       )}
       title={text}
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="t-small flex min-w-0 items-center gap-2 font-medium text-ink">
-          <span className={cn('grid h-6 w-6 shrink-0 place-items-center rounded-md [&>svg]:block', ringed ? 'bg-accent/10 text-accent' : 'bg-soft text-ink-2')}>{icon}</span>
-          <span className={cn('line-clamp-2', mark === 'removed' && 'line-through decoration-ink-3')}>{title}</span>
+      <div className="flex items-start justify-between gap-2">
+        <div className="t-small flex min-w-0 items-start gap-2.5 leading-tight">
+          <span className={tile(ringed)}>{icon}</span>
+          <span className="min-w-0">
+            {kicker && <span className="block text-ink-3">{kicker}</span>}
+            <span className={cn('line-clamp-2 font-medium text-ink', mark === 'removed' && 'line-through decoration-ink-3')}>{title}</span>
+          </span>
         </div>
         {word ? (
           <span className={cn('t-small shrink-0 font-medium', mark === 'removed' ? 'text-ink-3' : 'text-accent')}>{word}</span>
@@ -127,7 +133,7 @@ function Node({
           <GripVertical size={14} className="shrink-0 text-ink-3 opacity-0 transition-opacity group-hover:opacity-100 max-lg:hidden" aria-hidden />
         ) : null}
       </div>
-      {!same(title, text) && <div className={cn('t-small mt-1 line-clamp-4 text-ink-2', mark === 'removed' && 'line-through decoration-ink-3')}>
+      {!same(title, text) && <div className={cn('t-small mt-1.5 line-clamp-4 text-ink-2', mark === 'removed' && 'line-through decoration-ink-3')}>
         {was && was !== text && <><span className="text-ink-3 line-through">{was}</span>{' '}</>}
         {text}
       </div>}
@@ -158,7 +164,6 @@ const Down = () => (
 const Right = () => (
   <svg width="24" height="10" viewBox="0 0 24 10" aria-hidden className="block"><line x1="0" y1="5" x2="22" y2="5" {...stroke} /><path d="M18.5 2 L23 5 L18.5 8" {...stroke} /></svg>
 )
-const ArrowDown = () => <div className="ml-[22px] shrink-0 py-0.5 text-ink-3/45"><Down /></div>
 
 type Drag = { kind: 'step'; id: string } | { kind: 'palette'; key: string }
 type DragProps = {
@@ -262,7 +267,7 @@ function AddStep({ ed, wide }: { ed: Editor; wide?: boolean }) {
         aria-haspopup="menu"
         className={cn(
           't-small inline-flex cursor-pointer items-center gap-2 rounded-xl border border-dashed text-ink-2 transition-colors hover:border-ink-3/60 hover:text-ink focus-visible:outline-2 focus-visible:outline-accent',
-          open ? 'border-ink-3/60 bg-white text-ink' : 'border-ink-3/35',
+          open ? 'border-ink-3/60 bg-white text-ink' : 'border-ink-3/35 bg-white/75 hover:bg-white',
           wide ? 'h-[54px] px-4' : 'h-11 w-full justify-center',
         )}
       >
@@ -303,10 +308,10 @@ function AddStep({ ed, wide }: { ed: Editor; wide?: boolean }) {
   )
 }
 
-/** The fixed guard: one quiet, reassuring line under the routine, the same in every mode. */
+/** The fixed guard: one quiet, reassuring line under the canvas, the same in every mode. */
 function Guard({ badge, active }: { badge?: string; active?: boolean }) {
   return (
-    <div className="flex items-start gap-2.5 border-t border-hair pt-4">
+    <div className="flex items-start gap-2.5 px-1">
       <ShieldCheck size={15} strokeWidth={1.75} className="mt-[3px] shrink-0 text-ink-3" aria-hidden />
       <p className="t-small min-w-0 flex-1 text-ink-3">
         <span className="font-medium text-ink-2">Always: money and plan changes come to you.</span>{' '}
@@ -317,22 +322,39 @@ function Guard({ badge, active }: { badge?: string; active?: boolean }) {
   )
 }
 
-const head = 't-small mb-2.5 font-medium text-ink-3'
+/** The node look every box on the canvas shares. */
+const NODE = 'rounded-xl border border-hair bg-white shadow-[0_1px_2px_rgba(24,24,26,.04),0_6px_16px_-12px_rgba(24,24,26,.16)]'
+const tile = (on?: boolean) => cn('grid h-7 w-7 shrink-0 place-items-center rounded-lg [&>svg]:block', on ? 'bg-accent/10 text-accent' : 'bg-soft text-ink-2')
 
-/** WHEN: what the routine looks at, and how many cases that is right now. No box: it is context. */
+/** A node's head row: the icon tile, a small kicker and the title. */
+function NodeHead({ icon, kicker, title, accent, right }: { icon: ReactNode; kicker: string; title: string; accent?: boolean; right?: ReactNode }) {
+  return (
+    <div className="flex items-start gap-2.5 px-3.5 pt-3">
+      <span className={tile(accent)}>{icon}</span>
+      <div className="t-small min-w-0 flex-1 leading-tight">
+        <p className="text-ink-3">{kicker}</p>
+        <p className="font-medium text-ink">{title}</p>
+      </div>
+      {right}
+    </div>
+  )
+}
+
+/** WHEN: what the routine looks at, and how many cases that is right now. */
 function Trigger({ spec, before, fun }: { spec: Spec; before?: Spec; fun: Funnel | null }) {
   const t = triggerText(spec.on)
   const changed = !!before && (before.on ?? 'decisions') !== (spec.on ?? 'decisions')
   return (
-    <div className="flex min-w-0 items-start gap-3">
-      <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-lg [&>svg]:block', changed ? 'bg-accent/10 text-accent' : 'bg-soft text-ink-2')}>
-        <Radar size={14} strokeWidth={1.75} />
-      </span>
-      <div className="t-small min-w-0">
-        <p className="font-medium text-ink">{t.title}{changed && <span className="ml-2 text-accent">Changed</span>}</p>
-        <p className="text-ink-3">{t.text}</p>
-        {fun && <p className="mt-1 text-ink-2">{fun.total} {noun(spec, fun.total)} now</p>}
-      </div>
+    <div className={cn(NODE, 'min-w-0 pb-3', changed && 'border-accent/45 shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-accent)_9%,transparent)]')}>
+      <NodeHead
+        icon={<Radar size={14} strokeWidth={1.75} />}
+        kicker="When"
+        title={t.title}
+        accent={changed}
+        right={changed ? <span className="t-small shrink-0 font-medium text-accent">Changed</span> : undefined}
+      />
+      <p className="t-small mt-1.5 px-3.5 text-ink-3">{t.text}</p>
+      {fun && <p className="t-small mx-3.5 mt-2.5 border-t border-hair pt-2.5 text-ink-2">{fun.total} {noun(spec, fun.total)} now</p>}
     </div>
   )
 }
@@ -356,40 +378,46 @@ function RemoveLine({ label, onClick }: { label: string; onClick: () => void }) 
 }
 
 /**
- * ONLY IF: every condition as one checklist (all must hold, order does not matter), numbered so
- * the funnel line can point at one. The count on each line is how many cases are still left.
+ * ONLY IF: one node holding every condition as a numbered checklist (all must hold, order does
+ * not matter). The count on each line is how many cases are still left after it.
  */
-function Conditions({ spec, before, ed, fun }: { spec: Spec; before?: Spec; ed: Editor; fun: Funnel | null }) {
+function Conditions({ spec, before, ed, fun, c }: { spec: Spec; before?: Spec; ed: Editor; fun: Funnel | null; c: Counts | null }) {
   const rows: Row<Cond>[] = merge<Cond>(spec.when, before?.when)
   const repeats = lookAlikeConds(spec.when, condWords)
-  const number = new Map(spec.when.map((c, i) => [c.id, i + 1]))
+  const number = new Map(spec.when.map((x, i) => [x.id, i + 1]))
   const total = fun?.total ?? 0
+  const foot = fun ? verdict(spec, fun, number) : c ? `${c.matched} matched in the last test.` : null
   return (
-    <div className="min-w-0">
-      <ol className="divide-y divide-hair border-y border-hair">
+    <div className={cn(NODE, 'min-w-0')}>
+      <NodeHead
+        icon={<Filter size={14} strokeWidth={1.75} />}
+        kicker="Only if"
+        title={spec.when.length === 1 ? 'This holds' : `All ${spec.when.length} of these hold`}
+      />
+      <ol className="mt-2.5 divide-y divide-hair border-t border-hair">
         {rows.map((row) => {
-          const c = row.item
+          const cond = row.item
           const live = row.mark !== 'removed'
-          const n = number.get(c.id)
+          const n = number.get(cond.id)
           // Past the line where everything stops, more zeros say nothing: leave them out.
           const past = !!fun?.stop && (n ?? 0) > fun.stop.index + 1
-          const left = live && !past ? fun?.left.get(c.id) : undefined
-          const stop = fun?.stop?.id === c.id
+          const left = live && !past ? fun?.left.get(cond.id) : undefined
+          const stop = fun?.stop?.id === cond.id
           const ringed = row.mark === 'added' || row.mark === 'changed'
-          const repeatOf = live ? repeats.get(c.id) : undefined
+          const repeatOf = live ? repeats.get(cond.id) : undefined
           return (
             <li
-              key={c.id}
-              className={cn('rise group py-2.5', ringed && '-mx-2 rounded-lg bg-accent/[.04] px-2', !live && 'opacity-60')}
-              title={`${c.field.replace('_', ' ')} ${c.op === 'any_of' ? 'any of' : c.op} ${String(c.value)}`}
+              key={cond.id}
+              className={cn('rise group px-3.5 py-2.5', ringed && 'bg-accent/[.04]', !live && 'opacity-60')}
+              title={`${cond.field.replace('_', ' ')} ${cond.op === 'any_of' ? 'any of' : cond.op} ${String(cond.value)}`}
             >
-              <div className="flex items-start gap-3">
-                <span className="t-small w-4 shrink-0 text-right text-ink-3 tabular-nums">{live ? n : ''}</span>
+              <div className="flex items-start gap-2.5">
+                <span className="t-small w-7 shrink-0 text-center text-ink-3 tabular-nums">{live ? n : ''}</span>
                 <p className={cn('t-small min-w-0 flex-1 text-ink', !live && 'text-ink-3 line-through decoration-ink-3')}>
-                  {row.mark === 'changed' && row.old && condWords(row.old) !== condWords(c) && (
+                  {row.mark === 'changed' && row.old && condWords(row.old) !== condWords(cond) && (
                     <><span className="text-ink-3 line-through">{condWords(row.old)}</span>{' '}</>
                   )}
-                  {condWords(c)}
+                  {condWords(cond)}
                 </p>
                 {row.mark !== 'same' && MARK_WORD[row.mark] && (
                   <span className={cn('t-small shrink-0 font-medium', live ? 'text-accent' : 'text-ink-3')}>{MARK_WORD[row.mark]}</span>
@@ -402,19 +430,19 @@ function Conditions({ spec, before, ed, fun }: { spec: Spec; before?: Spec; ed: 
                     {left} left
                   </span>
                 )}
-                {ed.editable && live && <RemoveLine label={condWords(c)} onClick={() => ed.removeCond(c.id)} />}
+                {ed.editable && live && <RemoveLine label={condWords(cond)} onClick={() => ed.removeCond(cond.id)} />}
               </div>
               {repeatOf && (
-                <p className="t-small mt-1 pl-7 text-ink-3">
+                <p className="t-small mt-1 pl-[38px] text-ink-3">
                   Says nearly the same as line {number.get(repeatOf)}.
-                  {ed.editable && <> <button type="button" className="uline" onClick={() => ed.removeCond(c.id)}>Keep one</button></>}
+                  {ed.editable && <> <button type="button" className="uline" onClick={() => ed.removeCond(cond.id)}>Keep one</button></>}
                 </p>
               )}
             </li>
           )
         })}
       </ol>
-      {fun && <p className="t-small mt-2.5 pl-7 text-ink-2" aria-live="polite">{verdict(spec, fun, number)}</p>}
+      {foot && <p className="t-small rounded-b-xl border-t border-hair bg-soft/60 px-3.5 py-2.5 pl-[52px] text-ink-2" aria-live="polite">{foot}</p>}
     </div>
   )
 }
@@ -432,6 +460,7 @@ function verdict(spec: Spec, f: Funnel, number: Map<string, number>): string {
   return `Right now none of the ${f.total} ${noun(spec, f.total)} pass every line.`
 }
 
+/** THEN: one node per step, chained in order, and the dashed "Add step" node at the end. */
 function Steps({ spec, run, before, ed, c }: { spec: Spec; run?: Run; before?: Spec; ed: Editor; c: Counts | null }) {
   const rows = merge<Step>(spec.then, before?.then)
   return (
@@ -444,10 +473,11 @@ function Steps({ spec, run, before, ed, c }: { spec: Spec; run?: Run; before?: S
         const dragging = ed.drag?.kind === 'step' && ed.drag.id === s.id
         return (
           <div key={s.id}>
-            {i > 0 && <ArrowDown />}
+            {i > 0 && <Link />}
             <div {...drag} className={cn('rise min-w-0', drag.draggable && 'cursor-grab active:cursor-grabbing', dragging && 'opacity-40')}>
               <Node
                 icon={<StepIcon step={s} size={14} className="" />}
+                kicker={rows.length > 1 ? `Then · ${i + 1}` : 'Then'}
                 person={s.do === 'call'}
                 title={stepTitle(s)}
                 text={s.text}
@@ -465,19 +495,43 @@ function Steps({ spec, run, before, ed, c }: { spec: Spec; run?: Run; before?: S
           </div>
         )
       })}
-      {ed.editable && ed.palette.length > 0 && <div className="mt-2.5"><AddStep ed={ed} /></div>}
+      {ed.editable && ed.palette.length > 0 && <><Link dashed /><AddStep ed={ed} /></>}
     </div>
   )
 }
 
-/** Between groups only: right on a wide screen, down otherwise. */
-function Arrow({ wide }: { wide?: boolean }) {
-  return (
-    <div className="shrink-0 text-ink-3/45" aria-hidden>
-      <span className={cn('block', wide ? 'lg:hidden' : '')}><div className="ml-[13px] py-2"><Down /></div></span>
-      {wide && <span className="hidden pt-[38px] lg:flex lg:justify-center"><Right /></span>}
+const port = 'h-[7px] w-[7px] shrink-0 rounded-full border border-ink-3/45 bg-white'
+
+/**
+ * A connector between two nodes, n8n style: a port dot on the node it leaves, a hairline, and a
+ * small head on the node it enters. Across on a wide screen (`across`), down otherwise.
+ */
+function Link({ across, dashed }: { across?: boolean; dashed?: boolean }) {
+  const line = dashed ? 'border-dashed border-ink-3/35' : 'border-ink-3/40'
+  const down = (
+    <div className="ml-[24px] flex h-7 w-[9px] flex-col items-center">
+      <span className={cn(port, '-mt-[4px]')} />
+      <span className={cn('w-0 flex-1 border-l', line)} />
+      <svg width="9" height="5" viewBox="0 0 9 5" className="-mb-px block text-ink-3/55"><path d="M1 0.5 L4.5 4.5 L8 0.5" {...stroke} /></svg>
     </div>
   )
+  if (!across) return <div aria-hidden className="shrink-0">{down}</div>
+  return (
+    <div aria-hidden className="shrink-0">
+      <div className="lg:hidden">{down}</div>
+      <div className="mt-[23px] hidden h-[9px] w-12 items-center lg:flex">
+        <span className={cn(port, '-ml-[4px]')} />
+        <span className={cn('h-0 flex-1 border-t', line)} />
+        <svg width="5" height="9" viewBox="0 0 5 9" className="-mr-px block text-ink-3/55"><path d="M0.5 1 L4.5 4.5 L0.5 8" {...stroke} /></svg>
+      </div>
+    </div>
+  )
+}
+
+/** The canvas: a very light dot grid behind the nodes. */
+const CANVAS = {
+  backgroundImage: 'radial-gradient(circle, color-mix(in srgb, var(--color-ink-3) 22%, transparent) 1px, transparent 1.2px)',
+  backgroundSize: '18px 18px',
 }
 
 export function FlowGraph({
@@ -485,7 +539,7 @@ export function FlowGraph({
 }: {
   spec: Spec
   run?: Run
-  /** Three columns on a large screen; one vertical path below `lg` either way. */
+  /** Nodes in a row on a large screen; one vertical chain below `lg` either way. */
   wide?: boolean
   /** The version before a change: every line shows what the change does. */
   before?: Spec
@@ -498,27 +552,22 @@ export function FlowGraph({
   const ed = useEditor(spec, onChange, disabled)
   const c = count(spec, run)
   const fun = funnel(spec, ctx)
-  const runs = fun ? `${fun.pass} match now` : c ? `${c.matched} in the last test` : null
   return (
-    <div className="flex flex-col gap-6">
-      <div className={cn('flex flex-col', wide && 'lg:grid lg:grid-cols-[minmax(0,210px)_36px_minmax(0,1fr)_36px_minmax(0,290px)] lg:items-start')}>
-        <section aria-label="When" className="min-w-0">
-          <h4 className={head}>When</h4>
-          <Trigger spec={spec} before={before} fun={fun} />
-        </section>
-        <Arrow wide={wide} />
-        <section aria-label="Only if" className="min-w-0">
-          <h4 className={head}>Only if all of these hold</h4>
-          <Conditions spec={spec} before={before} ed={ed} fun={fun} />
-        </section>
-        <Arrow wide={wide} />
-        <section aria-label="Then" className="min-w-0">
-          <div className="flex items-baseline justify-between gap-3">
-            <h4 className={head}>Then</h4>
-            {runs && <span className="t-small mb-2.5 text-ink-3">{runs}</span>}
-          </div>
-          <Steps spec={spec} run={run} before={before} ed={ed} c={c} />
-        </section>
+    <div className="flex flex-col gap-4">
+      <div className="rounded-2xl border border-hair bg-ground p-3 sm:p-5" style={CANVAS}>
+        <div className={cn('flex flex-col', wide && 'lg:flex-row lg:items-start')}>
+          <section aria-label="When" className={cn('min-w-0', wide && 'lg:w-[200px] lg:shrink-0')}>
+            <Trigger spec={spec} before={before} fun={fun} />
+          </section>
+          <Link across={wide} />
+          <section aria-label="Only if" className={cn('min-w-0', wide && 'lg:flex-1')}>
+            <Conditions spec={spec} before={before} ed={ed} fun={fun} c={c} />
+          </section>
+          <Link across={wide} />
+          <section aria-label="Then" className={cn('min-w-0', wide && 'lg:w-[240px] lg:shrink-0')}>
+            <Steps spec={spec} run={run} before={before} ed={ed} c={c} />
+          </section>
+        </div>
       </div>
       <Guard badge={c?.guard ? `${c.guard} came to you` : undefined} active={!!c?.guard && !run?.dry} />
     </div>
