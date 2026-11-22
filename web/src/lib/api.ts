@@ -230,6 +230,8 @@ export interface Commitment {
   supplier_name: string
   quantity: number | null
   status: 'offered' | 'confirmed' | 'loading' | 'shipped' | 'delivered' | 'declined'
+  /** When the supplier confirmed it. */
+  confirmed_at?: string | null
   eta: string | null
   estimated: boolean
   /** The whole row in words, arithmetic included. */

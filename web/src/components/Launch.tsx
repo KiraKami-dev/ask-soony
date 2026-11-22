@@ -1,9 +1,11 @@
+import { Check } from 'lucide-react'
 import { type ReactNode, useEffect, useState } from 'react'
 import { LaunchBrief } from '@/components/LaunchBrief'
 import { LaunchTimeline } from '@/components/LaunchTimeline'
-import { fmtNum, type Card, type Inbound, type LaunchPart, type State, type StripItem } from '@/lib/api'
+import { fmtNum, viaOf, type Card, type Inbound, type LaunchPart, type State, type StripItem } from '@/lib/api'
 import { launchAt, when } from '@/lib/decisions'
 import type { Role } from '@/lib/role'
+import { noun } from '@/lib/today'
 import { cn } from '@/lib/utils'
 
 // Launch: "Will we make Sunday 20:00, and what breaks first?" One honest sentence, the timeline,
@@ -166,6 +168,7 @@ export function Launch({ state, nowMs, phone, onOpen, role = null }: Props) {
             </ul>
           </div>
         )}
+        <FixedToday state={state} nowMs={nowMs} onOpen={onOpen} />
         <LaunchBrief state={state} nowMs={nowMs} phone={phone} role={role} onOpen={onOpen} />
       </div>
 
@@ -368,4 +371,74 @@ const dayOf = (d: string | null | undefined, nowMs: number) => {
   if (Number.isNaN(v.getTime())) return d
   const day = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'Europe/Berlin' }).format(v)
   return /^\d{4}-\d{2}-\d{2}$/.test(d) ? day : when(d, nowMs)
+}
+
+// ---------------------------------------------------------------- what went right today
+
+type Win = { at: number; text: string; card?: string }
+
+/**
+ * What went right today because someone acted: confirmations that land before the trucks, counts
+ * from the site that replaced a guess, decisions acted on. Facts with a time, never "all fine";
+ * the check mark and the past tense carry it, the green only adds to it.
+ */
+function FixedToday({ state, nowMs, onOpen }: { state: State; nowMs: number; onOpen: (id: string) => void }) {
+  const dayStart = new Date(nowMs); dayStart.setHours(0, 0, 0, 0)
+  const today = (iso?: string | null) => !!iso && t(iso) >= dayStart.getTime() && t(iso) <= nowMs
+  const site = state.launch?.floor?.site ?? 'The site'
+  const wins: Win[] = []
+
+  // Confirmed orders that land before the trucks, with what they save (commitments.py).
+  const seen = new Set<string>()
+  for (const p of state.launch?.parts ?? []) {
+    for (const i of p.inbound) {
+      const m = i.commitment
+      if (!m || seen.has(m.id) || i.after_launch || !i.counted || !today(m.confirmed_at)) continue
+      seen.add(m.id)
+      const who = m.supplier_name.split(' ')[0]
+      const qty = m.quantity != null ? `${fmtNum(m.quantity)} ` : ''
+      const eta = m.eta ? `, arriving ${when(m.eta, nowMs)}` : ''
+      const saves = m.saves ? `: saves ${fmtNum(m.saves)} copies` : ''
+      wins.push({ at: t(m.confirmed_at), card: m.card_id, text: `${who} confirmed ${qty}${noun(p.short_name)}${eta}${saves}` })
+    }
+  }
+  for (const s of state.strip) {
+    const k = floorOf(state, s.edition)?.counted
+    if (k?.reported && today(k.as_of)) {
+      wins.push({ at: t(k.as_of), text: `${site} counted ${s.label}: ${fmtNum(k.number)} packed, the plan now uses the count` })
+    }
+  }
+  for (const p of state.launch?.parts ?? []) {
+    if (p.counted && today(p.counted.at)) {
+      wins.push({ at: t(p.counted.at), text: `${site} counted ${p.short_name.toLowerCase()} on the shelf: ${fmtNum(p.counted.count)}` })
+    }
+  }
+  const acted = state.activity.filter((a) => today(a.at) && (a.kind === 'approved' || a.kind === 'sent'))
+  const byRoutine = acted.filter((a) => viaOf(a)?.kind === 'routine').length
+
+  if (!wins.length && !acted.length) return null
+  wins.sort((a, b) => b.at - a.at)
+  return (
+    <section aria-label="Fixed today" className="mt-8">
+      <h2 className="t-small text-ink-3">Fixed today</h2>
+      <ul className="t-small mt-2 space-y-1">
+        {wins.slice(0, 4).map((w, i) => (
+          <li key={i} className="flex items-baseline gap-2">
+            <Check size={14} strokeWidth={2.25} className="shrink-0 translate-y-0.5 text-routine" aria-hidden="true" />
+            {w.card ? (
+              <a href={`/d/${encodeURIComponent(w.card)}`} onClick={(e) => { e.preventDefault(); onOpen(w.card!) }} className="text-ink-2 hover:text-ink hover:underline">{w.text}</a>
+            ) : <span className="text-ink-2">{w.text}</span>}
+          </li>
+        ))}
+        {acted.length > 0 && (
+          <li className="flex items-baseline gap-2">
+            <Check size={14} strokeWidth={2.25} className="shrink-0 translate-y-0.5 text-routine" aria-hidden="true" />
+            <span className="text-ink-2">
+              {acted.length} {acted.length === 1 ? 'decision' : 'decisions'} acted on{byRoutine > 0 ? `, ${byRoutine} by routines` : ''}
+            </span>
+          </li>
+        )}
+      </ul>
+    </section>
+  )
 }
