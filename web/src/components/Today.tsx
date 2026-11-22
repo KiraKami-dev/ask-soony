@@ -436,9 +436,10 @@ function Focus(p: Props & {
   }
   const voicePrepared = !!prepared && !p.doneText
   const emailPrepared = voicePrepared && prepared!.decision === 'approve' && emails && sel === prepared!.option_index
-  const escalate = () =>
+  const signer = card.signoff ? firstWord(card.signoff) : ''
+  const escalate = (text: string = note) =>
     act(async () => {
-      const r = await post<{ id?: string }>(`/api/cards/${encodeURIComponent(card.id)}/escalate`, { note })
+      const r = await post<{ id?: string }>(`/api/cards/${encodeURIComponent(card.id)}/escalate`, { note: text })
       return { text: `Passed on to ${card.approver || 'the approver'}.`, sub: 'You will see their answer here.', actionId: r?.id ?? null }
     })
   const dismiss = () =>
@@ -446,7 +447,13 @@ function Focus(p: Props & {
       const r = await post<{ id?: string }>(`/api/cards/${encodeURIComponent(card.id)}/dismiss`)
       return { text: 'Taken off the list.', sub: 'Nothing was sent.', actionId: r?.id ?? null }
     })
-  const onApprove = () => (emails ? openReview() : money ? setConfirm(true) : void approve())
+  // Above the viewer's limit: the primary step is asking the person who signs, with our recommendation.
+  const askSigner = () => {
+    const o = choice.kind === 'option' ? card.options[choice.i] : null
+    void escalate([o ? `Please approve: ${o.action}${o.cost ? ` (${o.cost})` : ''}.` : '', note].filter(Boolean).join(' '))
+  }
+  const onApprove = () =>
+    signer && choice.kind === 'option' ? askSigner() : emails ? openReview() : money ? setConfirm(true) : void approve()
   /** The primary button, following the choice. */
   const go = () => (choice.kind === 'escalate' ? void escalate() : choice.kind === 'dismiss' ? void dismiss() : onApprove())
   const choose = (c: Choice) => { setChoice(c); setOthers(false); setConfirm(false); setError('') }
@@ -491,11 +498,17 @@ function Focus(p: Props & {
   const meta = [card.supplier_name || card.part_name, decideBy].filter(Boolean).join(' · ')
 
   const primaryLabel =
-    choice.kind === 'escalate' ? 'Pass it on' : choice.kind === 'dismiss' ? 'Dismiss' : emails ? 'Review email' : 'Approve'
+    choice.kind === 'escalate' ? 'Pass it on' : choice.kind === 'dismiss' ? 'Dismiss'
+      : signer ? `Ask ${signer} to approve` : emails ? 'Review email' : 'Approve'
   const quietPrimary = choice.kind === 'dismiss'
   const actions = (opt || choice.kind !== 'option') && (
     <div className={cn(phone ? 'fixed inset-x-0 bottom-0 z-20 bg-gradient-to-t from-ground from-70% to-ground/0 px-6 pb-[max(28px,env(safe-area-inset-bottom))] pt-8' : 'mt-8')}>
       <div className={cn(phone && 'mx-auto max-w-[520px]')}>
+        {signer && choice.kind === 'option' && (
+          <p className={cn('t-small mb-3 text-ink-2', phone && 'text-center')}>
+            {signer} signs this: it is above your limit in the approval policy. We send it with our recommendation.
+          </p>
+        )}
         {confirm && (
           <p className={cn('t-small mb-3 text-ink-2', phone && 'text-center')} role="alert">
             Approve: <span className="text-ink">{actionText(card, sel).replace(/\.$/, '')}</span> ({costLine(card, sel).replace(/\.$/, '')})

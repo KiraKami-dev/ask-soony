@@ -46,6 +46,8 @@ export interface Card {
   level: Level
   status: string
   approver?: string
+  /** Someone else signs this (approval policy); it stays with the viewer until passed on. */
+  signoff?: string | null
   routed_to_other: boolean
   reason?: string
   called_at?: string

@@ -384,7 +384,11 @@ def build_cards(net: dict, ships: dict[str, dict]) -> list[dict]:
         approver = d.get("approver")
         if not approver and any(option_cost(o) for o in d.get("options") or []):
             approver = exception_approver()  # money: whoever the approval policy names
-        other = bool(approver and viewer and first_name(approver) != first_name(viewer))
+        # Someone else signs (approval policy), but it is only theirs once it was passed on:
+        # until then it stays with the viewer, whose next step is to ask them.
+        signoff = (
+            approver if approver and viewer and first_name(approver) != first_name(viewer) else None
+        )
         called = next(
             (
                 a
@@ -462,7 +466,8 @@ def build_cards(net: dict, ships: dict[str, dict]) -> list[dict]:
                 "level": level,
                 "status": status,
                 "approver": approver,
-                "routed_to_other": other,
+                "routed_to_other": bool(signoff and status != "open"),
+                "signoff": signoff,
                 "reason": d.get("reason"),
                 "called_at": called.get("at") if called else None,
                 "options": options,
@@ -874,8 +879,14 @@ def verifier_cards(
             ui=ui,
             approver=approver,
             routed_to_other=bool(
-                approver and viewer and first_name(person_of(approver)) != first_name(viewer)
+                approver
+                and viewer
+                and first_name(person_of(approver)) != first_name(viewer)
+                and status != "open"
             ),
+            signoff=approver
+            if approver and viewer and first_name(person_of(approver)) != first_name(viewer)
+            else None,
             reason=reason,
             called_at=called.get("at") if called else None,
             options=options,
@@ -975,6 +986,34 @@ def escalation_brief(f: dict, d: dict, imp: dict, options: list[dict], viewer: s
             f"Recommended: {lead.get('action')} ({lead.get('cost') or 'no cost stated'}). {lead.get('effect') or ''}"
         )
     return " ".join(p.strip() for p in parts if p)
+
+
+def _promote_by_launch(cards: list[dict], launch: dict, clock) -> bool:
+    """
+    Rank by what the launch loses: a case on a part that runs dry before the trucks becomes red
+    and is due when the part runs dry, however its detector rated it. Site questions about the
+    same part stay as they are (they support the case, they are not the case).
+    """
+    launch_at = parse_ts((launch or {}).get("launch_at")) or parse_ts(
+        getattr(clock, "launch_at", None) and clock.launch_at.isoformat()
+    )
+    changed = False
+    by_id = {c["id"]: c for c in cards}
+    for part in (launch or {}).get("parts") or []:
+        dry = parse_ts(part.get("runs_dry"))
+        if not dry or (launch_at and dry >= launch_at) or not part.get("short"):
+            continue
+        for cid in part.get("cards") or []:
+            c = by_id.get(cid)
+            if not c or c.get("site_question") or c["status"] not in ("open", "escalated"):
+                continue
+            c["level"] = "red"
+            c["runs_dry"] = c.get("runs_dry") or part["runs_dry"]
+            dl = parse_ts(c.get("deadline"))
+            if not dl or dl > dry:
+                c["deadline"] = part["runs_dry"]
+            changed = True
+    return changed
 
 
 def rank_key(c: dict):
@@ -1316,6 +1355,10 @@ def build_state() -> dict:
     inbox = [c for c in open_cards if not c["routed_to_other"]]
     strip = build_strip(cards, root, clock, cur)
     launch = launch_view.build(cards, net["shipments_raw"], clock, cur, strip, site)
+    if _promote_by_launch(cards, launch, clock):
+        cards.sort(key=rank_key)
+        open_cards = [c for c in cards if c["status"] == "open"]
+        inbox = [c for c in open_cards if not c["routed_to_other"]]
     return {
         "now": cur.isoformat(),
         "viewer": viewer_name(root),
@@ -1420,7 +1463,11 @@ def approve(card_id: str, body: dict = Body(default_factory=dict)) -> dict:
             "action_type": opt.get("routine_type"),
             "via": body.get("via") or "inbox",
             **({"message_id": sent["message_id"], "subject": sent["subject"]} if sent else {}),
-            **({"link": sent["link"], "channels": sent["channels"]} if sent and sent.get("link") else {}),
+            **(
+                {"link": sent["link"], "channels": sent["channels"]}
+                if sent and sent.get("link")
+                else {}
+            ),
         },
     )
     offer = (
