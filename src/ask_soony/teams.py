@@ -65,11 +65,11 @@ def card_payload(card: dict, reply: dict | None = None) -> dict:
         {
             "type": "TextBlock",
             "text": (
-                "📨 Supplier replied"
+                "Supplier replied"
                 if reply
-                else "🔴 Launch at risk"
+                else "Launch at risk"
                 if level == "red"
-                else "🟠 Needs a decision"
+                else "Needs a decision"
             ),
             "weight": "Bolder",
             "color": "Good" if reply else LEVEL_COLOR.get(level, "Default"),

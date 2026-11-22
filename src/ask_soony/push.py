@@ -125,6 +125,16 @@ def push_test(body: TestPush):
     )
     if not subscriptions():
         raise HTTPException(409, "no device has enabled alerts yet")
-    title = "🔴 Launch at risk"
-    text = card["headline"] if card else "Test alert"
-    return send(title, f"{text}. Tap to talk to the assistant.", card["id"] if card else None)
+    if card is None:
+        return send("Ask Soony", "Test alert: alerts are on for this device.", None)
+    return send(decision_title(card), card["headline"], card["id"])
+
+
+def decision_title(card: dict) -> str:
+    """'One decision before 10:00' (local time), or plain 'One decision' without a deadline."""
+    from ask_soony import api
+
+    deadline = api.parse_ts(card.get("deadline"))
+    if deadline is None:
+        return "One decision for you"
+    return f"One decision before {deadline.astimezone(api.tz()).strftime('%H:%M')}"

@@ -275,7 +275,7 @@ def check_once() -> list[dict]:
                 try:
                     from ask_soony import push
 
-                    push.send(f"📨 {who} replied", summary, card_id)
+                    push.send(f"{who} replied", summary, card_id)
                 except Exception:  # no devices: the reply is on the card anyway
                     pass
                 if found["after_launch"]:

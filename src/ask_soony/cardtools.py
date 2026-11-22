@@ -227,7 +227,7 @@ def run_tool(card_id: str, call: ToolCall):
         try:
             from ask_soony import push
 
-            push.send("⬆️ Escalated launch alert", f"{card.get('headline', '')}", card_id)
+            push.send("Escalated", f"{card.get('headline', '')}", card_id)
         except Exception:  # no devices: the escalation is recorded anyway
             pass
         return {"ok": True, "status": "escalated", "to": action.get("to")}
