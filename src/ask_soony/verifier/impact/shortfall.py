@@ -235,12 +235,32 @@ def compute(records: pd.DataFrame, issues: pd.DataFrame) -> Shortfall:
 
     # Supply that could close a gap before launch
     launch = min((e.launch_date for e in editions if e.launch_date), default=None)
+    newest: dict[str, dict] = {}  # reference -> newest ERP shipment row
+    for row in by_kind.get("shipment", []):
+        ref = row["reference"] or row["shipment_id"]
+        if ref and (ref not in newest or (row["as_of"] or "") > (newest[ref]["as_of"] or "")):
+            newest[ref] = row
     for plan in by_kind.get("plan_inbound", []):
         need = needs.get(plan["material_id"])
         status = (plan["attrs"].get("status") or "").lower()
         if need is None:
             continue
-        if "arrived" in status:  # at the port, not in stock yet: needs collecting
+        erp = newest.get(plan["reference"])
+        erp_status = (erp["attrs"].get("status") or "") if erp else ""
+        stopped = _skips(erp_status) if erp_status else None
+        if "arrived" in status and stopped and stopped.startswith("not moving"):
+            # The plan says it waits at the port; the system export says it is held: both shown
+            need.not_counted.append(
+                {
+                    "reference": plan["reference"],
+                    "quantity": plan["attrs"].get("quantity"),
+                    "status": erp_status,
+                    "supplier_id": plan["supplier_id"],
+                    "reason": f"launch plan says at the port for pick-up, but the ERP export "
+                    f"({erp['as_of']}) says '{erp_status}': not offered as a fix",
+                }
+            )
+        elif "arrived" in status:  # at the port, not in stock yet: needs collecting
             need.supply.append(
                 {
                     "kind": "at_port",
@@ -316,6 +336,9 @@ def _skips(status: str) -> str | None:
         return "cancelled"
     if "arrived" in s:  # at the port: a fix (collect it), see the at_port supply above
         return "at the port, needs collecting"
+    # Not moving: an ETA on a held or blocked shipment is a hope, not supply
+    if any(word in s for word in ("held", "hold", "blocked", "stuck", "strike", "seized")):
+        return f"not moving (status '{status}')"
     if s in ("delivered", "received", "closed", "completed"):
         return f"status '{status}'"
     return None
