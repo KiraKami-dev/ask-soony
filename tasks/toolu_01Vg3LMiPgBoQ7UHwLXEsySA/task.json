@@ -1,0 +1,20 @@
+{
+  "tool_use_id": "toolu_01Vg3LMiPgBoQ7UHwLXEsySA",
+  "agent_id": "a9a3b51fc46a02b56",
+  "subagent_type": "general-purpose",
+  "task_description": "Shipment truth from all sources",
+  "files": [
+    "src/ask_soony/api.py",
+    "src/ask_soony/cardtools.py",
+    "src/ask_soony/tracking.py"
+  ],
+  "token_usage": {
+    "input_tokens": 182,
+    "cache_creation_tokens": 280971,
+    "cache_read_tokens": 18382316,
+    "output_tokens": 110711,
+    "api_call_count": 90
+  },
+  "started_at": "2026-11-22T06:24:50.697158+01:00",
+  "completed_at": "2026-11-22T06:44:04.662088+01:00"
+}

@@ -1,0 +1,64 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M80WJ75JE51P0W3T0G6DHBPD",
+  "strategy": "manual-commit",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 5,
+  "files_touched": [
+    "src/ask_soony/api.py",
+    "src/ask_soony/cardtools.py",
+    "src/ask_soony/launch_view.py",
+    "src/ask_soony/routines.py",
+    "src/ask_soony/tracking.py",
+    "tests/test_routines_more.py",
+    "tests/test_tracking.py",
+    "web/src/components/SupplyMap.tsx",
+    "web/src/lib/api.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt",
+      "assets_manifest": "/0/assets/manifest.json"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 43,
+    "cache_creation_tokens": 26429,
+    "cache_read_tokens": 5591346,
+    "output_tokens": 14911,
+    "api_call_count": 18,
+    "subagent_tokens": {
+      "input_tokens": 94,
+      "cache_creation_tokens": 76494,
+      "cache_read_tokens": 12086926,
+      "output_tokens": 47168,
+      "api_call_count": 46
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 1715,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 66,
+      "credentialed_uri": 0,
+      "entropy": 567,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 1058,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 961,
+      "IP": 32,
+      "PHONE": 65
+    }
+  }
+}
