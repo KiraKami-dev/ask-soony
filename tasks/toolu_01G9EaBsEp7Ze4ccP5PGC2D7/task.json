@@ -1,0 +1,15 @@
+{
+  "tool_use_id": "toolu_01G9EaBsEp7Ze4ccP5PGC2D7",
+  "agent_id": "ae989bc4d1d90dfa3",
+  "subagent_type": "Plan",
+  "task_description": "Design C: jury story and visual style",
+  "token_usage": {
+    "input_tokens": 10,
+    "cache_creation_tokens": 39946,
+    "cache_read_tokens": 132674,
+    "output_tokens": 4297,
+    "api_call_count": 5
+  },
+  "started_at": "2026-11-22T03:57:38.882419+01:00",
+  "completed_at": "2026-11-22T03:58:32.388667+01:00"
+}

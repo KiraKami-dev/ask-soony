@@ -1,0 +1,196 @@
+also is it possible to visualize the code we write (maybe autonmatically) maybe a bit like n8n or so for no coders?
+
+---
+
+<task-notification>
+<task-id>a6f56ed4fb5bed5e4</task-id>
+<tool-use-id>toolu_017qLUr3DtxtdbtQ6YaQaLam</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a6f56ed4fb5bed5e4.output</output-file>
+<status>completed</status>
+<summary>Agent "Backend: demo cards, activity via, voice routine" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>All four tasks are done. I also ran `uv run python scripts/demo_cards.py` once for real, without `--reset`: all 7 cards are open, in `inbox_ids`, and every document side anchors. All 181 tests pass and ruff is clean. Nothing is committed, and nothing was approved or emailed.
+
+**Files changed**
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/api.py`: only `build_activity`, `escalate` and `dismiss`.
+  - Each decided or dismissed activity item now carries `via`. It comes from the action named in the card's `action_id`, or else the card's latest action.
+  - `escalate` and `dismiss` record `body.get("via") or "inbox"`, the same way `approve` does.
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/cardtools.py`:
+  - Voice escalate and reject now pass `via: "voice"`.
+  - New `teach_routine` tool: on an open card it returns `{ok: false, error: "decide first"}`.
+  - On a decided card it calls `routines.suggest`, stores the draft (switched off) in `routine_drafts.json` keyed by card id, and sends the "Routine draft ready" push inside try/except. It returns `{ok, name, description}`. It never saves or enables a routine.
+  - New route `GET /api/routines/drafts`, newest first.
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/voice.py`: the instructions now cover `teach_routine`: decide first, say "I've drafted it as a routine. Check it on screen before it starts.", and never switch a routine on.
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/components/VoiceCall.tsx`:
+  - Adds the transcript line "Routine drafted: &lt;name&gt; · review it under Routines".
+  - I had to change the hang-up. The call used to end 0.8 s after the goodbye, which left no time to say "next time just do that". It now waits 4 s, and cancels the hang-up if the buyer speaks again or a tool is running. Type-check passes.
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/scripts/demo_cards.py` (new): only the document references are fixed in the script (file paths, receipt and PO numbers, verbatim quotes). Every quantity, price, date and address is read from the portal at run time.
+  - It checks each PDF still contains the expected text and skips a case with a warning if not.
+  - Entries are merged by id, so a second run changes nothing except timestamps.
+- `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/tests/test_demo_tools.py` (new, 5 tests):
+  - activity `via` for voice, routine and inbox
+  - `teach_routine` refusing an open card, then storing a draft that stays off
+  - `demo_cards` being idempotent and keeping other entries, on a small fake portal
+  - `--reset` making backups and switching routines off
+
+**Demo reset:** `uv run python scripts/demo_cards.py --reset`
+- It backs up each file as `&lt;name&gt;.before-demo-&lt;timestamp&gt;.json`, then clears `decision_status.json`, `actions.json`, `replies_seen.json`, `teams_posted.json` and `routine_drafts.json`, and switches every routine off.
+- The cards themselves are refreshed and the Hwaseong card is left as it is.
+
+**What each card shows**
+- **Hwaseong** (`paper-4500318735-CMP-GAM-001`): unchanged.
+- **Art books** (red, 5,900 copies at risk):
+  - Headline: "We have 19,300 art books, not 91,300. The Collector's cell runs out about 5,900 copies early."
+  - Evidence: goods receipt 5000413065 booked 80,000 against 8,000 ordered, SAP stock of 91,300, and the delivery note scan WZ-261116-473. I looked at the scan: 80.000 is struck through and 8 000 written by hand, with 40 packages and 360 kg. The fourth side is Karton Nowak's rush offer.
+  - Recommended option: email Agnieszka Nowak to order the 8,000 from stock, about EUR 16,800 (8,000 × EUR 2.10 PO price). The other option is a note to DC receiving to correct the receipt, no cost.
+- **Sleeves** (amber, 4 cards, POs 4500318752, 4500318765, 4500318774 and 4500318786):
+  - Each order confirmation says "Artwork PR-SL-0604: rev. B (GH6_sleeve_revB.pdf)". The engineering change ECN-2026-118 says rev B must not be packed.
+  - Recommended option: email Lin Hui at PackRight to print to rev C (GH6_sleeve_revC_USK2026.pdf, the file name taken from Karton Nowak's confirmations), no cost. The other option is to tell the category lead.
+  - The 4 cards all have the same structure, so a routine learned from the first can handle the other three.
+  - The big number shown is the PO's sleeve quantity under the label "units short", for example 295,000.
+- **Statues** (red, 3,400 copies short): receipt 5000413063 put 5,600 statues in stock as unrestricted, but the inspection report says the lot does not meet AQL. Only 21,800 usable statues remain for 25,200 copies. The one option is to ask Supplier Quality and the category lead for a concession or a 100% sort, no cost.
+- Every card has a 3-step agent trail. Copies short are counted against the 25,200 still to pack at the stock snapshot (20 Nov), which matches the figures your data scout gave.
+
+**Before the demo**
+- **Deadlines:** a card's deadline is 10:00 or 12:00 on launch day, but never less than 1 to 3 hours from when the script runs. They currently show 10:00 and 12:00 (as does the Hwaseong card), which will be overdue at 14:00. Run the script, or `--reset`, shortly before the demo.
+- **Teams:** `--reset` writes `teams_posted.json` as an empty list rather than deleting it. If a Teams webhook is set, the server's Teams loop will then post all open red and amber cards once. That is intended for a live replay; if you don't want it, I can delete the file on reset instead.
+- **Frontend:** the UI still has to show `activity[].via` and read `GET /api/routines/drafts`. Those are in `web/src/lib/api.ts` and `Routines.tsx`, which are a teammate's files, so I didn't touch them.</result>
+<usage><subagent_tokens>165158</subagent_tokens><tool_uses>40</tool_uses><duration_ms>382758</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>ad6b5b0b5262f5468</task-id>
+<tool-use-id>toolu_01Aemw3axQDwsWDhcVQikVrf</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/ad6b5b0b5262f5468.output</output-file>
+<status>completed</status>
+<summary>Agent "Polish inbox, cards and header UI" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I've polished the inbox in the seven files you allowed, and nothing is committed. Typecheck and `npm run build` both pass; the bare `tsc -p .` checks nothing here because `tsconfig.json` has `files: []`, so I ran `npx tsc --noEmit -p tsconfig.app.json`.
+
+**Heads-up:** the app serves `web/dist` directly, so every build I ran went straight to the live app at :8000.
+
+I never clicked Approve, Escalate or Dismiss on a real card. The decided, routine/voice and empty states were faked by intercepting `/api/state` in the browser.
+
+**What changed, per file**
+- **`lib/api.ts`**: added the optional `via` field to activity items, plus shared helpers:
+  - turn part codes like `CMP-GAM-001` into readable names from the cards, or hide them;
+  - strip bracketed internal codes and show ISO dates as "Mon 23 Nov";
+  - one cost wording, so "none" becomes "No cost";
+  - slack text that hides itself when it would only confuse.
+- **`App.tsx`**:
+  - The bottom toast and the `offer` plumbing are gone; open→decided detection stays in `load`, so voice decisions still count.
+  - The offer is skipped when a routine made the decision or one already exists for that card.
+  - "Show me how" sets `automate`, which opens the Routines sheet and starts a draft.
+  - On `/d/&lt;id&gt;`, the same panel shows under the card, with a Routines button in that header so the sheet can open there. The main `&lt;Routines state={state} onChanged={load} request={automate} /&gt;` is unchanged.
+- **`Rail.tsx`**: holds the one automation panel, pinned above "Needs you", with your wording and Sent/Approved/Escalated/Dismissed as appropriate.
+  - All section headings now use one style.
+  - Activity items get a "By routine · &lt;name&gt;" chip or a "By voice" chip, and show nothing extra when `via` is missing.
+  - The empty state now reads "Nothing needs you right now." with what the agents are watching (shipments, suppliers, last check). It no longer says "On track" while the header says the line stops.
+- **`DecisionCard.tsx`**:
+  - Approve is the one primary button, full width on phones; Edit and Escalate are secondary, and Dismiss moved into a "⋯" menu.
+  - The recommendation reads "We recommend", then the action, the effect and a cost tag. Alternatives read "Or: …" with their cost.
+  - Cards with a system-vs-document mismatch show both sides on the card ("SYSTEM · SAP purchase order: 48,000 due Sat 21 Nov" vs "DOCUMENT: 28,000 flown · 20,000 arrive Tue 24 Nov"). Clicking it opens Evidence.
+  - Decided cards show an "Approved" or "Sent" banner instead of the buttons.
+  - The old hard-coded "Allow always / Ask me each time" block is gone. `/api/trust` is no longer called from the UI but still exists on the server.
+- **`StatusStrip.tsx`**:
+  - Collector's slack now shows "–" instead of "-7 h" when on track; Standard shows "−18 min".
+  - "Breaks first" shows "Game Card 128 GB" instead of the part code, and clicking it scrolls to its card.
+  - "Last portal drop 8 h ago" became "Watching · checked &lt;ago&gt;" under the logo.
+  - On phones, the logo and header buttons share the top row, the two editions sit side by side below, and nothing overflows.
+- **`EvidenceDrawer.tsx`**: generic "Evidence" titles became "Supporting note", and dates in the system/document values are tidied.
+
+**Screenshots** (in `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/ui-inbox/`)
+- Before: `before-desk.png`, `before-phone.png`
+- After: `final-desk.png`, `final-phone.png`
+- Offer panel: `decided-desk.png`, `decided-phone.png`
+- Single decision page with the offer: `single-phone.png`
+- Activity chips: `via-desk-bottom.png`, `via-phone-bottom.png`
+- Empty state: `calm-phone.png`
+
+The script is `shot.py` in the same folder.
+
+**For you to wire in the backend**
+- **`via` field:** activity items need `via` set to `"routine: &lt;name&gt;"`, `"voice"` or `"inbox"`. Until then, no chips show and routine decisions aren't filtered out of the offer.
+- **Numbers that disagree:** the Standard strip says 32,000 at risk while the cards say 20,000 and 34,800. I didn't reconcile them in the UI because that would mean inventing a number.
+- **Long option text:** some option text from the backend is long and phrased like an internal label ("Message approver of exceptions: Decision needed: …"). It needs shorter phrasing at the source.
+- **Code names in names:** the part-name lookup relies on the cards (card ids ending in the code, or "(CODE)" in an option's text). A `part_name` field on the strip's `breaks_first` and on each card would be sturdier.
+
+The working tree also has other people's uncommitted changes (Python files, `Routines.tsx`, `routines/`, `VoiceCall.tsx`); I didn't touch them.</result>
+<usage><subagent_tokens>140153</subagent_tokens><tool_uses>37</tool_uses><duration_ms>412893</duration_ms></usage>
+</task-notification>
+
+---
+
+I really meant the overall ui from top to bottom. do we need the world view? the top? the visual style? or would sth else fit better?
+
+---
+
+ask a bunch of subagents, then build the best version
+
+---
+
+<task-notification>
+<task-id>ab9a08cd4f98c918f</task-id>
+<tool-use-id>toolu_01F86f8Byvy5t1bufWbT9coc</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/ab9a08cd4f98c918f.output</output-file>
+<status>completed</status>
+<summary>Agent "Build routine flow UI and editing" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>The routines UI is built: the flow graph, the editable step list with before/after review, the suggested draft, and the voice drafts are all in. `tsc --noEmit` and `npm run build` both pass, and nothing is committed.
+
+I only touched `web/src/components/Routines.tsx` and the new `web/src/components/routines/` folder. The other modified files in `git status` belong to the other engineers.
+
+**Server on port 8000 needs a restart before the demo.** It was started at 03:32, before the commit that added `/api/routines/preview` and `/edit`, and it has no auto-reload. Right now `/preview` answers 405 and `/suggest` returns old-style code without the recipe, so the new UI shows the legacy view there. It also won't have `/api/routines/drafts` from `cardtools.py`. Until it restarts, the voice-draft section just stays empty.
+
+**What's built:**
+- **Header button:** `Workflow` icon, with the "Routines" label shown from `lg` up. A blue count badge shows when voice drafts are waiting; otherwise a quieter badge shows how many routines are on.
+- **Flow view (default on each card):**
+  - Reads left to right in the wide view: "Every portal check", then the conditions stacked in one column, then one node per step.
+  - The dashed "You decide" guard branches off the step that sends.
+  - Counters come from the latest run ("2 matched", "1 sent", "1 told", "1 to you"), with a green ring on nodes that did something and a "Test run" tag for previews.
+  - In the sheet it's vertical; "Expand" opens a near full-width sheet with the horizontal graph and the run result. On phones the guard drops below the send step.
+- **Steps view (where editing happens):**
+  - When / Then / Always blocks showing only the buyer phrases.
+  - × on hover removes a condition or step; steps reorder by native drag and drop.
+  - The palette adds "Tell me on my phone", "Tell me on Teams" and "Note it in the history" by click or drag. Each chip is hidden once that step exists.
+- **Review before saving:**
+  - Every direct edit goes through `/preview`; "Change it in your words" goes through `/edit`.
+  - The review shows the diff by block id: New, Removed (struck through), Changed (old phrase struck, then the new one), Moved. It also shows a name change, the agent's note if any, and the test on today's inbox.
+  - "Apply change" is disabled if the test failed; "Keep as is" drops the change. Edits can stack before applying. On a draft, Apply only updates the draft locally.
+- **Suggested routine:** a "The agent is writing a routine from your decision…" state, then the same card in a blue frame with the test run, "Turn on" and "Not now".
+- **Drafted from your call:** voice drafts appear at the top with "You said: …". Each one is re-tested once through `/preview` when the sheet opens. "Not now" hides it on that device only (stored in the browser, since there is no delete endpoint).
+- **Rest of the sheet:** a real switch, the stats line ("Handled N cards · Last ran HH:MM · Sent 1 message, told you about 2 cards"), Run now, Delete with an inline confirm, and "Show the code".
+  - Old routines saved as code only show their name, description and the code.
+  - "Automate a decision you made" shows Approved / Sent / Passed on / Dismissed, and "Automated · &lt;name&gt;" for cards that already have a routine. The card behind an open draft is hidden.
+- **Bug found and fixed:** dragging a step was dropping it at the end of the list instead of where it was released.
+
+**How I tested it:**
+- I ran a second copy of the server from this checkout on port 8011 with background loops off, since 8000 is out of date. Only `/preview`, which is a dry run, and one real `/suggest` reached the server.
+- I made 1 real `/suggest` call (it took 2.5 s); `/edit` was mocked. Save, toggle, run and delete were all mocked in Playwright, so no cards were approved and no emails were sent.
+- `data/state/routines.json` was backed up and still has the same two routines with the same switches. The test server is stopped.
+
+**For you to wire elsewhere:**
+- `sheet.tsx` already caps the sheet at 560px; I pass `sm:max-w-[560px]` anyway. The Expand view overrides it with `max-w-[min(1280px,100vw)]`.
+- **Run now is real, not a dry run** (unchanged backend behaviour). It can send emails if the routine matches an open card, so avoid clicking it during a rehearsal unless you mean it.
+- The lead may want a backend `DELETE /api/routines/drafts/{card_id}` so "Not now" on a voice draft is shared across devices.
+
+Everything is in `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/ui-routines/`. The screenshots are in `shots/`; open these first:
+- `wide-1-list-flow.png`
+- `wide-3-expanded.png`
+- `wide-8-review-drag.png`
+- `wide-12-review-words.png`
+- `phone-2-scrolled.png`
+- `header.png`
+
+That folder also holds the script (`shoot.py`), the `/suggest` sample (`suggest.json`) and the backup (`routines.backup.json`).
+
+Files are in `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/components/`:
+- `Routines.tsx`
+- `routines/types.ts`
+- `routines/FlowGraph.tsx`
+- `routines/RoutineFlow.tsx`
+- `routines/RoutineCard.tsx`</result>
+<usage><subagent_tokens>187734</subagent_tokens><tool_uses>50</tool_uses><duration_ms>689696</duration_ms></usage>
+</task-notification>

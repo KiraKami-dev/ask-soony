@@ -1,0 +1,61 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M80K1TCDNPBY0SECSK7QRAP6",
+  "strategy": "manual-commit",
+  "branch": "jonas/alert-platform",
+  "checkpoints_count": 4,
+  "files_touched": [
+    "web/src/App.tsx",
+    "web/src/components/DecisionCard.tsx",
+    "web/src/components/EvidenceDrawer.tsx",
+    "web/src/components/Rail.tsx",
+    "web/src/components/StatusStrip.tsx",
+    "web/src/lib/api.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt",
+      "assets_manifest": "/0/assets/manifest.json"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 4,
+    "cache_creation_tokens": 4614,
+    "cache_read_tokens": 622532,
+    "output_tokens": 1157,
+    "api_call_count": 1,
+    "subagent_tokens": {
+      "input_tokens": 6,
+      "cache_creation_tokens": 6193,
+      "cache_read_tokens": 140251,
+      "output_tokens": 11986,
+      "api_call_count": 3
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 1245,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 63,
+      "credentialed_uri": 0,
+      "entropy": 269,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 889,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 792,
+      "IP": 32,
+      "PHONE": 65
+    }
+  }
+}

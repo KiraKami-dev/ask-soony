@@ -1,0 +1,15 @@
+{
+  "tool_use_id": "toolu_01X21PJfESyaHF3ev2Sq6j5f",
+  "agent_id": "a5e7b1c23ba1c2723",
+  "subagent_type": "Plan",
+  "task_description": "Design B: triage-inbox first",
+  "token_usage": {
+    "input_tokens": 12,
+    "cache_creation_tokens": 47461,
+    "cache_read_tokens": 180786,
+    "output_tokens": 5378,
+    "api_call_count": 6
+  },
+  "started_at": "2026-11-22T03:57:29.717768+01:00",
+  "completed_at": "2026-11-22T03:58:32.390239+01:00"
+}
