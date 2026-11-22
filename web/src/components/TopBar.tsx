@@ -97,7 +97,8 @@ export function TopBar({ page, go, status, bell, phone, routinesBadge = 0, role 
           className="flex items-center gap-2.5 text-ink"
           aria-label="Lighthouse, today"
         >
-          <Mark />
+          {/* Up 2 px: measured, the glyph otherwise centres 1 to 2 px below the text. */}
+          <span className="-translate-y-[2px]"><Mark /></span>
           {!phone && <span className="font-medium">Lighthouse</span>}
         </a>
         {!phone && checkedAt && <Heartbeat at={checkedAt} nowMs={nowMs} />}
