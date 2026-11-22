@@ -1,0 +1,199 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M81BBY3KCF8AH6R1M4HZH50M",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T10:03:50.674759Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "bef89f7edf68",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 30,
+    "cache_creation_tokens": 17718,
+    "cache_read_tokens": 2628467,
+    "output_tokens": 7835,
+    "api_call_count": 15
+  },
+  "session_token_usage": {
+    "input_tokens": 3427,
+    "cache_creation_tokens": 3308088,
+    "cache_read_tokens": 746474754,
+    "output_tokens": 1346922,
+    "api_call_count": 1490,
+    "subagent_tokens": {
+      "input_tokens": 3280,
+      "cache_creation_tokens": 7006960,
+      "cache_read_tokens": 240487983,
+      "output_tokens": 1893026,
+      "api_call_count": 1569
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 2400,
+    "layers": {
+      "betterleaks": 34,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 94,
+      "credentialed_uri": 0,
+      "entropy": 862,
+      "goredact": 8,
+      "key_context": 0,
+      "pii": 1416,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1279,
+      "IP": 72,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-22T09:30:29.207868Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "6e096d3ead7c",
+      "timestamp": "2026-11-22T09:30:29.207868Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 293
+  },
+  "summary": {
+    "intent": "Win the Lio 'Keep the Line Running' challenge at START Hack Munich: analyze Soony's confidential launch data, then build and polish a deployed agent product (notice, show, act, learn) with role-based views for the buyer and the procurement head, ready for the Sun 12:00 hand-in.",
+    "outcome": "Found that the Collector's Edition misses launch despite a plan saying 'all ok', then built a poller, extraction and act pipeline with Today, Launch, Routines and phone-call approvals. Merged PRs #7 and #8 (260 tests pass), and added separate Felix/Maren sign-in, inbox filtering, a History page and a heartbeat; the last commits are local, unpushed, with live not restarted and the deck not started.",
+    "learnings": {
+      "repo": [
+        "Portal API has only list files, get file and archive.zip endpoints; no webhooks or change feed, so new or replaced files must be found by polling and comparing SHA-256 checksums.",
+        "Portal data under data/ is confidential and gitignored; AGENTS.md says not to commit it. Branch llm-task-update carried 335 data/portal files, and PR #8 was merged, which put them on main anyway.",
+        "Live (:8000) and demo (:8001) servers run from the main folder; switching branches there would break them, so other branches are checked out in a git worktree (../ask-soony-llm-task-update).",
+        "Demo instance runs without a portal token on purpose so files cannot change mid-demo; the heartbeat is now shown only on instances that poll, using the runner's own token check.",
+        "Entire only writes a checkpoint when repo files change; the repo requires `entire status` and `entire brain status` checks before pushing.",
+        "Team workflow files (CLAUDE.md, PROGRESS.md, AGENTS.md) exist; tasks are claimed in PROGRESS.md.",
+        "Project rules: ask before every push, no PRs unless asked, no attribution trailers, no em dashes, never print secrets, never approve/escalate cards on live data in tests (real supplier emails go out), manual supplier emails greet the full contact_name."
+      ],
+      "code": [
+        {
+          "path": "src/ask_soony/api.py",
+          "finding": "read_csv decodes utf-8-sig with a cp1252 fallback and sniffs ';' vs ','; added after the German PO export crashed the paper check. Also hosts the signed-in sign-off link endpoint and who-decided field on activity items."
+        },
+        {
+          "path": "src/ask_soony/outbox.py",
+          "finding": "Outbox sync previously overwrote actions written concurrently; the final append now happens under api._lock."
+        },
+        {
+          "path": "src/ask_soony/routines.py",
+          "finding": "pick() splits comma-separated words; expire_stale drops stale proposals that would fail with 'not an open card'."
+        },
+        {
+          "path": "web/src/components/History.tsx",
+          "finding": "New History page for both roles: who decided what, how and when, grouped by day, up to 200 entries."
+        }
+      ],
+      "workflow": [
+        "A subagent cross-checking 200 order confirmations and 59 scans against SAP found the key discrepancies (art-book receipt 80,000 vs 8,000, failed statue lot booked as usable).",
+        "Delegating UX review to a subagent gave a useful design constraint: green may show 'agents working' but never 'all fine'.",
+        "The user's cp1252 and format surprises show data formats can change mid-hack, so readers must be flexible.",
+        "Replying as 'Nobody scores whether Soony launches' framed that fixes should go through the product's act step rather than hand-written emails."
+      ]
+    },
+    "friction": [
+      "Hooks seemed not to fire; actually Entire skipped the checkpoint because no repo files had changed.",
+      "User asked about llm-task-update pulls four times because a branch checkout would have overwritten data/portal and swapped live code.",
+      "PR #8 merged with portal data in it, which conflicts with the no-commit-data rule.",
+      "Demo background loop does not auto-raise call alerts; workaround is running card_alerts.tick manually.",
+      "Realtime phone call cut off due to background noise, concurrent responses and a sideband ConnectionClosed.",
+      "Heartbeat 'Not checked since 08:30' on the demo looked broken because the demo never polls.",
+      "Demo DNS CNAME initially pointed to the wrong tunnel and needed --overwrite-dns.",
+      "Hand-in time pressure (about 11:20 against 12:00) with the video and deck still open."
+    ],
+    "open_items": [
+      "Push main (08c0d12, 02ce204, 16077f7 and later commits); not pushed yet.",
+      "Restart the live server so the new sign-in choice, who-decided field and heartbeat show up.",
+      "Decide whether to remove the 335 portal files from main (git rm -r --cached data/portal) and whether readings and golden.json stay in the repo.",
+      "Build the 6-slide pitch deck from docs/demo-script.md, using the Lio figures, network map and Maren's quote, and record the video of at most 3 minutes.",
+      "Check the new Maren/Felix views, History and the passed-on sign-off inbox in a browser; only verified by tests and endpoint probes.",
+      "Fix the demo background loop not auto-raising call alerts.",
+      "After the demo, switch the OpenAI webhook back to https://ask-soony.stenglein.dev/hooks/openai.",
+      "Delete duplicate routine 'Ask Hamburg to count book stock' on live; send the Hwaseong note and message Lucas about the Pulse emails.",
+      "Register sender addresses in the portal and confirm whether portal data and supplier replies differ per team."
+    ]
+  }
+}
