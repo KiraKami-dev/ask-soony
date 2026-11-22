@@ -47,7 +47,7 @@ box-shadow:0 1px 2px rgba(35,72,208,.25)}}button:hover{{background:#1d3db5}}
 <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path
 d="M2.5 8V2.5H8M16 2.5h5.5V8M21.5 16v5.5H16M8 21.5H2.5V16" fill="none" stroke="#18181a"
 stroke-width="2.4" stroke-linecap="square"/><rect x="6.5" y="9.5" width="11" height="5" rx="1"
-fill="#ffe066"/></svg>
+fill="#18181a"/></svg>
 <h1>Ask Soony</h1><p>Sign in to see what needs you today.</p>{error}
 <input type="hidden" name="next" value="{next}">
 <input type="password" name="password" placeholder="Password" aria-label="Password" autofocus
