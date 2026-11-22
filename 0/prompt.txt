@@ -1900,3 +1900,7 @@ or rather not?`
 <status>completed</status>
 <summary>Background command "Link the verdict to the first decision; build and test" completed (exit code 0)</summary>
 </task-notification>
+
+---
+
+and can we use the name lighthouse? (idk if we need a bit updated logo or ok)?
