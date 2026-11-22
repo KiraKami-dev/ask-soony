@@ -1,0 +1,21 @@
+{
+  "tool_use_id": "toolu_01CmhWajgJc7CB62FKWwiNFj",
+  "agent_id": "a41653865bb083677",
+  "subagent_type": "general-purpose",
+  "task_description": "Sign-off loop for escalations",
+  "files": [
+    "src/ask_soony/signoff.py",
+    "tests/test_signoff.py",
+    "web/src/components/OkPage.tsx",
+    "web/src/lib/signoff.ts"
+  ],
+  "token_usage": {
+    "input_tokens": 126,
+    "cache_creation_tokens": 208531,
+    "cache_read_tokens": 9482641,
+    "output_tokens": 57111,
+    "api_call_count": 62
+  },
+  "started_at": "2026-11-22T07:57:49.772866+01:00",
+  "completed_at": "2026-11-22T08:08:07.441499+01:00"
+}
