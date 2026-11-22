@@ -50,6 +50,11 @@ def _references(verdict: dict) -> dict:
                 keys["po_numbers"].append(value)
         else:
             keys.setdefault(column, value)
+    # Some readers put a delivery note's own number only in document_number, not in references
+    if verdict.get("document_type") == "delivery_note" and "delivery_note" not in keys:
+        own = clean(verdict.get("document_number"))
+        if own:
+            keys["delivery_note"] = own
     return keys
 
 
