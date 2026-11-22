@@ -1,0 +1,145 @@
+{
+  "document_type": "offer",
+  "languages": [
+    "Polish",
+    "English"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": null,
+  "document_date": "2026-11-21",
+  "references": [
+    {
+      "type": "contract",
+      "value": "§ 3.2 of the agreement (rush print)"
+    },
+    {
+      "type": "contract",
+      "value": "Annex A price list"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": null,
+      "supplier_part_no": null,
+      "description": "Druk ekspresowy wg § 3.2 umowy: okładki, ulotki, plakaty / Rush print per § 3.2 of the agreement: sleeves, leaflets, posters",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "do 50 000 szt. / up to 50,000 pcs",
+          "number": 50000,
+          "unit": "pcs",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "lead_time",
+          "field_label": null,
+          "value": "36 h od otrzymania pliku / 36 h from print-ready file",
+          "number": 36,
+          "unit": "h",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "cennik + 35 % / Annex A price + 35 %",
+          "number": 35,
+          "unit": "% surcharge on Annex A price",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "2",
+      "material_id": "CMP-GAM-008",
+      "supplier_part_no": null,
+      "description": "Art Book Grand Heist 6 (96 p, hardcover), nadwyżka z produkcji, na magazynie / overrun from production, in our finished-goods store",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "8 000 szt. / 8,000 pcs",
+          "number": 8000,
+          "unit": "pcs",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "lead_time",
+          "field_label": null,
+          "value": "załadunek w 4 h od zamówienia / loaded within 4 h of your order",
+          "number": 4,
+          "unit": "h",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "cennik / Annex A price",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Offer is valid for 24 hours.",
+      "quote": "ważna 24 h / valid 24 h"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Transport by Warta Trans truck, Poznań – Hamburg, about 9 hours driving.",
+      "quote": "Transport: Warta Trans, Poznań – Hamburg ok. 9 h jazdy. / Truck Poznań – Hamburg about 9 h driving."
+    },
+    {
+      "topic": "delay",
+      "text_en": "Please take our notice of planned downtime into account.",
+      "quote": "Uwaga: prosimy uwzględnić nasze zawiadomienie o przestoju technicznym. / Please note our notice of planned downtime."
+    },
+    {
+      "topic": "price",
+      "text_en": "Item 1 priced at Annex A price plus 35%; item 2 at Annex A price.",
+      "quote": "cennik + 35 % / Annex A price + 35 %; cennik / Annex A price"
+    },
+    {
+      "topic": "capacity",
+      "text_en": "Item 2 is overrun stock from production, held in the finished-goods store.",
+      "quote": "nadwyżka z produkcji, na magazynie / overrun from production, in our finished-goods store"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Rush-service offer from Karton Nowak to Soony Interactive GmbH dated 21.11.2026, valid 24 h. Item 1: rush print of sleeves, leaflets and posters up to 50,000 pcs, ready 36 h from print-ready file, at Annex A price +35%. Item 2: 8,000 pcs of CMP-GAM-008 Art Book Grand Heist 6 from overrun stock, loaded within 4 h of order, at Annex A price. Transport by Warta Trans, Poznań–Hamburg about 9 h. Refers to a separate notice of planned downtime.",
+    "red_flags": [
+      "Offer is valid for only 24 hours from 21.11.2026.",
+      "Item 1 carries a 35% surcharge over the Annex A price.",
+      "The offer refers to a separate notice of planned downtime, which is not part of this document and may affect the lead times.",
+      "No absolute prices are given, only references to Annex A, so the totals cannot be checked from this document.",
+      "Item 2 is overrun stock and is quoted at 8,000 pcs, which may not match the buyer's required quantity."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Clean, typed, bilingual (Polish/English) PDF with no handwriting, stamps or signatures.",
+      "Contact named: Agnieszka Nowak, +48 61 842 0101.",
+      "No document number shown."
+    ]
+  }
+}

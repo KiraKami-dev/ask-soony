@@ -1,0 +1,48 @@
+{
+  "path": "suppliers/SUP-0011_Boise_Semi/contracts/SUP-0011_Sales_Agreement_2023.pdf",
+  "sha256": "48b5ed33733232910c38a328dcf71a5608872653b8d0ea19a6bff271eaba0bb0",
+  "model": "claude-sonnet-5-5",
+  "effort": "high",
+  "fingerprint": "ef7ff7aae87f85e3",
+  "status": "ok",
+  "error": null,
+  "attempts": 1,
+  "finished_at": "2026-11-21T20:58:54+00:00",
+  "seconds": 514.9,
+  "num_turns": 4,
+  "cost_usd": 0.0936512,
+  "usage": {
+    "input_tokens": 6,
+    "cache_creation_input_tokens": 23514,
+    "cache_read_input_tokens": 29572,
+    "output_tokens": 3043,
+    "output_tokens_details": {
+      "thinking_tokens": 43
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 885,
+      "ephemeral_5m_input_tokens": 22629
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 2707,
+        "cache_read_input_tokens": 22000,
+        "cache_creation_input_tokens": 4415,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 4415,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  }
+}

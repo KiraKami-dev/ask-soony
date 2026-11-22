@@ -1,0 +1,31 @@
+{
+  "path": "suppliers/SUP-0028_Karton_Nowak/contracts/SUP-0028_Supply_Agreement_2021.pdf",
+  "sha256": "a4e91da8a44d900a372bb325c5131a2d2a712887008a4a52332c2d77a75215ab",
+  "model": "gpt-5.4",
+  "effort": "high",
+  "fingerprint": "704d1e77fe774b56",
+  "status": "ok",
+  "error": null,
+  "attempts": 1,
+  "finished_at": "2026-11-22T09:05:49+00:00",
+  "seconds": 107.3,
+  "usage": {
+    "completion_tokens": 12254,
+    "prompt_tokens": 5479,
+    "total_tokens": 17733,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 9612,
+      "rejected_prediction_tokens": 0,
+      "text_tokens": null
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": null,
+      "cached_tokens": 0,
+      "image_tokens": null,
+      "text_tokens": null
+    }
+  }
+}

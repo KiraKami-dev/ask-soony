@@ -1,0 +1,203 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Boise Semiconductor Inc.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26645916",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318766"
+    },
+    {
+      "type": "contract",
+      "value": "PC-0011-2023"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "5,000",
+          "number": 5000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "6.11",
+          "number": 6.11,
+          "unit": "USD",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-11-13",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2026-10-13",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "00030",
+      "material_id": "CMP-GAM-001",
+      "supplier_part_no": null,
+      "description": "Game Card 128 GB – Grand Heist 6",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "54,000",
+          "number": 54000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "10.93",
+          "number": 10.93,
+          "unit": "USD",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-11-11",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2026-10-13",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "00020",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "5,000",
+          "number": 5000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "6.11",
+          "number": 6.11,
+          "unit": "USD",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-11-23",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2026-10-13",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Incoterms EXW Boise, payment NET30.",
+      "quote": "Incoterms EXW Boise · Payment NET30"
+    },
+    {
+      "topic": "terms",
+      "text_en": "Terms of delivery: EXW Boise, ID per Sales Agreement PC-0011-2023, section 4.1. DDP is not agreed.",
+      "quote": "Terms of delivery: EXW Boise, ID per Sales Agreement PC-0011-2023, section 4.1. DDP is not agreed."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Freight, insurance and duties are prepaid by Seller and added to the invoice.",
+      "quote": "Freight, insurance and duties are prepaid by Seller and added to the invoice."
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Boise Semiconductor order acknowledgement OA26645916 for Soony Interactive GmbH's PO 4500318766 (dated 2026-10-13). It confirms three lines at USD prices: 5,000 x CMP-GAM-002 at 6.11 for 2026-11-13, 54,000 x CMP-GAM-001 at 10.93 for 2026-11-11, and 5,000 x CMP-GAM-002 at 6.11 for 2026-11-23. Terms are EXW Boise, NET30. The document has no handwritten corrections or stamps.",
+    "red_flags": [
+      "Contradictory delivery terms: the document says EXW Boise and 'DDP is not agreed', but also says freight, insurance and duties are prepaid by Seller and added to the invoice. That is DDP-like cost handling, which does not fit EXW.",
+      "CMP-GAM-002 appears on two lines (00010 and 00020), each 5,000 at 6.11, with different confirmed dates (2026-11-13 and 2026-11-23). The confirmed delivery is split, so the later 5,000 arrives 10 days after the first.",
+      "Lines are listed out of order (00010, 00030, 00020).",
+      "The acknowledgement does not show the originally ordered quantities or dates, so it cannot be checked against the PO from this document alone.",
+      "The document carries no issue date of its own."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Clean typed PDF, single page, fully legible.",
+      "No handwriting, stamps, signatures or strike-throughs.",
+      "Quantities use comma thousands separators (English convention), so 5,000 means 5000 and 54,000 means 54000.",
+      "The only date other than the confirmed dates is the customer order date, 2026-10-13."
+    ]
+  }
+}

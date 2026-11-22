@@ -11,6 +11,8 @@ agent loop and the model gets no tools: documents are untrusted input.
 
 Results are keyed by file checksum and a fingerprint of schema, prompts, model and effort: a
 re-run skips documents already read, and a changed file or a changed schema means read again.
+File versions the frozen baseline already holds (verifier/baseline.py) are never read again, so
+a new model or prompt only costs calls for new drops and never overwrites the baseline.
 Interrupt any time; the next run continues where this one stopped.
 """
 
@@ -28,6 +30,7 @@ from openai import AsyncOpenAI
 from tqdm import tqdm
 
 from ask_soony.extract import extract
+from ask_soony.verifier.baseline import BASELINE_DIR, baseline_keys, ignored_paths
 from ask_soony.verifier.image_recognizer.prompt import SYSTEM_PROMPT, USER_PROMPT
 from ask_soony.verifier.image_recognizer.schema import VERDICT_SCHEMA
 
@@ -57,6 +60,7 @@ class Settings:
     effort: str
     concurrency: int
     retries: int
+    baseline: Path | None = BASELINE_DIR  # file versions read here are skipped; None: read all
 
 
 def select_jobs(root: Path, only: str | None, images_only: bool, limit: int | None) -> list[Job]:
@@ -233,10 +237,21 @@ async def run_all(jobs: list[Job], settings: Settings, force: bool) -> dict:
     settings.out.mkdir(parents=True, exist_ok=True)
     index_path = settings.out / "index.jsonl"
     current = fingerprint(settings)
+    frozen = baseline_keys(settings.baseline)
+    in_baseline = [j for j in jobs if (j.rel, j.sha256) in frozen]
+    if in_baseline:
+        tqdm.write(f"{len(in_baseline)} documents already in the baseline: skipped")
+    jobs = [j for j in jobs if (j.rel, j.sha256) not in frozen]
+    ignored = ignored_paths()
+    if any(j.rel in ignored for j in jobs):
+        tqdm.write(f"{sum(j.rel in ignored for j in jobs)} documents ignored by decision: skipped")
+    jobs = [j for j in jobs if j.rel not in ignored]
     todo = [j for j in jobs if force or not is_done(j, settings.out, current)]
     skipped = len(jobs) - len(todo)
     if skipped:
         tqdm.write(f"{skipped} documents already read (same file, schema and prompt): skipped")
+    if not todo:
+        return _summarise(index_path, settings.out) if index_path.exists() else {}
     client = AsyncOpenAI(max_retries=2)  # reads OPENAI_API_KEY
     semaphore = asyncio.Semaphore(settings.concurrency)
     bar = tqdm(total=len(todo), unit="doc", desc="reading")

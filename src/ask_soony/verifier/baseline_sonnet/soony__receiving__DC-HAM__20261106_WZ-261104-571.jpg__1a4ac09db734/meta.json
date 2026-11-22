@@ -1,0 +1,48 @@
+{
+  "path": "soony/receiving/DC-HAM/20261106_WZ-261104-571.jpg",
+  "sha256": "1a4ac09db73460a5fbfb7facc856b34d380f027217d474f03a294ec7d2630022",
+  "model": "claude-sonnet-5-5",
+  "effort": "high",
+  "fingerprint": "ef7ff7aae87f85e3",
+  "status": "ok",
+  "error": null,
+  "attempts": 1,
+  "finished_at": "2026-11-21T20:54:25+00:00",
+  "seconds": 246.2,
+  "num_turns": 4,
+  "cost_usd": 0.10697899999999999,
+  "usage": {
+    "input_tokens": 4,
+    "cache_creation_input_tokens": 21827,
+    "cache_read_input_tokens": 8441,
+    "output_tokens": 1858,
+    "output_tokens_details": {
+      "thinking_tokens": 300
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 21827,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1759,
+        "cache_read_input_tokens": 4655,
+        "cache_creation_input_tokens": 20958,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 20958
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  }
+}

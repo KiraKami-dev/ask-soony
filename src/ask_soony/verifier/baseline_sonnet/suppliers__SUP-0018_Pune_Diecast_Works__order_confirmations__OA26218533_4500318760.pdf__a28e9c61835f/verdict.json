@@ -1,0 +1,130 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Pune Diecast Works Pvt. Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26218533",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318760"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-010",
+      "supplier_part_no": null,
+      "description": "Statue \"The Getaway\" (die-cast, 18 cm)",
+      "values": [
+        {
+          "field": "quantity_ordered",
+          "field_label": null,
+          "value": "2,800",
+          "number": 2800,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "1037",
+          "number": 1037,
+          "unit": "INR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-12-21",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "00020",
+      "material_id": "CMP-GAM-010",
+      "supplier_part_no": null,
+      "description": "Statue \"The Getaway\" (die-cast, 18 cm)",
+      "values": [
+        {
+          "field": "quantity_ordered",
+          "field_label": null,
+          "value": "2,400",
+          "number": 2400,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "1037",
+          "number": 1037,
+          "unit": "INR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-12-28",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "approval_status",
+      "text_en": "Supplier status: approved for serial supply to Soony (PPAP documents submitted 2026-09-14).",
+      "quote": "Supplier status: approved for serial supply to Soony (PPAP documents submitted 2026-09-14)."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Incoterms FOB Nhava Sheva; payment NET30. Customer order 4500318760 dated 2026-10-05.",
+      "quote": "Your order 4500318760 of 2026-10-05 · Incoterms FOB Nhava Sheva · Payment NET30"
+    }
+  ],
+  "decisions": [
+    {
+      "subject": "Supplier approval for serial supply to Soony",
+      "outcome": "approved",
+      "decided_by": "Pune Diecast Works Pvt. Ltd. (stated in the document)",
+      "conditions": null,
+      "quote": "Supplier status: approved for serial supply to Soony (PPAP documents submitted 2026-09-14)."
+    }
+  ],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order acknowledgement OA26218533 from Pune Diecast Works to Soony Interactive GmbH for PO 4500318760 (2026-10-05). Two lines for CMP-GAM-010 Statue \"The Getaway\": 2,800 pcs confirmed for 2026-12-21 and 2,400 pcs confirmed for 2026-12-28, both at 1037 INR. Incoterms FOB Nhava Sheva, NET30. The document states the supplier is approved for serial supply (PPAP submitted 2026-09-14).",
+    "red_flags": [
+      "The same material CMP-GAM-010 appears on two lines with different confirmed dates (total 5,200 pcs); the document does not say whether this is a split delivery.",
+      "The document states no unit of measure for the quantities, and no document date.",
+      "The unit price 1037 is shown with no per-unit basis stated, and no totals are given."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Clean typed PDF; no handwriting, stamps, strike-throughs or signatures.",
+      "The document has no explicit issue date; only the customer order date (2026-10-05) and the PPAP submission date (2026-09-14) appear."
+    ]
+  }
+}

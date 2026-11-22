@@ -1,0 +1,128 @@
+{
+  "document_type": "notice",
+  "languages": [
+    "Polish"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o.",
+  "recipient": "Soony Interactive GmbH, Dział Zakupów",
+  "document_number": null,
+  "document_date": "2026-11-09",
+  "references": [
+    {
+      "type": "contract",
+      "value": "§ 3.2 umowy (express orders)"
+    }
+  ],
+  "lines": [
+    {
+      "item": "Offset arkuszowy B1 (linia 1)",
+      "material_id": null,
+      "supplier_part_no": null,
+      "description": "Sheet-fed offset press B1 (line 1) - annual inspection, replacement of blankets and rollers; capacity during downtime: none (brak)",
+      "values": [
+        {
+          "field": "other",
+          "field_label": "downtime_from",
+          "value": "21.11.2026 14:00",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "other",
+          "field_label": "downtime_to",
+          "value": "23.11.2026 06:00",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "Druk cyfrowy B2 (linia 3)",
+      "material_id": null,
+      "supplier_part_no": null,
+      "description": "Digital press B2 (line 3) - operating unchanged; capacity up to 15 000 covers or flyers per 36 h",
+      "values": [
+        {
+          "field": "other",
+          "field_label": "capacity_during_downtime",
+          "value": "do 15 000 szt. okładek lub ulotek na 36 h",
+          "number": 15000,
+          "unit": "szt. per 36 h",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "Introligatornia (oprawa twarda)",
+      "material_id": null,
+      "supplier_part_no": null,
+      "description": "Bindery (hardcover binding) - line service; capacity during downtime: none; shipping of finished goods from warehouse possible",
+      "values": [
+        {
+          "field": "other",
+          "field_label": "downtime_from",
+          "value": "21.11.2026 14:00",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "other",
+          "field_label": "downtime_to",
+          "value": "23.11.2026 06:00",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "capacity",
+      "text_en": "We inform you of a planned technical downtime at our printing plant in Poznań. During the downtime, express orders (per § 3.2 of the contract) are handled only on the digital line, in the quantity given in the table.",
+      "quote": "informujemy o planowanym przestoju technicznym w naszej drukarni w Poznaniu. W czasie przestoju zlecenia w trybie ekspresowym (§ 3.2 umowy) realizujemy wyłącznie na linii cyfrowej, w ilości podanej w tabeli."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Express orders for the offset line are accepted until 21.11.2026, 09:00, with a print-ready file.",
+      "quote": "Zlecenia ekspresowe na linię offsetową przyjmujemy do 21.11.2026, godz. 09:00, z gotowym plikiem do druku."
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Bindery: no capacity during downtime, but shipping of finished goods from the warehouse is possible.",
+      "quote": "brak; wysyłka wyrobów gotowych z magazynu możliwa"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Notice dated 09.11.2026 from Karton Nowak to Soony Interactive GmbH Purchasing about a planned technical downtime at the Poznań plant. The B1 offset press (line 1) and hardcover bindery are down from 21.11.2026 14:00 to 23.11.2026 06:00 with no capacity. The B2 digital press (line 3) keeps running, with up to 15 000 covers or flyers per 36 h. Express orders for offset are accepted only until 21.11.2026 09:00 with a print-ready file. Finished goods can still ship from the warehouse.",
+    "red_flags": [
+      "Offset line 1 and bindery (hardcover) have zero capacity from 21.11.2026 14:00 to 23.11.2026 06:00",
+      "Express orders (§ 3.2) during downtime only possible on digital line, capped at 15 000 pcs of covers or flyers per 36 h",
+      "Cut-off for express offset orders is 21.11.2026 09:00, with a print-ready file, which is before the downtime starts at 14:00",
+      "Bindery cannot bind during downtime; only shipping of finished goods from stock is possible"
+    ],
+    "confidence": "high",
+    "observations": [
+      "Clean, typed/printed PDF with no handwriting, stamps or signatures",
+      "Signed by name in text only (Agnieszka Nowak, tel. +48 61 842 0101)",
+      "Digital press row has dashes for downtime from/to, meaning no downtime",
+      "No document number or PO references"
+    ]
+  }
+}

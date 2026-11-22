@@ -1,0 +1,156 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "Korean",
+    "English"
+  ],
+  "issuer": "Hwaseong Memory Co., Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26748424",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318756"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00020",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "14,000",
+          "number": 14000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "5.4",
+          "number": 5.4,
+          "unit": "USD",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-12-09",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-001",
+      "supplier_part_no": null,
+      "description": "Game Card 128 GB – Grand Heist 6",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "120,000",
+          "number": 120000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "9.8",
+          "number": 9.8,
+          "unit": "USD",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-12-18",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "00030",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "13,000",
+          "number": 13000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "5.4",
+          "number": 5.4,
+          "unit": "USD",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-12-15",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Customer Soony Interactive GmbH; your order 4500318756 of 2026-10-05; Incoterms FOB Busan; Payment NET45",
+      "quote": "Customer: Soony Interactive GmbH · Your order 4500318756 of 2026-10-05 · Incoterms FOB Busan · Payment NET45"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA26748424 from Hwaseong Memory for PO 4500318756 (dated 2026-10-05), FOB Busan, NET45. Three lines confirmed: 14,000 pcs CMP-GAM-002 at 5.4 USD for 2026-12-09; 120,000 pcs CMP-GAM-001 at 9.8 USD for 2026-12-18; 13,000 pcs CMP-GAM-002 at 5.4 USD for 2026-12-15. No handwriting or corrections.",
+    "red_flags": [
+      "Item 00020 and item 00030 are the same material (CMP-GAM-002) and price, split across two confirmed dates (2026-12-09 and 2026-12-15).",
+      "Lines are not in item-number order (00020, 00010, 00030).",
+      "No unit of measure is shown for quantities; no document date on the confirmation itself (only the PO date 2026-10-05)."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Typed document, no stamps, signatures or handwriting.",
+      "Currency is shown as USD in a Cur. column; unit prices are 5.4 and 9.8."
+    ]
+  }
+}

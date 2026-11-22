@@ -1,0 +1,112 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Korean",
+    "English"
+  ],
+  "issuer": "Hwaseong Memory Co., Ltd., Hwaseong, KR",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "DN-261004-669",
+  "document_date": "2026-10-04",
+  "references": [
+    {
+      "type": "delivery_note",
+      "value": "DN-261004-669"
+    },
+    {
+      "type": "po_number",
+      "value": "4500318733"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "13 000",
+          "number": 13000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "26",
+          "number": 26,
+          "unit": "boxes",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "2",
+      "material_id": "CMP-GAM-001",
+      "supplier_part_no": null,
+      "description": "Game Card 128 GB – Grand Heist 6",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "84 000",
+          "number": 84000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "168",
+          "number": 168,
+          "unit": "boxes",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Total weight: 2134 kg; boxes: 194; carrier: Nordhav Shipping A/S.",
+      "quote": "총중량: 2134 kg  박스: 194  운송: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "quality",
+      "text_en": "Remarks: Handle with care.",
+      "quote": "비고: 취급주의"
+    },
+    {
+      "topic": "other",
+      "text_en": "Receiver (signature line) is signed by hand: 'Yilmaz D.'",
+      "quote": "인수자: Yilmaz D."
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Korean-language delivery note DN-261004-669 dated 2026.10.04 from Hwaseong Memory Co., Ltd. to Soony Distribution Center Hamburg against PO 4500318733. It lists 13 000 PCS of CMP-GAM-002 (26 boxes) and 84 000 PCS of CMP-GAM-001 (168 boxes). The total is 194 boxes and 2134 kg, shipped by Nordhav Shipping A/S. The remark says handle with care. The receiver line is signed by hand 'Yilmaz D.'. There are no corrections, strike-throughs or stamps.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Handwritten signature 'Yilmaz D.' on the receiver (인수자) line.",
+      "No receiving date stamp or handwritten receipt date is visible, so a received date and any received quantity differences are not recorded.",
+      "No handwritten corrections or strike-throughs.",
+      "Box counts (26 + 168 = 194) match the stated total of 194 boxes.",
+      "Quantities use a space as thousands separator (13 000, 84 000).",
+      "The lower part of the page is blank."
+    ]
+  }
+}

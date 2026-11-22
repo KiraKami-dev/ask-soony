@@ -1,0 +1,88 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Korean",
+    "English"
+  ],
+  "issuer": "Hwaseong Memory Co., Ltd.",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "DN-261120-726",
+  "document_date": "2026-11-20",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318735"
+    },
+    {
+      "type": "delivery_note",
+      "value": "DN-261120-726"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-001",
+      "supplier_part_no": null,
+      "description": "Game Card 128 GB – Grand Heist 6",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "28 000",
+          "number": 28000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "5",
+          "number": 5,
+          "unit": "boxes",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "21.11.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S; total weight 75 kg; 5 boxes.",
+      "quote": "총중량: 75 kg  박스: 5  운송: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "other",
+      "text_en": "Remarks field is empty.",
+      "quote": "비고:"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Korean delivery note DN-261120-726 dated 2026.11.20 from Hwaseong Memory Co., Ltd. to Soony Distribution Center Hamburg, PO 4500318735. One line: CMP-GAM-001 Game Card 128 GB – Grand Heist 6, 28 000 PCS in 5 boxes, 75 kg total, carrier Nordhav Shipping A/S. Stamped RECEIVED 21.11.2026 DC-HAM and signed by Meyer K. No corrections or remarks.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Blue stamp 'RECEIVED 21.11.2026 DC-HAM' present.",
+      "Handwritten receiver signature 'Meyer K.' on the receiver (인수자) line.",
+      "Remarks (비고) field is blank.",
+      "Quantity 28 000 uses a space as thousands separator; read as 28000.",
+      "No ordered quantity is on the document, so it cannot be compared with the PO."
+    ]
+  }
+}

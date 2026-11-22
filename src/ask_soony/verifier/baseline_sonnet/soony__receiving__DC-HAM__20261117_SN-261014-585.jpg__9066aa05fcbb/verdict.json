@@ -1,0 +1,85 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Chinese",
+    "English"
+  ],
+  "issuer": "Guangzhou PackRight Packaging Co., Ltd.",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "SN-261014-585",
+  "document_date": "2026-10-14",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318738"
+    },
+    {
+      "type": "delivery_note",
+      "value": "SN-261014-585"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "PR-SL-0604",
+      "supplier_part_no": null,
+      "description": "Cover Sleeve Grand Heist 6 (USK/PE",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "64,000",
+          "number": 64000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "12",
+          "number": 12,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "168 kg",
+          "number": 168,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [],
+  "decisions": [],
+  "corrections": [
+    {
+      "what": "handwritten receiver signature (no date, no other notes)",
+      "original": null,
+      "replacement": "Yilmaz D.",
+      "where": "收货签字 (receiver signature) line, lower left"
+    }
+  ],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Supplier delivery note (送货单) SN-261014-585 dated 2026/10/14 from Guangzhou PackRight Packaging Co., Ltd. to Soony Distribution Center Hamburg, against PO 4500318738. One line: PR-SL-0604 Cover Sleeve Grand Heist 6 (USK/PE, 64,000 PCS in 12 packages, gross weight 168 kg, carrier Nordhav Shipping A/S. The remarks field is empty. The document carries the supplier's red round shipping seal and a handwritten receiver signature 'Yilmaz D.' with no date.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Red circular supplier seal 'GUANGZHOU PACKRIGHT PACKAGING CO LTD' with 出货专用章 (special shipping seal) overlaps the unit cell (PCS) and the header; the seal contains no date or number. The seal ink is slightly smudged but the quantity and unit are still readable.",
+      "Item description is cut off: it reads 'Cover Sleeve Grand Heist 6 (USK/PE' with no closing parenthesis.",
+      "Handwritten signature 'Yilmaz D.' sits on the receiver-signature line; there is no receiving date, receiving stamp or received quantity.",
+      "Remarks field (备注) is blank.",
+      "Package count of 12 appears in both the table and the footer and they agree.",
+      "A barcode at the top right was not decoded."
+    ]
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Boise Semiconductor Inc., Boise, US",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "DN-260924-875",
+  "document_date": "2026-09-24",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318717"
+    },
+    {
+      "type": "delivery_note",
+      "value": "DN-260924-875"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "5.000",
+          "number": 5000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "2",
+          "number": 2,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "42 kg",
+          "number": 42,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Alpen Air Cargo GmbH. Gross weight 42 kg, 2 packages.",
+      "quote": "Gross weight: 42 kg  Packages: 2  Carrier: Alpen Air Cargo GmbH"
+    }
+  ],
+  "decisions": [],
+  "corrections": [
+    {
+      "what": "handwritten signature/name in 'Received by' field (not a correction)",
+      "original": null,
+      "replacement": "Meyer K.",
+      "where": "Received by line, bottom left"
+    }
+  ],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Delivery note DN-260924-875 dated 09/24/2026 from Boise Semiconductor Inc. to Soony Distribution Center Hamburg against PO 4500318717. One line: CMP-GAM-002 Game Card 64 GB – Grand Heist 5, quantity 5.000 PCS in 2 packages, gross weight 42 kg, carrier Alpen Air Cargo GmbH. Remarks empty. Signed 'Meyer K.' in the Received by field; no receipt date or stamp.",
+    "red_flags": [
+      "Quantity '5.000' is ambiguous: read as 5000 PCS (thousands separator), though a strict English reading would be 5.0. Check against the PO and the physical count.",
+      "No receiving date or stamp on the note; the 'Received by' signature is undated.",
+      "No quantity ordered is shown on the note, so it cannot be checked against the PO."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Signature 'Meyer K.' is handwritten in blue ink on the Received by line.",
+      "Remarks field is blank.",
+      "Date is in US format MM/DD/YYYY (09/24/2026), matching the number DN-260924.",
+      "The 'Packages' column header is slightly cut off at the table edge; the values are readable.",
+      "No stamps, strike-throughs or overwrites visible."
+    ]
+  }
+}

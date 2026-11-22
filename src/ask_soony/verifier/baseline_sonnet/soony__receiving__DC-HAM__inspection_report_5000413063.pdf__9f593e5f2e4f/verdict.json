@@ -1,0 +1,132 @@
+{
+  "document_type": "inspection_report",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Soony · DC-HAM incoming inspection (Inspector: Schulz P.)",
+  "recipient": "Copy to: Daniel Okafor, Mei Lin",
+  "document_number": "5000413063",
+  "document_date": "2026-11-17",
+  "references": [
+    {
+      "type": "goods_receipt",
+      "value": "5000413063"
+    },
+    {
+      "type": "po_number",
+      "value": "4500318727"
+    },
+    {
+      "type": "other",
+      "value": "SUP-0018 Pune Diecast Works (supplier)"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-010",
+      "supplier_part_no": null,
+      "description": "Statue \"The Getaway\" (die-cast, 18 cm)",
+      "values": [
+        {
+          "field": "lot_size",
+          "field_label": null,
+          "value": "5,600",
+          "number": 5600,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "sample_size",
+          "field_label": null,
+          "value": "125",
+          "number": 125,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "defective",
+          "field_label": null,
+          "value": "9",
+          "number": 9,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "accept_number",
+          "field_label": null,
+          "value": "3",
+          "number": 3,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "reject_number",
+          "field_label": null,
+          "value": "4",
+          "number": 4,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "quality",
+      "text_en": "9 of 125 statues have paint defects on the base (runs, thin coverage on edges). Dimensions and weight are within tolerance. Packaging undamaged.",
+      "quote": "9 of 125 statues with paint defects on the base (runs, thin coverage on edges). Dimensions and weight within tolerance. Packaging undamaged."
+    },
+    {
+      "topic": "quality",
+      "text_en": "The lot does not meet AQL.",
+      "quote": "Lot does not meet AQL."
+    },
+    {
+      "topic": "approval_status",
+      "text_en": "Receiving booked the lot to stock as 'unrestricted' because the supplier is listed as active. Blocking has been requested from Supplier Quality.",
+      "quote": "Booked to stock as 'unrestricted' by receiving because the supplier is listed as active. Blocking requested from Supplier Quality."
+    },
+    {
+      "topic": "terms",
+      "text_en": "The lot may only be used under a concession signed by Supplier Quality and the Category Lead.",
+      "quote": "Use only under a concession signed by Supplier Quality and the Category Lead."
+    }
+  ],
+  "decisions": [
+    {
+      "subject": "Lot of CMP-GAM-010, goods receipt 5000413063 (lot size 5,600)",
+      "outcome": "fail",
+      "decided_by": "Schulz P. (Inspector)",
+      "conditions": "Use only under a concession signed by Supplier Quality and the Category Lead. Blocking requested from Supplier Quality.",
+      "quote": "Lot does not meet AQL."
+    }
+  ],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Incoming inspection of CMP-GAM-010 (die-cast statue 'The Getaway') from SUP-0018 Pune Diecast Works, goods receipt 5000413063 of 2026-11-17, PO 4500318727. 9 defective in a sample of 125 against accept 3 / reject 4 (AQL 1.0, level II), so the lot of 5,600 fails. The defects are paint defects on the base. The lot was booked to unrestricted stock, and blocking has been requested.",
+    "red_flags": [
+      "Lot failed AQL: 9 defective in a sample of 125, against an accept number of 3 and a reject number of 4.",
+      "The lot of 5,600 was booked to 'unrestricted' stock by receiving because the supplier is listed as active, even though it failed inspection. It is not blocked yet; blocking has only been requested from Supplier Quality.",
+      "Use is allowed only under a concession signed by Supplier Quality and the Category Lead.",
+      "Defect type: paint runs and thin coverage on the edges of the base. Dimensions, weight and packaging are OK."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Typed, clean digital document with no handwriting, stamps, or signatures.",
+      "Inspector named in the footer as Schulz P.; no signature is visible.",
+      "Clear, fully legible text."
+    ]
+  }
+}

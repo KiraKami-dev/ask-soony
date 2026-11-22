@@ -1,0 +1,168 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Boise Semiconductor Inc., Boise, US",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "DN-261110-769",
+  "document_date": "2026-11-10",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318762"
+    },
+    {
+      "type": "po_number",
+      "value": "4500318766"
+    },
+    {
+      "type": "delivery_note",
+      "value": "DN-261110-769"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-001",
+      "supplier_part_no": null,
+      "description": "Game Card 128 GB – Grand Heist 6",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "41.200",
+          "number": 41200,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "8",
+          "number": 8,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "2",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "5.000",
+          "number": 5000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "1",
+          "number": 1,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "Totals (shipment)",
+      "material_id": null,
+      "supplier_part_no": null,
+      "description": "Shipment totals below the table",
+      "values": [
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "198 kg",
+          "number": 198,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "9",
+          "number": 9,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "13.11.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Alpen Air Cargo GmbH. Gross weight 198 kg, 9 packages.",
+      "quote": "Gross weight: 198 kg Packages: 9 Carrier: Alpen Air Cargo GmbH"
+    },
+    {
+      "topic": "other",
+      "text_en": "Remarks field is empty.",
+      "quote": "Remarks:"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Goods stamped as received at DC-HAM on 13.11.2026; received by Meyer K. (handwritten signature).",
+      "quote": "RECEIVED 13.11.2026 DC-HAM / Received by: Meyer K."
+    }
+  ],
+  "decisions": [],
+  "corrections": [
+    {
+      "what": "Receiving stamp (not a correction)",
+      "original": null,
+      "replacement": "RECEIVED 13.11.2026 DC-HAM",
+      "where": "Lower right, beside 'Received by' line"
+    },
+    {
+      "what": "Handwritten receiver signature/name",
+      "original": null,
+      "replacement": "Meyer K.",
+      "where": "'Received by:' line"
+    }
+  ],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Delivery note DN-261110-769 from Boise Semiconductor Inc. to Soony DC Hamburg, dated 11/10/2026, covering POs 4500318762 and 4500318766. It lists 41.200 PCS of CMP-GAM-001 (8 packages) and 5.000 PCS of CMP-GAM-002 (1 package). Total is 9 packages, 198 kg gross, carrier Alpen Air Cargo GmbH. Stamped received 13.11.2026 at DC-HAM and signed by Meyer K. There are no corrections or remarks.",
+    "red_flags": [
+      "The note lists two POs but does not say which PO each line belongs to.",
+      "No ordered quantities are shown, so the delivered quantities cannot be checked against the POs from this document alone."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Quantities are printed as '41.200' and '5.000' with a dot separator. I read them as thousands separators (41200 and 5000 PCS), which is the plausible reading for piece counts. The document does not state this.",
+      "Note date '11/10/2026' is ambiguous between US and German formats. I read it as 10 Nov 2026, in line with the DN number (261110) and the received stamp of 13.11.2026.",
+      "Blue received stamp with handwritten signature 'Meyer K.' is clear.",
+      "Package counts per line (8 + 1) match the stated total of 9.",
+      "The Remarks field is blank."
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "path": "suppliers/SUP-0011_Boise_Semi/order_confirmations/OA26433970_4500318690.pdf",
+  "sha256": "084c67824e850a757bc9e4f103c0b906cf6216f0fd4e57793dd47fa7e122ae4f",
+  "model": "claude-sonnet-5-5",
+  "effort": "high",
+  "fingerprint": "ef7ff7aae87f85e3",
+  "status": "ok",
+  "error": null,
+  "attempts": 1,
+  "finished_at": "2026-11-21T21:00:48+00:00",
+  "seconds": 629.3,
+  "num_turns": 3,
+  "cost_usd": 0.07787269999999999,
+  "usage": {
+    "input_tokens": 4,
+    "cache_creation_input_tokens": 20972,
+    "cache_read_input_tokens": 7572,
+    "output_tokens": 2322,
+    "output_tokens_details": {
+      "thinking_tokens": 303
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 880,
+      "ephemeral_5m_input_tokens": 20092
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 2212,
+        "cache_read_input_tokens": 3786,
+        "cache_creation_input_tokens": 20092,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 20092,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  }
+}

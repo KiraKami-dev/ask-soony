@@ -1,0 +1,101 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Chinese",
+    "English"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd., Dongguan, CN",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "SN-261008-819",
+  "document_date": "2026-10-08",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318716"
+    },
+    {
+      "type": "delivery_note",
+      "value": "SN-261008-819"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-010",
+      "supplier_part_no": null,
+      "description": "Statue \"The Getaway\" (die-cast, 18  [text cut off in the document]",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "14.600",
+          "number": 14.6,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "2",
+          "number": 2,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "22 kg",
+          "number": 22,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S. Gross weight 22 kg, 2 packages.",
+      "quote": "毛重: 22 kg  件数: 2  承运: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "other",
+      "text_en": "Remarks: Please handle with care.",
+      "quote": "备注: 请轻拿轻放"
+    }
+  ],
+  "decisions": [],
+  "corrections": [
+    {
+      "what": "handwritten receiver signature/name on the receiver signature line (not a correction to any value)",
+      "original": null,
+      "replacement": "Meyer K.",
+      "where": "Below 收货签字 (receiver signature) at lower left"
+    }
+  ],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Chinese/English delivery note SN-261008-819 dated 2026-10-08 from Dongguan Precision Housings Co., Ltd. to Soony Distribution Center Hamburg, against PO 4500318716. One line: CMP-GAM-010, Statue \"The Getaway\", quantity 14.600 PCS, 2 packages, gross weight 22 kg, carrier Nordhav Shipping A/S. Remark: handle with care. It carries a red supplier shipping seal and a handwritten signature \"Meyer K.\" on the receiver signature line. There are no receiving date, no receiving stamp and no handwritten corrections.",
+    "red_flags": [
+      "Quantity \"14.600 PCS\" is ambiguous. The document is Chinese/English, so it is recorded as 14.6 (decimal point). That is not a plausible piece count. If it means 14,600 pieces, it does not fit 2 packages and 22 kg gross weight. Confirm the real quantity against the PO and the physical count.",
+      "The item description is cut off (\"... die-cast, 18\"), so the full specification is not visible.",
+      "The receiver signature \"Meyer K.\" has no date and no receiving stamp, so the receipt date and the quantity actually received are not confirmed on this document.",
+      "The red seal is the supplier's shipping seal (出货专用章). It carries no date or number and is not a receiving or inspection approval."
+    ],
+    "confidence": "medium",
+    "observations": [
+      "Red circular seal reads \"DONGGUAN PRECISION HOUSINGS CO LTD\" and \"出货专用章\" (shipping-use seal). It overlaps the unit (PCS) and packages cells in the table, but both are still readable.",
+      "Handwritten signature \"Meyer K.\" in blue ink sits on the receiver signature line. It is legible, with no date.",
+      "The barcode at top right is not decoded.",
+      "The item description is truncated in the table cell.",
+      "The lower half of the page is blank.",
+      "The packages value (2) appears both in the table and in the footer line."
+    ]
+  }
+}

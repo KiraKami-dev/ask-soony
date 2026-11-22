@@ -1,0 +1,88 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English",
+    "Polish"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA25558873",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318572"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-005",
+      "supplier_part_no": null,
+      "description": "Cover Sleeve Grand Heist 5 (USK/PEGI)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "115,000",
+          "number": 115000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.06",
+          "number": 0.06,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2025-11-27",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2025-10-31",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Incoterms DAP Hamburg; payment NET30.",
+      "quote": "Incoterms DAP Hamburg · Payment NET30"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA25558873 from Karton Nowak to Soony Interactive GmbH for PO 4500318572 dated 2025-10-31. One line: item 00010, CMP-GAM-005 Cover Sleeve Grand Heist 5 (USK/PEGI), qty 115,000 at 0.06 EUR, confirmed delivery 2025-11-27. Terms: DAP Hamburg, NET30.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Digitally generated PDF, no handwriting, stamps or signatures.",
+      "Document has no issue date of its own; only the order date 2025-10-31 is shown.",
+      "Quantity has no unit stated; unit price has no per-unit basis stated.",
+      "The Qty column shows 115,000 with a comma thousands separator (English convention), read as 115000."
+    ]
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Boise Semiconductor Inc., Boise, US",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "DN-261106-613",
+  "document_date": "2026-11-06",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318766"
+    },
+    {
+      "type": "delivery_note",
+      "value": "DN-261106-613"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-001",
+      "supplier_part_no": null,
+      "description": "Game Card 128 GB – Grand Heist 6",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "54.000",
+          "number": 54000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "54",
+          "number": 54,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "810 kg",
+          "number": 810,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Alpen Air Cargo GmbH",
+      "quote": "Carrier: Alpen Air Cargo GmbH"
+    },
+    {
+      "topic": "terms",
+      "text_en": "Pallets are returnable.",
+      "quote": "Remarks: Pallets returnable"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Delivery note DN-261106-613 dated 11/06/2026 from Boise Semiconductor Inc. to Soony Distribution Center Hamburg for PO 4500318766: CMP-GAM-001 Game Card 128 GB – Grand Heist 6, quantity 54.000 PCS in 54 packages, gross weight 810 kg, carrier Alpen Air Cargo GmbH. Pallets returnable. The 'Received by' line is blank, so there is no receiving signature or stamp. No corrections.",
+    "red_flags": [
+      "'Received by' signature line is empty: no receipt confirmation, receiving stamp or receipt date on the note.",
+      "Quantity is printed as '54.000'. This is read as 54000 pieces using the thousands-separator convention, but it could also be 54 pieces, which would match the 54 packages. The two readings differ greatly, so the buyer should check against the PO.",
+      "The date is written 11/06/2026 (month/day format assumed, giving 6 Nov 2026). The file name has 20261111, which may be the receiving date."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Clean printed document with a barcode at the top; no handwriting, stamps or strike-throughs.",
+      "The 'Packages' column header is slightly cut off or overlaps the table border.",
+      "The 'Received by' line is blank and unsigned."
+    ]
+  }
+}

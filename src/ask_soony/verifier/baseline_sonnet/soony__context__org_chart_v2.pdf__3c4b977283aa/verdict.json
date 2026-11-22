@@ -1,0 +1,60 @@
+{
+  "document_type": "org_chart",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Soony Interactive GmbH",
+  "recipient": null,
+  "document_number": "v2",
+  "document_date": "2026-11-21",
+  "references": [
+    {
+      "type": "other",
+      "value": "Approval Policy PP-07"
+    }
+  ],
+  "lines": [],
+  "statements": [
+    {
+      "topic": "other",
+      "text_en": "Internal. Solid lines: reporting. Approval limits see Approval Policy PP-07.",
+      "quote": "Internal. Solid lines: reporting. Approval limits see Approval Policy PP-07."
+    },
+    {
+      "topic": "other",
+      "text_en": "Arjun Krishnan is Category Lead Collector's Items from 2026-11-23 (highlighted box).",
+      "quote": "Arjun Krishnan (from 2026-11-23) Category Lead Collector's Items"
+    },
+    {
+      "topic": "other",
+      "text_en": "Distribution Center Hamburg has a dotted line to the Head of Procurement. Site Lead DC Hamburg is Katrin Jansen.",
+      "quote": "Distribution Center Hamburg (dotted line to Head of Procurement)"
+    },
+    {
+      "topic": "other",
+      "text_en": "Reporting structure: Jonas Lindqvist (Chief Procurement Officer) > Dr. Maren Vogt (Head of Procurement) > Tobias Brandt (Category Lead Game Media; Felix Brunner, Senior Buyer Game Cards), Sofia Marchetti (Category Lead Print & Packaging; Paul Winter, Buyer), Arjun Krishnan (Category Lead Collector's Items; Mei Lin, Buyer), Daniel Okafor (Supplier Quality Lead), Raj Patel (Logistics Planner).",
+      "quote": "Jonas Lindqvist Chief Procurement Officer / Dr. Maren Vogt Head of Procurement / Tobias Brandt ... Raj Patel Logistics Planner"
+    },
+    {
+      "topic": "other",
+      "text_en": "Also listed: Nils Berger (IT & Systems Lead, Procurement), Clara Weiss (Quality & Compliance Manager), Henrik Dahl (Chief Financial Officer).",
+      "quote": "Also: Nils Berger (IT & Systems Lead (Procurement)), Clara Weiss (Quality & Compliance Manager), Henrik Dahl (Chief Financial Officer)"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Soony Interactive GmbH procurement organisation chart, version 2, dated 2026-11-21. It shows the CPO (Jonas Lindqvist) over the Head of Procurement (Dr. Maren Vogt). Five direct reports sit under the Head: three category leads with buyers, a Supplier Quality Lead and a Logistics Planner. DC Hamburg's site lead has a dotted line to the Head of Procurement. Three other roles are listed below the chart. Arjun Krishnan is highlighted as Category Lead Collector's Items effective 2026-11-23. Approval limits are not on this chart and are referred to Approval Policy PP-07.",
+    "red_flags": [
+      "Arjun Krishnan's role as Category Lead Collector's Items takes effect 2026-11-23, which is after the chart date of 2026-11-21. It is highlighted on the chart.",
+      "The chart gives no approval limits. It refers to Approval Policy PP-07."
+    ],
+    "confidence": "high",
+    "observations": [
+      "The chart is a typed PDF with no handwriting, stamps or signatures.",
+      "The Arjun Krishnan box is shaded, which marks the upcoming change.",
+      "The first read with page rendering failed because pdftoppm is missing. A read without the pages parameter worked and returned the text and the image."
+    ]
+  }
+}

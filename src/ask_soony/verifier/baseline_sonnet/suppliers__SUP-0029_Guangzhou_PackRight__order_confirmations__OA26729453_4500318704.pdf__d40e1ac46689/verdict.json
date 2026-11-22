@@ -1,0 +1,95 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English",
+    "Chinese"
+  ],
+  "issuer": "Guangzhou PackRight Packaging Co., Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26729453",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318704"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "PR-RB-2207",
+      "supplier_part_no": null,
+      "description": "Collector's Box Grand Heist 6 (rigid, magnetic lid)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "17,500",
+          "number": 17500,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "25.62",
+          "number": 25.62,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-09-30",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2026-07-27",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Incoterms FOB Yantian, payment NET30.",
+      "quote": "Incoterms FOB Yantian · Payment NET30"
+    },
+    {
+      "topic": "other",
+      "text_en": "For PR-RB-2207, lid closure magnets RM-N42-D0401 (4 pcs per box) are fitted in the supplier's plant and are included in the unit price.",
+      "quote": "PR-RB-2207: lid closure magnets RM-N42-D0401 (4 pcs per box) are fitted in our plant and included in the unit price."
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA26729453 from Guangzhou PackRight to Soony Interactive GmbH for PO 4500318704 (dated 2026-07-27). One line: 17,500 pcs of PR-RB-2207 Collector's Box Grand Heist 6 at 25.62 CNY each, confirmed for 2026-09-30. Terms are FOB Yantian, NET30. A note says the lid magnets RM-N42-D0401 (4 per box) are fitted by the supplier and included in the unit price.",
+    "red_flags": [
+      "The note says the magnets RM-N42-D0401 are fitted in the supplier's plant and included in the unit price. Check this against the buyer's own sourcing or supply of magnets, to avoid double-buying or a price mismatch."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Single-page printed PDF with no handwriting, stamps or signatures.",
+      "The document has no issue date of its own. Only the PO date (2026-07-27) is shown.",
+      "The unit of measure for the quantity is not stated.",
+      "The Chinese heading reads 订单确认书 (order confirmation)."
+    ]
+  }
+}

@@ -133,3 +133,42 @@ def test_safety_block_is_tried_once(tmp_path, monkeypatch):
     job = select_jobs(tmp_path, None, False, None)[0]
     row = asyncio.run(run.process(job, settings(tmp_path), asyncio.Semaphore(1)))
     assert (row["status"], len(calls)) == ("error", 1)
+
+
+def test_files_in_the_baseline_are_not_read_and_the_baseline_is_not_touched(tmp_path, monkeypatch):
+    root, base = tmp_path / "portal", tmp_path / "baseline"
+    make(root, "x/old.jpg", b"old")
+    make(root, "x/new.jpg", b"new")
+    old = next(j for j in select_jobs(root, None, False, None) if j.rel == "x/old.jpg")
+    (base / old.folder).mkdir(parents=True)
+    frozen = json.dumps({"path": old.rel, "sha256": old.sha256, "status": "ok", "model": "big"})
+    (base / old.folder / "meta.json").write_text(frozen)
+    (base / old.folder / "verdict.json").write_text("{}")
+
+    ok = {"verdict": {"verdict": {}}, "usage": None, "error": None}
+    read, calls = _fake_reader([ok])
+    monkeypatch.setattr(run, "read_document", read)
+    monkeypatch.setattr(run, "AsyncOpenAI", lambda **_: None)
+    cfg = settings(root)
+    cfg.baseline = base
+    asyncio.run(run.run_all(select_jobs(root, None, False, None), cfg, force=True))
+    assert calls == ["x/new.jpg"]  # even with --force
+    assert (base / old.folder / "meta.json").read_text() == frozen
+
+    calls.clear()
+    cfg.baseline = None  # --ignore-baseline
+    asyncio.run(run.run_all(select_jobs(root, None, False, None), cfg, force=True))
+    assert sorted(calls) == ["x/new.jpg", "x/old.jpg"]
+
+
+def test_ignored_documents_are_never_read(tmp_path, monkeypatch):
+    root = tmp_path / "portal"
+    make(root, "x/redline.pdf", b"r")
+    make(root, "x/note.jpg", b"n")
+    ok = {"verdict": {"verdict": {}}, "usage": None, "error": None}
+    read, calls = _fake_reader([ok])
+    monkeypatch.setattr(run, "read_document", read)
+    monkeypatch.setattr(run, "AsyncOpenAI", lambda **_: None)
+    monkeypatch.setattr(run, "ignored_paths", lambda: {"x/redline.pdf"})
+    asyncio.run(run.run_all(select_jobs(root, None, False, None), settings(root), force=True))
+    assert calls == ["x/note.jpg"]

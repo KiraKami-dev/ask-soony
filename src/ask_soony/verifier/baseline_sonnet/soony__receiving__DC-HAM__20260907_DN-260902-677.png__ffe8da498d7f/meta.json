@@ -1,0 +1,31 @@
+{
+  "path": "soony/receiving/DC-HAM/20260907_DN-260902-677.png",
+  "sha256": "ffe8da498d7fa700fbf80a08485674f0f95990c07c878731702b68b6a95a57f2",
+  "model": "gpt-5.4",
+  "effort": "high",
+  "fingerprint": "704d1e77fe774b56",
+  "status": "ok",
+  "error": null,
+  "attempts": 1,
+  "finished_at": "2026-11-22T09:03:58+00:00",
+  "seconds": 59.5,
+  "usage": {
+    "completion_tokens": 5361,
+    "prompt_tokens": 3577,
+    "total_tokens": 8938,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 4896,
+      "rejected_prediction_tokens": 0,
+      "text_tokens": null
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": null,
+      "cached_tokens": 0,
+      "image_tokens": null,
+      "text_tokens": null
+    }
+  }
+}

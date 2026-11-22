@@ -1,0 +1,105 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Chinese",
+    "English"
+  ],
+  "issuer": "Guangzhou PackRight Packaging Co., Ltd.",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "SN-260827-134",
+  "document_date": "2026-08-27",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318704"
+    },
+    {
+      "type": "delivery_note",
+      "value": "SN-260827-134"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": null,
+      "supplier_part_no": "PR-RB-2207",
+      "description": "Collector's Box Grand Heist 6 (rig... — text cut off in the description column",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "17,500",
+          "number": 17500,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "3",
+          "number": 3,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "unclear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "51 kg",
+          "number": 51,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "30.09.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S",
+      "quote": "承运: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "other",
+      "text_en": "Remark: Handle with care (please handle gently).",
+      "quote": "备注: 请轻拿轻放"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Chinese/English delivery note SN-260827-134 from Guangzhou PackRight Packaging to Soony DC Hamburg, dated 2026/08/27, for PO 4500318704. One line: PR-RB-2207 Collector's Box Grand Heist 6, 17,500 PCS in 3 packages, 51 kg gross, carrier Nordhav Shipping A/S. Stamped RECEIVED 30.09.2026 DC-HAM. The recipient signature line is blank. No handwritten corrections.",
+    "red_flags": [
+      "Receiving signature line (收货签字) is blank, so no named receiver confirmed the goods.",
+      "Received stamp (30.09.2026) is about a month after the note date (2026/08/27), which could be transit time or a delay.",
+      "Gross weight of 51 kg for 17,500 collector's boxes in 3 packages looks very low. The document does not explain this, so check it against the packing list.",
+      "Item description is cut off ('(rig'), so the full product name cannot be confirmed.",
+      "The received stamp has no quantity, so the receiving quantity is not confirmed separately from the printed quantity."
+    ],
+    "confidence": "medium",
+    "observations": [
+      "Red round supplier seal (出货专用章, Guangzhou PackRight Packaging Co. Ltd) overlaps the unit and package-count columns. The unit reads PCS, and the package count '3' is partly covered, so it is marked unclear.",
+      "Blue rectangular stamp 'RECEIVED 30.09.2026 DC-HAM' is placed below the table.",
+      "Receiver signature line is empty.",
+      "Description text in the table is truncated at '(rig'.",
+      "No handwriting on the page. The lower half of the page is blank.",
+      "A barcode is printed at the top right."
+    ]
+  }
+}

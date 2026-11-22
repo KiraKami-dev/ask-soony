@@ -13,8 +13,10 @@ separators the way the document's language does (Polish or German "80.000" is 80
 - Mark a value legible "unclear" when its characters are hard to read.
 - Record outcomes (inspection results, approvals, rejections) under decisions.
 - Name each value with the closest field from the list. On a delivery note the quantity on \
-the note is quantity_delivered; a receiving stamp date is date_received. Use other plus \
-field_label only when nothing fits.
+the note is quantity_delivered; a receiving stamp date is date_received. On an offer the \
+quantity offered is quantity_offered. Use other plus field_label only when nothing fits.
+- A supplier's offer to sell or deliver (quantity, price or lead time on offer) is document type \
+offer, even when it is titled or sent as a notice.
 - Make no statements relative to today's date (such as "this deadline has passed"). Report \
 dates as written; comparing them with the current date is not your job.
 - A crossed-out value is still a value: record it with crossed_out=true, and record its \

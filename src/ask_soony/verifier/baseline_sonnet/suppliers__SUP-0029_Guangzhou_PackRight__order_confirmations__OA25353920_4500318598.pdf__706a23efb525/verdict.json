@@ -1,0 +1,87 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English",
+    "Chinese"
+  ],
+  "issuer": "Guangzhou PackRight Packaging Co., Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA25353920",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318598"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "PR-CC-0312",
+      "supplier_part_no": null,
+      "description": "Game Card Case (clear)",
+      "values": [
+        {
+          "field": "quantity_ordered",
+          "field_label": null,
+          "value": "80,000",
+          "number": 80000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "1.44",
+          "number": 1.44,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-02-25",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2025-12-23",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Incoterms FOB Yantian, payment NET30.",
+      "quote": "Incoterms FOB Yantian · Payment NET30"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA25353920 from Guangzhou PackRight to Soony Interactive GmbH for PO 4500318598 dated 2025-12-23. One line: item 00010, PR-CC-0312 Game Card Case (clear), 80,000 at 1.44 CNY, confirmed for 2026-02-25. Terms are FOB Yantian, NET30.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Single-page, fully printed document with no handwriting, stamps or corrections.",
+      "The document has no issue date of its own; the only date besides the confirmed delivery date is the PO date.",
+      "Quantity has no unit shown, and the confirmed quantity equals the ordered quantity as stated in the Qty column."
+    ]
+  }
+}

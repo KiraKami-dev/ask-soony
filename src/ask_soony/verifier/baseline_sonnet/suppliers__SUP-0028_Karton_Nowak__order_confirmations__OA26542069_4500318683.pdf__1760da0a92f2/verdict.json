@@ -1,0 +1,145 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English",
+    "Polish"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26542069",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318683"
+    },
+    {
+      "type": "other",
+      "value": "Order Confirmation OA26542069"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-005",
+      "supplier_part_no": null,
+      "description": "Cover Sleeve Grand Heist 5 (USK/PEGI)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "110,000",
+          "number": 110000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.06",
+          "number": 0.06,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-07-08",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2026-06-16",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "00020",
+      "material_id": "CMP-GAM-011",
+      "supplier_part_no": null,
+      "description": "Activation Code Leaflet",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "140,000",
+          "number": 140000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.03",
+          "number": 0.03,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-07-13",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2026-06-16",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Incoterms DAP Hamburg; payment NET30.",
+      "quote": "Incoterms DAP Hamburg · Payment NET30"
+    },
+    {
+      "topic": "other",
+      "text_en": "Confirmation refers to customer Soony Interactive GmbH's order 4500318683 dated 2026-06-16.",
+      "quote": "Customer: Soony Interactive GmbH · Your order 4500318683 of 2026-06-16"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Karton Nowak order confirmation OA26542069 for PO 4500318683 (2026-06-16) to Soony Interactive GmbH. Item 00010 CMP-GAM-005 Cover Sleeve Grand Heist 5 (USK/PEGI): 110,000 at 0.06 EUR, confirmed 2026-07-08. Item 00020 CMP-GAM-011 Activation Code Leaflet: 140,000 at 0.03 EUR, confirmed 2026-07-13. Terms: DAP Hamburg, NET30. The document has no corrections or handwriting.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Typed PDF with no handwriting, stamps, or signatures.",
+      "The document carries no issue date of its own. The only date in the header is the customer order date, 2026-06-16.",
+      "The column 'Qty' is read as the confirmed quantity. The unit of measure is not stated.",
+      "Quantities use comma thousands separators (110,000 read as 110000) and prices use a decimal point, which is English-style formatting."
+    ]
+  }
+}

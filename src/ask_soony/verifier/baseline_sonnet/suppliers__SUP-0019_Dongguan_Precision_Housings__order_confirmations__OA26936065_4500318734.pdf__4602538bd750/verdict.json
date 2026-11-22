@@ -1,0 +1,88 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English",
+    "Chinese"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26936065",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318734"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-010",
+      "supplier_part_no": null,
+      "description": "Statue \"The Getaway\" (die-cast, 18 cm)",
+      "values": [
+        {
+          "field": "quantity_ordered",
+          "field_label": null,
+          "value": "8,500",
+          "number": 8500,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "88.38",
+          "number": 88.38,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-12-16",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2026-09-10",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Incoterms FOB Yantian, payment NET30.",
+      "quote": "Incoterms FOB Yantian · Payment NET30"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA26936065 from Dongguan Precision Housings to Soony Interactive GmbH for PO 4500318734 (dated 2026-09-10). One line: item 00010, CMP-GAM-010, die-cast statue \"The Getaway\" 18 cm, 8,500 pcs at 88.38 CNY, confirmed delivery 2026-12-16. Terms FOB Yantian, NET30.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Single-page, fully printed document; no handwriting, stamps, or signatures.",
+      "The Qty column has no unit stated.",
+      "The confirmed quantity is not shown separately; the Qty column is recorded as quantity_ordered.",
+      "No document date is printed; 2026-09-10 is the date of the customer's order."
+    ]
+  }
+}

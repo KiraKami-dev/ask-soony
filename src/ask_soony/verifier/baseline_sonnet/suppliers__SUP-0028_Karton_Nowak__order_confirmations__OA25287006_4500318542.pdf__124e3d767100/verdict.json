@@ -1,0 +1,117 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "Polish",
+    "English"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA25287006",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318542"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00020",
+      "material_id": "CMP-GAM-011",
+      "supplier_part_no": null,
+      "description": "Activation Code Leaflet",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "110,000",
+          "number": 110000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.03",
+          "number": 0.03,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2025-09-09",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-005",
+      "supplier_part_no": null,
+      "description": "Cover Sleeve Grand Heist 5 (USK/PEGI)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "135,000",
+          "number": 135000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.06",
+          "number": 0.06,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2025-09-05",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Customer: Soony Interactive GmbH; your order 4500318542 of 2025-08-13; Incoterms DAP Hamburg; Payment NET30.",
+      "quote": "Customer: Soony Interactive GmbH · Your order 4500318542 of 2025-08-13 · Incoterms DAP Hamburg · Payment NET30"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA25287006 from Karton Nowak to Soony Interactive GmbH for PO 4500318542 (dated 2025-08-13), DAP Hamburg, NET30. Two lines: item 00020 CMP-GAM-011 Activation Code Leaflet, 110,000 at 0.03 EUR, confirmed 2025-09-09; item 00010 CMP-GAM-005 Cover Sleeve Grand Heist 5 (USK/PEGI), 135,000 at 0.06 EUR, confirmed 2025-09-05. No handwriting, stamps or corrections.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Typed PDF with no handwriting, stamps or signatures.",
+      "Document has no issue date of its own; only the PO date 2025-08-13 is shown.",
+      "Line items are listed out of order (00020 before 00010).",
+      "The quantity unit (e.g. pcs) is not stated; the Qty column is recorded as quantity_confirmed.",
+      "Confirmed dates differ per line (2025-09-09 and 2025-09-05)."
+    ]
+  }
+}

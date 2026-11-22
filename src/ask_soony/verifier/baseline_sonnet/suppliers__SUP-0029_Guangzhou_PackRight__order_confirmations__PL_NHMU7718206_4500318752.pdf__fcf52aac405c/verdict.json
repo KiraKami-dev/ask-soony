@@ -1,0 +1,118 @@
+{
+  "document_type": "packing_list",
+  "languages": [
+    "English",
+    "Chinese"
+  ],
+  "issuer": "Guangzhou PackRight Packaging Co., Ltd.",
+  "recipient": "Soony Interactive GmbH, Distribution Center Hamburg",
+  "document_number": null,
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318752"
+    },
+    {
+      "type": "container",
+      "value": "NHMU7718206"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": null,
+      "supplier_part_no": "PR-SL-0604",
+      "description": "彩盒封套 printed sleeve GH6",
+      "values": [
+        {
+          "field": "quantity_shipped",
+          "field_label": null,
+          "value": "150,000 pcs",
+          "number": 150000,
+          "unit": "pcs",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "300",
+          "number": 300,
+          "unit": "cartons",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": "pallets",
+          "value": "15",
+          "number": 15,
+          "unit": "pallets",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "3,600 kg",
+          "number": 3600,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "revision",
+          "field_label": null,
+          "value": "rev. B (GH6_sleeve_revB.pdf)",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_shipped",
+          "field_label": null,
+          "value": "ETD 2026-10-30",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Container NHMU7718206 shipped by Nordhav Shipping from Yantian to Hamburg, ETD 2026-10-30.",
+      "quote": "Container: NHMU7718206 · Nordhav Shipping · Yantian – Hamburg · ETD 2026-10-30"
+    },
+    {
+      "topic": "revision",
+      "text_en": "Artwork revision is rev. B (GH6_sleeve_revB.pdf).",
+      "quote": "版本 Artwork: rev. B (GH6_sleeve_revB.pdf)"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Packing list from Guangzhou PackRight for PO 4500318752, container NHMU7718206 (Yantian to Hamburg, ETD 2026-10-30). It covers 150,000 pcs of printed sleeve GH6 (part PR-SL-0604, artwork rev. B) in 300 cartons on 15 pallets, gross weight 3,600 kg. It was prepared by Lin Hui and carries a company chop. There are no handwritten corrections.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Red circular company stamp (Guangzhou PackRight Packaging Co., Ltd., 出货专用章 'shipping special seal') at lower right; it contains no dates or numbers.",
+      "No document number or document date is shown; only the ETD 2026-10-30.",
+      "Prepared by: Lin Hui; no handwritten signature visible.",
+      "No buyer material ID (CMP-...) is shown; only the supplier part number PR-SL-0604.",
+      "Quantity on the packing list is not labelled as ordered or confirmed, so it cannot be compared with the PO quantity."
+    ]
+  }
+}

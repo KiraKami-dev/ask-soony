@@ -1,0 +1,88 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "Korean",
+    "English"
+  ],
+  "issuer": "Hwaseong Memory Co., Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26273967",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318608"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "18,000",
+          "number": 18000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "5.4",
+          "number": 5.4,
+          "unit": "USD",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-03-16",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2026-01-07",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Incoterms FOB Busan; payment terms NET45.",
+      "quote": "Incoterms FOB Busan · Payment NET45"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA26273967 from Hwaseong Memory to Soony Interactive GmbH for PO 4500318608 dated 2026-01-07. One line: item 00010, CMP-GAM-002 Game Card 64 GB – Grand Heist 5, 18,000 units at 5.4 USD, confirmed for 2026-03-16. Terms are FOB Busan and NET45.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Single-page, typed document with no handwriting, stamps or corrections.",
+      "The document has no issue date of its own; 2026-01-07 is the customer's PO date.",
+      "The Qty column has no unit of measure printed.",
+      "The unit price has no stated per-unit basis beyond the currency (USD)."
+    ]
+  }
+}

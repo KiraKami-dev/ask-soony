@@ -1,0 +1,118 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Chinese",
+    "English"
+  ],
+  "issuer": "Guangzhou PackRight Packaging Co., Ltd.",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "SN-261007-850",
+  "document_date": "2026-10-07",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318726"
+    },
+    {
+      "type": "delivery_note",
+      "value": "SN-261007-850"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": null,
+      "supplier_part_no": "PR-RB-2207",
+      "description": "Collector's Box Grand Heist 6 (rig",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "21,800",
+          "number": 21800,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "4",
+          "number": 4,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "80 kg",
+          "number": 80,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "11.11.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S. Gross weight 80 kg, 4 packages.",
+      "quote": "毛重: 80 kg 件数: 4 承运: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "other",
+      "text_en": "Remarks field is empty.",
+      "quote": "备注:"
+    },
+    {
+      "topic": "approval_status",
+      "text_en": "Red round company seal of the supplier reading 'Guangzhou PackRight Packaging Co. Ltd' with 'Shipping dedicated seal' in Chinese.",
+      "quote": "出货专用章"
+    },
+    {
+      "topic": "other",
+      "text_en": "Blue receiving stamp: received 11.11.2026 at DC-HAM.",
+      "quote": "RECEIVED 11.11.2026 DC-HAM"
+    },
+    {
+      "topic": "other",
+      "text_en": "Receiver signature field is present but the signature line is blank.",
+      "quote": "收货签字:"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Chinese-language delivery note SN-261007-850 dated 2026/10/07 from Guangzhou PackRight Packaging to Soony DC Hamburg, against PO 4500318726. It lists one line, PR-RB-2207 Collector's Box Grand Heist 6, 21,800 PCS in 4 packages, 80 kg gross, carried by Nordhav Shipping A/S. A blue DC-HAM stamp shows it was received 11.11.2026. The supplier's red seal is applied. The receiver signature line is blank and there are no handwritten corrections.",
+    "red_flags": [
+      "Receiver signature line (收货签字) is blank; only the DC-HAM received stamp is present.",
+      "The note shows no ordered quantity, so 21,800 PCS cannot be checked against the PO from this document alone.",
+      "Item description is cut off at '(rig', so the full product name is not visible.",
+      "Gross weight of 80 kg for 21,800 PCS in 4 packages looks low (about 3.7 g per piece), and the weight and quantity were not checked against each other by the supplier. Recorded as written."
+    ],
+    "confidence": "high",
+    "observations": [
+      "The red supplier seal overlaps the table header cells 单位 and 件数 and part of the 'PCS' cell, but the values are still readable.",
+      "Description text ends with '(rig' and appears truncated on the paper.",
+      "Blue rectangular stamp 'RECEIVED 11.11.2026 / DC-HAM' sits below the remarks area.",
+      "The remarks field and the receiver signature line are empty.",
+      "No handwriting, strike-throughs or overwrites seen."
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "path": "suppliers/SUP-0010_Hwaseong_Memory/order_confirmations/OA26397528_4500318772.pdf",
+  "sha256": "df7c419cf20d0d116ba7ce62c301af07f489ccabcfbca14143c0582b35155aee",
+  "model": "claude-sonnet-5-5",
+  "effort": "high",
+  "fingerprint": "ef7ff7aae87f85e3",
+  "status": "ok",
+  "error": null,
+  "attempts": 1,
+  "finished_at": "2026-11-21T20:57:24+00:00",
+  "seconds": 425.1,
+  "num_turns": 3,
+  "cost_usd": 0.072745,
+  "usage": {
+    "input_tokens": 4,
+    "cache_creation_input_tokens": 20967,
+    "cache_read_input_tokens": 7572,
+    "output_tokens": 1810,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 883,
+      "ephemeral_5m_input_tokens": 20084
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1697,
+        "cache_read_input_tokens": 3786,
+        "cache_creation_input_tokens": 20084,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 20084,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  }
+}

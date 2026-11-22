@@ -1,0 +1,106 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Chinese",
+    "English"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd., Dongguan, CN (+86 769 2200 8800)",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "SN-260915-558",
+  "document_date": "2026-09-15",
+  "references": [
+    {
+      "type": "delivery_note",
+      "value": "SN-260915-558"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "PRM-GH6-PIN",
+      "supplier_part_no": null,
+      "description": "Pre-order Pin \"GH6\" (enamel)",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "24.000",
+          "number": 24,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "12",
+          "number": 12,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "216 kg",
+          "number": 216,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_shipped",
+          "field_label": null,
+          "value": "2026-09-15",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S",
+      "quote": "承运: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "terms",
+      "text_en": "Purchase order field is blank (shows a dash).",
+      "quote": "采购订单: —"
+    },
+    {
+      "topic": "other",
+      "text_en": "Remarks field is empty.",
+      "quote": "备注:"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Chinese-language delivery note SN-260915-558 dated 2026-09-15 from Dongguan Precision Housings to Soony DC Hamburg. It covers one line: PRM-GH6-PIN, Pre-order Pin \"GH6\" (enamel), quantity 24.000 PCS, 12 packages, gross weight 216 kg, carrier Nordhav Shipping A/S. The PO field is blank. It is signed by hand \"Meyer K.\" in the receiver signature box. There are no corrections, no receiving date stamp and no inspection result.",
+    "red_flags": [
+      "No purchase order number: the 采购订单 field shows only a dash, so the delivery cannot be matched to a PO from this document.",
+      "Quantity \"24.000 PCS\" is ambiguous. It reads as 24 under the Chinese decimal-point convention, but 24,000 under a thousands-separator reading. 12 packages and 216 kg gross weight (18 kg per package) are more consistent with a larger count. I recorded 24 per the document's convention; check this against the order.",
+      "Description says \"Pre-order Pin\", which may indicate a pre-order or sample item rather than a standard order line.",
+      "No receiving date is written or stamped on the note, and the receiver's signature is the only receipt mark. The file name carries 20261019, but that date is not on the document.",
+      "The signature \"Meyer K.\" is not accompanied by any quantity check or condition remark."
+    ],
+    "confidence": "medium",
+    "observations": [
+      "Printed form with Chinese labels (送货单, 单号, 日期, 发货方, 收货方, 采购订单, 物料号, 品名, 数量, 单位, 件数, 毛重, 承运, 备注, 收货签字).",
+      "The only handwriting is the signature \"Meyer K.\" in blue ink above the 收货签字 line. It is clear and is not a correction.",
+      "The 备注 (remarks) area is blank.",
+      "A barcode is printed at the top right; its contents are not readable as text.",
+      "The lower two-thirds of the page is empty.",
+      "The scan is clean and fully legible, with no stamps, strike-throughs or damage."
+    ]
+  }
+}

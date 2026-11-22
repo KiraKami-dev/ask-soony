@@ -1,0 +1,109 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Chinese",
+    "English"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd.",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "SN-260831-177",
+  "document_date": "2026-08-31",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318697"
+    },
+    {
+      "type": "delivery_note",
+      "value": "SN-260831-177"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-003",
+      "supplier_part_no": null,
+      "description": "Game Card Case (clear)",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "122.000",
+          "number": 122,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "244",
+          "number": 244,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "件数: 244",
+          "number": 244,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "毛重: 2928 kg",
+          "number": 2928,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S.",
+      "quote": "承运: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "other",
+      "text_en": "Remark: Please handle with care.",
+      "quote": "备注: 请轻拿轻放"
+    }
+  ],
+  "decisions": [],
+  "corrections": [
+    {
+      "what": "handwritten receiver signature (not a correction to any value)",
+      "original": null,
+      "replacement": "Schulz P.",
+      "where": "Receiver signature line (收货签字), bottom left; no date written next to it"
+    }
+  ],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Chinese-language delivery note SN-260831-177 dated 2026-08-31 from Dongguan Precision Housings Co., Ltd. to Soony Distribution Center, Hamburg, against PO 4500318697. It lists one line: CMP-GAM-003 Game Card Case (clear), quantity 122.000 PCS, 244 packages, gross weight 2928 kg, carrier Nordhav Shipping A/S, with the remark 'handle with care'. It has the supplier's red shipping seal and a handwritten receiver signature 'Schulz P.' with no date. There are no crossed-out values or handwritten corrections.",
+    "red_flags": [
+      "The package count (244) is exactly twice the delivered quantity (122.000 PCS), so there are more packages than pieces. This is unusual and may point to a quantity or package-count error on the note.",
+      "The receiver signature 'Schulz P.' has no date, and no receiving stamp or receipt date appears on the document."
+    ],
+    "confidence": "high",
+    "observations": [
+      "The red round supplier seal ('DONGGUAN PRECISION HOUSINGS CO LTD 出货专用章', shipping seal) overlaps the 单位 (unit) and 件数 (packages) column headers and partly overlaps the 'PCS' and '244' cells. Both are still readable.",
+      "The seal contains no date or number.",
+      "Quantity '122.000' is read with the Chinese/English decimal-point convention as 122 (not 122,000).",
+      "The handwritten signature 'Schulz P.' is in blue ink and clearly legible.",
+      "The lower half of the page is blank. The page has a barcode at the top right.",
+      "The purchase order number is printed under the sender block."
+    ]
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Boise Semiconductor Inc., Boise, US",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "DN-260831-382",
+  "document_date": "2026-08-31",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318710"
+    },
+    {
+      "type": "delivery_note",
+      "value": "DN-260831-382"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "8.500",
+          "number": 8500,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "1",
+          "number": 1,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "11 kg",
+          "number": 11,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Remarks: Fragile – handle with care",
+      "quote": "Fragile – handle with care"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Alpen Air Cargo GmbH; gross weight 11 kg; 1 package",
+      "quote": "Gross weight: 11 kg   Packages: 1   Carrier: Alpen Air Cargo GmbH"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Delivery note DN-260831-382 dated 08/31/2026 from Boise Semiconductor Inc. to Soony Distribution Center Hamburg, PO 4500318710. It lists one line: CMP-GAM-002 Game Card 64 GB – Grand Heist 5, quantity 8.500 PCS in 1 package, gross weight 11 kg, carrier Alpen Air Cargo GmbH. The 'Received by' line carries a handwritten signature 'Schulz P.' There are no corrections, strike-throughs or stamps.",
+    "red_flags": [
+      "The quantity '8.500' uses a dot that could be a thousands separator (8,500 pcs) or a decimal point (8.5). I recorded it as 8500 because the unit is PCS. Confirm against the PO.",
+      "The receiving signature has no receipt date written on the document, so the receipt date cannot be read from it."
+    ],
+    "confidence": "high",
+    "observations": [
+      "The 'Received by' field has a handwritten signature in blue ink reading 'Schulz P.'.",
+      "No receiving date stamp appears on the document.",
+      "The document is printed and clean, with no handwritten changes to values and no stamps.",
+      "The document date is in MM/DD/YYYY format (08/31/2026).",
+      "Most of the lower page is blank."
+    ]
+  }
+}

@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 
 from ask_soony.config import load_dotenv
+from ask_soony.verifier.baseline import BASELINE_DIR
 from ask_soony.verifier.image_recognizer.run import Settings, run_all, select_jobs
 
 
@@ -29,6 +30,11 @@ def main() -> None:
     parser.add_argument("--images-only", action="store_true")
     parser.add_argument("--limit", type=int)
     parser.add_argument("--force", action="store_true", help="read again even if already read")
+    parser.add_argument(
+        "--ignore-baseline",
+        action="store_true",
+        help="also read file versions the frozen baseline already has (costs calls)",
+    )
     args = parser.parse_args()
     load_dotenv()
 
@@ -40,6 +46,7 @@ def main() -> None:
         effort=args.effort,
         concurrency=args.concurrency,
         retries=args.retries,
+        baseline=None if args.ignore_baseline else BASELINE_DIR,
     )
     jobs = select_jobs(root, args.only, args.images_only, args.limit)
     print(f"{len(jobs)} documents under {root} → {settings.out}  (model {args.model})")

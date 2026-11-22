@@ -1,0 +1,119 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Chinese",
+    "English"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd., Dongguan, CN",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "SN-261008-884",
+  "document_date": "2026-10-08",
+  "references": [
+    {
+      "type": "delivery_note",
+      "value": "SN-261008-884"
+    },
+    {
+      "type": "po_number",
+      "value": "—"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "PRM-GH6-PIN",
+      "supplier_part_no": null,
+      "description": "Pre-order Pin \"GH6\" (enamel)",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "30.000",
+          "number": 30,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "15",
+          "number": 15,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "315 kg",
+          "number": 315,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_shipped",
+          "field_label": null,
+          "value": "2026-10-08",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "11.11.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Received 11.11.2026 at DC-HAM (receiving stamp).",
+      "quote": "RECEIVED 11.11.2026 DC-HAM"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S. Gross weight 315 kg, 15 packages.",
+      "quote": "毛重: 315 kg  件数: 15  承运: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "other",
+      "text_en": "Red round company seal of the shipper: 'Dongguan Precision Housings Co Ltd – shipping dedicated seal'.",
+      "quote": "DONGGUAN PRECISION HOUSINGS CO LTD 出货专用章"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Chinese-language delivery note SN-261008-884 dated 2026-10-08 from Dongguan Precision Housings Co., Ltd. to Soony Distribution Center Hamburg for one line: PRM-GH6-PIN, Pre-order Pin \"GH6\" (enamel), quantity 30.000 PCS, 15 packages, gross weight 315 kg, carrier Nordhav Shipping A/S. The shipper's seal is on it. It carries a blue DC-HAM receiving stamp dated 11.11.2026 and a handwritten signature \"Meyer K.\". There are no handwritten corrections. The purchase order field is blank (\"—\").",
+    "red_flags": [
+      "Purchase order field (采购订单) is blank (\"—\"), so the delivery cannot be matched to a PO from this document.",
+      "Quantity \"30.000\" is ambiguous: read by the Chinese/English decimal convention it is 30 PCS, but read as a thousands separator it would be 30,000 PCS. The 315 kg gross weight over 15 packages (21 kg each) does not settle which it is. Check the quantity against the order.",
+      "The item is described as a \"Pre-order Pin\" and has no PO reference.",
+      "The receiving stamp only records receipt on 11.11.2026. It gives no received quantity and no inspection or acceptance result."
+    ],
+    "confidence": "medium",
+    "observations": [
+      "The red shipper seal overlaps the 单位 (unit) and 件数 (packages) column headers and the area around the '15' value. 'PCS' and '15' are still readable.",
+      "The signature \"Meyer K.\" is handwritten in blue ink on the 收货签字 (receiving signature) line.",
+      "The blue rectangular stamp reads 'RECEIVED 11.11.2026 / DC-HAM'.",
+      "The remarks field (备注) is empty.",
+      "Scan is slightly skewed, and the lower half of the page is blank.",
+      "PRM-GH6-PIN is the 物料号 (material number) on the note. It is not in the buyer's usual CMP- format, so it may be the supplier's own number."
+    ]
+  }
+}

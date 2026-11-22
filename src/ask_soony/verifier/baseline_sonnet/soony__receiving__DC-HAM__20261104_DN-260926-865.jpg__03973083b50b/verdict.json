@@ -1,0 +1,87 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Korean",
+    "English"
+  ],
+  "issuer": "Hwaseong Memory Co., Ltd.",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "DN-260926-865",
+  "document_date": "2026-09-26",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318718"
+    },
+    {
+      "type": "delivery_note",
+      "value": "DN-260926-865"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "10 000",
+          "number": 10000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "5",
+          "number": 5,
+          "unit": "boxes",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "65 kg",
+          "number": 65,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S",
+      "quote": "운송: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Total weight 65 kg, 5 boxes",
+      "quote": "총중량: 65 kg 박스: 5"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Korean/English delivery note DN-260926-865 dated 2026.09.26 from Hwaseong Memory Co., Ltd. to Soony Distribution Center Hamburg, PO 4500318718. One line: CMP-GAM-002 Game Card 64 GB – Grand Heist 5, 10 000 PCS in 5 boxes, 65 kg, carrier Nordhav Shipping A/S. The remarks field is empty. There are no corrections.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Red round company stamp 'HWASEONG MEMORY CO LTD' with a star overlaps the unit and box columns of the table. It contains no date or number. The PCS and box digits are slightly overlapped but still readable.",
+      "Handwritten name 'Meyer K.' on the receiver (인수자) signature line. No receiving date is written.",
+      "Remarks (비고) field is blank.",
+      "No prices shown."
+    ]
+  }
+}

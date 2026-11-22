@@ -1,0 +1,106 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Polish",
+    "English"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o., Poznań, PL",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "WZ-260902-594",
+  "document_date": "2026-09-02",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318698"
+    },
+    {
+      "type": "delivery_note",
+      "value": "WZ-260902-594"
+    },
+    {
+      "type": "other",
+      "value": "Przewoźnik (carrier): PO 57746"
+    }
+  ],
+  "lines": [
+    {
+      "item": "CMP-GAM-008",
+      "material_id": "CMP-GAM-008",
+      "supplier_part_no": null,
+      "description": "Art Book Grand Heist 6 (96 p, hard  (text cut off on the document)",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "10.500",
+          "number": 10500,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "10",
+          "number": 10,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "160 kg",
+          "number": 160,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_shipped",
+          "field_label": null,
+          "value": "02.09.2026",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [],
+  "decisions": [],
+  "corrections": [
+    {
+      "what": "Handwritten signature in the 'Odebrał' (received by) field",
+      "original": null,
+      "replacement": "Yilmaz D.",
+      "where": "Bottom left, above the signature line under 'Odebrał:'"
+    }
+  ],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Polish WZ delivery note WZ-260902-594 dated 02.09.2026 from Karton Nowak Sp. z o.o. (Poznań) to Soony Distribution Center Hamburg, against order 4500318698. One line: CMP-GAM-008 Art Book Grand Heist 6, 10.500 (10,500) PCS in 10 packages, gross weight 160 kg, carrier reference PO 57746. The 'Uwagi' (remarks) field is empty. It is signed as received by 'Yilmaz D.' (handwritten), with no date and no receiving stamp. There are no crossed-out values or other corrections.",
+    "red_flags": [
+      "The receipt signature 'Yilmaz D.' has no date and there is no receiving stamp, so the receipt date cannot be read from the document.",
+      "The product description is cut off at '(96 p, hard', so the full item name is not shown.",
+      "The quantity is printed as '10.500', which under Polish convention means 10,500 pieces, not 10.5. Check this against the order.",
+      "The gross weight of 160 kg for 10,500 hardcover 96-page art books in 10 packages looks very low. This is a plausibility concern only; the figures are recorded as written.",
+      "There is no ordered quantity on the document, so a short or over-delivery cannot be checked against it."
+    ],
+    "confidence": "high",
+    "observations": [
+      "The document is a clean printed form. The only handwriting is the blue-ink signature 'Yilmaz D.' at the bottom left.",
+      "No stamps are visible.",
+      "The item description in the table is truncated at '(96 p, hard'.",
+      "'Opak.' (packages) appears twice, in the table and in the footer, and both show 10.",
+      "The 'Uwagi' (remarks) field is blank.",
+      "The signature has no date next to it.",
+      "A barcode is printed at the top right."
+    ]
+  }
+}

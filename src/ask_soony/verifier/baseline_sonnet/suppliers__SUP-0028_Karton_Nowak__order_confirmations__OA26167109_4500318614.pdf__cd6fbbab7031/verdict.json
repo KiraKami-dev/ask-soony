@@ -1,0 +1,97 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English",
+    "Polish"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26167109",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318614"
+    },
+    {
+      "type": "other",
+      "value": "Order confirmation OA26167109"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-005",
+      "supplier_part_no": null,
+      "description": "Cover Sleeve Grand Heist 5 (USK/PEGI)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "110,000",
+          "number": 110000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.06",
+          "number": 0.06,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-02-20",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2026-01-22",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Incoterms DAP Hamburg; payment NET30.",
+      "quote": "Incoterms DAP Hamburg · Payment NET30"
+    },
+    {
+      "topic": "other",
+      "text_en": "Customer is Soony Interactive GmbH; reference is their order 4500318614 of 2026-01-22.",
+      "quote": "Customer: Soony Interactive GmbH · Your order 4500318614 of 2026-01-22"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA26167109 from Karton Nowak to Soony Interactive GmbH for PO 4500318614 (dated 2026-01-22). One line: item 00010, CMP-GAM-005 Cover Sleeve Grand Heist 5 (USK/PEGI), 110,000 pcs at 0.06 EUR, confirmed delivery date 2026-02-20. Terms: DAP Hamburg, NET30. No corrections, stamps or handwriting.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Printed PDF, single page, no handwriting, stamps or signatures.",
+      "The document has no issue date of its own; only the order date (2026-01-22) and confirmed date (2026-02-20) appear.",
+      "The quantity column is headed 'Qty' with no unit given; it is recorded as quantity_confirmed.",
+      "The 'Confirmed' column holds the date 2026-02-20; I read it as the confirmed delivery date."
+    ]
+  }
+}

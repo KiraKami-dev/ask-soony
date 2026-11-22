@@ -1,0 +1,124 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Korean",
+    "English"
+  ],
+  "issuer": "Hwaseong Memory Co., Ltd., Hwaseong, KR (+82 31 200 3300)",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "DN-260904-745",
+  "document_date": "2026-09-04",
+  "references": [
+    {
+      "type": "delivery_note",
+      "value": "DN-260904-745"
+    },
+    {
+      "type": "po_number",
+      "value": "4500318705"
+    },
+    {
+      "type": "po_number",
+      "value": "4500318707"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "13 000",
+          "number": 13000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "2",
+          "number": 2,
+          "unit": "boxes",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "2",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "11 000",
+          "number": 11000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "22",
+          "number": 22,
+          "unit": "boxes",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Total gross weight: 360 kg; boxes: 24; carrier: Nordhav Shipping A/S.",
+      "quote": "총중량: 360 kg  박스: 24  운송: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "other",
+      "text_en": "Remarks field is empty.",
+      "quote": "비고:"
+    },
+    {
+      "topic": "other",
+      "text_en": "Receiver field (인수자) carries a handwritten signature/name 'Yilmaz D.' with no date.",
+      "quote": "인수자: Yilmaz D."
+    },
+    {
+      "topic": "other",
+      "text_en": "A red round stamp 'HWASEONG MEMORY CO LTD' with a star is placed over the lower right of the table. It contains no date or number.",
+      "quote": "HWASEONG MEMORY CO LTD"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Korean/English delivery note DN-260904-745 dated 2026.09.04 from Hwaseong Memory Co., Ltd. to Soony Distribution Center Hamburg. It covers two lines of CMP-GAM-002 Game Card 64 GB – Grand Heist 5: 13 000 PCS in 2 boxes and 11 000 PCS in 22 boxes. That is 24,000 PCS in 24 boxes, 360 kg total, shipped by Nordhav Shipping A/S. It lists POs 4500318705 and 4500318707. It has no corrections or strike-throughs. A receiver signature 'Yilmaz D.' is present, and a red supplier stamp sits over the table.",
+    "red_flags": [
+      "Two PO numbers (4500318705, 4500318707) are listed in the header, but the lines do not say which PO each quantity belongs to.",
+      "The same part number CMP-GAM-002 appears on both lines with different box counts (2 boxes for 13 000 PCS, 22 boxes for 11 000 PCS). No explanation is given.",
+      "The receiver signature has no receiving date, and the stamp carries no date."
+    ],
+    "confidence": "high",
+    "observations": [
+      "The red round stamp overlaps the unit and box columns at the lower right of the table. It partly covers the 'PCS' text in row 1 and the 단위 header, and it is close to the box counts '2' and '22'. These remain readable.",
+      "The signature 'Yilmaz D.' is handwritten in dark blue ink on the 인수자 line.",
+      "The remarks field is blank.",
+      "A barcode is printed at the top right. No prices are shown.",
+      "The document is slightly skewed (rotated), which does not affect legibility."
+    ]
+  }
+}

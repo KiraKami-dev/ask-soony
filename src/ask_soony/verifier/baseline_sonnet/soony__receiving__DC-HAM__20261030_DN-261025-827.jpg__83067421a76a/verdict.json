@@ -1,0 +1,83 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Korean",
+    "English"
+  ],
+  "issuer": "Hwaseong Memory Co., Ltd., Hwaseong, KR",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "DN-261025-827",
+  "document_date": "2026-10-25",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318718"
+    },
+    {
+      "type": "delivery_note",
+      "value": "DN-261025-827"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-001",
+      "supplier_part_no": null,
+      "description": "Game Card 128 GB – Grand Heist 6",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "70 000",
+          "number": 70000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "70",
+          "number": 70,
+          "unit": "boxes",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "910 kg",
+          "number": 910,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S. Total weight 910 kg, 70 boxes.",
+      "quote": "총중량: 910 kg  박스: 70  운송: Nordhav Shipping A/S"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Korean delivery note DN-261025-827 dated 2026.10.25 from Hwaseong Memory Co., Ltd. to Soony Distribution Center Hamburg, against PO 4500318718. One line: CMP-GAM-001 Game Card 128 GB – Grand Heist 6, 70 000 PCS in 70 boxes, total weight 910 kg, carrier Nordhav Shipping A/S. The remarks field is empty. There are no corrections or strike-throughs. A handwritten receiver signature 'Meyer K.' and the supplier's red company stamp are present.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Red round stamp 'HWASEONG MEMORY CO LTD' with a star overlaps the unit (PCS) and box-count cells and part of the header. The values are still readable. The stamp contains no date.",
+      "Handwritten signature 'Meyer K.' on the receiver (인수자) line. No receiving date is written next to it.",
+      "Remarks (비고) field is blank.",
+      "Quantity is written as '70 000' with a space as the thousands separator, which I read as 70000. The box count 70 is consistent with the 박스: 70 total.",
+      "The note shows no ordered quantity and no prices, so I could not compare the delivered quantity with the order."
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "path": "suppliers/SUP-0018_Pune_Diecast_Works/order_confirmations/OA26385785_4500318777.pdf",
+  "sha256": "322e2231136c3afc45d0ddc477468bad8fa903210f7f35fcff6a4c0c35116448",
+  "model": "claude-sonnet-5-5",
+  "effort": "high",
+  "fingerprint": "ef7ff7aae87f85e3",
+  "status": "ok",
+  "error": null,
+  "attempts": 1,
+  "finished_at": "2026-11-21T21:02:07+00:00",
+  "seconds": 708.2,
+  "num_turns": 3,
+  "cost_usd": 0.0680491,
+  "usage": {
+    "input_tokens": 4,
+    "cache_creation_input_tokens": 20911,
+    "cache_read_input_tokens": 7572,
+    "output_tokens": 1354,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 884,
+      "ephemeral_5m_input_tokens": 20027
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1240,
+        "cache_read_input_tokens": 3786,
+        "cache_creation_input_tokens": 20027,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 20027,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  }
+}

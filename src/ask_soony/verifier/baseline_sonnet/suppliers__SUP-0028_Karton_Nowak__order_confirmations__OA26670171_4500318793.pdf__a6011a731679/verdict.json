@@ -1,0 +1,116 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "Polish",
+    "English"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26670171",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318793"
+    },
+    {
+      "type": "other",
+      "value": "Incoterms DAP Hamburg"
+    },
+    {
+      "type": "other",
+      "value": "Payment NET30"
+    },
+    {
+      "type": "other",
+      "value": "Artwork file GH6_sleeve_revC_USK2026.pdf"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-004",
+      "supplier_part_no": null,
+      "description": "Cover Sleeve Grand Heist 6 (USK/PEGI)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "210,000",
+          "number": 210000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.06",
+          "number": 0.06,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-12-14",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2026-11-17",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "revision",
+          "field_label": null,
+          "value": "rev. C",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "revision",
+      "text_en": "CMP-GAM-004: printed to artwork rev. C (GH6_sleeve_revC_USK2026.pdf), as received from Soony Marketing on 2026-08-07.",
+      "quote": "CMP-GAM-004: druk wg pliku rev. C (GH6_sleeve_revC_USK2026.pdf), otrzymanego od Soony Marketing 2026-08-07. / Printed to artwork rev. C as received from Soony Marketing on 2026-08-07."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Incoterms DAP Hamburg; payment NET30.",
+      "quote": "Incoterms DAP Hamburg · Payment NET30"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA26670171 from Karton Nowak to Soony Interactive GmbH for PO 4500318793 (dated 2026-11-17). One item: 00010 CMP-GAM-004 Cover Sleeve Grand Heist 6 (USK/PEGI), 210,000 pcs at 0.06 EUR, confirmed for 2026-12-14. Terms are DAP Hamburg and NET30. The supplier states it will print to artwork rev. C, received from Soony Marketing on 2026-08-07.",
+    "red_flags": [
+      "Supplier confirms printing to artwork rev. C (received 2026-08-07); the buyer should check that rev. C is the current approved artwork for CMP-GAM-004."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Typed PDF with no handwriting, stamps or signatures.",
+      "The document has no issue date; 2026-11-17 is the date of the buyer's order.",
+      "The quantity has no unit stated, and the quantity uses a comma as thousands separator (English convention) so 210,000 read as 210000."
+    ]
+  }
+}

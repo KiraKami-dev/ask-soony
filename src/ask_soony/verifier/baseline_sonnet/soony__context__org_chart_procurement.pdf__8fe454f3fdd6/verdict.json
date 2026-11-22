@@ -1,0 +1,70 @@
+{
+  "document_type": "org_chart",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Soony Interactive GmbH",
+  "recipient": null,
+  "document_number": null,
+  "document_date": "2026-09-01",
+  "references": [
+    {
+      "type": "other",
+      "value": "Approval Policy PP-07"
+    },
+    {
+      "type": "other",
+      "value": "Procurement organisation v1"
+    }
+  ],
+  "lines": [],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Internal document. Solid lines show reporting. Approval limits are in Approval Policy PP-07.",
+      "quote": "Internal. Solid lines: reporting. Approval limits see Approval Policy PP-07."
+    },
+    {
+      "topic": "other",
+      "text_en": "Jonas Lindqvist, Chief Procurement Officer, is at the top of the chart. Dr. Maren Vogt, Head of Procurement, sits directly below him.",
+      "quote": "Jonas Lindqvist – Chief Procurement Officer; Dr. Maren Vogt – Head of Procurement"
+    },
+    {
+      "topic": "other",
+      "text_en": "Five roles report to the Head of Procurement: Tobias Brandt (Category Lead Game Media), Sofia Marchetti (Category Lead Print & Packaging), TBD (Category Lead Collector's Items), Daniel Okafor (Supplier Quality Lead) and Raj Patel (Logistics Planner).",
+      "quote": "Tobias Brandt / Sofia Marchetti / TBD / Daniel Okafor / Raj Patel"
+    },
+    {
+      "topic": "other",
+      "text_en": "Buyers sit under the category leads: Felix Brunner (Senior Buyer, Game Cards) under Tobias Brandt, Paul Winter (Buyer, Print & Packaging) under Sofia Marchetti, and Mei Lin (Buyer, Collector's Items) under the TBD Category Lead Collector's Items.",
+      "quote": "Felix Brunner – Senior Buyer (Game Cards); Paul Winter – Buyer (Print & Packaging); Mei Lin – Buyer (Collector's Items)"
+    },
+    {
+      "topic": "other",
+      "text_en": "Distribution Center Hamburg has a dotted line to the Head of Procurement. Katrin Jansen is Site Lead DC Hamburg.",
+      "quote": "Distribution Center Hamburg (dotted line to Head of Procurement) – Katrin Jansen, Site Lead DC Hamburg"
+    },
+    {
+      "topic": "other",
+      "text_en": "Also listed: Nils Berger (IT & Systems Lead, Procurement), Clara Weiss (Quality & Compliance Manager), Henrik Dahl (Chief Financial Officer).",
+      "quote": "Also: Nils Berger (IT & Systems Lead (Procurement)), Clara Weiss (Quality & Compliance Manager), Henrik Dahl (Chief Financial Officer)"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Printed org chart (v1, dated 2026-09-01) of Soony Interactive GmbH's procurement organisation. The CPO and the Head of Procurement are at the top. Five roles report to the Head of Procurement, and three buyers sit below the category leads. The DC Hamburg site lead has a dotted line to the Head of Procurement. The Category Lead Collector's Items position is shown as TBD (vacant or unassigned) and is highlighted. The chart has no quantities, prices or approval decisions. Approval limits are not on this document and are referred to Approval Policy PP-07.",
+    "red_flags": [
+      "The Category Lead Collector's Items position is shown as 'TBD' and highlighted. It is not filled, and Mei Lin (Buyer, Collector's Items) reports to this open position.",
+      "Approval limits are not stated here; they are in Approval Policy PP-07, which is not part of this document."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Clean printed PDF, single page, with no handwriting, stamps or signatures.",
+      "The TBD box has a light orange fill, unlike the other boxes.",
+      "Henrik Dahl, Nils Berger and Clara Weiss appear only in the 'Also' footnote line, with no place in the reporting lines.",
+      "The Distribution Center Hamburg box is shown separately with a dotted-line relationship."
+    ]
+  }
+}

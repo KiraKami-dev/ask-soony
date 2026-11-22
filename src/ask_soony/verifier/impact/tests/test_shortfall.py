@@ -178,6 +178,39 @@ def test_blocked_stock_card_asks_whether_it_was_packed(tmp_path):
     assert "do any packed copies already contain this stock?" in blocked.messages[0].body
 
 
+def test_an_offer_counts_as_supply_with_quantity_offered(tmp_path):
+    root = portal_with_plan(tmp_path)
+    folder = tmp_path / "readings" / "offer"
+    folder.mkdir(parents=True)
+    path = "suppliers/SUP-0007_Acme_Parts/notices/offer.pdf"
+    (folder / "meta.json").write_text(json.dumps({"path": path, "sha256": "0", "status": "ok"}))
+    value = {
+        "field": "quantity_offered",
+        "field_label": None,
+        "value": "1.300",
+        "number": 1.3,
+        "unit": "PCS",
+        "written": "printed",
+        "crossed_out": False,
+        "legible": "clear",
+    }
+    lead = {**value, "field": "lead_time", "value": "loaded within 4 h", "number": 4}
+    line = {
+        "item": "1",
+        "material_id": "CMP-B",
+        "supplier_part_no": None,
+        "description": None,
+        "values": [value, lead],
+    }
+    (folder / "verdict.json").write_text(
+        json.dumps({"document_type": "offer", "references": [], "lines": [line]})
+    )
+    graph = build(root, tmp_path / "readings")
+    part_b = next(p for p in compute(graph.records, graph.issues).parts if p.part == "CMP-B")
+    offers = [s for s in part_b.supply if s["kind"] == "offer"]
+    assert [(o["quantity"], o["document"]) for o in offers] == [(1300, path)]  # '1.300' fixed
+
+
 # ---- inbound that lands before packing ends (launch day here is Sun 1 Mar 2026)
 
 ADVICE = "suppliers/SUP-0007_Acme_Parts/order_confirmations/Shipping_advice_020-1_9100000002.pdf"

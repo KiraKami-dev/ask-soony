@@ -1,0 +1,152 @@
+{
+  "document_type": "contract",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Soony Interactive GmbH",
+  "recipient": "Pune Diecast Works Pvt. Ltd.",
+  "document_number": "PC-0018-2026",
+  "document_date": "2026-08-01",
+  "references": [
+    {
+      "type": "contract",
+      "value": "PC-0018-2026"
+    }
+  ],
+  "lines": [
+    {
+      "item": "Annex A line 1",
+      "material_id": "CMP-GAM-010",
+      "supplier_part_no": null,
+      "description": "Statue \"The Getaway\" (die-cast, 18 cm)",
+      "values": [
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "1037 INR",
+          "number": 1037,
+          "unit": "INR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "minimum_order_quantity",
+          "field_label": null,
+          "value": "2,000",
+          "number": 2000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "lead_time",
+          "field_label": null,
+          "value": "70",
+          "number": 70,
+          "unit": "days",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Agreement between Soony Interactive GmbH and Pune Diecast Works Pvt. Ltd. Effective 2026-08-01, expires 2029-07-31 unless extended in writing.",
+      "quote": "Contract no. PC-0018-2026 · Effective 2026-08-01 · Expires 2029-07-31"
+    },
+    {
+      "topic": "approval_status",
+      "text_en": "Deliveries are made under Soony's conditional release of 1 August 2026. Serial supply requires a completed PPAP and the written release by Soony Supplier Quality and the responsible Category Lead.",
+      "quote": "Deliveries under this Agreement are made under Soony's conditional release of 1 August 2026. Serial supply requires a completed PPAP and the written release by Soony Supplier Quality and the responsible Category Lead."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Lead times per Annex A are counted from PO acknowledgement. Supplier acknowledges POs within 3 working days.",
+      "quote": "Lead times per Annex A, counted from PO acknowledgement. Supplier acknowledges POs within 3 working days."
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Deliveries are FOB Nhava Sheva (Incoterms 2020). Risk passes according to the agreed Incoterm.",
+      "quote": "Deliveries are made FOB Nhava Sheva (Incoterms 2020). Risk passes in accordance with the agreed Incoterm."
+    },
+    {
+      "topic": "price",
+      "text_en": "Prices per Annex A, in INR, are fixed for the calendar year. Invoices quote the Soony PO number and item. Payment NET30.",
+      "quote": "Prices per Annex A, in INR, are fixed for the calendar year. Invoices quote the Soony PO number and item. Payment NET30."
+    },
+    {
+      "topic": "quality",
+      "text_en": "PPAP level 3 for new part numbers. Changes to process, site or sub-supplier require Soony's written approval (PCN, 90 days). Supplier maintains IATF 16949 or ISO 9001 certification.",
+      "quote": "PPAP level 3 for new part numbers. Changes to process, site or sub-supplier require Soony's written approval (PCN, 90 days). Supplier maintains IATF 16949 or ISO 9001 certification."
+    },
+    {
+      "topic": "delay",
+      "text_en": "Late delivery penalty: 0.5% of the delayed order value per commenced week, capped at 5%.",
+      "quote": "Late delivery: 0.5 % of the delayed order value per commenced week, capped at 5 %."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Force majeure excuses performance only to the extent prevented. Shortages of materials or labour at the Supplier or sub-suppliers are not force majeure unless themselves caused by force majeure. Notice within 48 hours; if the event lasts more than 60 days either party may terminate affected orders.",
+      "quote": "Shortages of materials or labour at the Supplier or its sub-suppliers are not force majeure unless they are themselves caused by force majeure. Notice within 48 hours; if the event lasts more than 60 days, either party may terminate the affected orders."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Supplier discloses sub-suppliers of critical materials on request.",
+      "quote": "Supplier discloses sub-suppliers of critical materials on request."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Supplier complies with Soony's Supplier Code of Conduct, REACH, RoHS and conflict-minerals reporting (CMRT annually).",
+      "quote": "Supplier complies with Soony's Supplier Code of Conduct, REACH, RoHS and conflict-minerals reporting (CMRT annually)."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Confidentiality for 5 years after termination.",
+      "quote": "Each party keeps the other party's information confidential for 5 years after termination."
+    },
+    {
+      "topic": "terms",
+      "text_en": "German law applies, excluding the CISG. Place of jurisdiction is Munich.",
+      "quote": "German law applies, excluding the CISG. Place of jurisdiction is Munich."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Signature block: Munich, 2026-08-01, for Soony Jonas Lindqvist, CPO; for Supplier Rohan Deshmukh (names typed, no visible handwritten signatures).",
+      "quote": "Munich, 2026-08-01 · for Soony: Jonas Lindqvist, CPO · for Supplier: Rohan Deshmukh"
+    }
+  ],
+  "decisions": [
+    {
+      "subject": "Supply status under the agreement",
+      "outcome": "conditional",
+      "decided_by": "Soony",
+      "conditions": "Serial supply requires a completed PPAP and written release by Soony Supplier Quality and the responsible Category Lead.",
+      "quote": "Deliveries under this Agreement are made under Soony's conditional release of 1 August 2026."
+    }
+  ],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Three-page framework supply agreement PC-0018-2026 between Soony Interactive GmbH and Pune Diecast Works Pvt. Ltd., effective 2026-08-01 to 2029-07-31. It covers one part, CMP-GAM-010 (die-cast statue 'The Getaway'), at 1037 INR per unit, MOQ 2,000 and 70 days lead time. Terms: FOB Nhava Sheva, NET30, late-delivery penalty of 0.5% per week capped at 5%, German law, Munich jurisdiction. Supply is under a conditional release only.",
+    "red_flags": [
+      "Supply is conditional: deliveries are made under Soony's conditional release of 1 August 2026. Serial supply needs a completed PPAP and written release by Soony Supplier Quality and the Category Lead.",
+      "Prices are fixed per calendar year only, so the 1037 INR price may change after the 2026 calendar year; the contract does not state the price for later years.",
+      "Shortages of materials or labour at the Supplier or its sub-suppliers are not force majeure unless themselves caused by force majeure.",
+      "The signature block shows typed names only; no handwritten signatures or stamps are visible.",
+      "Annex A lists only one part number."
+    ],
+    "confidence": "high",
+    "observations": [
+      "The PDF was read as text and page images; all text is clear and printed.",
+      "No handwriting, stamps, strike-throughs or overwrites are visible.",
+      "The signature block is typed text only; no visible signature marks.",
+      "Page 2 holds only § 13 and the signature line; page 3 holds only Annex A.",
+      "The unit price is printed as '1037' with the currency in a separate column (INR)."
+    ]
+  }
+}

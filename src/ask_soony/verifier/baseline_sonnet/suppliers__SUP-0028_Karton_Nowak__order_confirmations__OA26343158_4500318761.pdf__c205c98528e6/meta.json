@@ -1,0 +1,48 @@
+{
+  "path": "suppliers/SUP-0028_Karton_Nowak/order_confirmations/OA26343158_4500318761.pdf",
+  "sha256": "c205c98528e6d52773492ed0c7934690b2e1d3ad3dccf095cb9fef48551a3136",
+  "model": "claude-sonnet-5-5",
+  "effort": "high",
+  "fingerprint": "ef7ff7aae87f85e3",
+  "status": "ok",
+  "error": null,
+  "attempts": 1,
+  "finished_at": "2026-11-21T21:15:25+00:00",
+  "seconds": 47.3,
+  "num_turns": 3,
+  "cost_usd": 0.1047508,
+  "usage": {
+    "input_tokens": 4,
+    "cache_creation_input_tokens": 20912,
+    "cache_read_input_tokens": 7572,
+    "output_tokens": 2020,
+    "output_tokens_details": {
+      "thinking_tokens": 407
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 20912,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1909,
+        "cache_read_input_tokens": 3786,
+        "cache_creation_input_tokens": 20031,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 20031
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  }
+}

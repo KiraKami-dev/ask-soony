@@ -1,0 +1,93 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "Polish",
+    "English"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26148191",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318603"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-011",
+      "supplier_part_no": null,
+      "description": "Activation Code Leaflet",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "110,000",
+          "number": 110000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.03",
+          "number": 0.03,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-01-27",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2025-12-30",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Incoterms DAP Hamburg; payment NET30.",
+      "quote": "Incoterms DAP Hamburg · Payment NET30"
+    },
+    {
+      "topic": "other",
+      "text_en": "Customer is Soony Interactive GmbH, referencing their order 4500318603 dated 2025-12-30.",
+      "quote": "Customer: Soony Interactive GmbH · Your order 4500318603 of 2025-12-30"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA26148191 from Karton Nowak for Soony Interactive GmbH's PO 4500318603 (dated 2025-12-30). It covers one line: item 00010, CMP-GAM-011 Activation Code Leaflet, 110,000 pcs at 0.03 EUR, confirmed for 2026-01-27. Terms are DAP Hamburg and NET30. The document has no handwriting, stamps or corrections.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Printed, machine-generated PDF with no handwriting, stamps or signatures.",
+      "The quantity has no unit of measure printed.",
+      "No document date or total value is shown; the only dates are the PO date and the confirmed date.",
+      "Quantity '110,000' is read as 110000 (comma as thousands separator, since the unit price uses a dot decimal)."
+    ]
+  }
+}

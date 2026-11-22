@@ -1,0 +1,108 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Pune Diecast Works Pvt. Ltd.",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "DN-261021-819",
+  "document_date": "2026-10-21",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318727"
+    },
+    {
+      "type": "delivery_note",
+      "value": "DN-261021-819"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-010",
+      "supplier_part_no": null,
+      "description": "Statue \"The Getaway\" (die-cast, 18 (description cut off on the document)",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "5 600",
+          "number": 5600,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "2",
+          "number": 2,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "30 kg",
+          "number": 30,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "17.11.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "other",
+      "text_en": "Remarks: Pallets returnable",
+      "quote": "Remarks: Pallets returnable"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Sahyadri Freight Forwarders Pvt. Ltd.; gross weight 30 kg; 2 packages.",
+      "quote": "Gross weight: 30 kg    Packages: 2    Carrier: Sahyadri Freight Forwarders Pvt. Ltd."
+    },
+    {
+      "topic": "other",
+      "text_en": "Receiving stamp from DC-HAM dated 17.11.2026; received by Schulz P. (handwritten signature).",
+      "quote": "RECEIVED 17.11.2026 DC-HAM"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Delivery note DN-261021-819 dated 2026-10-21 from Pune Diecast Works to Soony DC Hamburg against PO 4500318727. It lists CMP-GAM-010 Statue \"The Getaway\", 5 600 PCS in 2 packages, gross weight 30 kg. It carries a DC-HAM receiving stamp dated 17.11.2026 and a handwritten 'Schulz P.' in the Received by field. There are no corrections or strike-throughs. No received quantity or discrepancy is recorded.",
+    "red_flags": [
+      "Gross weight of 30 kg for 5 600 die-cast statues in 2 packages looks inconsistent. The values are recorded as written.",
+      "The part description is cut off after '(die-cast, 18', so the full specification is not visible.",
+      "The stamp and signature confirm receipt but give no received quantity and no note of any shortage or damage.",
+      "The remark 'Pallets returnable' may need follow-up on returning the pallets."
+    ],
+    "confidence": "high",
+    "observations": [
+      "The 'Received by' field has a handwritten signature reading 'Schulz P.'.",
+      "The blue receiving stamp reads 'RECEIVED 17.11.2026' and 'DC-HAM'. It is slightly rotated but legible.",
+      "The description text is truncated in the table cell.",
+      "The 'Packages' column header text runs over the table border.",
+      "The quantity is written with a space as the thousands separator ('5 600').",
+      "No handwritten corrections or crossed-out values are visible."
+    ]
+  }
+}

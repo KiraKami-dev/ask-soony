@@ -1,0 +1,100 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Pune Diecast Works Pvt. Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26385785",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318777"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-010",
+      "supplier_part_no": null,
+      "description": "Statue \"The Getaway\" (die-cast, 18 cm)",
+      "values": [
+        {
+          "field": "quantity_ordered",
+          "field_label": null,
+          "value": "2,200",
+          "number": 2200,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "1037",
+          "number": 1037,
+          "unit": "INR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2027-01-13",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2026-10-28",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "approval_status",
+      "text_en": "Supplier status: approved for serial supply to Soony (PPAP documents submitted 2026-09-14).",
+      "quote": "Supplier status: approved for serial supply to Soony (PPAP documents submitted 2026-09-14)."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Incoterms FOB Nhava Sheva; payment NET30.",
+      "quote": "Incoterms FOB Nhava Sheva · Payment NET30"
+    }
+  ],
+  "decisions": [
+    {
+      "subject": "Supplier approval for serial supply to Soony",
+      "outcome": "approved",
+      "decided_by": "Pune Diecast Works Pvt. Ltd. (stated in document)",
+      "conditions": null,
+      "quote": "Supplier status: approved for serial supply to Soony (PPAP documents submitted 2026-09-14)."
+    }
+  ],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order acknowledgement OA26385785 from Pune Diecast Works to Soony Interactive GmbH for PO 4500318777 (dated 2026-10-28): one item, CMP-GAM-010 die-cast statue 'The Getaway', qty 2,200 at 1037 INR, confirmed for 2027-01-13. Terms FOB Nhava Sheva, NET30. The supplier states it is approved for serial supply (PPAP submitted 2026-09-14).",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Single-page, machine-generated text document; no handwriting, stamps or signatures.",
+      "Unit price has no thousands separator and no per-unit basis stated; no total value shown.",
+      "Document has no issue date of its own; 2026-10-28 is the customer order date.",
+      "The approval status is a supplier self-statement."
+    ]
+  }
+}

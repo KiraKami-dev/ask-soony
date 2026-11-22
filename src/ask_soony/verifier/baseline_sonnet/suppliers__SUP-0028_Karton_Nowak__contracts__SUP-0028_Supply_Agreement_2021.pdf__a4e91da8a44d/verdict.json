@@ -1,0 +1,394 @@
+{
+  "document_type": "contract",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Soony Interactive GmbH, Leopoldstraße 180, 80804 Munich, Germany",
+  "recipient": "Karton Nowak Sp. z o.o., Poznań",
+  "document_number": "PC-0028-2021",
+  "document_date": "2021-01-01",
+  "references": [],
+  "lines": [
+    {
+      "item": null,
+      "material_id": null,
+      "supplier_part_no": null,
+      "description": "execution_marks",
+      "values": [
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "2021-01",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "other",
+          "field_label": "soony_signature_date",
+          "value": "2021-01-01",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "other",
+          "field_label": "soony_signature",
+          "value": "Kessler",
+          "number": null,
+          "unit": null,
+          "written": "handwritten",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "other",
+          "field_label": "soony_signatory",
+          "value": "Bernd Kessler, CPO",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "other",
+          "field_label": "supplier_signature_date",
+          "value": "2020-12-27",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "other",
+          "field_label": "supplier_signature",
+          "value": "Nowak",
+          "number": null,
+          "unit": null,
+          "written": "handwritten",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "other",
+          "field_label": "supplier_signatory",
+          "value": "Agnieszka Nowak",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "other",
+          "field_label": "supplier_company_stamp",
+          "value": "Karton Nowak Sp. z o.o. Poznań",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": null,
+      "material_id": "CMP-GAM-004",
+      "supplier_part_no": null,
+      "description": "Cover Sleeve Grand Heist 6 (USK/PE",
+      "values": [
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.0600",
+          "number": 0.06,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "minimum_order_quantity",
+          "field_label": null,
+          "value": "50,000",
+          "number": 50000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "lead_time",
+          "field_label": null,
+          "value": "21d",
+          "number": 21,
+          "unit": "d",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": null,
+      "material_id": "CMP-GAM-005",
+      "supplier_part_no": null,
+      "description": "Cover Sleeve Grand Heist 5 (USK/PE",
+      "values": [
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.0600",
+          "number": 0.06,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "minimum_order_quantity",
+          "field_label": null,
+          "value": "50,000",
+          "number": 50000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "lead_time",
+          "field_label": null,
+          "value": "21d",
+          "number": 21,
+          "unit": "d",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": null,
+      "material_id": "CMP-GAM-008",
+      "supplier_part_no": null,
+      "description": "Art Book Grand Heist 6 (96 p, hard",
+      "values": [
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "2.1000",
+          "number": 2.1,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "minimum_order_quantity",
+          "field_label": null,
+          "value": "5,000",
+          "number": 5000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "lead_time",
+          "field_label": null,
+          "value": "35d",
+          "number": 35,
+          "unit": "d",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": null,
+      "material_id": "CMP-GAM-009",
+      "supplier_part_no": null,
+      "description": "City Map Poster Grand Heist 6 (fol",
+      "values": [
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.2200",
+          "number": 0.22,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "minimum_order_quantity",
+          "field_label": null,
+          "value": "20,000",
+          "number": 20000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "lead_time",
+          "field_label": null,
+          "value": "21d",
+          "number": 21,
+          "unit": "d",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": null,
+      "material_id": "CMP-GAM-011",
+      "supplier_part_no": null,
+      "description": "Activation Code Leaflet",
+      "values": [
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.0300",
+          "number": 0.03,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "minimum_order_quantity",
+          "field_label": null,
+          "value": "100,000",
+          "number": 100000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "lead_time",
+          "field_label": null,
+          "value": "21d",
+          "number": 21,
+          "unit": "d",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "other",
+      "text_en": "Supplier manufactures and supplies the parts listed in Annex A for Soony's products.",
+      "quote": "Supplier manufactures and supplies the parts listed in Annex A for Soony's products."
+    },
+    {
+      "topic": "capacity",
+      "text_en": "Supplier reserves capacity for Soony's rolling 12-month forecast ±20 %.",
+      "quote": "Supplier reserves capacity for Soony's rolling 12-month forecast ±20 %."
+    },
+    {
+      "topic": "other",
+      "text_en": "Lead times per Annex A, counted from PO acknowledgment. Supplier acknowledges POs within 3 working days.",
+      "quote": "Lead times per Annex A, counted from PO acknowledgment. Supplier acknowledges POs within 3 working days."
+    },
+    {
+      "topic": "shipment",
+      "text_en": "On Soony's written request Supplier produces up to 50,000 printed parts (sleeves, leaflets, posters) within 36 hours of receipt of the print-ready artwork, at a surcharge of 35 % on the Annex A price. Rush orders are delivered by express truck DAP Hamburg.",
+      "quote": "3.2 Rush orders. On Soony's written request Supplier produces up to 50,000 printed parts (sleeves, leaflets, posters) within 36 hours of receipt of the print-ready artwork, at a surcharge of 35 % on the Annex A price. Rush orders are delivered by express truck DAP Hamburg."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Deliveries are made DAP Hamburg (Incoterms 2020) unless the purchase order states otherwise.",
+      "quote": "Deliveries are made DAP Hamburg (Incoterms 2020) unless the purchase order states otherwise."
+    },
+    {
+      "topic": "price",
+      "text_en": "Prices per Annex A, in EUR. Payment terms NET30 from receipt of a correct invoice.",
+      "quote": "Prices per Annex A, in EUR. Payment terms NET30 from receipt of a correct invoice."
+    },
+    {
+      "topic": "quality",
+      "text_en": "PPAP level 3 for new part numbers. Changes to process, site or sub-supplier require Soony's written approval (PCN, 90 days).",
+      "quote": "PPAP level 3 for new part numbers. Changes to process, site or sub-supplier require Soony's written approval (PCN, 90 days)."
+    },
+    {
+      "topic": "quality",
+      "text_en": "Supplier prints to the artwork file last released by Soony in writing. Parts printed to a superseded artwork after such release are not accepted.",
+      "quote": "6.2 Artwork. Supplier prints to the artwork file last released by Soony in writing. Parts printed to a superseded artwork after such release are not accepted."
+    },
+    {
+      "topic": "delay",
+      "text_en": "Late delivery: 0.5 % of the delayed order value per commenced week, capped at 5 %.",
+      "quote": "Late delivery: 0.5 % of the delayed order value per commenced week, capped at 5 %."
+    },
+    {
+      "topic": "other",
+      "text_en": "Neither party is liable for failure to perform caused by events beyond its reasonable control, including natural disasters, war, epidemics and governmental acts. The affected party notifies the other party within 48 hours and uses reasonable efforts to mitigate.",
+      "quote": "Neither party is liable for failure to perform caused by events beyond its reasonable control, including natural disasters, war, epidemics and governmental acts. The affected party notifies the other party within 48 hours and uses reasonable efforts to mitigate."
+    },
+    {
+      "topic": "other",
+      "text_en": "Supplier confirms that no sub-supplier provides a critical material for Soony parts.",
+      "quote": "Supplier confirms that no sub-supplier provides a critical material for Soony parts."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Each party keeps the other party's information confidential for 5 years after termination.",
+      "quote": "Each party keeps the other party's information confidential for 5 years after termination."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Supplier maintains product liability insurance of at least EUR 5 million per event.",
+      "quote": "Supplier maintains product liability insurance of at least EUR 5 million per event."
+    },
+    {
+      "topic": "terms",
+      "text_en": "This Agreement runs from 2021-01-01 until 2027-12-31. Either party may terminate for convenience with six months' notice.",
+      "quote": "This Agreement runs from 2021-01-01 until 2027-12-31. Either party may terminate for convenience with six months' notice."
+    },
+    {
+      "topic": "terms",
+      "text_en": "German law applies. Place of jurisdiction is Munich.",
+      "quote": "German law applies. Place of jurisdiction is Munich."
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Readable signed supply agreement with Annex A pricing for five parts. No corrections are visible, but the contract contains key commercial and quality conditions a buyer should note.",
+    "red_flags": [
+      "Delivery term is DAP Hamburg (Incoterms 2020) unless the purchase order states otherwise.",
+      "Payment terms are NET30 from receipt of a correct invoice.",
+      "Supplier reserves capacity for Soony's rolling 12-month forecast ±20 %.",
+      "Rush orders allow up to 50,000 printed parts within 36 hours at a surcharge of 35 % on the Annex A price; rush orders are delivered by express truck DAP Hamburg.",
+      "PPAP level 3 is required for new part numbers.",
+      "Changes to process, site or sub-supplier require Soony's written approval (PCN, 90 days).",
+      "Parts printed to a superseded artwork after release are not accepted.",
+      "Late delivery penalty is 0.5 % of the delayed order value per commenced week, capped at 5 %.",
+      "Supplier maintains product liability insurance of at least EUR 5 million per event.",
+      "Agreement term is 2021-01-01 to 2027-12-31; either party may terminate for convenience with six months' notice."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Scanned PDF; printed text is legible.",
+      "Page 1 bears a stamped mark: 'RECEIVED 2021-01'.",
+      "Page 3 bears handwritten signatures: 'Kessler' and 'Nowak'.",
+      "Page 3 bears a blue rectangular supplier stamp: 'Karton Nowak Sp. z o.o. Poznań'.",
+      "Initials lines on pages 1 and 2 are visible and not filled in."
+    ]
+  }
+}

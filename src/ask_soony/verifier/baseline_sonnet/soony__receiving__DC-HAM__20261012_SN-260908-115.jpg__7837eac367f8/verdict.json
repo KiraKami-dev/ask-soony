@@ -1,0 +1,117 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Chinese",
+    "English"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd., Dongguan, CN",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "SN-260908-115",
+  "document_date": "2026-09-08",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318691"
+    },
+    {
+      "type": "delivery_note",
+      "value": "SN-260908-115"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-010",
+      "supplier_part_no": null,
+      "description": "Statue \"The Getaway\" (die-cast, 18 — text cut off in the description column)",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "15.000",
+          "number": 15,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "30",
+          "number": 30,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "600 kg",
+          "number": 600,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "12.10.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S",
+      "quote": "承运: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Gross weight 600 kg; 30 packages",
+      "quote": "毛重: 600 kg 件数: 30"
+    },
+    {
+      "topic": "other",
+      "text_en": "Receiving stamp: RECEIVED 12.10.2026, DC-HAM",
+      "quote": "RECEIVED 12.10.2026 DC-HAM"
+    }
+  ],
+  "decisions": [],
+  "corrections": [
+    {
+      "what": "Receiving stamp (blue) applied, not a correction",
+      "original": null,
+      "replacement": "RECEIVED 12.10.2026 DC-HAM",
+      "where": "Lower middle of page, below the remarks area"
+    }
+  ],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Supplier delivery note SN-260908-115 dated 2026-09-08 from Dongguan Precision Housings to Soony DC Hamburg, for PO 4500318691. It has one line, CMP-GAM-010 Statue \"The Getaway\", with quantity 15.000 PCS in 30 packages and a gross weight of 600 kg. Carrier is Nordhav Shipping A/S. It carries a blue DC-HAM receiving stamp dated 12.10.2026 and the red supplier seal. There are no handwritten corrections. The remarks field and the receiver signature line are blank.",
+    "red_flags": [
+      "Quantity \"15.000\" is ambiguous. Read with the Chinese decimal-point convention it is 15 PCS. Read as a thousands separator it is 15,000 PCS. The note itself shows 30 packages and 600 kg, and 30 packages for only 15 pieces does not fit well. The buyer should check the quantity against the PO and the goods receipt.",
+      "Receiver signature line (收货签字) is blank. Only the DC-HAM receiving stamp is present.",
+      "The description is cut off at \"(die-cast, 18\", so the full product specification is not visible.",
+      "The receiving stamp does not record any received quantity or inspection result."
+    ],
+    "confidence": "medium",
+    "observations": [
+      "The red supplier seal (出货专用章) partly overlaps the unit (PCS) and package count (30) cells. Both are still readable.",
+      "The description text is truncated at the column edge.",
+      "The blue stamp reads RECEIVED 12.10.2026 with DC-HAM below it. It is clear, and the date is in DD.MM.YYYY format.",
+      "The remarks field (备注) is empty.",
+      "The signature line is empty.",
+      "The barcode at the top right was not decoded.",
+      "No handwriting is visible anywhere on the page."
+    ]
+  }
+}

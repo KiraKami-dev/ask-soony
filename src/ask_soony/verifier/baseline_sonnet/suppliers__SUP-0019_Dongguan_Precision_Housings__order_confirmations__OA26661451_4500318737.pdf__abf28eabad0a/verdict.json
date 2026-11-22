@@ -1,0 +1,116 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English",
+    "Chinese"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26661451",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318737"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-003",
+      "supplier_part_no": null,
+      "description": "Game Card Case (clear)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "312,000",
+          "number": 312000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "1.61",
+          "number": 1.61,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-12-07",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "00020",
+      "material_id": "CMP-GAM-006",
+      "supplier_part_no": null,
+      "description": "Steel Case Grand Heist 6",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "24,000",
+          "number": 24000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "22.29",
+          "number": 22.29,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-12-11",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Incoterms FOB Yantian, payment NET30. Customer order 4500318737 dated 2026-09-15.",
+      "quote": "Customer: Soony Interactive GmbH · Your order 4500318737 of 2026-09-15 · Incoterms FOB Yantian · Payment NET30"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA26661451 from Dongguan Precision Housings to Soony Interactive GmbH for PO 4500318737 (2026-09-15), FOB Yantian, NET30. Line 00010: CMP-GAM-003 Game Card Case (clear), 312,000 at 1.61 CNY, confirmed 2026-12-07. Line 00020: CMP-GAM-006 Steel Case Grand Heist 6, 24,000 at 22.29 CNY, confirmed 2026-12-11.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Printed, typed document with no handwriting, stamps or signatures.",
+      "The document has no issue date. The only date besides the confirmed delivery dates is the PO date, 2026-09-15.",
+      "The quantity column has no unit stated.",
+      "The quantity column is labelled 'Qty' and is not marked as ordered or confirmed. I recorded it as quantity_confirmed because it sits on an order confirmation."
+    ]
+  }
+}

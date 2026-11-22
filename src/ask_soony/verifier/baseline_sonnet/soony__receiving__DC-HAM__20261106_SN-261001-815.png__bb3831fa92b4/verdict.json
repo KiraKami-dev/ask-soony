@@ -1,0 +1,93 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "English",
+    "Chinese"
+  ],
+  "issuer": "Guangzhou PackRight Packaging Co., Ltd., Guangzhou",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "SN-261001-815",
+  "document_date": "2026-10-01",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318726"
+    }
+  ],
+  "lines": [
+    {
+      "item": null,
+      "material_id": "PR-CC-0312",
+      "supplier_part_no": null,
+      "description": "Game Card Case (clear)",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "160,000",
+          "number": 160000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "32",
+          "number": 32,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "608 kg",
+          "number": 608,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "06.11.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S.",
+      "quote": "承运: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Protect from moisture; do not invert.",
+      "quote": "备注: 防潮，请勿倒置"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Clean delivery note for PO 4500318726 from Guangzhou PackRight Packaging Co., Ltd. for material PR-CC-0312, Game Card Case (clear), quantity 160,000 PCS, 32 packages, weight 608 kg. A blue received stamp shows 06.11.2026.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Printed delivery note in Chinese and English.",
+      "Red circular company stamp overlaps the lower-right table area but the visible values remain readable.",
+      "Blue received stamp reads 'RECEIVED 06.11.2026' and includes 'DC-HAM'.",
+      "Handwritten receiving signature appears as 'Yilmaz P.'."
+    ]
+  }
+}

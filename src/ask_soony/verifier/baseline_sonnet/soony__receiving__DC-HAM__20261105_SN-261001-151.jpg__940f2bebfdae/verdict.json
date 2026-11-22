@@ -1,0 +1,103 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Chinese",
+    "English"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd.",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "SN-261001-151",
+  "document_date": "2026-10-01",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318716"
+    },
+    {
+      "type": "delivery_note",
+      "value": "SN-261001-151"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-003",
+      "supplier_part_no": null,
+      "description": "Game Card Case (clear)",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "122.000",
+          "number": 122,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "122",
+          "number": 122,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "1586 kg",
+          "number": 1586,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "05.11.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Remark: keep dry (moisture-proof), do not turn upside down.",
+      "quote": "备注: 防潮，请勿倒置"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S.",
+      "quote": "承运: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "other",
+      "text_en": "Receiving stamp reads RECEIVED 05.11.2026, DC-HAM, with a handwritten receiver signature 'Meyer K.'.",
+      "quote": "RECEIVED 05.11.2026 DC-HAM"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Chinese-language delivery note SN-261001-151 dated 2026-10-01 from Dongguan Precision Housings Co., Ltd. to Soony DC Hamburg, against PO 4500318716. It covers 122 PCS of CMP-GAM-003 Game Card Case (clear) in 122 packages, gross weight 1586 kg, carrier Nordhav Shipping A/S. It carries a DC-HAM receiving stamp dated 05.11.2026 and a handwritten receiver signature 'Meyer K.'. The note has no corrections or strike-throughs, and no discrepancy is stated.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Red circular supplier seal (出货专用章, 'shipping dedicated seal') overlaps the table header cells for unit and packages and the packages value '122'. The values are still readable.",
+      "Quantity printed as '122.000'. In the Chinese document's convention this is 122 pieces, which matches the 122 packages count.",
+      "Blue rectangular stamp 'RECEIVED 05.11.2026 DC-HAM' is the receiving date stamp.",
+      "Handwritten signature 'Meyer K.' above the receiver signature line (收货签字). It is a signature, not a correction.",
+      "No handwritten quantity changes or crossed-out values. No inspection result or acceptance/rejection is stated."
+    ]
+  }
+}

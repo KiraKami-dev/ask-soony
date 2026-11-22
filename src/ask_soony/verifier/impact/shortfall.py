@@ -272,6 +272,7 @@ def compute(records: pd.DataFrame, issues: pd.DataFrame) -> Shortfall:
                 (
                     final[k]
                     for k in (
+                        "quantity_offered",
                         "quantity_confirmed",
                         "quantity_ordered",
                         "quantity_shipped",

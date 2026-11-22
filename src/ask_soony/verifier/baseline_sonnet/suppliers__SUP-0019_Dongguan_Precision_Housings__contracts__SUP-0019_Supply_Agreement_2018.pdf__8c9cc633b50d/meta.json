@@ -1,0 +1,31 @@
+{
+  "path": "suppliers/SUP-0019_Dongguan_Precision_Housings/contracts/SUP-0019_Supply_Agreement_2018.pdf",
+  "sha256": "8c9cc633b50d3fa1ba0079ddfbb430cb6c763b8eb2edd12647447f170ae57314",
+  "model": "gpt-5.4",
+  "effort": "high",
+  "fingerprint": "704d1e77fe774b56",
+  "status": "ok",
+  "error": null,
+  "attempts": 1,
+  "finished_at": "2026-11-22T09:06:00+00:00",
+  "seconds": 118.8,
+  "usage": {
+    "completion_tokens": 13266,
+    "prompt_tokens": 5483,
+    "total_tokens": 18749,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 10035,
+      "rejected_prediction_tokens": 0,
+      "text_tokens": null
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": null,
+      "cached_tokens": 0,
+      "image_tokens": null,
+      "text_tokens": null
+    }
+  }
+}

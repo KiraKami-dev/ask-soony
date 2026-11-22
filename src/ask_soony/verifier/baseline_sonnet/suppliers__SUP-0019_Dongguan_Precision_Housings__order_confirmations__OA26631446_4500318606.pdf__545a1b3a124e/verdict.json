@@ -1,0 +1,94 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English",
+    "Chinese"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26631446",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318606"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-003",
+      "supplier_part_no": null,
+      "description": "Game Card Case (clear)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "52,000",
+          "number": 52000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "1.52",
+          "number": 1.52,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-03-18",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2026-01-05",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Incoterms FOB Yantian, payment NET30.",
+      "quote": "Incoterms FOB Yantian · Payment NET30"
+    },
+    {
+      "topic": "other",
+      "text_en": "Order confirmation for customer Soony Interactive GmbH, referencing their order 4500318606 of 2026-01-05.",
+      "quote": "Customer: Soony Interactive GmbH · Your order 4500318606 of 2026-01-05"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA26631446 from Dongguan Precision Housings to Soony Interactive GmbH for PO 4500318606 (dated 2026-01-05). One line: item 00010, CMP-GAM-003 Game Card Case (clear), 52,000 units at 1.52 CNY, confirmed for 2026-03-18. Terms FOB Yantian, NET30.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Fully printed, single page, one line item.",
+      "No handwriting, stamps, signatures or corrections.",
+      "The quantity column has no unit stated.",
+      "The document itself has no issue date; 2026-01-05 is the date of the customer's order.",
+      "The 'Qty' column is the supplier's confirmed quantity; it is recorded as quantity_confirmed."
+    ]
+  }
+}

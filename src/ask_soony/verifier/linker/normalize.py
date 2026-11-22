@@ -111,6 +111,7 @@ _GROUPED_THOUSANDS = re.compile(r"\d{1,3}(?:[.,  ]\d{3})+")
 COUNT_FIELDS = {
     "quantity_ordered",
     "quantity_confirmed",
+    "quantity_offered",
     "quantity_shipped",
     "quantity_delivered",
     "quantity_received",

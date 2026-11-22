@@ -1,0 +1,151 @@
+{
+  "about": "Must-catch facts per document. A reader (model + prompt) is trusted only if every check of every case with must=true passes. Facts are checked by a human against the document, not copied from a model. Value checks are tied to a field prefix (the schema fixes field names). Clean notes are negative controls: no invented corrections. Numbers are compared after the linker's fixes (normalize.count_number). confirmed=false: drafted from the Sonnet baseline, not yet checked by a human.",
+  "cases": [
+    {
+      "id": "artbook_handwritten_correction",
+      "path": "soony/receiving/DC-HAM/20261118_WZ-261116-473.jpg",
+      "sha256": "5ce4bc4bb37463db77a3d3034fb89fbcbdb1bc81c9ba1149b4d9cc6f90c84fcd",
+      "why": "Art book delivery note: printed 80,000 crossed out, 8,000 written by hand. SAP booked 80,000. Behind the art-book card.",
+      "must": true,
+      "confirmed": true,
+      "checks": [
+        {"value": 80000, "field": "quantity", "crossed_out": true},
+        {"value": 8000, "field": "quantity", "written": "handwritten", "crossed_out": false},
+        {"standing": 8000, "field": "quantity"},
+        {"reference": "4500318768"}
+      ]
+    },
+    {
+      "id": "sleeves_wrong_pallet_remark",
+      "path": "soony/receiving/DC-HAM/20261121_WZ-261120-732.jpg",
+      "sha256": "9825706e93d756c3c520674b40ead82a8c9f32cea6001745a3d16161a2b49b31",
+      "why": "Sleeve delivery note with the handwritten remark '1 Pal. = GH5 Sleeves!': one pallet is the wrong part.",
+      "must": true,
+      "confirmed": true,
+      "checks": [
+        {"value": 20000, "field": "quantity", "crossed_out": false},
+        {"text": "GH5"},
+        {"reference": "4500318775"}
+      ]
+    },
+    {
+      "id": "statue_failed_inspection",
+      "path": "soony/receiving/DC-HAM/inspection_report_5000413063.pdf",
+      "sha256": "9f593e5f2e4f794661f372109b479ec5ad51113573f9bbfa931ead26c6906146",
+      "why": "Statue lot failed AQL (9 of 125 defective, accept 3) but sits in unrestricted stock. Behind the statue card.",
+      "must": true,
+      "confirmed": true,
+      "checks": [
+        {"value": 5600, "field": "lot_size"},
+        {"value": 125, "field": "sample_size"},
+        {"value": 9, "field": "defective"},
+        {"value": 3, "field": "accept_number"},
+        {"decision": "fail"},
+        {"reference": "5000413063"}
+      ]
+    },
+    {
+      "id": "game_cards_short_shipment",
+      "path": "suppliers/SUP-0010_Hwaseong_Memory/order_confirmations/Shipping_advice_020-48113256_4500318735.pdf",
+      "sha256": "ffc7d82e8f2156b4c82e0ea5dfa4f754c4570a13e8669484fad29345c7674755",
+      "why": "Only 28,000 of 48,000 game cards flew; the 20,000 balance lands 24 Nov, after launch. Decides 6,800 vs 34,800 short.",
+      "must": true,
+      "confirmed": true,
+      "checks": [
+        {"value": 48000, "field": "quantity_ordered"},
+        {"value": 28000, "field": "quantity_shipped"},
+        {"value": 20000, "field": "quantity_balance"},
+        {"text": "2026-11-24|24\\.11\\.2026|24 Nov|Nov(ember)? 24"},
+        {"reference": "020-48113256"}
+      ]
+    },
+    {
+      "id": "artbook_rush_offer",
+      "path": "suppliers/SUP-0028_Karton_Nowak/notices/Oferta_tryb_ekspresowy_2026-11-21.pdf",
+      "sha256": "256840ad6ee4b8a4baa3c33ac4bbe4ae2cb45b057cff25485dab257a9bd210bc",
+      "why": "Karton's bilingual (PL/EN) rush offer: 8,000 art books in stock, loaded within 4 h, about 9 h drive. The only fix for the art-book gap.",
+      "must": true,
+      "confirmed": true,
+      "checks": [
+        {"value": 8000, "field": "quantity"},
+        {"text": "\\b4 ?h"},
+        {"text": "\\b9 ?(h|hours|godz)"}
+      ]
+    },
+    {
+      "id": "two_lines_same_part",
+      "path": "soony/receiving/DC-HAM/20261121_DN-261119-197.jpg",
+      "sha256": "4c6f612256345687c1075fa0961ead709d54d1b7420451e780b438d5a10040c6",
+      "why": "One delivery note, two POs, the same part on two lines (5.000 + 5.500, dot as thousands separator).",
+      "must": false,
+      "confirmed": true,
+      "checks": [
+        {"value": 5000, "field": "quantity"},
+        {"value": 5500, "field": "quantity"},
+        {"reference": "4500318766"},
+        {"reference": "4500318769"}
+      ]
+    },
+    {
+      "id": "thousands_dot",
+      "path": "soony/receiving/DC-HAM/20260904_SN-260730-216.jpg",
+      "sha256": "c162337a3f9e54883a37ce2c44af9de4ebfd4b6500927bbddf53ccb523336d1f",
+      "why": "'134.000' means 134,000. Sonnet read 134; the linker's count fix repairs it, so this tests reader + fix together.",
+      "must": false,
+      "confirmed": true,
+      "checks": [
+        {"value": 134000, "field": "quantity"},
+        {"value": 23000, "field": "quantity"}
+      ]
+    },
+    {
+      "id": "sleeve_old_revision",
+      "path": "suppliers/SUP-0028_Karton_Nowak/order_confirmations/OA26324887_4500318740.pdf",
+      "sha256": "c73a070937881a04edd99b552063ff3b6d00698b088aa11b83024eaec9b5fc5a",
+      "why": "Karton confirms the GH6 sleeve printed to artwork rev. C.",
+      "must": false,
+      "confirmed": true,
+      "checks": [
+        {"value": 65000, "field": "quantity"},
+        {"text": "rev(ision)?\\.? ?C\\b"},
+        {"reference": "4500318740"}
+      ]
+    },
+    {
+      "id": "clean_note_polish",
+      "path": "soony/receiving/DC-HAM/20261109_WZ-261108-879.jpg",
+      "sha256": "ac7b44fd48b097d27a2af5962c888f1f8a2d96ef020354f8f017fec6377dd7b7",
+      "why": "Negative control: a clean Polish delivery note that matches SAP (270,000). Signatures and stamps must not become corrections or quantities.",
+      "must": true,
+      "confirmed": true,
+      "checks": [
+        {"value": 270000, "field": "quantity", "crossed_out": false},
+        {"no_marks": "quantity"}
+      ]
+    },
+    {
+      "id": "clean_note_chinese",
+      "path": "soony/receiving/DC-HAM/20261111_SN-261007-850.jpg",
+      "sha256": "94a58889a86f7cb10db8f0e4590f9d30a230f4450e8ba56cee3c48fe3087463a",
+      "why": "Negative control: a clean Chinese delivery note that matches SAP (21,800). Signatures and stamps must not become corrections or quantities.",
+      "must": true,
+      "confirmed": true,
+      "checks": [
+        {"value": 21800, "field": "quantity", "crossed_out": false},
+        {"no_marks": "quantity"}
+      ]
+    },
+    {
+      "id": "clean_note_english",
+      "path": "soony/receiving/DC-HAM/20261105_DN-261101-479.jpg",
+      "sha256": "7b96a696f45a890bd3f46419b3f00c1b8912c154c7820b7f61651121f465d117",
+      "why": "Negative control: a clean English delivery note that matches SAP (96,000). Signatures and stamps must not become corrections or quantities.",
+      "must": true,
+      "confirmed": true,
+      "checks": [
+        {"value": 96000, "field": "quantity", "crossed_out": false},
+        {"no_marks": "quantity"}
+      ]
+    }
+  ]
+}

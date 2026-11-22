@@ -1,0 +1,142 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Boise Semiconductor Inc., Boise, US",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "DN-261027-679",
+  "document_date": "2026-10-27",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318746"
+    },
+    {
+      "type": "po_number",
+      "value": "4500318751"
+    },
+    {
+      "type": "delivery_note",
+      "value": "DN-261027-679"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "5.500",
+          "number": 5500,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "2",
+          "number": 2,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "2",
+      "material_id": "CMP-GAM-001",
+      "supplier_part_no": null,
+      "description": "Game Card 128 GB – Grand Heist 6",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "52.000",
+          "number": 52000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "52",
+          "number": 52,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "Shipment total",
+      "material_id": null,
+      "supplier_part_no": null,
+      "description": "Totals line below the table",
+      "values": [
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "756 kg",
+          "number": 756,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "54",
+          "number": 54,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Alpen Air Cargo GmbH",
+      "quote": "Carrier: Alpen Air Cargo GmbH"
+    },
+    {
+      "topic": "other",
+      "text_en": "Remarks field is empty.",
+      "quote": "Remarks:"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Delivery note DN-261027-679 from Boise Semiconductor Inc. to Soony Distribution Center Hamburg, dated 10/27/2026, covering POs 4500318746 and 4500318751. It lists 5.500 PCS of CMP-GAM-002 in 2 packages and 52.000 PCS of CMP-GAM-001 in 52 packages. The footer gives gross weight 756 kg, 54 packages and carrier Alpen Air Cargo GmbH. It is signed 'Yilmaz D.' as received, with no receiving date. There are no corrections, strike-throughs or remarks.",
+    "red_flags": [
+      "Quantities are written '5.500' and '52.000'. This is read as 5500 and 52000 (thousands separator), but a decimal reading is possible and the note does not say which.",
+      "The note does not say which PO covers which line, although two POs are listed.",
+      "The 'Received by' signature has no date, and there is no receiving stamp."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Handwritten blue signature 'Yilmaz D.' on the 'Received by' line, with no date.",
+      "Package counts (2 + 52) match the stated total of 54.",
+      "Date is in US MM/DD/YYYY format (10/27/2026).",
+      "The 'Packages' column header slightly overflows the table border.",
+      "Remarks field is blank.",
+      "No stamps or damage are visible."
+    ]
+  }
+}

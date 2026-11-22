@@ -1,0 +1,131 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Chinese",
+    "English"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd., Dongguan, CN",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "SN-260730-216",
+  "document_date": "2026-07-30",
+  "references": [
+    {
+      "type": "delivery_note",
+      "value": "SN-260730-216"
+    },
+    {
+      "type": "po_number",
+      "value": "4500318682"
+    },
+    {
+      "type": "po_number",
+      "value": "4500318684"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-003",
+      "supplier_part_no": null,
+      "description": "Game Card Case (clear)",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "134.000",
+          "number": 134,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "268",
+          "number": 268,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "2",
+      "material_id": "CMP-GAM-006",
+      "supplier_part_no": null,
+      "description": "Steel Case Grand Heist 6",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "23.000",
+          "number": 23,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "11",
+          "number": 11,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Gross weight: 3069 kg",
+      "quote": "毛重: 3069 kg"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Total packages: 279",
+      "quote": "件数: 279"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S",
+      "quote": "承运: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "other",
+      "text_en": "Remarks field is empty.",
+      "quote": "备注:"
+    },
+    {
+      "topic": "other",
+      "text_en": "Red round company seal reading 'DONGGUAN PRECISION HOUSINGS CO LTD' and 'Dedicated shipping seal'.",
+      "quote": "出货专用章"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Chinese/English delivery note SN-260730-216 dated 2026-07-30 from Dongguan Precision Housings to Soony Distribution Center Hamburg, referencing POs 4500318682 and 4500318684. It lists 134 PCS of CMP-GAM-003 (268 packages) and 23 PCS of CMP-GAM-006 (11 packages). Total is 279 packages and gross weight is 3069 kg, carried by Nordhav Shipping A/S. It has a red shipping seal. The receiving signature line is blank. There are no handwritten corrections.",
+    "red_flags": [
+      "The note lists two POs (4500318682, 4500318684) but does not say which PO each line belongs to.",
+      "The receiving signature line (收货签字) is blank, so there is no receipt confirmation on this copy.",
+      "Quantities are printed as '134.000' and '23.000'. They are read as 134 and 23 PCS under the Chinese decimal-point convention. If the period were a thousands separator, the quantities would be far larger. The package counts (268 and 11) are consistent with the smaller reading."
+    ],
+    "confidence": "high",
+    "observations": [
+      "The red company seal overlaps the unit and package columns, including the header, the 'PCS' on line 2 and the '11'. The values are still readable.",
+      "The seal contains no date or numbers.",
+      "The receiving signature line and the remarks field are empty.",
+      "There are no handwritten marks or strike-throughs.",
+      "The package counts sum correctly: 268 + 11 = 279.",
+      "The page has a barcode at the top right, which was not decoded.",
+      "The page is slightly skewed, as in a scan."
+    ]
+  }
+}
