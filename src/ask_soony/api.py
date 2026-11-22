@@ -1248,6 +1248,14 @@ def build_clock(strip: list[dict], clock: PackClock, cur: datetime) -> dict:
     }
 
 
+def _watching() -> bool:
+    """Same test as the background loop: switched on and a portal token to poll with."""
+    from ask_soony.config import Settings
+
+    on = os.environ.get("ASK_BACKGROUND", "").lower() in ("on", "1", "true")
+    return on and bool(Settings.from_env().portal_token)
+
+
 def build_activity(cards: list[dict], events: list[dict], root: Path | None) -> list[dict]:
     items = []
     # Who decided: the card's recorded action (decision_status action_id), else its latest action.
@@ -1477,6 +1485,8 @@ def build_state() -> dict:
         "activity": build_activity(cards, events, root),
         "last_drop_at": last_drop.isoformat() if last_drop else None,
         "last_check_at": last_check.isoformat() if last_check else None,
+        # Whether this instance polls the portal at all (the demo does not): no heartbeat if not.
+        "watching": _watching(),
         "read_since_6": read_n,
         "trust": read_json("trust.json", {}),
     }

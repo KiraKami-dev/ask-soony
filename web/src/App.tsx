@@ -236,7 +236,7 @@ export default function App() {
       role={role}
       onRole={chooseRole}
       people={{ buyer: state.launch?.money?.viewer ?? state.viewer, approver: state.launch?.money?.approver ?? null }}
-      checkedAt={state.last_check_at}
+      checkedAt={state.watching ? state.last_check_at : null}
       nowMs={nowMs}
     />
   )
