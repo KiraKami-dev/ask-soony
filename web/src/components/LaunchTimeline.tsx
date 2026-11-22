@@ -1,6 +1,13 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { fmtDay, fmtNum, fmtTime, partName, tidy, type Card, type ClockEdition, type Level, type State } from '@/lib/api'
 
+/** "Decide by" for your own decisions; "With Maren · due" once it was passed on. */
+const dueWord = (c?: Card | null) => {
+  if (!c || !(c.status === 'escalated' || c.routed_to_other)) return 'Decide by'
+  const who = (c.approver ?? '').split(' ').find((w) => !w.endsWith('.')) || 'the approver'
+  return `With ${who} · due`
+}
+
 // The launch timeline: shift hours to scale, nights squeezed, a thick truck line at launch and a
 // "Too late" gutter past it. One lane per edition (packing bar, decide-by and runs-dry markers),
 // one inbound lane (shipment ETAs, late goods stated on cards). Everything comes from
@@ -431,7 +438,7 @@ function EditionLane({
         const when = `${fmtDay(new Date(m.at).toISOString())} ${fmtTime(new Date(m.at).toISOString())}`
         const lead = m.cards[0]
         const text = m.kind === 'decide'
-          ? `Decide by ${when} · ${m.cards.length > 1 ? `${m.cards.length} decisions, first: ` : ''}${tidy(lead.headline)}`
+          ? `${dueWord(lead)} ${when} · ${m.cards.length > 1 ? `${m.cards.length} decisions, first: ` : ''}${tidy(lead.headline)}`
           : `Runs dry ${when} · ${tidy(lead.headline)}`
         const isFirst = !compact && m.kind === 'decide' && !!first && ids.includes(first.id)
         const s = compact ? 5 : 5.5
@@ -458,7 +465,7 @@ function EditionLane({
                 x={Math.min(Math.max(m.x, x0 + 4), x1 - 8)} y={barY + barH + 18}
                 textAnchor={m.x < x0 + 60 ? 'start' : m.x > x1 - 160 ? 'end' : 'middle'} fontSize={12} fill={INK2}
               >
-                {`Decide by ${fmtTime(new Date(m.at).toISOString())} · ${what(first, all, 28)}`}
+                {`${dueWord(first)} ${fmtTime(new Date(m.at).toISOString())} · ${what(first, all, 28)}`}
               </text>
             )}
           </g>

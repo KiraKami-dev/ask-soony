@@ -84,7 +84,19 @@ function verdictBits(state: State, nowMs: number): Bit[] {
         out.push({ text: past ? ' and stays ' : ', ' }, { text: `${fmtNum(short)} short`, late: true }, { text: '.' })
       } else {
         out.push({ text: ', ' }, { text: `${fmtNum(short)} short`, late: true })
-        out.push({ text: `, unless ${n} ${n === 1 ? 'decision goes' : 'decisions go'} through.` })
+        // Say who holds the decisions: yours, or passed on and waiting for someone else.
+        const fixes = fixesFor(state, s)
+        const theirs = fixes.filter((c) => c.status === 'escalated' || c.routed_to_other)
+        const mine = fixes.length - theirs.length
+        const who = [...new Set(theirs.map((c) => firstName(c.approver ?? c.signoff ?? '') || 'someone'))]
+        const since = theirs[0]?.ui?.at ? ` since ${when(theirs[0].ui.at, nowMs)}` : ''
+        out.push({
+          text: mine > 0 && theirs.length === 0
+            ? `, unless ${mine} ${mine === 1 ? 'decision goes' : 'decisions go'} through.`
+            : mine === 0
+              ? `, unless ${who.join(' and ')} ${who.length === 1 && theirs.length === 1 ? 'approves the decision' : 'approve'} (waiting${since}).`
+              : `, unless ${mine} of your decisions and ${theirs.length} with ${who.join(' and ')} go through.`,
+        })
       }
     } else if (s.finishes_at) {
       const spare = s.slack_hours
