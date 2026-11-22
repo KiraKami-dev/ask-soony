@@ -221,7 +221,7 @@ export default function App() {
         page === 'today'
           ? <button className="cursor-pointer hover:text-ink" onClick={() => { if (page !== 'today' || single) go('/'); setAllReq(Date.now()) }}>{open} {open === 1 ? 'decision' : 'decisions'}</button>
           : `${open} ${open === 1 ? 'decision' : 'decisions'}`
-      ) : open > 0 ? `${open} ${open === 1 ? 'decision needs' : 'decisions need'} you`
+      ) : open > 0 ? <>{open} {open === 1 ? 'decision' : 'decisions'}<span className="hidden 2xl:inline"> {open === 1 ? 'needs' : 'need'} you</span></>
         : readyN > 0 ? `${readyN} ready for your OK`
         : done ? 'nothing else due' : phone ? null : 'nothing needs you'}
     </>
@@ -285,7 +285,7 @@ export default function App() {
           phone={phone}
           card={card}
           order={today}
-          onFocus={(id) => { setFocusId(id); if (single) go('/') }}
+          onFocus={(id) => { setFocusId(id); setDone(null); if (single) go('/') }}
           done={done}
           onDone={(d) => { decidedHere.current.add(d.card.id); void finish(state, d) }}
           onClearDone={() => { setDone(null); if (single) go('/') }}

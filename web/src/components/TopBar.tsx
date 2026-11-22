@@ -86,19 +86,22 @@ export function TopBar({ page, go, status, bell, phone, routinesBadge = 0, role 
     </button>
   )
   return (
-    <header className="relative z-20 flex h-[72px] shrink-0 items-center justify-center px-4 text-[length:var(--small)] text-ink-2 lg:px-8">
-      <a
-        href="/"
-        onClick={(e) => { e.preventDefault(); go('/') }}
-        className="absolute left-4 top-1/2 flex -translate-y-1/2 items-center gap-2.5 text-ink lg:left-8"
-        aria-label="Lighthouse, today"
-      >
-        <Mark />
-        {!phone && <span className="font-medium">Lighthouse</span>}
-      </a>
-      {!phone && checkedAt && <Heartbeat at={checkedAt} nowMs={nowMs} />}
-      <p className={cn('min-w-0 truncate text-center', phone && 'max-w-[calc(100%-88px)]')} aria-live="polite">{status}</p>
-      <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-3 lg:right-6">
+    // Three columns: the mark, the status (cut short when tight, never under the menu), the menu.
+    <header className="relative z-20 grid h-[72px] shrink-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 px-4 text-[length:var(--small)] text-ink-2 lg:gap-8 lg:px-8">
+      <div className="flex items-center gap-5">
+        <a
+          href="/"
+          onClick={(e) => { e.preventDefault(); go('/') }}
+          className="flex items-center gap-2.5 text-ink"
+          aria-label="Lighthouse, today"
+        >
+          <Mark />
+          {!phone && <span className="font-medium">Lighthouse</span>}
+        </a>
+        {!phone && checkedAt && <Heartbeat at={checkedAt} nowMs={nowMs} />}
+      </div>
+      <p className="min-w-0 truncate text-center" aria-live="polite">{status}</p>
+      <div className="flex items-center gap-3">
         {phone ? (
           <PhoneMenu page={page} go={go} bell={bell} badge={role === 'approver' ? 0 : routinesBadge} who={who} links={linksFor(role)} />
         ) : (
@@ -200,11 +203,18 @@ function RoleMenu({ role, onRole, people }: RoleProps) {
       <button
         onClick={() => setOpen(!open)}
         aria-label={name ? `Using this as ${name}` : 'Who is using this?'}
+        title={name ?? undefined}
         aria-expanded={open}
         className={cn('flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-2.5 hover:bg-soft hover:text-ink focus-visible:outline-2 focus-visible:outline-accent', name ? 'bg-soft text-ink' : 'text-ink-3')}
       >
         <UserRound size={16} />
-        {name && <span>{name}</span>}
+        {role && label && (
+          <span>
+            {firstNameOf(label)}
+            {/* The role only where the bar has room; it is always in the menu and the tooltip. */}
+            <span className="hidden 2xl:inline"> · {roleTitle(role, label)}</span>
+          </span>
+        )}
       </button>
       {open && (
         <div className="absolute right-0 top-10 z-30 w-64 rounded-2xl bg-ground p-1.5 shadow-[0_12px_40px_-12px_rgba(0,0,0,.28)]">
@@ -236,7 +246,7 @@ function Heartbeat({ at, nowMs }: { at: string; nowMs: number }) {
   const fresh = nowMs - t.getTime() < 30 * 60000
   const hm = t.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
   return (
-    <span className="absolute left-[150px] top-1/2 hidden -translate-y-1/2 items-center gap-2 text-ink-3 xl:flex lg:left-[166px]">
+    <span className="hidden items-center gap-2 whitespace-nowrap text-ink-3 2xl:flex">
       <span
         aria-hidden="true"
         className={cn('inline-block h-1.5 w-1.5 rounded-full', fresh ? 'bg-routine' : 'ring-1 ring-ink-3/50')}
