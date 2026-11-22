@@ -87,7 +87,7 @@ export function TopBar({ page, go, status, bell, phone, routinesBadge = 0, role 
   )
   return (
     // Three columns: the mark, the status (cut short when tight, never under the menu), the menu.
-    <header className="relative z-20 grid h-[72px] shrink-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 px-4 text-[length:var(--small)] text-ink-2 lg:gap-8 lg:px-8">
+    <header className="relative z-20 grid h-[72px] shrink-0 grid-cols-[1fr_minmax(0,max-content)_1fr] items-center gap-4 px-4 text-[length:var(--small)] text-ink-2 lg:gap-8 lg:px-8">
       <div className="flex items-center gap-5">
         <a
           href="/"
@@ -101,7 +101,7 @@ export function TopBar({ page, go, status, bell, phone, routinesBadge = 0, role 
         {!phone && checkedAt && <Heartbeat at={checkedAt} nowMs={nowMs} />}
       </div>
       <p className="min-w-0 truncate text-center" aria-live="polite">{status}</p>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-self-end gap-3">
         {phone ? (
           <PhoneMenu page={page} go={go} bell={bell} badge={role === 'approver' ? 0 : routinesBadge} who={who} links={linksFor(role)} />
         ) : (
