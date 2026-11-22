@@ -1,0 +1,46 @@
+{
+  "branch": "jonas/case-flow",
+  "checkpoint_id": "5cd480e2bcc5",
+  "checkpoints_count": 3,
+  "cli_version": "0.13.4",
+  "files_touched": null,
+  "redaction": {
+    "layers": {
+      "betterleaks": 38,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 102,
+      "credentialed_uri": 0,
+      "entropy": 891,
+      "goredact": 8,
+      "key_context": 0,
+      "pii": 1492,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1355,
+      "IP": 72,
+      "PHONE": 65
+    },
+    "replacements": 2517
+  },
+  "sessions": [
+    {
+      "assets_manifest": "/0/assets/manifest.json",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "metadata": "/0/metadata.json",
+      "prompt": "/0/prompt.txt",
+      "transcript": "/0/full.jsonl"
+    }
+  ],
+  "strategy": "manual-commit",
+  "token_usage": {
+    "api_call_count": 36,
+    "cache_creation_tokens": 50170,
+    "cache_read_tokens": 11347897,
+    "input_tokens": 79,
+    "output_tokens": 24680
+  }
+}
