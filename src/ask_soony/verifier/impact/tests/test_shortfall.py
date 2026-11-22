@@ -197,8 +197,11 @@ def inbound_plan(root, rows):
     wb.save(root / "soony/context/plan.xlsx")
 
 
-def shipping_advice(root, readings, shipped, expected):
-    """The supplier's shipping advice for AWB 020-1, read: CMP-A shipped `shipped`."""
+def shipping_advice(root, readings, shipped, expected, part_in_item=False):
+    """
+    The supplier's shipping advice for AWB 020-1, read: CMP-A shipped `shipped`.
+    part_in_item: the reader put the part number in `item` and left material_id empty.
+    """
     folder = readings / "advice"
     folder.mkdir(parents=True)
     sha = hashlib.sha256((root / ADVICE).read_bytes()).hexdigest()
@@ -223,8 +226,8 @@ def shipping_advice(root, readings, shipped, expected):
                 "references": [{"type": "air_waybill", "value": "020-1"}],
                 "lines": [
                     {
-                        "item": "1",
-                        "material_id": "CMP-A",
+                        "item": "CMP-A" if part_in_item else "1",
+                        "material_id": None if part_in_item else "CMP-A",
                         "supplier_part_no": None,
                         "description": None,
                         "values": [
@@ -296,6 +299,18 @@ def test_shipped_short_counts_only_what_the_paper_says_and_the_card_goes(tmp_pat
     assert part_a.gap == 0  # 550 + 30 + 25 >= 600
     cards = build_cards(result, graph.issues, graph.records)
     assert not any(c.id == "allocate-CMP-A" for c in cards)  # no gap left, nothing to allocate
+
+
+def test_shipped_short_is_found_when_the_part_number_sits_in_item(tmp_path):
+    root = portal_with_plan(tmp_path)
+    inbound_plan(root, PLAN_ROWS)
+    readings = tmp_path / "readings"
+    failed_inspection(root, readings)
+    shipping_advice(root, readings, shipped=25, expected="2026-03-04", part_in_item=True)
+    graph = build(root, readings)
+    part_a = next(p for p in compute(graph.records, graph.issues).parts if p.part == "CMP-A")
+    assert ("020-1", 25) in [(a["reference"], a["quantity"]) for a in part_a.arriving]
+    assert any(a["reference"] == "020-1" for a in part_a.not_counted)
 
 
 def receipt(root, gr_date):

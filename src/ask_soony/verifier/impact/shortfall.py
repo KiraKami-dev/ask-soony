@@ -355,7 +355,11 @@ def _arriving(
     read_paths = {r["doc_path"] for r in by_kind.get("reading", [])}
     lines_by_doc: dict[tuple, list[dict]] = {}
     for line in by_kind.get("doc_line", []):
-        lines_by_doc.setdefault((line["doc_path"], line["material_id"]), []).append(line)
+        # The reader sometimes puts our part number in `item` (or the supplier part number)
+        # and the linker leaves material_id empty; fall back so the line is still found.
+        attrs = line.get("attrs") or {}
+        part_key = line["material_id"] or attrs.get("item") or attrs.get("supplier_part_no")
+        lines_by_doc.setdefault((line["doc_path"], part_key), []).append(line)
     receipts: dict[tuple, list[dict]] = {}
     for g in by_kind.get("goods_receipt", []):
         receipts.setdefault((g["po_number"], g["material_id"]), []).append(g)
