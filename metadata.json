@@ -5,7 +5,12 @@
   "branch": "jonas/alert-platform",
   "checkpoints_count": 2,
   "files_touched": [
-    "src/ask_soony/teams.py"
+    ".env.example",
+    "src/ask_soony/api.py",
+    "src/ask_soony/background.py",
+    "src/ask_soony/replies.py",
+    "src/ask_soony/teams.py",
+    "tests/test_teams.py"
   ],
   "sessions": [
     {
@@ -13,12 +18,19 @@
       "transcript": "/0/full.jsonl",
       "compact_transcript": "/0/transcript.jsonl",
       "content_hash": "/0/content_hash.txt",
-      "prompt": "/0/prompt.txt",
+      "prompt": "",
       "assets_manifest": "/0/assets/manifest.json"
     }
   ],
+  "token_usage": {
+    "input_tokens": 2,
+    "cache_creation_tokens": 1271,
+    "cache_read_tokens": 435912,
+    "output_tokens": 1027,
+    "api_call_count": 1
+  },
   "redaction": {
-    "replacements": 1150,
+    "replacements": 1154,
     "layers": {
       "betterleaks": 28,
       "connection_string": 0,
@@ -28,12 +40,12 @@
       "entropy": 216,
       "goredact": 2,
       "key_context": 0,
-      "pii": 853,
+      "pii": 857,
       "provider_token": 0,
       "shell_stdin": 0
     },
     "pii": {
-      "EMAIL": 756,
+      "EMAIL": 760,
       "IP": 32,
       "PHONE": 65
     }
