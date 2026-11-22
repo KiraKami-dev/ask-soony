@@ -1,15 +1,31 @@
 {
   "path": "soony/receiving/DC-HAM/20261001_WZ-260930-528.png",
   "sha256": "7855d442f29c8a5ec1f50111728cdb7f0e8d47dfebfb6540c0b9b75d5aee8d18",
-  "model": "claude-sonnet-5-5",
+  "model": "gpt-5.4",
   "effort": "high",
-  "fingerprint": "ef7ff7aae87f85e3",
-  "status": "error",
-  "error": "CLIJSONDecodeError: Failed to decode JSON: JSON message exceeded maximum buffer size of 1048576 bytes...",
-  "attempts": 3,
-  "finished_at": "2026-11-21T21:18:57+00:00",
-  "seconds": 258.8,
-  "num_turns": null,
-  "cost_usd": null,
-  "usage": null
+  "fingerprint": "704d1e77fe774b56",
+  "status": "ok",
+  "error": null,
+  "attempts": 1,
+  "finished_at": "2026-11-22T09:03:47+00:00",
+  "seconds": 48.8,
+  "usage": {
+    "completion_tokens": 4653,
+    "prompt_tokens": 3577,
+    "total_tokens": 8230,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 4024,
+      "rejected_prediction_tokens": 0,
+      "text_tokens": null
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": null,
+      "cached_tokens": 0,
+      "image_tokens": null,
+      "text_tokens": null
+    }
+  }
 }

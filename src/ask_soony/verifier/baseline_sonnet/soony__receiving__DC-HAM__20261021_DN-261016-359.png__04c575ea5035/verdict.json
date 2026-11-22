@@ -1,0 +1,147 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Boise Semiconductor Inc., Boise, US, +1 208 362 0144",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "DN-261016-359",
+  "document_date": "2026-10-16",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318736"
+    }
+  ],
+  "lines": [
+    {
+      "item": null,
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "5.000",
+          "number": 5000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "1",
+          "number": 1,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": null,
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "6.000",
+          "number": 6000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "1",
+          "number": 1,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": null,
+      "material_id": null,
+      "supplier_part_no": null,
+      "description": null,
+      "values": [
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "18",
+          "number": 18,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "2",
+          "number": 2,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "other",
+          "field_label": "carrier",
+          "value": "Alpen Air Cargo GmbH",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "21.10.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "other",
+          "field_label": "receiving_site",
+          "value": "DC-HAM",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Clean printed delivery note from Boise Semiconductor Inc. for PO 4500318736 with two line entries for CMP-GAM-002 and a blue received stamp dated 21.10.2026; no corrections or contradictions observed.",
+    "red_flags": [],
+    "confidence": "medium",
+    "observations": [
+      "Blue rectangular stamp at lower right reads 'RECEIVED 21.10.2026' and 'DC-HAM'.",
+      "Received-by signature line is blank.",
+      "Quantities are printed with dot separators: '5.000' and '6.000'.",
+      "The document is clear and fully legible."
+    ]
+  }
+}

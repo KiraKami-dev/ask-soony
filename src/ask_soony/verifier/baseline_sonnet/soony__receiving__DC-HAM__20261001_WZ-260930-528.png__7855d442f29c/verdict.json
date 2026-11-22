@@ -1,0 +1,113 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Polish",
+    "English"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o., Poznań",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "WZ-260930-528",
+  "document_date": "2026-09-30",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318731"
+    }
+  ],
+  "lines": [
+    {
+      "item": null,
+      "material_id": "CMP-GAM-004",
+      "supplier_part_no": null,
+      "description": "Cover Sleeve Grand Heist 6 (USK/PE",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "47.400",
+          "number": 47400,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "47",
+          "number": 47,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "658",
+          "number": 658,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "01.10.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "other",
+          "field_label": "received_by",
+          "value": "Meyer K.",
+          "number": null,
+          "unit": null,
+          "written": "handwritten",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "other",
+          "field_label": "receiving_location_code",
+          "value": "DC-HAM",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Gross weight: 658 kg",
+      "quote": "Waga brutto: 658 kg"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: PO 50466",
+      "quote": "Przewoźnik: PO 50466"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Clean delivery note from Karton Nowak Sp. z o.o. for PO 4500318731, showing one item CMP-GAM-004 with quantity delivered 47.400 PCS, 47 packages, gross weight 658 kg, and a receipt stamp dated 01.10.2026.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Blue rectangular receiving stamp present: 'RECEIVED 01.10.2026' and 'DC-HAM'.",
+      "Handwritten receiver name/signature 'Meyer K.' present.",
+      "Printed text is clear and fully readable.",
+      "No corrections or strike-throughs visible."
+    ]
+  }
+}
