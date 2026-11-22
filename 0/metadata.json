@@ -1,0 +1,125 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M812BQE9HY8DEG50TPBNNCVQ",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T07:26:25.410884Z",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 3,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "f96ca6db8492",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 12,
+    "cache_creation_tokens": 6921,
+    "cache_read_tokens": 4073751,
+    "output_tokens": 4532,
+    "api_call_count": 7,
+    "subagent_tokens": {
+      "input_tokens": 68,
+      "cache_creation_tokens": 64459,
+      "cache_read_tokens": 4322085,
+      "output_tokens": 30123,
+      "api_call_count": 33
+    },
+    "subagent_tokens_complete": true
+  },
+  "session_token_usage": {
+    "input_tokens": 2890,
+    "cache_creation_tokens": 2956863,
+    "cache_read_tokens": 625943708,
+    "output_tokens": 1179296,
+    "api_call_count": 1251,
+    "subagent_tokens": {
+      "input_tokens": 3076,
+      "cache_creation_tokens": 6619320,
+      "cache_read_tokens": 228799202,
+      "output_tokens": 1793964,
+      "api_call_count": 1467
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 2073,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 70,
+      "credentialed_uri": 0,
+      "entropy": 711,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 1268,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1155,
+      "IP": 48,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 257
+  }
+}
