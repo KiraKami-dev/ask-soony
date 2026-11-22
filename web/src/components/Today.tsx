@@ -272,7 +272,7 @@ function rowsOf(order: Card[], state: State): { c: Card; n: number; key: string 
   return [...seen.values()]
 }
 
-function QuietList({ order, card, onFocus, state, nowMs }: Props) {
+function QuietList({ order, card, onFocus, state, nowMs, phone }: Props) {
   // One line per problem: look-alikes fold into their first card.
   const rows = rowsOf(order, state)
   const cardKey = card ? rowKey(card, state) : null
@@ -285,9 +285,12 @@ function QuietList({ order, card, onFocus, state, nowMs }: Props) {
   const shown = open ? rows : rows.slice(0, 5)
   const more = rows.slice(5).reduce((n, r) => n + r.n, 0)
   const listRef = useRef<HTMLUListElement>(null)
+  // Desktop only: there the list scrolls in its own column. On a phone it sits in the page, and
+  // this would scroll the whole page down to it on load.
   useEffect(() => {
+    if (phone) return
     listRef.current?.querySelector('[aria-current="true"]')?.scrollIntoView({ block: 'nearest' })
-  }, [card?.id, open])
+  }, [card?.id, open, phone])
   return (
     <div>
       <p className="t-small mb-3 text-ink-3">Needs you</p>

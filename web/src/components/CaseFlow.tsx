@@ -99,18 +99,30 @@ function Node({ s, nowMs, compact, onDoc }: { s: Step; nowMs: number; compact?: 
   return (
     <div
       className={cn(
-        'min-w-0', compact ? 'pb-2.5' : 'pb-3',
+        'min-w-0', compact ? 'pb-2' : 'pb-3',
         s.tone === 'next' ? 'rounded-xl border border-dashed border-ink-3/40 bg-ground/70' : NODE,
         s.tone === 'now' && 'border-accent/45 shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-accent)_9%,transparent)]',
       )}
     >
-      <NodeHead
-        icon={s.icon}
-        kicker={s.kicker}
-        title={s.title}
-        accent={s.tone === 'now'}
-        right={s.at || open ? right : undefined}
-      />
+      {compact ? (
+        // One line: icon, "Reader · Read it (Polish)", time and Open on the right.
+        <div className="flex items-center gap-2.5 px-3.5 pt-2">
+          <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-lg [&>svg]:block', s.tone === 'now' ? 'bg-accent/10 text-accent' : 'bg-soft text-ink-2')}>{s.icon}</span>
+          <p className="t-small min-w-0 flex-1 truncate">
+            <span className="text-ink-3">{s.kicker} · </span>
+            <span className={cn('font-medium', s.tone === 'next' ? 'text-ink-2' : s.late ? 'text-late' : 'text-ink')}>{s.title}</span>
+          </p>
+          {(s.at || open) && right}
+        </div>
+      ) : (
+        <NodeHead
+          icon={s.icon}
+          kicker={s.kicker}
+          title={s.title}
+          accent={s.tone === 'now'}
+          right={s.at || open ? right : undefined}
+        />
+      )}
       {s.text && !compact && <p className={cn('t-small mt-1.5 line-clamp-2 pl-[52px] pr-3.5', s.late ? 'text-late' : 'text-ink-3')}>{s.text}</p>}
     </div>
   )
@@ -123,18 +135,18 @@ const CANVAS = {
 
 export function CaseFlow({ card, state, nowMs, className, onDoc }: { card: Card; state: State; nowMs: number; phone?: boolean; className?: string; onDoc?: () => void }) {
   const steps = stepsOf(card, state, nowMs)
-  // Compact by default (one line a step); "Details" shows the evidence lines. Remembered here.
-  const [detail, setDetail] = useState(() => { try { return localStorage.getItem('ask-soony.flow-detail') === '1' } catch { return false } })
+  // Full by default (the evidence lines are the point); "Less" folds to one line a step.
+  const [detail, setDetail] = useState(() => { try { return localStorage.getItem('ask-soony.flow-detail') !== '0' } catch { return true } })
   const toggle = () => setDetail((d) => { try { localStorage.setItem('ask-soony.flow-detail', d ? '0' : '1') } catch { /* private mode */ } return !d })
   if (steps.length < 3) return null
 
   // One column, top to bottom, in the order the agents worked: no turns to follow.
   const body = (
-    <ol className="grid">
+    <ol className="grid grid-cols-[minmax(0,1fr)]">
       {steps.map((s, i) => (
         <Fragment key={s.key}>
           {i > 0 && <li aria-hidden="true"><Link dashed={s.tone === 'next'} /></li>}
-          <li><Node s={s} nowMs={nowMs} compact={!detail} onDoc={onDoc} /></li>
+          <li className="min-w-0"><Node s={s} nowMs={nowMs} compact={!detail} onDoc={onDoc} /></li>
         </Fragment>
       ))}
     </ol>
