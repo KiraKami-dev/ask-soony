@@ -338,6 +338,7 @@ def build_cards(net: dict, ships: dict[str, dict]) -> list[dict]:
             "edition": imp.get("edition"), "cell_hours_lost": hours, "slack_hours": slack,
             "deadline": d.get("deadline") or imp.get("deadline"),
             "runs_dry": imp.get("runs_dry") or d.get("runs_dry"),
+            "arrives_at": stated_arrival(f, imp),
             "severity": sev, "level": level, "status": status,
             "approver": approver, "routed_to_other": other,
             "reason": d.get("reason"), "called_at": called.get("at") if called else None,
@@ -352,8 +353,33 @@ def build_cards(net: dict, ships: dict[str, dict]) -> list[dict]:
     for extra in verifier_cards(net, statuses, actions, trust, viewer) + event_cards(net, statuses, trust):
         if extra["id"] not in known:
             cards.append(extra)
+    names = part_names(net.get("root"))
+    for c in cards:
+        c["part_name"] = names.get(str(c.get("part") or ""))
     cards.sort(key=rank_key)
     return cards
+
+
+def part_names(root: Path | None) -> dict[str, str]:
+    """Short readable names for part codes, from components.csv: 'Art Book Grand Heist 6 (96 p,
+    hardcover)' -> 'Art Book'. The launch title (the part of a launch product's name before ' – ')
+    and anything in brackets are dropped."""
+    if root is None:
+        return {}
+    master = root / "soony" / "master"
+    titles = {r.get("name", "").split("–")[0].strip() for r in read_csv(master / "products.csv")
+              if r.get("lifecycle") == "launch" and "–" in r.get("name", "")}
+    out = {}
+    for r in read_csv(master / "components.csv"):
+        name = str(r.get("description") or "")
+        for t in filter(None, titles):
+            name = name.replace(f"– {t}", "").replace(t, "")
+        name = re.sub(r"\s*\([^)]*\)", "", name)
+        name = re.sub(r"\s+", " ", name).strip(" –-")
+        if r.get("component_id") and name:
+            out[r["component_id"]] = name
+            out[str(r.get("description"))] = name  # cards that already carry the description
+    return out
 
 
 # ---------------------------------------------------------------- adapters for teammates' outputs
@@ -453,6 +479,33 @@ def parse_when(value: Any) -> datetime | None:
     return None
 
 
+_ARRIVAL = re.compile(
+    r"\barriv\w*\b[^.;]{0,40}?\b((?:(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\w*\s+)?\d{1,2}\s+[A-Z][a-z]{2}|\d{4}-\d{2}-\d{2})"
+)
+
+
+def stated_arrival(f: dict, imp: dict) -> str | None:
+    """When the late goods of a finding arrive: an explicit `arrives_at` from the finding or its
+    impact, else the first date the summary or title gives after 'arrive' ('20,000 arrive in
+    Hamburg on Tue 24 Nov'). Date only: the start of that day, local time."""
+    explicit = f.get("arrives_at") or imp.get("arrives_at")
+    if explicit:
+        return _iso(explicit)
+    for text in (f.get("summary"), f.get("title")):
+        m = _ARRIVAL.search(str(text or ""))
+        if not m:
+            continue
+        raw = m.group(1)
+        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", raw):
+            return datetime.fromisoformat(raw).replace(tzinfo=tz()).isoformat()
+        day_month = " ".join(raw.split()[-2:])
+        try:
+            return datetime.strptime(f"{now().year} {day_month}", "%Y %d %b").replace(tzinfo=tz()).isoformat()
+        except ValueError:
+            continue
+    return None
+
+
 def _iso(value: Any) -> str | None:
     dt = parse_when(value)
     return dt.isoformat() if dt else None
@@ -467,7 +520,7 @@ def _base_card(cid: str, **kw) -> dict:
     card = {
         "id": cid, "kind": None, "part": None, "headline": cid, "summary": None, "number": None,
         "number_label": "copies at risk", "edition": None, "cell_hours_lost": None, "slack_hours": None,
-        "deadline": None, "runs_dry": None, "severity": None, "level": "blue", "status": "open",
+        "deadline": None, "runs_dry": None, "arrives_at": None, "severity": None, "level": "blue", "status": "open",
         "approver": None, "routed_to_other": False, "reason": None, "called_at": None, "options": [],
         "evidence": [], "trail": [], "supplier_id": None, "supplier_name": None, "shipment": None,
         "routes": [], "ui": {}, "created_at": None, "escalation_brief": "", "trusted_types": [],
@@ -647,9 +700,24 @@ def edition_labels(root: Path | None) -> dict[str, str]:
     return out
 
 
+def edition_copies_at_risk(mine: list[dict], verifier_figure: float | None, remaining: float | None) -> float:
+    """Copies at risk for one edition, always a number the user can find on screen.
+
+    Rule: the largest 'copies at risk' figure among the edition's open cards, or the verifier's
+    edition total when that is higher (it covers its own cards without double counting). Max, not
+    sum: every box needs all its parts, so shortfalls of different parts hit the same unpacked
+    copies and the scarcest part bounds the loss. Cards counted in parts ('units short') are left
+    out. Never more than the copies still to pack.
+    """
+    figures = [c.get("number") or 0 for c in mine if c.get("number_label") == "copies at risk"]
+    best = max([*figures, verifier_figure or 0])
+    return min(best, remaining) if remaining is not None else best
+
+
 def build_strip(cards: list[dict], root: Path | None, clock: PackClock, cur: datetime) -> list[dict]:
     """One cell per launch edition. Slack and the time a line stops come from the packing clock
-    (shift windows, rate, copies left), so a line never 'stops' at night."""
+    (shift windows, rate, copies left), so a line never 'stops' at night. Each cell also carries
+    when the line finishes or stops, for the launch timeline (build_clock)."""
     launch = {str(e.get("edition")): e for e in (read_json("launch.json", {}).get("editions") or [])}
     labels = edition_labels(root)
     try:  # the verifier prices copies at risk per edition without double counting shared parts
@@ -681,23 +749,63 @@ def build_strip(cards: list[dict], root: Path | None, clock: PackClock, cur: dat
         if slack is None:
             vals = [c["slack_hours"] for c in mine if c.get("slack_hours") is not None]
             slack = min(vals) if vals else None
+        ed = clock.editions.get(k)
+        at_risk = edition_copies_at_risk(mine, verifier_at_risk.get(k), ed.remaining if ed else None)
+        if not mine and k in verifier_at_risk:
+            at_risk = verifier_at_risk[k]
+        # The line stops when a part runs dry (a card says when), or once it has packed every copy
+        # it has parts for (clock), whichever comes first.
+        stops_when = [t for t in (parse_when(c.get("runs_dry")) for c in mine if (c.get("number") or 0) > 0) if t]
+        by_clock = clock.line_stops(cur, k, at_risk)
+        stops = min([*stops_when, *([by_clock] if by_clock else [])], default=None)
+        # A stop in the past stays where it was: the line stood still from then on (moving it to
+        # 'now' would make it creep on every poll).
+        finishes = None if stops else clock.finishes(cur, k)
         first = sorted(mine, key=rank_key)[0] if mine else None
         breaks = None
         if first:
-            stops = parse_when(first.get("runs_dry")) or clock.line_stops(cur, k, first.get("number"))
-            if stops and stops < cur:  # already ran out per the data: the line stops when it next starts
-                stops = clock.after_packing_hours(cur, 0) or stops
             breaks = {"text": first.get("part") or first.get("headline"), "deadline": first.get("deadline"),
                       "stops_at": stops.isoformat() if stops else None, "card": first["id"]}
+        left = clock.remaining_at(cur, k)
+        if stops and stops <= cur and left is not None:  # a stopped line packs nothing more
+            left = max(left, min(at_risk, ed.remaining if ed and ed.remaining is not None else at_risk))
+        rate = ed.rate_per_hour if ed else None
         strip.append({
             "edition": k, "label": label_of(k),
             "level": {3: "red", 2: "amber", 1: "grey", 0: "blue"}[worst],
             "status": {3: "Stops the line", 2: "At risk", 1: "Unclear", 0: "On track"}[worst],
-            "copies_at_risk": verifier_at_risk.get(k, sum(c.get("number") or 0 for c in mine)),
+            "copies_at_risk": at_risk,
             "slack_hours": slack,
             "breaks_first": breaks,
+            "finishes_at": finishes.isoformat() if finishes else None,
+            "stops_at": stops.isoformat() if stops else None,
+            "remaining": round(left) if left is not None else None,
+            "rate_per_hour": rate,
+            "packed_as_of": ed.packed_as_of.isoformat() if ed and ed.packed_as_of else None,
+            # Copies the shifts cannot pack even with every part present (plan rate, hours left).
+            "short_of_time": round(max(left - rate * clock.hours_left(cur), 0)) if left is not None and rate else None,
         })
     return strip
+
+
+def build_clock(strip: list[dict], clock: PackClock, cur: datetime) -> dict:
+    """The packing clock for the launch timeline: launch time, the shifts from today's start until
+    launch, and per edition when its line finishes or stops."""
+    windows = clock.windows
+    if not windows:  # no plan and no launch date: the brief's shifts in the coming launch week
+        sunday = (cur + timedelta(days=(6 - cur.weekday()) % 7)).date()
+        windows = launch_clock.default_windows(sunday, tz())
+    launch_at = windows[-1][1]
+    day_start = cur.astimezone(tz()).replace(hour=0, minute=0, second=0, microsecond=0)
+    keep = [(s, e) for s, e in windows if e > day_start and s < launch_at] or windows[-1:]
+    fields = ("edition", "label", "level", "finishes_at", "stops_at", "copies_at_risk", "slack_hours",
+              "remaining", "rate_per_hour", "packed_as_of", "short_of_time")
+    return {
+        "launch": launch_at.isoformat(),
+        "windows": [[s.isoformat(), e.isoformat()] for s, e in keep],
+        "editions": [{f: x.get(f) for f in fields} | {"breaks_first_card": (x.get("breaks_first") or {}).get("card")}
+                     for x in strip],
+    }
 
 
 def build_activity(cards: list[dict], events: list[dict], root: Path | None) -> list[dict]:
@@ -791,6 +899,8 @@ def build_state() -> dict:
     )
 
     inbox = [c for c in open_cards if not c["routed_to_other"]]
+    clock = launch_clock.load(root, tz())
+    strip = build_strip(cards, root, clock, cur)
     return {
         "now": cur.isoformat(), "viewer": viewer_name(root),
         "portal_found": root is not None,
@@ -800,7 +910,8 @@ def build_state() -> dict:
         },
         "route_level": route_level, "badges": dict(badges),
         "shipments": list(ships.values()),
-        "strip": build_strip(cards, root, launch_clock.load(root, tz()), cur),
+        "strip": strip,
+        "clock": build_clock(strip, clock, cur),
         "cards": cards,
         "inbox_ids": [c["id"] for c in inbox],
         "calm": not inbox,

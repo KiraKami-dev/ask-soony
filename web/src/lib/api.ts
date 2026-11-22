@@ -27,6 +27,8 @@ export interface Card {
   id: string
   kind?: string
   part?: string
+  /** Short readable name of the part code, from the master data ("Art Book"). */
+  part_name?: string | null
   headline: string
   summary?: string
   number: number | null
@@ -36,6 +38,8 @@ export interface Card {
   slack_hours?: number
   deadline?: string
   runs_dry?: string | null
+  /** When the late goods arrive, if a finding states it (may be after launch). */
+  arrives_at?: string | null
   severity?: string
   level: Level
   status: string
@@ -69,6 +73,36 @@ export interface StripItem {
   edition: string; label: string; level: Level; status: string
   copies_at_risk: number; slack_hours: number | null
   breaks_first: { text?: string; deadline?: string; stops_at?: string | null; card: string } | null
+  finishes_at?: string | null
+  stops_at?: string | null
+}
+
+/** One edition on the packing clock: when its line finishes, or stops for want of parts. */
+export interface ClockEdition {
+  edition: string
+  label: string
+  level: Level
+  /** Last copy packed at plan rate; null if the line stops first or the shifts run out. */
+  finishes_at: string | null
+  /** Line runs out of parts (projected; never at night); null if it does not stop. */
+  stops_at: string | null
+  /** Largest copies-at-risk figure on the edition's open cards, or the verifier's if higher. */
+  copies_at_risk: number
+  slack_hours: number | null
+  remaining: number | null
+  rate_per_hour: number | null
+  /** When the packed count behind `remaining` was taken; packing is projected at plan rate since. */
+  packed_as_of: string | null
+  /** Copies the hours left cannot pack even with every part present. */
+  short_of_time: number | null
+  breaks_first_card: string | null
+}
+export interface Clock {
+  /** Trucks leave: the end of the last shift. */
+  launch: string
+  /** Shift windows [start, end] from the start of today until launch, ISO. */
+  windows: [string, string][]
+  editions: ClockEdition[]
 }
 export interface EventItem { id: string; at: string; path?: string; file?: string; node?: string }
 export interface ActivityItem {
@@ -86,6 +120,7 @@ export interface State {
   badges: Record<string, number>
   shipments: Shipment[]
   strip: StripItem[]
+  clock?: Clock
   cards: Card[]
   inbox_ids: string[]
   calm: boolean

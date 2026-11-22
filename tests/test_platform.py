@@ -58,7 +58,8 @@ def test_dispatch_decision_maps_to_inbox_and_strip(env):
     assert card["part"] == "Book" and card["supplier_id"] == "SUP-9"
     assert card["deadline"].startswith("2030-06-01T23:00")
     cell = next(x for x in s["strip"] if x["edition"] == "P-A")
-    assert cell["copies_at_risk"] == 250  # the verifier's edition total, not a card sum
+    # never below an open card's figure (the verifier says 250, its card 300), never a card sum
+    assert cell["copies_at_risk"] == 300
     assert cell["breaks_first"]["stops_at"].startswith("2030-06-02T11:00")  # not at night
 
 
