@@ -25,7 +25,7 @@
     "api_call_count": 17
   },
   "redaction": {
-    "replacements": 1089,
+    "replacements": 1095,
     "layers": {
       "betterleaks": 28,
       "connection_string": 0,
@@ -35,12 +35,12 @@
       "entropy": 195,
       "goredact": 2,
       "key_context": 0,
-      "pii": 813,
+      "pii": 819,
       "provider_token": 0,
       "shell_stdin": 0
     },
     "pii": {
-      "EMAIL": 720,
+      "EMAIL": 726,
       "IP": 32,
       "PHONE": 61
     }
