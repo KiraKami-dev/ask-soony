@@ -55,15 +55,30 @@ def run_pipeline(paths: list[str], root: Path) -> str:
     from ask_soony.llm import make_backend
     from ask_soony.predictor import ImpactAgent
     from ask_soony.store import Store
+    from ask_soony.verifier.image_recognizer.run import recognize_changed
 
     settings = Settings.from_env()
     predictor = None
+    backend = None
     if settings.llm_provider != "none":
         backend = make_backend(
             settings.llm_provider, settings.llm_model, settings.llm_api_key,
             settings.llm_base_url, settings.llm_effort,
         )
         predictor = ImpactAgent(Store(settings.data_dir), backend, state_dir())
+    visual_suffixes = {".pdf", ".jpg", ".jpeg", ".png", ".webp"}
+    visual_paths = [path for path in paths if Path(path).suffix.lower() in visual_suffixes]
+    if visual_paths and backend is None:
+        raise RuntimeError("visual documents changed but ASK_LLM_PROVIDER=none")
+    readings = []
+    if visual_paths:
+        readings = recognize_changed(
+            root,
+            visual_paths,
+            settings.data_dir / "image_recognizer",
+            backend,
+            settings.llm_effort,
+        )
     dispatch_file = state_dir() / "dispatch.json"
     routed = refresh(paths, root, settings.data_dir / "image_recognizer", dispatch_file, predictor)
     store = Store(settings.data_dir)
@@ -84,7 +99,7 @@ def run_pipeline(paths: list[str], root: Path) -> str:
         store.db.close()
     return (
         f"pipeline: verifier={routed.verifier} predictor={routed.predictor} "
-        f"alerts={len(alert_ids)}"
+        f"readings={len(readings)} alerts={len(alert_ids)}"
     )
 
 

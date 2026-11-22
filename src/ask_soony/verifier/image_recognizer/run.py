@@ -28,6 +28,7 @@ from openai import AsyncOpenAI
 from tqdm import tqdm
 
 from ask_soony.extract import extract
+from ask_soony.llm import Backend, Tool, ToolError
 from ask_soony.verifier.image_recognizer.prompt import SYSTEM_PROMPT, USER_PROMPT
 from ask_soony.verifier.image_recognizer.schema import VERDICT_SCHEMA
 
@@ -119,6 +120,64 @@ def _content(job: Job) -> list[dict]:
         url = f"data:{img.media_type};base64,{b64}"
         parts.append({"type": "image_url", "image_url": {"url": url, "detail": "high"}})
     return parts
+
+
+def read_with_backend(job: Job, settings: Settings, backend: Backend) -> dict:
+    """Read one changed visual document through the configured agent provider."""
+    document = extract(job.rel, job.path.read_bytes())
+    text = USER_PROMPT.format(path=job.rel, suffix=job.path.suffix.lower())
+    if document.text.strip():
+        text += f"\n\nText layer of the document:\n{document.text}"
+    verdict: dict = {}
+
+    def submit(name: str, args: dict) -> str:
+        if name != "submit_document_reading":
+            raise ToolError(f"unknown tool {name}")
+        verdict.update(args)
+        return "recorded"
+
+    started = time.time()
+    try:
+        result = backend.run(
+            SYSTEM_PROMPT,
+            text,
+            document.images,
+            [
+                Tool(
+                    "submit_document_reading",
+                    "Submit the structured document reading.",
+                    VERDICT_SCHEMA,
+                )
+            ],
+            submit,
+            lambda: bool(verdict),
+            max_turns=3,
+        )
+        run = {
+            "verdict": verdict or None,
+            "usage": result.usage,
+            "error": None if verdict else f"agent did not submit ({result.stop_reason})",
+        }
+    except Exception as error:
+        run = {"error": f"{type(error).__name__}: {error}"}
+    return _save(job, settings, run, started, 1)
+
+
+def recognize_changed(
+    root: Path, paths: list[str], out: Path, backend: Backend, effort: str
+) -> list[dict]:
+    """Read changed PDFs and images before their claims enter the verifier."""
+    wanted = set(paths)
+    jobs = [job for job in select_jobs(root, None, False, None) if job.rel in wanted]
+    settings = Settings(
+        root=root, out=out, model=backend.model, effort=effort, concurrency=1, retries=0
+    )
+    current = fingerprint(settings)
+    return [
+        read_with_backend(job, settings, backend)
+        for job in jobs
+        if not is_done(job, out, current)
+    ]
 
 
 async def read_document(job: Job, settings: Settings, client: AsyncOpenAI) -> dict:
