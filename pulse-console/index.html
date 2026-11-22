@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pulse — Procurement workflows</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workflow-pane" aria-label="Workflow builder">
+        <header class="pane-header">
+          <a class="brand" href="/"><span>✦</span> pulse</a>
+          <div class="workflow-name"><p>WORKFLOW</p><h1 id="workflow-title">Launch risk monitor</h1></div>
+          <span id="run-state" class="run-state ready">READY</span>
+        </header>
+        <div class="canvas-wrap"><div id="canvas" class="canvas" aria-live="polite"></div><section id="outcomes" class="outcomes" aria-live="polite"></section></div>
+        <footer class="run-footer"><div><span class="live-dot"></span><span id="run-summary">Ask Pulse to build and run a workflow.</span></div><button id="activity-button" type="button">Run activity <span>→</span></button></footer>
+      </section>
+      <section class="chat-pane" aria-label="Pulse agent">
+        <header class="chat-header"><div><p>PROCUREMENT AGENT</p><h2>Pulse</h2></div><div class="agent-controls"><select id="model-select" aria-label="Claude model" disabled><option>Loading models…</option></select><span id="source-status"><i></i> Checking source</span></div></header>
+        <div id="messages" class="messages"><article class="message assistant"><span class="message-icon">✦</span><div><p>I’m connected to Soony’s procurement workspace.</p><p>Tell me what should happen and I’ll build the workflow on the canvas, then run it.</p></div></article></div>
+        <div class="quick-prompts"><button data-prompt="Monitor open shipments, chase any that are stale, and raise an approval if the Sunday launch is at risk.">Monitor shipment risk</button><button data-prompt="Verify Haneul Print’s bank-detail change against the supplier contract before any payment is released.">Verify bank change</button></div>
+        <form id="prompt-form" class="composer"><textarea id="prompt" rows="1" placeholder="Describe the workflow you need…"></textarea><div><span>↵ to send</span><button id="send" type="submit" aria-label="Build workflow">↑</button></div></form>
+      </section>
+    </main>
+    <dialog id="activity-dialog"><button class="close-dialog" aria-label="Close">×</button><p>PIPELINE RUN</p><h2 id="activity-title">No workflow run yet</h2><div id="activity-list"></div></dialog>
+    <template id="user-message"><article class="message user"><div></div></article></template>
+    <template id="assistant-message"><article class="message assistant"><span class="message-icon">✦</span><div><p class="assistant-copy"></p><small class="assistant-meta"></small></div></article></template>
+    <script src="/app.js"></script>
+  </body>
+</html>

@@ -9,6 +9,7 @@ flowchart LR
 ```
 
 ## Now
+- Codex (now): Pulse workflow canvas and approval-gated live portal actions on `new-approach`; next: handoff for review
 - Akshat (01:21): platform + verifier + predictor + alert agent merged to main (PR #6), inbox runs on real pipeline output; next: fix stale art-book deadline, calm opening, deploy
 - Farhan: verification: claim extraction from documents + three-way match (PO ↔ confirmation ↔ receipt) — see plan.md §5
 - Lucas: arrival forecast: rules for ETA + road leg, silence detection, news/notice risks, alternatives — see plan.md §5
