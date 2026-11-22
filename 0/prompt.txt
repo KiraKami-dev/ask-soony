@@ -1,0 +1,472 @@
+<task-notification>
+<task-id>ae989bc4d1d90dfa3</task-id>
+<tool-use-id>toolu_01G9EaBsEp7Ze4ccP5PGC2D7</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/ae989bc4d1d90dfa3.output</output-file>
+<status>completed</status>
+<summary>Agent "Design C: jury story and visual style" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>**Verdict:** the jury sees a map and two KPI tiles that don't agree with the card. The story is on screen, but it sits in a narrow right column.
+
+## 1. Map and KPI strip: demote both
+
+The map takes 60% of the screen and tells nobody anything. It's a stock "supply chain" visual, your pitch notes already say not to narrate it, and the supplier labels overlap ("Dongguan Precision Housings / Guangzhou PackRight / Pune Diecast Works"). It also turns the problem card into a sidebar.
+
+The KPI strip actively hurts. On screen it reads "Standard 32,000 at risk" next to a card that says 20,000. It also shows "Collector's · On track · 0 at risk", while your pitch calls Collector's "the real risk this weekend" (art books ~5,900 short, statues ~3,400 short). "−18 min slack" doesn't explain itself, "Game Ca…" is cut off, and "checked 8 h ago" undercuts the word "Watching". A juror who reads the top-left first gets a contradiction you didn't intend.
+
+**Replace both with a launch timeline**: one horizontal band from today to Sunday 20:00. Each shipment is a dot, and the launch is a hard red vertical line. Hwaseong's 20,000 lands to the right of that line, after launch. That shows "arrives after launch" before you say a word, and it is the only chart the story needs. Move the map to a "Network" tab.
+
+## 2. Layout at 1440 px
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│ ● Ask Soony   Grand Heist 6 · launch Sun 22 Nov 20:00 · 29 h left   ⚙ Routines 3 │
+├──────────────────────────────────────────────────────────────────────────┤
+│ LAUNCH TIMELINE  Fri ─── Sat ────── Sun ──────┃LAUNCH┃── Mon ── Tue       │
+│  Standard   ●●●●  ●  ●●       ●               ┃      ┃            ◉ 20,000│
+│  Collector's  ●●   ●    ◐ art books ◐ statues ┃      ┃                   │
+├───────────────┬──────────────────────────────────────────────────────────┤
+│ NEEDS YOU · 3 │  HERO CARD (selected)                                    │
+│ ▌Hwaseong     │  20,000 game cards arrive after launch                   │
+│  20,000 late  │  ┌──────── SAP ────────┐ ≠ ┌──── Supplier PDF ────┐      │
+│ ▌Nowak        │  │ 48,000 · Sat 21 Nov │   │ 20,000 · Tue 24 Nov  │      │
+│  art books    │  └─────────────────────┘   └──────────────────────┘      │
+│ ▌Dongguan     │  [ PDF snippet, highlighted number, KR → EN line ]        │
+│  statues      │  Recommend: Boise air-freights 20,000 · ~USD 196k         │
+│───────────────│  [ Approve ]  [ Call supplier ]  Edit  ···               │
+│ HANDLED BY    │  ── Reply thread (supplier's real answer lands here) ──  │
+│ ROUTINES · 3  │                                                          │
+│ ⚙ PackRight ✓ │                                                          │
+│ ⚙ PackRight ✓ │                                                          │
+└───────────────┴──────────────────────────────────────────────────────────┘
+```
+
+Each demo beat has a fixed place on screen:
+- **Problem:** the timeline dot to the right of the launch line.
+- **Evidence:** the SAP-vs-PDF slab in the hero card, with the PDF snippet inline instead of in a drawer.
+- **Decision:** the buttons directly under it.
+- **Reply:** a thread at the bottom of the same card.
+- **Routine takes over:** the bottom-left list, where cards drop in one by one, each ticking ✓ "handled by routine". The routine flow opens as a full-width sheet, not a 560 px drawer.
+
+The presenter always moves top to bottom, then left.
+
+## 3. Visual style
+
+- **Stay light.** Projectors wash out dark UIs and grey-on-dark text. The Linear-like base is right.
+- **Ration red.** Right now red is everywhere: border, number, recommendation box, map route, strip. Use `stop` only for things past the launch line (the late quantity and date, the timeline dot, the launch line). Make the recommendation box neutral: `panel` background with a 1 px `line` border and the cost as an ink chip. Use `warn` amber only for "short but recoverable". `ok` blue is for actions only, never for status.
+- **Add one more token.** Something like `--color-auto: #7c3aed` (or a teal) marks routine work, so "the agent did this" reads differently from "you did this".
+- **Typography scale:** 12 / 14 / 16 / 20 / 28 / 64. One display size, for the hero numbers. Labels at 12 px uppercase with +0.04em tracking in `ink-3`. Card titles at 20/600. Drop the 14 px grey body copy under the recommendation.
+- **Density:** fewer boxes. Today it's a card inside a box inside a box. Use one surface per card, separated by 24 px whitespace and hairline dividers.
+- **What reads as a funded product:** consistent nouns, no truncation, no internal IDs (CMP-GAM-001), live relative times ("2 min ago"), and a real empty state, which you already have and is good. A tiny "source-anchored" mark (a small doc icon plus page number) next to every number makes the trust claim visible.
+
+## 4. Hero moment
+
+Put two slabs side by side in the card at 64 px tabular numbers:
+
+```
+  SAP SAYS                       SUPPLIER PDF SAYS (Korean, p.1)
+  48,000                    ≠    20,000
+  Sat 21 Nov  ✓ before launch    Tue 24 Nov  ✕ 2 days after launch
+```
+
+- The left slab is in `ink`. The right slab is in `stop`, on a light `#fef2f2` background.
+- Put a large "≠" between them, or a red bracket.
+- Under the right slab, show the actual PDF crop with the number circled and the Korean line plus translation in 16 px.
+- Animate it once: the PDF highlight pulses, then the number flies into the slab.
+
+That's readable at 10 m. The current 14 px two-column "SYSTEM / DOCUMENT" table is not.
+
+## 5. Remove or rename
+
+1. **"Standard: Stops the line · 32,000 · −18 min slack"** strip: remove it. It contradicts the card and hides the Collector's risk.
+2. **"Talk it through"**: rename to "Call supplier" or "Call me". The phone call is a demo beat, and the label should say so.
+3. **"Edit / Escalate / Dismiss / ···"**: keep only Approve plus Call. Put the rest in the overflow menu.
+4. **The duplicate Hwaseong card** ("34,800 short across 2 editions", same supplier and part): merge it into the hero card or hide it. Otherwise the jury asks "which number is real?"
+5. **The "Agent trail" / "Evidence" text links** and the map legend ("Air / truck, Sea, Silent"): evidence goes inline, the legend goes with the map tab, and "Agent trail" becomes "How we know".
+
+Also fix before the demo: the "checked 8 h ago" freshness label and the "Decide by Sun 10:00" deadline, which will already be past at a 14:00 demo slot.
+
+### Critical files
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/App.tsx
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/components/StatusStrip.tsx
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/components/DecisionCard.tsx
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/components/Rail.tsx
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/index.css</result>
+<usage><subagent_tokens>49058</subagent_tokens><tool_uses>11</tool_uses><duration_ms>53561</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>a7c4102e071042adb</task-id>
+<tool-use-id>toolu_014x8TFzZwLvH6KZhMC9QzMp</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a7c4102e071042adb.output</output-file>
+<status>completed</status>
+<summary>Agent "Design A: launch control timeline" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I'd centre the screen on the trucks line (Sun 20:00), with one recommendation directly under it. Plan below.
+
+## 1. Wireframes
+
+**1440 px**
+```
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│ S  Standard stops Sun 17:00 unless you decide by 10:00.   TRUCKS IN 6 h 12 min   │ 56px
+│    Watching · 2 min ago                     [Launch] Routines  Map     🔔        │
+├──────────────────────────────────────────────────────────────────────────────────┤
+│ LAUNCH TIMELINE                                                         ~240px   │
+│        Sat 06    12    18  22░night░06    12    16   20┃ TOO LATE ▸              │
+│ Standard   ████████████████░░░░░░████████████▼░░hatch░░┃  ● 20,000 cards Tue 24  │
+│            stops Sun 17:00 · 32,000 short   ◆10:00     ┃                          │
+│ Collector's████████████████░░░░░░███████████████████▏  ┃  2 h spare               │
+│ Inbound     ●Nowak   ○Pune(silent)  ●Boise              ┃  ●Hwaseong sea          │
+│            │now                                        ┃                          │
+├───────────────────────────────────────────────┬──────────────────────────────────┤
+│ DECIDE · 1 of 2                               │ NEXT  ▢ Statue Pune · 18:00      │
+│ [selected DecisionCard, unchanged component]  │                                  │
+│  20,000 at risk · Decide by Sun 10:00         │ AGENTS AT WORK                   │
+│  SYSTEM vs DOCUMENT                           │ ⚙ Nowak ETA routine · ran 09:12  │
+│  WE RECOMMEND … [Approve] Talk it through     │ 🎙 Voice: approved air freight    │
+│                                               │ ↳ Boise replied: "stock ok"      │
+└───────────────────────────────────────────────┴──────────────────────────────────┘
+        ~7/12                                            ~5/12
+```
+
+**390 px**
+```
+┌──────────────────────────────┐
+│ S  TRUCKS IN 6 h 12 min    🔔│
+│ Standard stops Sun 17:00     │
+│ unless you decide by 10:00.  │
+├──────────────────────────────┤
+│ Std  ██████░███▼░░┃●         │  ~120px, no text labels
+│ Coll ██████░██████┃          │  on the markers, tap to select
+│ In   ● ○  ●       ┃●         │
+├──────────────────────────────┤
+│ [DecisionCard, full width]   │
+│ Next: Statue Pune · 18:00    │
+├──────────────────────────────┤
+│ Launch · Routines · Map      │  bottom tabs
+└──────────────────────────────┘
+```
+
+## 2. Timeline component (`LaunchTimeline.tsx`, plain SVG, no new library)
+
+**Axis.** It runs from `min(now, first shift start)` to Sun 20:00, plus a gutter of about 12% width past the truck line labelled "Too late", which is not to scale. The scale is piecewise: shift hours are full width and nights are drawn at 25% width, greyed with "no shift". Past time is faded, and a `now` hairline uses `state.now` plus the existing offset clock. The truck line is a thick ink rule with "Trucks 20:00" written on it.
+
+**Edition lanes** come from `strip[]` (`label`, `level`).
+- If `breaks_first.stops_at` is before launch, draw a solid bar in the level colour up to `stops_at`, then red hatching up to 20:00. The label reads "stops Sun 17:00 · {copies_at_risk} short".
+- Otherwise draw a blue bar up to the finish time with "{slack_hours} h spare" after it. Collector's with 2 h spare will look visibly tight, which is the point.
+- Bars are clipped to shift windows, so the line never appears to run at night.
+
+**Markers.** Cards are matched to a lane by `card.edition`; cards without an edition go to the Inbound lane.
+- ◆ `card.deadline`, labelled "Decide by 10:00". It turns red within 3 h, using the existing `until()`.
+- ▼ `card.runs_dry`.
+- Only the `breaks_first.card` marker gets a permanent label. All others show their label on hover, to avoid label collisions.
+
+**Inbound lane** comes from `shipments[]`.
+- A dot sits at `eta`, coloured by `level`. Silent shipments are hollow grey with "silent {silent_hours} h".
+- If `eta` is after 20:00, the dot goes into the gutter, stacked and red, with the real date ("Tue 24 Nov"). That is how the 20,000 game cards visibly fall past the line.
+- If `eta` is missing, the dot goes in a "No ETA" chip at the lane start.
+
+**Interaction.**
+- Hovering a marker shows a one-line tooltip and highlights the matching card. A dot is linked to a card when `card.shipment === shipment.id`.
+- Clicking selects the card (`selectedId`), which then fills the main column.
+- In the other direction, hovering a card highlights its markers. Reuse the existing `onHover` pattern, but key it by card id.
+
+**Missing data and fallbacks.** `State` has no shift windows, no launch time, and no finish time per edition. In `build_state`, add:
+```
+clock: { launch, windows:[[s,e]], editions:[{edition, finishes_at}] }
+```
+This is about 15 lines and uses `PackClock.windows` and `after_packing_hours(cur, remaining/rate)`. On the frontend, keep a constant fallback (Sat 06–22, Sun 06–20, launch Sun 20:00). If `finishes_at` is missing, compute it as the 20:00 line minus `slack_hours`. If both are missing, draw the bar to the line, dashed, with no claim attached.
+
+## 3. Header
+
+Drop the KPI cards. Replace them with **one sentence** taken from the worst `strip` item: "{label} stops {stops_at} unless you decide by {deadline}." When nothing is at risk it reads "Both editions make the trucks. Collector's has 2 h spare." On the right, a **countdown** shows "Trucks in 6 h 12 min".
+
+Tabs are **Launch** (the default), **Routines** (the current panel as a full page) and **Map** (the existing `SupplyMap`, unchanged, as a secondary view). "Watching · checked …" stays as small text under the logo.
+
+## 4. Remove or demote
+
+- **Remove:** `StatusStrip`, the map from the main screen, the Legend, and the count in the "Needs you" heading.
+- **Demote:** other open cards become one-line rows under "Next". Cards routed to someone else go behind a link.
+- **Agents at work:** the right column shows `activity[]`, filtered to `via` = routine, voice or supplier reply, as three to five lines. Routine lines open the flow view. The AutomateOffer appears in place of the card you just decided.
+- **Money:** any option with a `cost` keeps the human Approve button. Routine lines never show a price.
+
+## 5. Live-demo risks
+
+1. **Data contradicts the story.** The current screenshot shows Standard red at −18 min and Collector's on track. The brief says Collector's is the real risk and Standard has 9 h of slack. Check `launch.json` and the verifier before the demo. Because the timeline draws Collector's margin explicitly, a "fine" answer still looks fragile.
+2. **Clock drift.** Today is the launch Sunday. Always use the server's `state.now`. Deadlines that have passed show "passed" rather than disappearing, and the gutter keeps late arrivals visible even after 20:00.
+3. **The money shot.** Approve should visibly move the lane from hatched red to a blue bar with a finish tick. That needs `finishes_at` from the new `clock` field. Animate bar width over 400 ms.
+4. **Polling jitter.** Fixed lane heights, markers keyed by id, and no layout shift on the 5 s poll.
+5. **Projector.** Minimum font 13 px, and nothing important that only shows on hover: the breaks-first label and the gutter labels are always visible.
+6. **Stale indicator.** "Checked 8 h ago" undermines the demo. Before presenting, trigger a portal check or hide the indicator after 60 min.
+
+### Critical Files for Implementation
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/App.tsx
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/components/StatusStrip.tsx (gets replaced by the header sentence and countdown)
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/components/Rail.tsx
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/lib/api.ts (add `clock` to `State`)
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/api.py (`build_state`/`build_strip`) with /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/launch.py (`PackClock`)</result>
+<usage><subagent_tokens>51760</subagent_tokens><tool_uses>7</tool_uses><duration_ms>72823</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>a5e7b1c23ba1c2723</task-id>
+<tool-use-id>toolu_01X21PJfESyaHF3ev2Sq6j5f</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a5e7b1c23ba1c2723.output</output-file>
+<status>completed</status>
+<summary>Agent "Design B: triage-inbox first" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Design plan for the triage inbox. It is buildable in about 2 hours, mostly by rearranging components you already have.
+
+## 1. Wireframes
+
+**1440 px**
+```
++--------------------------------------------------------------------------------------------+
+| S Ask Soony  Launch Sun 20:00 · 7 h 12 m · Standard short 32,000 unless you decide 2 things.|
+|              Collector's on track.               [Inbox 6] [Routines 1] [Suppliers]  (bell) |
++---------------------------+----------------------------------------------------------------+
+| NEEDS YOU · 3        j/k  | Hwaseong Memory · Game Card 128 GB              Decide by Sun 10:00|
+| &gt; ■ 20,000 game cards     |                                                   in 6 h 7 m     |
+|     after launch   10:00  | 20,000 game cards arrive after launch, but SAP still counts them |
+|   ■ Art books 19,300,     | ---------------------------------------------------------------- |
+|     not 91,300     14:00  | SYSTEM SAYS            | DOCUMENT SAYS (Korean, translated)      |
+|   ■ Statues failed        | 48,000 due Sat 21 Nov  | 28,000 flown · 20,000 arrive Tue 24 Nov |
+|     inspection     16:00  | SAP PO row 227 [table] | [scan, highlight ring on 20,000]        |
+|   ■ PackRight sleeves     | ---------------------------------------------------------------- |
+|     rev B  ×4 like this   | WE RECOMMEND  Ask Boise to fly 20,000 cards for Sunday           |
+| WAITING ON OTHERS · 1     | ~USD 196k air freight · covers the gap if Boise has stock        |
+|   ○ ... with Head of Proc.| Or: Re-plan, give the 28,000 to Collector's first   No cost      |
+| HANDLED FOR YOU · 0       | [✓ Approve  A]  [Edit  E]  [Escalate  X]  [Talk it through  T]   |
+|   (routine runs appear)   | ---------------------------------------------------------------- |
+| WATCHING                  | Reply from Boise 11:42 · "Can ship 20k ex Chicago Sat"           |
+|   21 shipments, 6 supp.,  | History  ▸ 4 agent steps · last 09:58                            |
+|   checked 2 min ago       |                                                                  |
++---------------------------+----------------------------------------------------------------+
+   360 px fixed                flex, max-w ~880, scrolls on its own
+```
+
+**390 px**: list only. Tapping a row goes to the existing `/d/:id`, which gets the same detail pane stacked in this order: header, system vs document (two rows instead of two columns, document scan full width), recommendation, a sticky bottom bar with `[Approve]` and `[Talk]`. The header becomes `Launch in 7 h 12 m · Standard short 32,000` on one line.
+
+## 2. Header
+
+- It says one sentence, not two KPI boxes. "Launch Sun 20:00 · in 7 h 12 m. Standard is short 32,000 copies unless you decide 2 things. Collector's is on track." The sentence comes from `state.strip`. Red is used only on the short edition's words.
+- Navigation is three text tabs: Inbox (count), Routines (count), Suppliers. The Inbox count is the only badge.
+- The world map comes off the main screen and moves to the Suppliers tab, unchanged. It is a nice-to-look-at view, and the brief explicitly marks "every number on one screen" as weak. Inside a card, the route shows as text instead ("Sea, Busan to Hamburg, ETA Tue 24"). Drop `onHover` and the route highlighting.
+
+## 3. Detail pane, top to bottom
+
+1. **Identity line**: supplier and part on the left, "Decide by" plus countdown on the right. The big red number moves into the headline itself.
+2. **Headline**: one sentence, as today.
+3. **System vs document, inline**: export `Evidence` from `EvidenceDrawer.tsx` and render it directly in the pane as two columns: `Side` for the system on the left, `Side` for the paper on the right. The paper side already auto-opens its first anchor (the highlighted scan crop). That gives evidence without a drawer. "More evidence" stays collapsed in a `&lt;details&gt;`.
+4. **Recommendation block** with alternatives, then the action row. Each button shows its key hint.
+5. **Supplier reply**, when there is one. It gets a green "Reply" stripe and moves above History once it arrives.
+6. **History**: the agent trail as a collapsed `&lt;details&gt;`, with "4 agent steps · last 09:58" as the summary.
+7. **Automation offer**: after Approve, the pane does not jump straight to the next card. It shows "Done. 3 more like this from PackRight. Handle them the same way? Money and plan changes still come to you." with `[Show me the routine]` and `[Next decision  J]`. Accepting it runs the routine on the other 3, and they slide into Handled for you. That is the demo's climax.
+
+**Grouping**: group by `supplier_id + kind + part` (normalized headline as a fallback). A group renders as one row with a "×4 like this" chip. The detail shows the first card, plus a line "Same issue on POs …, …, …".
+
+## 4. Keyboard, speed, wording
+
+- `j`/`k` (and arrows) move the selection. `Enter` and `o` open the source full size.
+- `a` approves. On the first press the button becomes "Press Enter to approve: Ask Boise to fly… (~USD 196k)", and `Esc` cancels. After approving, the selection moves to the next card automatically.
+- `e`, `x` and `t` map to Edit, Escalate and Talk. `?` opens a small cheat sheet.
+- Implementation: `DecisionCard` takes an `active` prop and attaches the window keydown listener only when active. Ignore keys while focus is in an input or textarea.
+- Keep the selection by id across the 5-second polls. If the selected card disappears, select the next one.
+- **Empty states**:
+  - Needs you: "Nothing needs you. Agents are watching 21 shipments; last check 2 min ago." (reuse `Calm`)
+  - Handled: "Routines will handle repeats here. You'll see each one."
+  - Detail with nothing selected: "Pick a decision, or press J."
+- **Wording**:
+  - Use "Waiting on others", not "With others".
+  - Use "Handled for you", never "automated".
+  - The button says "Approve", never "Submit".
+  - Write the countdown as "in 6 h 7 m", not "−18 min slack". Negative slack becomes "18 min short".
+
+## 5. Cut, and demo risks
+
+**Cut**:
+- The map from the inbox, its legend and the Europe inset
+- The edition KPI boxes
+- The "Breaks first" column (it now lives in the header sentence)
+- The evidence drawer on desktop (keep it only as the mobile "Show full page")
+- The Activity feed (Handled for you replaces it)
+- The Dismiss menu (move it to the `#` key or drop it)
+
+**Risks**:
+1. **Slow anchors**: `useAnchors` fetches per card, so the scan arrives late. Prefetch anchors for the next card when the selection changes.
+2. **Grouping on demo data**: a brittle key could merge or split the 4 PackRight cards. Check the grouping on the real 7 demo cards before stage time.
+3. **Voice in the venue**: the mic permission and room noise are uncertain. Make Approve the fallback and rehearse "Talk" once on site.
+4. **Polling during keyboard confirm**: a 5-second poll mid-confirm must not reset the confirm state. Key the confirm state to the card id.
+5. **Projector width**: at 1280 px the two-column evidence gets cramped. Below `xl`, stack the columns.
+6. **Reset**: have a reset-demo-state endpoint or script ready so the PackRight routine moment can be replayed.
+
+**Build order**: App two-pane shell and selection state (30 min), inline Evidence (30 min), list rows, grouping and sections (30 min), header sentence and tabs (15 min), keyboard (15 min).
+
+### Critical Files for Implementation
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/App.tsx
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/components/Rail.tsx
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/components/DecisionCard.tsx
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/components/EvidenceDrawer.tsx
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/components/StatusStrip.tsx</result>
+<usage><subagent_tokens>57618</subagent_tokens><tool_uses>9</tool_uses><duration_ms>62743</duration_ms></usage>
+</task-notification>
+
+---
+
+"Your screenshot came through as a placeholder, so I can't see it; please describe it or resend. Meanwhile I'm committing the three builders' work, since all 181 tests pass and the server is restarted with the new routes. · summary" I didn'T send a screenshot?
+
+---
+
+is the cards or however we show that and the whole visual identity also being tackled?
+
+---
+
+And are we too close at the soony case / does ours generalize enough?
+
+---
+
+yeah, do this. or if it does not affect it in parallel
+
+---
+
+"After that come the visual-identity pass and the final review." do we have anything to look at for this? some design artifact or so?
+
+---
+
+yeah, or ask a subagent for that
+
+---
+
+<task-notification>
+<task-id>aa1c1309d0272cb89</task-id>
+<tool-use-id>toolu_01QQ2JN22TEFJ4R5dAeNLgsm</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/aa1c1309d0272cb89.output</output-file>
+<status>completed</status>
+<summary>Agent "Build launch timeline and backend clock" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>The Launch Timeline is built and the clock data is in `/api/state`. All 185 tests pass, lint is clean, and the typecheck and `npm run build` succeed. I did not commit anything.
+
+**One thing to decide before the demo:** the Standard lane will look completely stopped. With the agreed max rule, Standard's at-risk number comes from the open card "Game Card 128 GB: 34,800 short across 2 editions". 34,800 is just 153,200 needed minus 118,400 in stock. It appears to ignore the 28,000 Hwaseong cards that landed this weekend, so it is probably too high. At plan rate that says the line stopped **Sat 21:32 with 34,800 short**, so the whole Sunday Standard lane is red hatching. The numbers are consistent and come from the data, but the story rests on that one card's figure. Collector's tells the better story: **stops Sun 11:26 · 5,900 short**, with decide-by 10:00 on the art book marker and a 2 h margin otherwise. If 34,800 is wrong, the fix is in that card's output, not in the timeline.
+
+**Restart needed:** the live server on :8000 does not reload Python. Until someone restarts it (yours or the shell engineer's call), it serves no `clock` and the old strip numbers.
+
+**What changed in the data**
+- **Strip numbers now match the cards.** Copies at risk per edition is the largest "copies at risk" figure among that edition's open cards, or the verifier's edition total if that is higher. The rule is documented in `edition_copies_at_risk`.
+  - It is a max, not a sum: every box needs all its parts, so the scarcest part sets the loss.
+  - Cards counted in parts ("units short", like the sleeve cards) are left out.
+  - Live result: Standard 34,800 (was 32,000), Collector's 5,900 (was 0).
+- **The pack clock now uses the time each packed count was taken.** `launch_status.xlsx` is titled "Saturday 13:00", but the clock treated it as current. On Sunday morning that meant it assumed nothing was packed Saturday afternoon (Collector's −7 h spare). It now assumes packing at plan rate inside shifts since the count, which gives exactly the brief's Collector's 2.0 h spare.
+- **When a line stops:** the earliest "runs dry" on its cards, or the moment it has packed everything it has parts for. A stop in the past stays where it was; the old code moved it to "now", which would creep on every 5 s poll.
+- **New card fields:**
+  - `arrives_at`: taken from a finding's text ("arrive in Hamburg on Tue 24 Nov", giving 2026-11-24) or an explicit field. The Hwaseong card now sits in the "Too late" gutter with no ids hardcoded.
+  - `part_name`: a short name from `components.csv` ("Art Book", "Game Card 128 GB"), so labels never show part codes or long headlines.
+- **Fallback shifts:** the brief's shifts are used only when no plan states any.
+- **Test changed:** I changed one assertion in `tests/test_platform.py` (expected 250, now 300), because "never below an open card's figure" is the rule you agreed. `tests/test_clock.py` adds 4 new tests.
+
+**The clock contract**
+```
+clock: {
+  launch: ISO,                        // end of the last shift (Sun 20:00)
+  windows: [[start, end], ...],       // shifts from the start of today until launch
+  editions: [{ edition, label, level, finishes_at, stops_at, copies_at_risk, slack_hours,
+               remaining, rate_per_hour, packed_as_of, short_of_time, breaks_first_card }]
+}
+```
+Strip items also gained `finishes_at`, `stops_at`, `remaining`, `rate_per_hour`, `packed_as_of` and `short_of_time`. Strip and clock come from the same calculation, so they always agree.
+
+**What the timeline shows**
+- **Scale:** shift hours at full width, nights at a quarter width in grey marked "no shift". There is a thick ink "Trucks 20:00" line and a "Too late" gutter past it. The past is faded, but labels and markers stay crisp, so overdue decisions stay readable.
+- **Edition lanes:** a bar only inside shifts. A stopping line gets red hatching to the truck line and "stops Sun 11:26 · 5,900 short"; otherwise "makes the trucks · N h spare".
+- **Markers:** ◆ for decide-by (red if under 3 h away) and ▼ for runs dry. Markers on the same spot merge with a count badge; clicking cycles through the merged cards.
+- **Always-visible labels:** only the breaks-first marker ("Decide by 10:00 · Art Book") and the gutter items. Everything else has a one-line tooltip.
+- **Gutter:** "Tue 24 Nov / 20,000 Game Card 128 GB" in red, clickable.
+- **Inbound lane:** shipment ETAs, silent ones hollow grey.
+- **Two choices that differ from the spec:**
+  - The other 19 shipments due after launch are not tied to any card. They show as a grey "+19 later, not on a card" instead of 19 red dots, which would have drowned out the real case.
+  - 5 or 6 shipments whose ETA already passed (not received) appear as a count under "Inbound" with a tooltip.
+- **Sizes:** full is 196 px tall. Compact is 120 px: day labels only, 32 px tap targets, shortened wording. Selection draws a blue ring, everything is keyed by id, and the height is fixed so there is no layout shift.
+
+**Screenshots** are in `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/timeline/`, rendered from real state through a standalone harness there, at the current time, at demo time (Sun 14:00) and at Saturday 15:00:
+- `full-now.png`
+- `full-14.png` (with a card selected)
+- `full-sat.png`
+- `compact-14.png`
+- `compact-sat.png`
+
+Files changed:
+- `src/ask_soony/launch.py`
+- `src/ask_soony/api.py`
+- `web/src/lib/api.ts` (types only)
+- `web/src/components/LaunchTimeline.tsx`
+- `tests/test_clock.py` (new)
+- `tests/test_platform.py` (one assertion)</result>
+<usage><subagent_tokens>197927</subagent_tokens><tool_uses>50</tool_uses><duration_ms>795655</duration_ms></usage>
+</task-notification>
+
+---
+
+I think this does not look professional tbh (the design proposal)
+
+---
+
+"❯ I think this does not look professional tbh (the design proposal)" mostly the issue is also the overall design. And can't you do a design artifact or only from claude desktop?
+
+---
+
+<task-notification>
+<task-id>a546ddcc440dfeb86</task-id>
+<tool-use-id>toolu_01DtoJN5hooVdPCuzuNjZ1nB</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a546ddcc440dfeb86.output</output-file>
+<status>completed</status>
+<summary>Agent "Rebuild app shell: header, two panes" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I've rebuilt the main screen. It type-checks and builds cleanly, and the live server on :8000 is now serving it. Nothing is committed or pushed. No real card was approved, escalated or dismissed: the screenshot script blocks those calls and fakes decided states by rewriting `/api/state` in the browser.
+
+I checked it with headless Chrome at 1440x900 and 390x844 on the live data. Pressing Enter after `a` was not tested end to end, because it would act on a real card.
+
+**What the screen does now**
+- **Header:** one row with "Ask Soony · Watching · checked 8 h ago", one sentence built from the worst edition, the "Trucks in 15 h 46 min" countdown (from the timeline engineer's `state.clock.launch`), tabs for Launch, Routines and Suppliers, and the alerts bell. Only the failing edition's words are red. The Routines button and sheet are unchanged; CSS makes the button look like a tab.
+- **Launch view:** the `LaunchTimeline` is mounted with the agreed interface. Below it there are two panes:
+  - **Left list (372 px):** "Needs you", "Waiting on others", "Handled for you" (in a new purple `--color-routine`, "By routine · name"), a collapsed "Decided by you", and a "Watching 25 shipments…" line. The four PackRight sleeve cards collapse into one row with a "×4 like this" chip that expands. Their detail says "Same issue on PO 4500318774, 4500318765 and 4500318786."
+  - **Right pane:** "THE SYSTEM SAYS" against "THE DOCUMENT SAYS (KOREAN, P. 1)" with numbers up to 48 px. The document opens inline with its highlights, and you can switch to the SAP row. "More evidence" and "How we know" are folded. Then the recommendation, the alternatives and the supplier reply.
+  - **Action bar:** it stays at the bottom of the pane while you scroll: Approve, Talk it through, Edit, Escalate, and ⋯ for Dismiss. When the recommendation has scrolled out of view, the bar repeats it in one line.
+- **Keyboard:** `j`/`k` and the arrow keys move the selection. `a` shows "Press Enter to approve: … (cost)" and Esc cancels. Keys are ignored while typing in a field.
+- **Selection:** it survives the 5-second polls. Clicking a timeline marker selects that card and opens its group.
+- **After a decision:**
+  - If a routine made it, or a routine already covers the card, the selection moves on to the next card.
+  - Otherwise the pane shows the offer in place: "Done. 3 more like this from Guangzhou PackRight. Handle them the same way?" with [Show me the routine] and [Next decision].
+- **Phone:** a compact header with logo, countdown, a menu for the tabs, and the bell. Then the sentence, the compact timeline and the list. Tapping a row opens `/d/&lt;id&gt;` with the same detail pane and a bottom bar with Approve, Talk and ⋯ (Edit, Escalate and Dismiss are in ⋯). The incoming-call state from `?talk=1` still works, and "Show all evidence" opens the existing evidence drawer.
+- **Suppliers tab:** the map is unchanged, with its legend. The KPI tiles, "Breaks first" column, legend on the main screen and the activity feed are gone.
+
+**Open issues**
+1. **The header sentence can be wrong on live data.** The backend reports Standard stopping at Sat 21:32, which is before now (Sun 04:00). The sentence becomes "Standard stopped Sat 21:32 … unless you decide 3 things by 10:00", which doesn't make sense. Worth checking with the timeline engineer.
+2. **The header sentence wraps to two lines at 1440 px** with the current wording (both editions failing). It still fits the 64 px header.
+3. **Headlines are cut after two lines in the list**, for example "…cell runs…", as the design asked. The full headline is in the pane.
+4. **The big document number isn't always the one that matters.** The slab shows the first number in the document's value. For Hwaseong that is "28,000 flown", while the 20,000 arriving late sits in the line below. The cleaner fix is in the backend's evidence `value` text.
+5. **The source buttons use the file name with underscores replaced by spaces**, which can wrap onto a second line.
+6. **During a live voice call, the transcript appears inside the action bar** at full width, up to about 14 lines.
+
+**Files** (all under `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/`)
+- New: `components/Header.tsx`, `components/DecisionList.tsx`, `components/DecisionPane.tsx`, `lib/decisions.ts` (sections, grouping, the sentence, countdown, evidence split).
+- Rewritten: `App.tsx`.
+- Edited:
+  - `components/EvidenceDrawer.tsx`: exports `Side`, `EvidenceItem` and `Trail`, and fixes a React hook-order bug in `Evidence`.
+  - `index.css`: `--color-routine`, `--color-good`, and the Routines-as-tab styling.
+- Deleted: `Rail.tsx`, `DecisionCard.tsx`, `StatusStrip.tsx` (nothing else imported them).
+- Not touched: `LaunchTimeline.tsx`, `api.ts`, Python, Routines, `VoiceCall.tsx`, the internals of `SourceAnchors.tsx`.
+
+**Screenshots** are in `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/shell/shots/`; the script that makes them is `shoot.py` in the folder above.
+- `desk.png`
+- `desk-group.png`
+- `desk-confirm.png`
+- `desk-decided.png` (faked decided state with the offer)
+- `desk-suppliers.png`
+- `phone.png` / `phone-full.png`
+- `phone-detail.png`
+- `phone-ringing.png`</result>
+<usage><subagent_tokens>215048</subagent_tokens><tool_uses>64</tool_uses><duration_ms>859132</duration_ms></usage>
+</task-notification>

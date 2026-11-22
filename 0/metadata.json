@@ -1,0 +1,191 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M80M1DZY8SRFRC3MAJ19EJ8Y",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T03:16:05.202277Z",
+  "branch": "jonas/alert-platform",
+  "checkpoints_count": 6,
+  "save_step_count": 1,
+  "files_touched": [
+    "web/src/App.tsx",
+    "web/src/components/DecisionCard.tsx",
+    "web/src/components/DecisionList.tsx",
+    "web/src/components/DecisionPane.tsx",
+    "web/src/components/EvidenceDrawer.tsx",
+    "web/src/components/Header.tsx",
+    "web/src/components/Rail.tsx",
+    "web/src/components/StatusStrip.tsx",
+    "web/src/index.css",
+    "web/src/lib/decisions.ts"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "b6651f131236",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 2,
+    "cache_creation_tokens": 224,
+    "cache_read_tokens": 719631,
+    "output_tokens": 888,
+    "api_call_count": 1,
+    "subagent_tokens": {
+      "input_tokens": 6,
+      "cache_creation_tokens": 31967,
+      "cache_read_tokens": 457694,
+      "output_tokens": 21363,
+      "api_call_count": 3
+    },
+    "subagent_tokens_complete": true
+  },
+  "session_token_usage": {
+    "input_tokens": 1845,
+    "cache_creation_tokens": 2167239,
+    "cache_read_tokens": 386076456,
+    "output_tokens": 804096,
+    "api_call_count": 784,
+    "subagent_tokens": {
+      "input_tokens": 782,
+      "cache_creation_tokens": 2450193,
+      "cache_read_tokens": 37542393,
+      "output_tokens": 519178,
+      "api_call_count": 375
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 1280,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 63,
+      "credentialed_uri": 0,
+      "entropy": 300,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 893,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 796,
+      "IP": 32,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 182
+  },
+  "summary": {
+    "intent": "Win the Lio 'Keep the Line Running' hackathon challenge for the Soony launch by analysing the confidential data drops, then building a general agent product (poller, extraction, recheck-and-act, routines) with a polished UI and pitch material.",
+    "outcome": "Found that the Soony plan's all-ok status hides real shortfalls (art books overbooked by 72,000, 5,600 failed statues, short game card shipment, sleeve revision conflict). Built the polling, anchoring, routines, voice and timeline pieces plus a redesigned main view; the paper check agent and visual identity are still in progress.",
+    "learnings": {
+      "repo": [
+        "Confidential portal data lives in the gitignored data/ folder (raw/, drops/, img/, notes/); .env holds SOONY_PORTAL_TOKEN and .env.example is committed with an empty token.",
+        "Portal API has only three endpoints (files list, single file, archive.zip) and no webhooks; the documented approach is to poll the list and compare SHA-256, because files are replaced under the same name.",
+        "The team workflow uses CLAUDE.md and PROGRESS.md; work is claimed via a 'Now' line in PROGRESS.md, and work happens on branch jonas/alert-platform (PR #5).",
+        "The challenge forbids hardcoding and overfitting; scripts/demo_cards.py originally fixed which document contradicts which PO, which is an attack surface, so a generic papercheck.py module replaces it.",
+        "Routine actions must be restricted by type: only communication options may run automatically; re-plans, allocations and orders are never automatic. Relying on the cost text ('none') was a safety gap in _costs_money in routines.py.",
+        "Routines are now structured recipes (conditions, steps, fixed brake) compiled to sandboxed code (Monty), which allows automatic flow visualisation.",
+        "The Python server on :8000 does not hot-reload and must be restarted to serve new clock and state data.",
+        "The pack clock must use the time each packed count was taken, not the file title, otherwise the slack is wrong; edition at-risk is the max over cards, not the sum."
+      ],
+      "code": [
+        {
+          "path": "src/ask_soony/routines.py",
+          "finding": "_costs_money treated an option as free when its cost text was empty or 'none', letting a routine carry out allocation decisions; fixed by restricting to communication option types."
+        },
+        {
+          "path": "src/ask_soony/launch.py",
+          "finding": "edition_copies_at_risk takes the maximum of an edition's card figures, and the clock uses packed_as_of timestamps; the 34,800 Standard figure likely ignores the 28,000 Hwaseong cards."
+        },
+        {
+          "path": "scripts/demo_cards.py",
+          "finding": "Reads quantities live from the portal but hardcoded document references; supports --reset, which backs up state files and switches routines off."
+        }
+      ],
+      "workflow": [
+        "Entire only writes a checkpoint when repo files change; the hook log shows turns skipped with 'no files modified'.",
+        "Running independent expert and builder subagents in parallel with separate file ownership worked well, though a concurrent edit once caused a transient test failure.",
+        "A subagent cross-check of all order confirmations and scans against SAP surfaced discrepancies that a first pass missed.",
+        "Poll the portal regularly: five new files arrived within 40 minutes of the first download and changed the risk picture."
+      ]
+    },
+    "friction": [
+      "The team token was initially empty, which blocked data access with 401 until the user supplied it.",
+      "A style-guide page was judged unprofessional by the user, requiring a rework toward a high-fidelity Design artifact.",
+      "The timeline shows too much red because of a questionable 34,800 Standard figure.",
+      "Dashboard contradictions (header vs cards, duplicate Hwaseong cards, raw part codes) undermined the demo.",
+      "The live server did not reload Python, so new clock data did not appear until a restart.",
+      "The user was confused by an image-size note that I misread as a user message."
+    ],
+    "open_items": [
+      "Finish and verify the generic paper check agent, and make sure it re-finds the Hwaseong, PackRight, statue and art book cases on its own.",
+      "Verify or correct the 34,800 Standard shortfall at its source before the timeline declares the line stopped.",
+      "Run the visual-identity pass (and choose between identity A and B) across all screens, Routines panel, /d/<id>, login, phone, PWA icon and Teams card.",
+      "Wire the UI to show activity[].via and read GET /api/routines/drafts in Routines.tsx and api.ts.",
+      "Push 13+ commits on jonas/alert-platform into PR #5 once the user approves.",
+      "Register sender email addresses in the portal Settings and send the Karton Nowak art-book order (24h offer) and the Boise reply through the product.",
+      "Make the launch deadline, editions and capacity configurable instead of Soony-specific, and align with Akshat before replacing the world map main view.",
+      "Decide whether to delete the earlier Claude doc, and update the briefing page with the 14:37 drop.",
+      "Run scripts/demo_cards.py --reset shortly before the demo so deadlines are not overdue."
+    ]
+  }
+}
