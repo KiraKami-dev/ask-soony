@@ -3,11 +3,15 @@
   "checkpoint_id": "4a189597549e",
   "strategy": "manual-commit",
   "branch": "image-plugin-pipeline",
-  "checkpoints_count": 1,
+  "checkpoints_count": 20,
   "files_touched": [
     "src/ask_soony/dispatch/__init__.py",
     "src/ask_soony/verifier/image_recognizer/README.md",
     "src/ask_soony/verifier/image_recognizer/gate.py",
+    "src/ask_soony/verifier/image_recognizer/live.py",
+    "src/ask_soony/verifier/image_recognizer/run.py",
+    "src/ask_soony/verifier/image_recognizer/tests/test_golden.py",
+    "src/ask_soony/verifier/image_recognizer/tests/test_live.py",
     "tests/conftest.py"
   ],
   "sessions": [
@@ -18,34 +22,42 @@
       "content_hash": "/4a/189597549e/0/content_hash.txt",
       "prompt": "/4a/189597549e/0/prompt.txt",
       "assets_manifest": "/4a/189597549e/0/assets/manifest.json"
+    },
+    {
+      "metadata": "/4a/189597549e/1/metadata.json",
+      "transcript": "/4a/189597549e/1/full.jsonl",
+      "compact_transcript": "/4a/189597549e/1/transcript.jsonl",
+      "content_hash": "/4a/189597549e/1/content_hash.txt",
+      "prompt": "/4a/189597549e/1/prompt.txt",
+      "assets_manifest": "/4a/189597549e/1/assets/manifest.json"
     }
   ],
   "token_usage": {
-    "input_tokens": 12,
-    "cache_creation_tokens": 50013,
-    "cache_read_tokens": 391471,
-    "output_tokens": 3796,
-    "api_call_count": 6
+    "input_tokens": 1156,
+    "cache_creation_tokens": 1035540,
+    "cache_read_tokens": 159383909,
+    "output_tokens": 489647,
+    "api_call_count": 477
   },
   "redaction": {
-    "replacements": 50,
+    "replacements": 88836,
     "layers": {
       "betterleaks": 0,
       "connection_string": 0,
       "credential_key": 0,
-      "credential_value": 0,
+      "credential_value": 21,
       "credentialed_uri": 0,
-      "entropy": 20,
+      "entropy": 88659,
       "goredact": 0,
-      "key_context": 16,
-      "pii": 14,
+      "key_context": 114,
+      "pii": 42,
       "provider_token": 0,
       "shell_stdin": 0
     },
     "pii": {
-      "EMAIL": 14,
+      "EMAIL": 40,
       "IP": 0,
-      "PHONE": 0
+      "PHONE": 2
     }
   }
 }
