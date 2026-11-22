@@ -515,7 +515,7 @@ export function Link({ across, dashed }: { across?: boolean; dashed?: boolean })
     <div className="ml-[24px] flex h-7 w-[9px] flex-col items-center">
       <span className={cn(port, '-mt-[4px]')} />
       <span className={cn('w-0 flex-1 border-l', line)} />
-      <svg width="9" height="5" viewBox="0 0 9 5" className="-mb-px block text-ink-3/55"><path d="M1 0.5 L4.5 4.5 L8 0.5" {...stroke} /></svg>
+      <svg width="9" height="5" viewBox="0 0 9 5" className="mb-px block text-ink-3/55"><path d="M1 0.5 L4.5 4.5 L8 0.5" {...stroke} /></svg>
     </div>
   )
   if (!across) return <div aria-hidden className="shrink-0">{down}</div>
@@ -525,7 +525,7 @@ export function Link({ across, dashed }: { across?: boolean; dashed?: boolean })
       <div className="mt-[23px] hidden h-[9px] w-12 items-center lg:flex">
         <span className={cn(port, '-ml-[4px]')} />
         <span className={cn('h-0 flex-1 border-t', line)} />
-        <svg width="5" height="9" viewBox="0 0 5 9" className="-mr-px block text-ink-3/55"><path d="M0.5 1 L4.5 4.5 L0.5 8" {...stroke} /></svg>
+        <svg width="5" height="9" viewBox="0 0 5 9" className="mr-px block text-ink-3/55"><path d="M0.5 1 L4.5 4.5 L0.5 8" {...stroke} /></svg>
       </div>
     </div>
   )
