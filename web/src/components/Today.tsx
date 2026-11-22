@@ -13,6 +13,7 @@ import {
   actionText, claimOf, costLine, costsMoney, docKind, forToday, headlineOf, launchStatus, ordinal, plural,
   recommendedIndex, routineCount, shortName, shortTitle, summaryLine, type Claim,
 } from '@/lib/today'
+import { resendSignoff, sentSub, signoffLine, signoffOpen } from '@/lib/signoff'
 import { cn } from '@/lib/utils'
 
 // The Sunday flow: one decision at a time, the source one tap away, then "Done" and what's next.
@@ -307,10 +308,16 @@ function CaseGroups({
   const groups: { key: GroupKey; title: string; n: number; routine?: boolean; rows: ReactNode }[] = [
     {
       key: 'waiting', title: 'Waiting on others', n: sec.waiting.length,
-      rows: sec.waiting.map((c) => (
-        <CaseRow key={c.id} {...row} card={c} title={shortTitle(c, state)} dot="hollow"
-          sub={[`${c.status === 'escalated' ? 'Waiting for' : 'With'} ${firstWord(c.approver) || 'the approver'}`, c.ui?.at ? `since ${when(c.ui.at, nowMs)}` : '']} />
-      )),
+      rows: sec.waiting.map((c) => {
+        // Where the sign-off link went (or that it reached nobody); Send again while it waits.
+        const reached = signoffLine(c, nowMs)
+        const again = c.status === 'escalated' && (signoffOpen(c) || !c.signoff_request)
+        return (
+          <CaseRow key={c.id} {...row} card={c} title={shortTitle(c, state)} dot="hollow"
+            sub={reached ? [reached] : [`${c.status === 'escalated' ? 'Waiting for' : 'With'} ${firstWord(c.approver) || 'the approver'}`, c.ui?.at ? `since ${when(c.ui.at, nowMs)}` : '']}
+            undo={again ? <SendAgain cardId={c.id} onSent={onChanged} /> : null} />
+        )
+      }),
     },
     {
       key: 'handled', title: 'Handled for you', n: sec.handled.length, routine: true,
@@ -323,7 +330,7 @@ function CaseGroups({
         const undo = c.status !== 'sent' ? actionIdOf(state.activity.find((x) => x.card === c.id)) : null
         return (
           <CaseRow key={c.id} {...row} card={c} title={shortTitle(c, state)} dot="quiet"
-            sub={[DONE_WORD[c.status] ?? 'Done', c.ui?.at ? when(c.ui.at, nowMs) : '']}
+            sub={signoffLine(c, nowMs) && c.signoff_request?.kind === 'escalation' ? [signoffLine(c, nowMs)!] : [DONE_WORD[c.status] ?? 'Done', c.ui?.at ? when(c.ui.at, nowMs) : '', signoffLine(c, nowMs) ?? '']}
             undo={undo ? <UndoAction actionId={undo} onUndone={onChanged} /> : null} />
         )
       }),
@@ -356,6 +363,20 @@ function CaseGroups({
 type CaseRowBase = { nowMs: number; activeId: string | null; onOpen: (id: string) => void }
 
 /** One quiet case line: dot, title, where it stands; a div with role=button so it can hold Undo. */
+/** A quiet link on a waiting row: a fresh sign-off link to the approver (never sent on its own). */
+function SendAgain({ cardId, onSent }: { cardId: string; onSent: () => void }) {
+  const [state, setState] = useState<'idle' | 'busy' | 'failed'>('idle')
+  const go = async () => {
+    setState('busy')
+    try { await resendSignoff(cardId); setState('idle'); onSent() } catch { setState('failed') }
+  }
+  return (
+    <button onClick={() => void go()} disabled={state === 'busy'} className="uline cursor-pointer text-ink-3 hover:text-ink disabled:opacity-60">
+      {state === 'busy' ? 'Sending…' : state === 'failed' ? 'Did not go out, try again' : 'Send again'}
+    </button>
+  )
+}
+
 function CaseRow({
   card, title, dot, sub, undo, routine, activeId, onOpen,
 }: CaseRowBase & { card: Card; title: string; dot: 'hollow' | 'quiet' | 'routine'; sub: string[]; undo?: ReactNode; routine?: string }) {
@@ -475,7 +496,7 @@ function Focus(p: Props & {
             ...(head.cc.length ? { cc: head.cc } : {}),
           }
         : {}
-      const r = await post<{ action?: { id?: string; status?: string; to?: string } }>(
+      const r = await post<{ action?: { id?: string; status?: string; to?: string; channels?: string[] } }>(
         `/api/cards/${encodeURIComponent(card.id)}/approve`,
         { option: sel, ...(edited ? { text } : {}), ...changes, ...(force ? { force: true } : {}) },
       )
@@ -486,7 +507,7 @@ function Focus(p: Props & {
         ? `Sent to ${opt.to} at ${at}. Their answer replaces the system's number.`
         : sent
         ? `Sent to ${head?.to && head.to !== opt?.to ? head.to : shortName(card.supplier_name) || opt?.to}${head?.cc.length ? `, copy to ${head.cc.length}` : ''} at ${at}. You'll see the reply here.`
-        : opt?.channel === 'notify' && opt.to ? `${opt.to} has it now.` : 'Recorded.'
+        : opt?.channel === 'notify' && opt.to ? sentSub(opt.to, r.action?.channels) : 'Recorded.'
       // A sent email cannot be undone, so no Undo is offered for it.
       return { text: doneFrom(card, sel, status), sub, actionId: sent ? null : r.action?.id ?? null }
     })
@@ -523,10 +544,10 @@ function Focus(p: Props & {
   const voicePrepared = !!prepared && !p.doneText
   const emailPrepared = voicePrepared && prepared!.decision === 'approve' && emails && sel === prepared!.option_index
   const signer = card.signoff ? firstWord(card.signoff) : ''
-  const escalate = (text: string = note) =>
+  const escalate = (text: string = note, option?: number) =>
     act(async () => {
-      const r = await post<{ id?: string }>(`/api/cards/${encodeURIComponent(card.id)}/escalate`, { note: text })
-      return { text: `Passed on to ${card.approver || 'the approver'}.`, sub: 'You will see their answer here.', actionId: r?.id ?? null }
+      const r = await post<{ id?: string; channels?: string[] }>(`/api/cards/${encodeURIComponent(card.id)}/escalate`, { note: text, ...(option != null ? { option } : {}) })
+      return { text: `Passed on to ${card.approver || 'the approver'}.`, sub: sentSub(signer || firstWord(card.approver ?? '') || 'the approver', r?.channels), actionId: r?.id ?? null }
     })
   const dismiss = () =>
     act(async () => {
@@ -536,7 +557,7 @@ function Focus(p: Props & {
   // Above the viewer's limit: the primary step is asking the person who signs, with our recommendation.
   const askSigner = () => {
     const o = choice.kind === 'option' ? card.options[choice.i] : null
-    void escalate([o ? `Please approve: ${o.action}${o.cost ? ` (${o.cost})` : ''}.` : '', note].filter(Boolean).join(' '))
+    void escalate([o ? `Please approve: ${o.action}${o.cost ? ` (${o.cost})` : ''}.` : '', note].filter(Boolean).join(' '), choice.kind === 'option' ? choice.i : undefined)
   }
   const onApprove = () =>
     signer && choice.kind === 'option' ? askSigner() : emails ? openReview() : money ? setConfirm(true) : void approve()
@@ -648,6 +669,9 @@ function Focus(p: Props & {
     <article className="rise" aria-label={headlineOf(card, state)}>
       <p className="t-small mb-4 text-ink-3">{meta}</p>
       <h1 className="t-big text-ink">{headlineOf(card, state)}</h1>
+      {card.signoff_request?.answer?.decision === 'declined' && (
+        <p className="t-body mt-4 text-ink" role="status">{signoffLine(card, nowMs)}. It is back with you.</p>
+      )}
 
       <p className="t-body mt-6 text-ink-2">
         {claim ? (
@@ -1342,6 +1366,8 @@ function CaseView({ card, state, nowMs, onChanged, onDrawer }: { card: Card; sta
   const facts = replyFacts(card)
   const who = (card.approver ?? '').split(' ').find((w) => !w.endsWith('.')) || 'the approver'
   const at = card.ui?.at ? ` at ${when(card.ui.at, nowMs)}` : ''
+  // Approved by the person it was passed on to, through their sign-off link.
+  const signed = card.signoff_request?.kind === 'escalation' && card.signoff_request.answer?.decision === 'approved'
   return (
     <article className="rise" aria-label={headlineOf(card, state)}>
       <p className="t-small mb-4 text-ink-3">{card.supplier_name || card.part_name || 'Soony'}</p>
@@ -1349,12 +1375,18 @@ function CaseView({ card, state, nowMs, onChanged, onDrawer }: { card: Card; sta
 
       <p className="t-body mt-6 flex flex-wrap items-baseline gap-x-2 text-ink-2">
         {waiting ? (
-          <span className="text-ink">Waiting for {who}{card.ui?.at ? ` since ${when(card.ui.at, nowMs)}` : ''}.</span>
+          <span className="text-ink">
+            Waiting for {who}{card.ui?.at ? ` since ${when(card.ui.at, nowMs)}` : ''}.
+            {signoffLine(card, nowMs) && <span className="text-ink-2"> {signoffLine(card, nowMs)}.</span>}
+            {(signoffOpen(card) || !card.signoff_request) && <> <SendAgain cardId={card.id} onSent={onChanged} /></>}
+          </span>
         ) : (
           <>
             <Check size={17} strokeWidth={1.75} className="translate-y-0.5 self-center text-ink" aria-hidden="true" />
             <span className="text-ink">{DONE_WORD[card.status] ?? 'Done'}{at}.</span>
-            {routine ? <span className="t-small dot-routine text-routine">By your routine ‘{routine}’</span> : <span className="t-small text-ink-3">By you</span>}
+            {routine ? <span className="t-small dot-routine text-routine">By your routine ‘{routine}’</span>
+              : signed ? <span className="t-small text-ink-3">{signoffLine(card, nowMs)}</span>
+              : <span className="t-small text-ink-3">By you{card.signoff_request ? ` · ${signoffLine(card, nowMs)}` : ''}</span>}
           </>
         )}
         {undo && <UndoAction actionId={undo} onUndone={onChanged} />}

@@ -32,7 +32,7 @@ from fastapi import Body, FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from ask_soony import commitments, floor, launch_view, supplier_master, tracking
+from ask_soony import commitments, floor, launch_view, signoff, supplier_master, tracking
 from ask_soony import launch as launch_clock
 from ask_soony.launch import PackClock
 
@@ -1430,6 +1430,7 @@ def build_state() -> dict:
         cards.sort(key=rank_key)
         open_cards = [c for c in cards if c["status"] == "open"]
         inbox = [c for c in open_cards if not c["routed_to_other"]]
+    signoff.attach(cards)  # who a passed-on case or internal message reached, and their answer
     return {
         "now": cur.isoformat(),
         "viewer": viewer_name(root),
@@ -1549,6 +1550,13 @@ def approve(card_id: str, body: dict = Body(default_factory=dict)) -> dict:
         cc=cc if isinstance(cc, list) else [cc],
     )
     status = "sent" if sent else "approved"
+    # An internal message (channel "notify") reaches its person through a sign-off link.
+    reached = None
+    if not sent and opt.get("channel") == "notify":
+        from ask_soony import signoff
+
+        asker = body.get("by") or viewer_name(portal_root())
+        reached = signoff.notify(card, opt, body.get("text"), asker)
     action = _record(
         card_id,
         status,
@@ -1567,6 +1575,12 @@ def approve(card_id: str, body: dict = Body(default_factory=dict)) -> dict:
             "status": status,
             "action_type": opt.get("routine_type"),
             "via": body.get("via") or "inbox",
+            **({"by": body["by"]} if body.get("by") else {}),
+            **(
+                {"channels": reached["channels"], "signoff_request": reached["request"]}
+                if reached
+                else {}
+            ),
             **({"message_id": sent["message_id"], "subject": sent["subject"]} if sent else {}),
             **(
                 {"link": sent["link"], "channels": sent["channels"]}
@@ -1585,12 +1599,15 @@ def approve(card_id: str, body: dict = Body(default_factory=dict)) -> dict:
 
 @app.post("/api/cards/{card_id}/escalate")
 def escalate(card_id: str, body: dict = Body(default_factory=dict)) -> dict:
+    from ask_soony import signoff
+
     card = _card(card_id)
     note = (body.get("note") or "").strip()
-    brief = card["escalation_brief"] + (
-        f" Note from {first_name(build_state()['viewer'])}: {note}" if note else ""
-    )
-    return _record(
+    viewer = viewer_name(portal_root())
+    brief = card["escalation_brief"] + (f" Note from {first_name(viewer)}: {note}" if note else "")
+    # The approver gets a link to approve or decline (push, Teams); channels [] = reached nobody.
+    reached = signoff.escalation(card, body.get("option"), note, viewer)
+    action = _record(
         card_id,
         "escalated",
         {
@@ -1598,10 +1615,19 @@ def escalate(card_id: str, body: dict = Body(default_factory=dict)) -> dict:
             "to": card.get("approver"),
             "brief": brief,
             "note": note,
+            **({"option": body["option"]} if isinstance(body.get("option"), int) else {}),
             "status": "requested",
             "via": body.get("via") or "inbox",
+            **(
+                {"channels": reached["channels"], "signoff_request": reached["request"]}
+                if reached
+                else {}
+            ),
         },
     )
+    if reached:
+        signoff.start_simulation(reached["request"])
+    return action
 
 
 @app.post("/api/cards/{card_id}/dismiss")
@@ -1684,6 +1710,7 @@ for _router in (
     routines.router,
     datacheck.router,
     floor.router,
+    signoff.router,
 ):
     app.include_router(_router)
 _GLOBE_ROUTES = {"/api/feed", "/api/network", "/api/mode", "/api/cards/{card_id}/action"}

@@ -75,6 +75,27 @@ export interface Card {
   /** Where the order this case placed stands: 'Ordered 06:50 · Karton confirmed 8,000 at 07:13 · truck details pending'. */
   commitment_line?: string | null
   commitments?: string[]
+  /** The sign-off link behind a passed-on case or an internal message: who it reached, their answer. */
+  signoff_request?: SignoffRequest | null
+}
+
+export interface SignoffAnswer {
+  decision: 'approved' | 'declined' | 'done'
+  by: string; at: string; note?: string | null; simulated?: boolean; status?: string
+}
+export interface SignoffRequest {
+  id: string
+  kind: 'escalation' | 'notify'
+  /** 'Dr. Maren Vogt', 'DC site lead' */
+  to: string
+  /** 'Maren', 'DC site lead' */
+  who: string
+  asked_at: string | null
+  sent_at: string | null
+  channels: ('push' | 'teams')[]
+  delivered: boolean
+  answer: SignoffAnswer | null
+  acks: { answer: 'got_it' | 'done'; by: string; at: string }[]
 }
 
 export type SiteKind = 'packed' | 'received' | 'count'

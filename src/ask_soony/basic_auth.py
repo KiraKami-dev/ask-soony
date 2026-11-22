@@ -94,6 +94,13 @@ class BasicAuth(BaseHTTPMiddleware):
             if floor.public_path(path):
                 return await call_next(request)
             return Response("This link is not valid any more.", status_code=404)
+        # The sign-off page for an approver or an internal recipient: same rule, its own links.
+        if path.startswith("/ok/") or path.startswith("/api/ok/"):
+            from ask_soony import signoff
+
+            if signoff.public_path(path):
+                return await call_next(request)
+            return Response("This link is not valid any more.", status_code=404)
         if path.startswith("/assets/"):
             return await call_next(request)
 
