@@ -7,7 +7,7 @@ import { pendingOf, undoAction, useLive } from '@/components/routines/live'
 import { UndoAction } from '@/components/routines/Undo'
 import { ProposalLines, ProposalSheet, RoutineLine, WouldLine, groupProposals } from '@/components/routines/Proposals'
 import type { Proposal } from '@/components/routines/types'
-import { DONE_WORD, post, sentence, tidy, type Card, type Evidence, type State } from '@/lib/api'
+import { DONE_WORD, fmtNum, fmtTime, post, sentence, tidy, type Card, type Evidence, type State } from '@/lib/api'
 import { actionIdOf, languageOf, replyFacts, routineActionOf, routineOf, sections, splitValue, when, type Handled } from '@/lib/decisions'
 import {
   actionText, claimOf, costLine, costsMoney, docKind, forToday, headlineOf, launchStatus, ordinal, plural,
@@ -173,7 +173,7 @@ function QuietList({ order, card, onFocus, state, nowMs }: Props) {
   // One line per problem: look-alikes fold into their first card.
   const seen = new Map<string, { c: Card; n: number }>()
   for (const c of order) {
-    const k = `${c.supplier_id ?? c.supplier_name}|${c.kind}|${shortTitle(c, state).replace(/\d[\d,.]*/g, '#')}`
+    const k = c.group ?? `${c.supplier_id ?? c.supplier_name}|${c.kind}|${shortTitle(c, state).replace(/\d[\d,.]*/g, '#')}`
     const e = seen.get(k)
     if (e) e.n += 1
     else seen.set(k, { c, n: 1 })
@@ -200,6 +200,7 @@ function QuietList({ order, card, onFocus, state, nowMs }: Props) {
                 <i className={cn('h-[7px] w-[7px] -translate-y-px rounded-full', on ? 'bg-accent' : 'bg-ink-3')} />
                 <span className="min-w-0">
                   <span className="line-clamp-2">{shortTitle(c, state)}</span>
+                  {c.follow_up && <span className="block font-normal text-ink-3">half done</span>}
                   {n > 1 && <span className="block font-normal text-ink-3">{n} like this, one decision each</span>}
                 </span>
                 <span className="font-normal text-ink-3">{c.deadline ? when(c.deadline, nowMs) : ''}</span>
@@ -400,7 +401,9 @@ function Focus(p: Props & {
       const status = r.action?.status
       const at = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
       const sent = status === 'sent'
-      const sub = sent
+      const sub = sent && opt?.channel === 'floor'
+        ? `Sent to ${opt.to} at ${at}. Their answer replaces the system's number.`
+        : sent
         ? `Sent to ${shortName(card.supplier_name) || opt?.to} at ${at}. You'll see the reply here.`
         : opt?.channel === 'notify' && opt.to ? `${opt.to} has it now.` : 'Recorded.'
       // A sent email cannot be undone, so no Undo is offered for it.
@@ -448,7 +451,8 @@ function Focus(p: Props & {
   const go = () => (choice.kind === 'escalate' ? void escalate() : choice.kind === 'dismiss' ? void dismiss() : onApprove())
   const choose = (c: Choice) => { setChoice(c); setOthers(false); setConfirm(false); setError('') }
   const choices: Choice[] = [
-    ...card.options.map((_, i): Choice => ({ kind: 'option', i })),
+    // A half-done decision does not offer what was already done; indices stay the server's.
+    ...card.options.flatMap((o, i): Choice[] => (o.done ? [] : [{ kind: 'option', i }])),
     { kind: 'escalate' }, { kind: 'dismiss' },
   ]
 
@@ -558,6 +562,7 @@ function Focus(p: Props & {
 
       {(opt || choice.kind !== 'option') && (
         <div className={cn(phone ? 'mt-9' : 'mt-12')}>
+          {card.follow_up && <HalfDone card={card} state={state} />}
           <p className="t-small mb-1.5 text-ink-3">
             {recommended ? 'We recommend' : 'You chose'}
             {!recommended && card.options.length > 0 && (
@@ -645,6 +650,19 @@ function Focus(p: Props & {
         />
       )}
     </article>
+  )
+}
+
+/** "Half done: corrected the goods receipt at 05:40. Still 5,900 Collector's copies short." */
+function HalfDone({ card, state }: { card: Card; state: State }) {
+  const fu = card.follow_up!
+  const done = tidy(fu.done).replace(/\.$/, '')
+  const label = state.strip.find((s) => s.edition === card.edition)?.label
+  return (
+    <p className="t-body mb-6 text-ink-2">
+      Half done: {done ? done[0].toLowerCase() + done.slice(1) : 'one step'}{fu.at ? ` at ${fmtTime(fu.at)}` : ''}.
+      {fu.still_short ? ` Still ${fmtNum(fu.still_short)}${label ? ` ${label}` : ''} copies short.` : ''}
+    </p>
   )
 }
 
@@ -1069,7 +1087,7 @@ function CaseView({ card, state, nowMs, onChanged, onDrawer }: { card: Card; sta
   const routine = routineOf(state, card.id)
   const waiting = card.status === 'escalated'
   const actionId = routine ? routineActionOf(state, card.id) : actionIdOf(state.activity.find((a) => a.card === card.id))
-  const undo = !waiting && card.status !== 'sent' ? actionId : null
+  const undo = !waiting && card.status !== 'sent' && card.status !== 'answered' ? actionId : null
   const facts = replyFacts(card)
   const who = (card.approver ?? '').split(' ').find((w) => !w.endsWith('.')) || 'the approver'
   const at = card.ui?.at ? ` at ${when(card.ui.at, nowMs)}` : ''

@@ -38,6 +38,7 @@ class EditionPlan:
     packed: float | None = None
     rate_per_hour: float | None = None
     packed_as_of: datetime | None = None  # when `packed` was counted, if a source says so
+    packed_source: str | None = None  # the file (and sheet) the packed figure comes from
 
     @property
     def remaining(self) -> float | None:
@@ -202,16 +203,17 @@ def _read_csv(path: Path) -> list[dict]:
         return []
 
 
-def _set_packed(ed: EditionPlan, n: float, at: datetime | None) -> None:
+def _set_packed(ed: EditionPlan, n: float, at: datetime | None, source: str | None = None) -> None:
     """Packed copies only grow, so the highest figure is the newest; it keeps its own stamp."""
     if ed.packed is None or n > ed.packed:
-        ed.packed, ed.packed_as_of = n, at
+        ed.packed, ed.packed_as_of, ed.packed_source = n, at, source
     elif n == ed.packed and at and (ed.packed_as_of is None or at > ed.packed_as_of):
-        ed.packed_as_of = at
+        ed.packed_as_of, ed.packed_source = at, source
 
 
 def _read_editions(rows: list[tuple], editions: dict[str, EditionPlan],
-                   launch: date | None = None, tz: ZoneInfo | None = None) -> None:
+                   launch: date | None = None, tz: ZoneInfo | None = None,
+                   source: str | None = None) -> None:
     """Rates and packed copies from any table that lists launch products by id."""
     for i, r in enumerate(rows):
         cells = [str(c or "").strip().lower() for c in r]
@@ -234,7 +236,7 @@ def _read_editions(rows: list[tuple], editions: dict[str, EditionPlan],
                 ed.rate_per_hour = _num(row[rc])
             n = _num(row[kc]) if kc is not None else None
             if n is not None:
-                _set_packed(ed, n, at)
+                _set_packed(ed, n, at, source)
 
 
 def load(root: Path | None, tz: ZoneInfo) -> PackClock:
@@ -252,20 +254,22 @@ def load(root: Path | None, tz: ZoneInfo) -> PackClock:
     windows: list[tuple[datetime, datetime]] = []
     books = [b for d in ("context", "erp") if (soony / d).is_dir() for b in sorted((soony / d).glob("*.xlsx"))]
     for book in books:
-        for rows in _rows(book).values():
+        for sheet, rows in _rows(book).items():
             windows = windows or _windows(rows, launch, tz)
-            _read_editions(rows, editions, launch, tz)
+            _read_editions(rows, editions, launch, tz, f"{book.relative_to(root)} · {sheet}")
     if not windows and launch:
         windows = default_windows(launch, tz)
     # Packed copies only grow, so the highest figure across the plan, status sheets and the
     # pack-out log is the newest one. A log is complete up to the end of its last day.
     packed: dict[str, float] = {}
     last_day: dict[str, date] = {}
+    log_file: dict[str, str] = {}
     for f in sorted((soony / "erp").glob("packout_log*.csv")) if (soony / "erp").is_dir() else []:
         for r in _read_csv(f):
             pid = r.get("product_id")
             if pid in editions:
                 packed[pid] = packed.get(pid, 0) + (_num(r.get("units_packed")) or 0)
+                log_file[pid] = str(f.relative_to(root))
                 try:
                     d = date.fromisoformat(str(r.get("date") or "")[:10])
                     last_day[pid] = max(last_day.get(pid, d), d)
@@ -274,5 +278,5 @@ def load(root: Path | None, tz: ZoneInfo) -> PackClock:
     for pid, n in packed.items():
         d = last_day.get(pid)
         at = datetime(d.year, d.month, d.day, tzinfo=tz) + timedelta(days=1) if d else None
-        _set_packed(editions[pid], n, at)
+        _set_packed(editions[pid], n, at, log_file.get(pid))
     return PackClock(windows, editions)

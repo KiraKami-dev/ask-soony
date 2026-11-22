@@ -31,8 +31,8 @@ from fastapi import Body, FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+from ask_soony import floor, launch_view
 from ask_soony import launch as launch_clock
-from ask_soony import launch_view
 from ask_soony.launch import PackClock
 
 LEVEL_RANK = {"red": 3, "amber": 2, "grey": 1, "blue": 0}
@@ -276,16 +276,45 @@ def viewer_name(root: Path | None) -> str:
     return buyers.most_common(1)[0][0] if buyers else ""
 
 
+_COST_TEXT = re.compile(r"(?:EUR|USD|€|\$)\s*([\d][\d,.']*)|([\d][\d,.']*)\s*(?:EUR|USD|€)", re.I)
+
+
+def option_cost(option: dict) -> float:
+    """What an option costs: the number if given, else read from its cost text
+    ('about EUR 16,800'). Anything that mentions money but cannot be read counts as costing."""
+    for key in ("cost_value", "cost_eur"):
+        v = num(option.get(key))
+        if v:
+            return v
+    text = str(option.get("cost") or "")
+    m = _COST_TEXT.search(text)
+    if m:
+        raw = (m.group(1) or m.group(2)).replace(",", "").replace("'", "")
+        try:
+            return float(raw.rstrip("."))
+        except ValueError:
+            return 1.0
+    return 0.0
+
+
 def routine_type(decision: dict, option: dict) -> str | None:
     """Action type that may be allowed to run automatically: routine, free, no commitment."""
     kind = str(option.get("type") or decision.get("action_type") or "")
     flag = option.get("routine", decision.get("routine"))
-    cost = num(option.get("cost_value", option.get("cost_eur"))) or 0
-    if cost > 0:
+    if option_cost(option) > 0:  # the money guard: costs never run as a routine
         return None
     if flag is True or (flag is None and "chase" in kind.lower()):
         return kind or "chaser"
     return None
+
+
+_COVERS = re.compile(r"covers\s+([\d][\d,.]*)", re.I)
+
+
+def _covers(option: dict) -> float:
+    """How many of the gap an option closes, from its effect ('covers 5,900 of the 5,900 gap')."""
+    m = _COVERS.search(str(option.get("effect") or ""))
+    return float(m.group(1).replace(",", "")) if m else 0.0
 
 
 def build_cards(net: dict, ships: dict[str, dict]) -> list[dict]:
@@ -353,6 +382,8 @@ def build_cards(net: dict, ships: dict[str, dict]) -> list[dict]:
                 }
             )
         approver = d.get("approver")
+        if not approver and any(option_cost(o) for o in d.get("options") or []):
+            approver = exception_approver()  # money: whoever the approval policy names
         other = bool(approver and viewer and first_name(approver) != first_name(viewer))
         called = next(
             (
@@ -386,11 +417,37 @@ def build_cards(net: dict, ships: dict[str, dict]) -> list[dict]:
                     "unit": c.get("unit"),
                 }
             )
+        follow_up = None
+        if status in ("approved", "sent") and short:
+            # Half done: the chosen option does not close the gap but another one would (e.g. the
+            # booking was corrected, the missing books were never ordered). Keep it open.
+            done = next(
+                (
+                    a.get("option")
+                    for a in reversed(actions)
+                    if a.get("decision_id") == fid and a.get("kind") == "approve"
+                ),
+                None,
+            )
+            idx = int(done) if str(done).isdigit() else None
+            cover = [_covers(o) for o in options]
+            if idx is not None and idx < len(options) and not cover[idx] and any(cover):
+                follow_up = {
+                    "done": options[idx].get("action"),
+                    "done_index": idx,
+                    "at": ui.get("at"),
+                    "still_short": short,
+                }
+                status = "open"
+                for i, o in enumerate(options):
+                    o["done"] = i == idx
+                    o["recommended"] = i == cover.index(max(cover))
         cards.append(
             {
                 "id": fid,
                 "kind": f.get("kind"),
                 "part": f.get("part"),
+                "follow_up": follow_up,
                 "headline": d.get("headline") or f.get("title") or f.get("summary") or fid,
                 "summary": f.get("summary"),
                 "number": short if short is not None else num(imp.get("units_short")),
@@ -490,7 +547,8 @@ def exception_approver() -> str | None:
             from ask_soony.verifier.linker import build
 
             records = build(root, readings_dir()).records
-            people = People(records[records.kind == "reading"].to_dict("records"), None)
+            # today's date: a role holder who starts later (org chart v2) is not active yet
+            people = People(records[records.kind == "reading"].to_dict("records"), now())
             holder = people.exception_approver()
             name = people.label(holder, "") or None
         except Exception:  # verifier not installed or no readings: no named approver
@@ -991,7 +1049,13 @@ def build_strip(
 
     strip = []
     for k in keys:
-        mine = [c for c in cards if c.get("edition") == k and c["status"] in ("open", "escalated")]
+        mine = [
+            c
+            for c in cards
+            if c.get("edition") == k
+            and c["status"] in ("open", "escalated")
+            and not c.get("site_question")  # questions to the site: the count, not a shortfall
+        ]
         base = launch.get(k, {})
         worst = max((LEVEL_RANK[c["level"]] for c in mine), default=0)
         slack = base.get("slack_hours")
@@ -1125,6 +1189,9 @@ def build_activity(cards: list[dict], events: list[dict], root: Path | None) -> 
             {"at": e.get("at"), "text": f"Read {e.get('path') or e.get('file')}", "kind": "read"}
         )
     for c in cards:
+        if c.get("site_question"):  # questions to the site write their own lines
+            items += c.get("activity") or []
+            continue
         if c["status"] in ("dismissed", "logged"):
             items.append(
                 {
@@ -1188,6 +1255,23 @@ def build_state() -> dict:
         if v and v["id"] and v["status"] not in ("delivered", "received", "cancelled"):
             ships[v["id"]] = v
     cards = build_cards(net, ships)
+    # The packing clock, with the site's reported counts in place of the projection, and the
+    # questions to the site (stale counts, due shipments, uncounted book stock) as cards.
+    clock = launch_clock.load(root, tz())
+    site = floor.prepare(root, clock, cur, net)
+    cards += floor.cards(
+        site,
+        read_json("decision_status.json", {}),
+        read_list("actions.json"),
+        read_json("trust.json", {}),
+        viewer_name(root),
+        cur,
+    )
+    names = part_names(root)
+    for c in cards:
+        if c.get("site_question") and not c.get("part_name"):
+            c["part_name"] = names.get(str(c.get("part") or ""))
+    cards.sort(key=rank_key)
     open_cards = [c for c in cards if c["status"] == "open"]
 
     route_level: dict[str, str] = {}
@@ -1230,8 +1314,8 @@ def build_state() -> dict:
     )
 
     inbox = [c for c in open_cards if not c["routed_to_other"]]
-    clock = launch_clock.load(root, tz())
     strip = build_strip(cards, root, clock, cur)
+    launch = launch_view.build(cards, net["shipments_raw"], clock, cur, strip, site)
     return {
         "now": cur.isoformat(),
         "viewer": viewer_name(root),
@@ -1248,7 +1332,7 @@ def build_state() -> dict:
         "shipments": list(ships.values()),
         "strip": strip,
         "clock": build_clock(strip, clock, cur),
-        "launch": launch_view.build(cards, net["shipments_raw"], clock, cur, strip),
+        "launch": launch,
         "cards": cards,
         "inbox_ids": [c["id"] for c in inbox],
         "calm": not inbox,
@@ -1304,6 +1388,13 @@ def approve(card_id: str, body: dict = Body(default_factory=dict)) -> dict:
     if idx >= len(card["options"]):
         raise HTTPException(400, "unknown option")
     opt = card["options"][idx]
+    if opt.get("channel") == "wait":  # "wait for the books": nothing to send, off the list
+        return {
+            "action": dismiss(
+                card_id, {"note": opt.get("action"), "via": body.get("via") or "inbox"}
+            ),
+            "offer_trust": None,
+        }
     trust = read_json("trust.json", {})
     # Same send path for the Approve button and a spoken yes (alert agent, cardtools.deliver):
     # an email option to a known supplier address goes out now; anything else is only recorded.
@@ -1329,6 +1420,7 @@ def approve(card_id: str, body: dict = Body(default_factory=dict)) -> dict:
             "action_type": opt.get("routine_type"),
             "via": body.get("via") or "inbox",
             **({"message_id": sent["message_id"], "subject": sent["subject"]} if sent else {}),
+            **({"link": sent["link"], "channels": sent["channels"]} if sent and sent.get("link") else {}),
         },
     )
     offer = (
@@ -1439,6 +1531,7 @@ for _router in (
     teams.router,
     routines.router,
     datacheck.router,
+    floor.router,
 ):
     app.include_router(_router)
 _GLOBE_ROUTES = {"/api/feed", "/api/network", "/api/mode", "/api/cards/{card_id}/action"}

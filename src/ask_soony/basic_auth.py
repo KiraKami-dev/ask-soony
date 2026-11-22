@@ -86,6 +86,16 @@ class BasicAuth(BaseHTTPMiddleware):
         # Call webhooks authenticate themselves (signature or per-alert token), see calls.py.
         if not self.password or path in PUBLIC_PATHS or path.startswith("/hooks/"):
             return await call_next(request)
+        # The count page for the people at the site: no dashboard password, only a valid link
+        # (floor.public_path checks the token); its built JS and CSS hold code, no data.
+        if path.startswith("/count/") or path.startswith("/api/count/"):
+            from ask_soony import floor
+
+            if floor.public_path(path):
+                return await call_next(request)
+            return Response("This link is not valid any more.", status_code=404)
+        if path.startswith("/assets/"):
+            return await call_next(request)
 
         if path == "/login":
             if request.method == "POST":

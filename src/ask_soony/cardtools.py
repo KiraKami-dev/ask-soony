@@ -183,7 +183,12 @@ def send_followup(
 
 
 def deliver(card: dict, option: dict, text: str | None) -> dict | None:
-    """Send the approved option if it is an email to a known supplier; None if nothing was sent."""
+    """Send the approved option if it is an email to a known supplier, or a question to the site
+    (channel "floor": Teams and push, see floor.ask); None if nothing was sent."""
+    if option.get("channel") == "floor" and card.get("site_question"):
+        from ask_soony import floor
+
+        return floor.ask(card)
     to = (option.get("to") or "").strip().lower()
     body = (text or option.get("draft") or "").strip()
     if option.get("channel") != "email" or not body or to not in supplier_addresses():

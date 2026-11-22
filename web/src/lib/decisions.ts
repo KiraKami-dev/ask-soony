@@ -15,7 +15,7 @@ export interface Group {
 }
 
 const shape = (t: string) => tidy(t).replace(/\d[\d,.' ]*\d|\d/g, '#').replace(/\s+/g, ' ').trim().toLowerCase()
-export const groupKey = (c: Card) => `${c.supplier_id ?? c.supplier_name ?? ''}|${c.kind ?? ''}|${shape(c.headline)}`
+export const groupKey = (c: Card) => c.group ?? `${c.supplier_id ?? c.supplier_name ?? ''}|${c.kind ?? ''}|${shape(c.headline)}`
 
 const deadlineMs = (c: Card) => (c.deadline ? new Date(c.deadline).getTime() : Number.POSITIVE_INFINITY)
 /** Most urgent first: earliest decide-by time, then the worse level, then the bigger number. */

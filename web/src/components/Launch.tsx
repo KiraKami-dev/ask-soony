@@ -44,11 +44,34 @@ function fixesFor(state: State, s: StripItem): Card[] {
 
 type Bit = { text: string; late?: boolean }
 
+const floorOf = (state: State, edition: string) => state.launch?.floor?.editions?.[edition]
+
+/** What the counts behind the verdict are worth: stale counts first, then a site's count that
+ * came in well below plan ("it likely stood still"). */
+function countBits(state: State, nowMs: number): Bit[] {
+  const eds = state.strip.map((s) => floorOf(state, s.edition)).filter((e): e is NonNullable<typeof e> => !!e)
+  const out: Bit[] = []
+  const stale = eds.filter((e) => e.stale)
+  if (stale.length) {
+    const h = Math.floor(Math.max(...stale.map((e) => e.age_hours)))
+    const all = stale.length === eds.length
+    out.push({ text: all ? `Packing counts are ${h} h old.` : `The ${stale.map((e) => e.label).join(' and ')} count is ${h} h old.`, late: true })
+  }
+  for (const e of eds) {
+    const b = e.below_plan
+    if (!e.counted.reported || !b?.stood_still) continue
+    if (out.length) out.push({ text: ' ' })
+    out.push({ text: e.line.startsWith('the ') ? `The ${e.label} ${e.line.slice(4)} packed ` : `${e.label} packed ` }, { text: `${fmtNum(b.copies)} fewer`, late: true },
+      { text: ` than planned since ${when(b.since, nowMs)}: it likely stood still.` })
+  }
+  return out
+}
+
 /** One sentence per edition, in the order the editions stop. */
 function verdictBits(state: State, nowMs: number): Bit[] {
   if (!state.strip.length) return [{ text: 'No packing plan yet, so whether we make the trucks is unknown.' }]
   const order = [...state.strip].sort((a, b) => (t(a.stops_at) || Infinity) - (t(b.stops_at) || Infinity))
-  const out: Bit[] = []
+  const out: Bit[] = countBits(state, nowMs)
   for (const s of order) {
     if (out.length) out.push({ text: ' ' })
     const stops = s.stops_at
@@ -131,9 +154,12 @@ export function Launch({ state, nowMs, phone, onOpen }: Props) {
         </div>
 
         <p className="t-small mt-16 text-ink-3">
-          Packed counts are projected at plan rate from the last count
-          {state.strip[0]?.packed_as_of ? ` (${when(state.strip[0].packed_as_of, nowMs)})` : ''}. Parts and stock as the
-          verifier counted them; the trucks leave when the last shift ends.
+          Packed copies are projected at plan rate from the last count
+          {state.strip.some((s) => s.packed_as_of)
+            ? ` (${state.strip.filter((s) => s.packed_as_of).map((s) => `${s.label}: ${floorOf(state, s.edition)?.counted.reported ? `reported by ${state.launch?.floor?.site ?? 'the site'}` : 'pack-out log'} ${when(s.packed_as_of, nowMs)}`).join('; ')})`
+            : ''}
+          ; a count from the site replaces the projection. Parts and stock as the verifier counted them, unless the site
+          counted them; the trucks leave when the last shift ends.
         </p>
         {health?.checked_at && (
           <p className="t-small mt-2 text-ink-3">
@@ -151,6 +177,8 @@ export function Launch({ state, nowMs, phone, onOpen }: Props) {
 
 function EditionBlock({ s, state, nowMs }: { s: StripItem; state: State; nowMs: number }) {
   const dayOne = state.launch?.editions.find((e) => e.edition === s.edition)?.day_one ?? null
+  const fl = floorOf(state, s.edition)
+  const site = state.launch?.floor?.site ?? 'the site'
   const left = s.remaining ?? null
   const packed = dayOne != null && left != null ? dayOne - left : null
   const rate = s.rate_per_hour ?? null
@@ -172,7 +200,26 @@ function EditionBlock({ s, state, nowMs }: { s: StripItem; state: State; nowMs: 
       <h2 className="t-small text-ink-3">{s.label} Edition</h2>
       <p className="t-body mt-1 font-medium">{head}</p>
       <dl className="t-small mt-5">
-        <Fact k="Packed">{n(packed, (x) => <>{fmtNum(x)}{dayOne != null && <span className="text-ink-3"> of {fmtNum(dayOne)}</span>}</>)}</Fact>
+        {fl?.counted.number != null && (
+          <Fact k="Counted">
+            {fmtNum(fl.counted.number)}
+            <span className="text-ink-3"> at {when(fl.counted.as_of, nowMs)}</span>
+            {fl.counted.reported ? (
+              <span className="text-ink-3">
+                {' '}by {site}{fl.counted.by ? ` (${fl.counted.by})` : ''}, reported
+                {fl.reported?.photo_url && <> · <a href={fl.reported.photo_url} target="_blank" rel="noreferrer" className="uline">count sheet</a></>}
+              </span>
+            ) : <span className="text-ink-3"> · pack-out log</span>}
+          </Fact>
+        )}
+        <Fact k={fl?.counted.number != null ? 'Packed now' : 'Packed'}>
+          {n(packed, (x) => <>{fmtNum(x)}{dayOne != null && <span className="text-ink-3"> of {fmtNum(dayOne)}</span>}</>)}
+          {fl && fl.stale_hours > 0 && (
+            <span className={cn('block', fl.stale ? 'text-late' : 'text-ink-3')}>
+              projected{fl.stale ? `, ${fl.counted.reported ? 'count' : 'log'} ${Math.floor(fl.age_hours)} h old` : ' at plan rate'}
+            </span>
+          )}
+        </Fact>
         <Fact k="Still to pack">{n(left, (x) => fmtNum(x))}</Fact>
         <Fact k="Pack rate">{n(rate, (x) => `${fmtNum(x)} an hour`)}</Fact>
         <Fact k="Work left">
@@ -239,6 +286,11 @@ function PartRow({ p, state, nowMs, phone, onOpen }: { p: LaunchPart; state: Sta
       <span className={cn('t-small', short ? 'text-ink' : 'text-ink-2')}>{p.short_name}</span>
       <span className={cn('t-small min-w-0', phone && 'col-start-1 row-start-2')}>
         {status}
+        {p.counted && (
+          <span className="block text-ink-3">
+            {fmtNum(p.counted.count)} counted on the shelf {when(p.counted.at, nowMs)}, books said {fmtNum(p.counted.book)}
+          </span>
+        )}
         {inbound.map((i, k) => <span key={k} className="block text-ink-3">{inboundLine(i, launch, nowMs)}</span>)}
         {p.inbound.length > 2 && <span className="block text-ink-3">+{p.inbound.length - 2} more on the way</span>}
         {!inbound.length && short && <span className="block text-ink-3">Nothing on its way that counts</span>}
@@ -253,6 +305,7 @@ const MOVING: Record<string, string> = { sea: 'on the water', air: 'in the air',
 /** "350,000 at the port, not counted: needs collecting". */
 function inboundLine(i: Inbound, launchMs: number, nowMs: number): string {
   const qty = i.quantity != null ? fmtNum(i.quantity) : 'Unknown quantity'
+  if (i.reason === 'reported, not booked') return `${qty} arrived (${i.reference}), reported by the site, not booked yet`
   const sh = i.shipment
   const etaMs = t(i.eta ?? sh?.eta)
   const late = i.after_launch || (Number.isFinite(etaMs) && Number.isFinite(launchMs) && etaMs > launchMs)

@@ -10,6 +10,8 @@ export interface Option {
   to?: string
   channel?: string
   routine_type?: string | null
+  /** Already carried out on a half-done decision: not offered again (indices stay as they are). */
+  done?: boolean
 }
 export interface Evidence {
   source?: string
@@ -62,6 +64,46 @@ export interface Card {
     reply_date?: string | null; reply_quantity?: number | string | null; reply_after_launch?: boolean | null
   }
   escalation_brief: string
+  /** Approved with an option that did not close the gap while another would: open again. */
+  follow_up?: { done: string; done_index: number; at: string | null; still_short: number | null } | null
+  /** Look-alikes fold under this key when set (questions to the site: one per kind). */
+  group?: string
+  /** A question to the people at the site (stale count, due shipment, uncounted stock). */
+  site_question?: SiteQuestion
+}
+
+export type SiteKind = 'packed' | 'received' | 'count'
+export interface FloorAnswer {
+  id?: string; kind?: SiteKind; count?: number | null; at?: string | null; by?: string | null
+  arrived?: boolean; photo_url?: string | null; by_books?: boolean; gone?: boolean
+}
+export interface SiteQuestion {
+  kind: SiteKind
+  subject: string
+  last_known: { value: number | string | null; as_of: string | null; source: string | null }
+  asked_at: string | null
+  answer: FloorAnswer | null
+  site: string
+}
+/** One edition's packing count: what was counted (log or the site), and what Launch assumes. */
+export interface FloorEdition {
+  label: string
+  rate: number | null
+  log: { number: number | null; as_of: string | null; source: string | null }
+  counted: { number: number | null; as_of: string | null; source: string | null; by: string | null; reported: boolean }
+  projected: number | null
+  stale_hours: number
+  age_hours: number
+  stale: boolean
+  reported: FloorAnswer | null
+  below_plan: { copies: number; since: string | null; stood_still: boolean } | null
+  line: string
+}
+export interface Floor {
+  site: string
+  stale_after_hours: number
+  editions: Record<string, FloorEdition>
+  questions: { id: string; kind: SiteKind; answered: boolean }[]
 }
 
 export interface MapNode { id: string; kind: 'supplier' | 'port' | 'dc' | 'site'; name: string; lat: number; lon: number; country?: string }
@@ -140,13 +182,16 @@ export interface LaunchPart {
   runs_dry: string | null
   shared: boolean
   inbound: Inbound[]
+  /** Counted on the shelf by the site; replaces the book stock. */
+  counted?: { count: number; at: string | null; by: string | null; book: number; photo_url?: string | null } | null
   /** Open or passed-on cases about it, most urgent first. */
   cards: string[]
 }
 export interface LaunchData {
   hours_left: number | null
-  editions: { edition: string; day_one: number | null }[]
+  editions: ({ edition: string; day_one: number | null } & Partial<FloorEdition>)[]
   parts: LaunchPart[]
+  floor?: Floor | null
 }
 export interface EventItem { id: string; at: string; path?: string; file?: string; node?: string }
 export interface ActivityItem {

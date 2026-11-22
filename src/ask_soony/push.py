@@ -62,13 +62,16 @@ def subscriptions() -> list[dict]:
         return []
 
 
-def send(title: str, body: str, card_id: str | None = None) -> dict:
-    """Push to every subscribed device; drop subscriptions the push service reports as gone."""
+def send(title: str, body: str, card_id: str | None = None, url: str | None = None) -> dict:
+    """Push to every subscribed device; drop subscriptions the push service reports as gone.
+    `url` opens that page on tap instead of the card (the count page of a site question)."""
     from pywebpush import WebPushException, webpush
 
     keys = vapid()
     claims_sub = os.environ.get("ASK_PUSH_CONTACT", "https://ask-soony.example.com")
-    payload = json.dumps({"title": title, "body": body, "card_id": card_id})
+    payload = json.dumps(
+        {"title": title, "body": body, "card_id": card_id, **({"url": url} if url else {})}
+    )
     kept, sent, failed = [], 0, []
     for sub in subscriptions():
         try:

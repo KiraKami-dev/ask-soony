@@ -59,7 +59,8 @@ PROPOSALS = "routine_proposals.json"
 STUBS = '''
 def open_cards() -> list[dict]:
     """Open decisions. Keys: id, headline, level ('red'|'amber'|'grey'|'blue'), kind, part,
-    supplier_id, supplier_name, number (copies at risk or units short, may be None), deadline,
+    supplier_id, supplier_name, edition (launch edition id and name, may be ''), part_name,
+    number (copies at risk or units short, may be None), deadline,
     hours_left (hours until the decide-by, may be None), has_reply (bool), reply_after_launch
     (bool), evidence (list of {'source': str, 'value': str}), options (list of {'index': int,
     'action': str, 'cost': str | None, 'free': bool, 'channel': str | None, 'to': str | None,
@@ -212,6 +213,8 @@ def _card_view(c: dict, cur=None) -> dict:
         "level": c.get("level"),
         "kind": c.get("kind"),
         "part": c.get("part"),
+        "part_name": c.get("part_name") or "",
+        "edition": _edition_text(c.get("edition")),
         "supplier_id": c.get("supplier_id"),
         "supplier_name": c.get("supplier_name"),
         "number": c.get("number"),
@@ -245,6 +248,15 @@ def _card_view(c: dict, cur=None) -> dict:
     }
 
 
+def _edition_text(edition: str | None) -> str:
+    """'FG-GH6-CE Collector's': the id and its name, so a condition can use either."""
+    if not edition:
+        return ""
+    from ask_soony import api
+
+    return f"{edition} {api.edition_labels(api.portal_root()).get(edition, '')}".strip()
+
+
 def _costs_money(option: dict) -> bool:
     cost = str(option.get("cost") or "").strip().lower()
     return bool(cost) and cost not in ("none", "0", "free", "no cost", "-")
@@ -253,7 +265,7 @@ def _costs_money(option: dict) -> bool:
 # Routines may only carry out options that communicate (an email or a message to a person).
 # Re-plans, allocations and orders change the plan or commit money: never automatic, whatever
 # their cost text says.
-AUTOMATABLE_CHANNELS = {"email", "notify"}
+AUTOMATABLE_CHANNELS = {"email", "notify", "floor"}  # floor: a question to the site
 
 
 def automatable(option: dict) -> bool:
@@ -547,7 +559,10 @@ class _Run:
         preview = f"{opt.get('action')}" + (f"\nTo {opt.get('to')}:\n{draft}" if draft else "")
 
         def execute() -> dict:
-            out = api.approve(card_id, {"option": int(option_index), "via": self.via})
+            try:
+                out = api.approve(card_id, {"option": int(option_index), "via": self.via})
+            except HTTPException as exc:  # e.g. no channel reaches the site: nothing was done
+                return _no(str(exc.detail), "error")
             return _ok(str(out["action"].get("status")), action_id=out["action"].get("id"))
 
         return self._side(
@@ -880,6 +895,8 @@ def undo(action_id: str) -> dict:
             return {"ok": False, "reason": "Already undone."}
         if act.get("kind") == "call" or act.get("channel") == "call":
             return {"ok": False, "reason": CALL_GONE}
+        if act.get("channel") == "floor" and act.get("status") == "sent":
+            return {"ok": False, "reason": f"The question already went to {act.get('to')}."}
         if (
             act.get("message_id")
             or act.get("status") == "sent"
@@ -956,7 +973,16 @@ def would_handle() -> dict[str, list[dict]]:
 # always compiled in.
 
 TRIGGERS = ("decisions", "waiting", "replies", "shipments")
-TEXT_FIELDS = {"evidence", "headline", "option_action", "option_to", "supplier_name", "kind"}
+TEXT_FIELDS = {
+    "evidence",
+    "headline",
+    "option_action",
+    "option_to",
+    "supplier_name",
+    "kind",
+    "edition",
+    "part_name",
+}
 NUM_FIELDS = {"hours_left", "waiting_hours", "silent_hours"}
 FLAG_FIELDS = {"has_reply", "reply_after_launch"}
 FIELDS = TEXT_FIELDS | NUM_FIELDS | FLAG_FIELDS
@@ -1266,8 +1292,12 @@ on: "decisions" (open decisions in the inbox, the default) | "waiting" (decision
   updating)
 condition: {"id": "c1", "field": ..., "op": ..., "value": ..., "text": "<the condition as a
   plain phrase>"}
-  words: field evidence | headline | option_action | option_to | supplier_name | kind, op
-    contains | is | any_of (comma-separated), value "<lowercase words>"
+  words: field evidence | headline | option_action | option_to | supplier_name | kind | edition
+    | part_name, op contains | is | any_of (comma-separated), value "<lowercase words>"
+    kind is the kind of decision; questions to the site have their own kinds: "packed" (the
+    packing count of an edition is stale), "received" (a shipment is due at the site but not
+    booked in), "count" (the launch depends on book stock nobody counted recently). edition =
+    the launch edition (id and name, e.g. "collector"), part_name = the part ("statues").
   hours: field hours_left (hours until the decision's deadline) | waiting_hours (hours since
     our message went out; only on "waiting") | silent_hours (hours since a shipment last
     updated; only on "shipments"), op lt (less than) | gt (more than), value a number
@@ -1310,7 +1340,11 @@ call me" ->
 "When a shipment has not updated for 12 hours, ask the supplier for its status" ->
 {"on": "shipments", "when": [{"id": "c1", "field": "silent_hours", "op": "gt", "value": 12,
  "text": "no update for 12 hours"}], "then": [{"id": "s1", "do": "ask_status", "text": "Ask the
- supplier where it is"}]}"""
+ supplier where it is"}]}
+"When a packing count is stale, ask the site for the current count" ->
+{"on": "decisions", "when": [{"id": "c1", "field": "kind", "op": "is", "value": "packed", "text":
+ "a packing count is stale"}], "then": [{"id": "s1", "do": "carry_out", "match":
+ {"action_contains": "ask"}, "text": "Ask the site for the current count"}]}"""
 
 
 # ---------------------------------------------------------------- the writer agent
@@ -1402,6 +1436,11 @@ def suggest(card_id: str) -> dict:
     )
     if act is None:
         raise HTTPException(409, "decide this card first, then automate it")
+    sq = card.get("site_question")
+    if sq and act["kind"] == "approve" and act.get("channel") == "floor":
+        draft = site_question_routine(card, act)
+        draft.update(id=uuid.uuid4().hex[:8], created_from=card_id, enabled=False, mode="ask")
+        return {"routine": draft, "preview": run(draft, dry=True)}
     action = {
         "approve": f"approved: {act.get('action')} (to {act.get('to')}, {act.get('status')})",
         "escalate": f"escalated it to {act.get('to')}",
@@ -1414,6 +1453,44 @@ def suggest(card_id: str) -> dict:
     # Trust ladder: a new routine prepares its actions for one-tap approval until switched up.
     draft.update(id=uuid.uuid4().hex[:8], created_from=card_id, enabled=False, mode="ask")
     return {"routine": draft, "preview": run(draft, dry=True)}
+
+
+def site_question_routine(card: dict, act: dict) -> dict:
+    """The routine a question to the site asks for, written without a model: when a question of
+    this kind comes up, ask the site the same way. Its kind is the condition, the approved
+    option's words are the step."""
+    from ask_soony import floor
+
+    kind = card["site_question"]["kind"]
+    city = card["site_question"].get("site") or "the site"
+    when = floor.KIND_WHEN.get(kind, kind)
+    ask = str(act.get("action") or f"Ask {city}")
+    spec = clean_spec(
+        {
+            "on": "decisions",
+            "when": [{"id": "c1", "field": "kind", "op": "is", "value": kind, "text": when}],
+            "then": [
+                {
+                    "id": "s1",
+                    "do": "carry_out",
+                    "match": {"action_contains": ask.split()[0].lower(), "to": city.lower()},
+                    "text": ask,
+                }
+            ],
+        }
+    )
+    return {
+        "name": {
+            "packed": f"Ask {city} when a count is stale",
+            "received": f"Ask {city} about due shipments",
+            "count": f"Ask {city} to count book stock",
+        }.get(kind, f"Ask {city}"),
+        "description": f"When {when}, {ask[0].lower()}{ask[1:]} on Teams and by phone alert. "
+        "Their answer replaces the system's number until the books catch up.",
+        "spec": spec,
+        "code": compile_spec(spec),
+        "note": "",
+    }
 
 
 def edit(routine: dict, instruction: str) -> dict:
@@ -1527,8 +1604,13 @@ def suggestions(min_count: int = 2) -> list[dict]:
         card = by_id.get(cid)
         if card is None or card.get("status") == "open":
             continue
+        sq = card.get("site_question")
+        # Questions to the site: one group per kind and part (or edition); their headlines carry
+        # changing hours and quantities.
         key = "|".join(
-            [
+            ["site", sq["kind"], str(card.get("part") or card.get("edition") or ""), act["kind"]]
+            if sq
+            else [
                 str(card.get("supplier_id") or card.get("supplier_name") or ""),
                 str(card.get("kind") or ""),
                 _shape(card.get("headline") or ""),

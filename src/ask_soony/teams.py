@@ -186,14 +186,73 @@ def card_payload(card: dict, reply: dict | None = None) -> dict:
 
 
 def post(card: dict, reply: dict | None = None) -> bool:
+    return post_payload(card_payload(card, reply))
+
+
+def post_payload(payload: dict) -> bool:
     url = _webhook()
     if not url:
         return False
-    r = httpx.post(url, json=card_payload(card, reply), timeout=20)
+    r = httpx.post(url, json=payload, timeout=20)
     if r.status_code >= 300:
         log.warning("teams post failed: %s %s", r.status_code, r.text[:200])
         return False
     return True
+
+
+QUESTION_BUTTON = {"packed": "Send the count", "received": "Answer", "count": "Send the count"}
+
+
+def question_payload(card: dict, link: str) -> dict:
+    """A question for the people at the site (floor.ask): what we know, and one button to the
+    count page. It asks; the answer comes back through the page, not the channel."""
+    sq = card.get("site_question") or {}
+    body = [
+        {
+            "type": "TextBlock",
+            "text": f"Question for {sq.get('site') or 'the site'}",
+            "isSubtle": True,
+            "size": "Small",
+        },
+        {
+            "type": "TextBlock",
+            "text": card.get("headline", ""),
+            "weight": "Bolder",
+            "size": "Large",
+            "wrap": True,
+        },
+        {"type": "TextBlock", "text": card.get("summary") or "", "wrap": True},
+        {
+            "type": "TextBlock",
+            "text": "It takes a minute: type the number, or take a photo of the sheet.",
+            "wrap": True,
+            "isSubtle": True,
+            "spacing": "Medium",
+        },
+    ]
+    return {
+        "type": "message",
+        "attachments": [
+            {
+                "contentType": "application/vnd.microsoft.card.adaptive",
+                "contentUrl": None,
+                "content": {
+                    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                    "type": "AdaptiveCard",
+                    "version": "1.4",
+                    "msteams": {"width": "Full"},
+                    "body": body,
+                    "actions": [
+                        {
+                            "type": "Action.OpenUrl",
+                            "title": QUESTION_BUTTON.get(sq.get("kind") or "", "Answer"),
+                            "url": link,
+                        }
+                    ],
+                },
+            }
+        ],
+    }
 
 
 def notify_reply(card_id: str, who: str, summary: str) -> None:

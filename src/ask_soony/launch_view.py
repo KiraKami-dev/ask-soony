@@ -102,10 +102,44 @@ def _inbound(part: dict, ships: dict[str, dict]) -> list[dict]:
     return rows
 
 
+def _with_floor(p: dict, site: dict, clock: PackClock, cur: datetime) -> dict:
+    """What the site reported for one part: a count replaces the book stock, a shipment reported
+    as arrived counts as stock until its goods receipt is booked."""
+    from ask_soony.api import parse_ts
+
+    gap = _num(p.get("gap"))
+    out: dict = {"counted": None, "reported_in": []}
+    counted = site.get("counted")
+    per = {str(k): _num(v) or 0 for k, v in (p.get("per_copy") or {}).items()}
+    if counted:
+        at = parse_ts(counted.get("at")) or cur
+        # The need from the time of the count: copies still to pack then, times parts per copy.
+        need = sum(q * (clock.remaining_at(at, ed) or 0) for ed, q in per.items())
+        later = sum(
+            _num(a.get("quantity")) or 0
+            for a in p.get("arriving") or []
+            if str(a.get("eta") or "") >= at.date().isoformat()
+        )
+        gap = max(need - counted["count"] - later, 0)
+        out["counted"] = counted
+    for r in site.get("received") or []:
+        gap = max((gap or 0) - r["quantity"], 0)
+        out["reported_in"].append(r)
+    out["gap"] = gap
+    return out
+
+
 def build(
-    cards: list[dict], ships_raw: list[dict], clock: PackClock, cur: datetime, strip: list[dict]
+    cards: list[dict],
+    ships_raw: list[dict],
+    clock: PackClock,
+    cur: datetime,
+    strip: list[dict],
+    site=None,
 ) -> dict:
-    """{hours_left, editions: [...], parts: [...]} for the Launch page."""
+    """{hours_left, editions: [...], parts: [...], floor} for the Launch page. `site` is the
+    floor's picture (floor.prepare): reported counts per edition and per part."""
+    from ask_soony import floor
     from ask_soony.api import part_names, portal_root, rank_key
 
     data = _dispatch()
@@ -120,7 +154,9 @@ def build(
             if plan and plan.day_one is not None
             else _num((v_eds.get(k) or {}).get("day_one"))
         )
-        editions.append({"edition": k, "day_one": day_one})
+        editions.append(
+            {"edition": k, "day_one": day_one, **((site.editions.get(k) or {}) if site else {})}
+        )
 
     live = [c for c in cards if c.get("status") in OPEN]
     parts = []
@@ -133,7 +169,16 @@ def build(
         mine = _cards_for(p, live)
         per_copy = max([_num(v) or 0 for v in (p.get("per_copy") or {}).values()] or [0]) or 1
         gap = _num(p.get("gap"))
+        reported = (
+            _with_floor(p, site.parts.get(str(p["part"])) or {}, clock, cur)
+            if site and site.parts.get(str(p["part"]))
+            else None
+        )
+        if reported:
+            gap = reported["gap"]
         copies = [c.get("number") or 0 for c in mine if c.get("number_label") == "copies at risk"]
+        if reported and reported["counted"]:
+            copies = []  # a count on the shelf replaces what the cases inferred from book stock
         # Copies this part cannot cover: the verifier's gap, or a case's copies at risk if higher
         # (a case may know about stock the count still includes, such as a rejected lot).
         short = max([*copies, (gap or 0) / per_copy]) if (copies or gap is not None) else None
@@ -157,8 +202,30 @@ def build(
                 # the part is shared by editions (then it depends on how the stock is split).
                 "runs_dry": runs_dry,
                 "shared": len(eds) > 1,
-                "inbound": _inbound(p, ships),
+                "inbound": [
+                    *(
+                        {
+                            "reference": r["reference"],
+                            "quantity": r["quantity"],
+                            "eta": None,
+                            "counted": True,
+                            "reason": "reported, not booked",
+                            "after_launch": False,
+                            "supplier_id": None,
+                            "shipment": None,
+                            "reported": r,
+                        }
+                        for r in (reported or {}).get("reported_in") or []
+                    ),
+                    *_inbound(p, ships),
+                ],
+                "counted": (reported or {}).get("counted"),
                 "cards": [c["id"] for c in sorted(mine, key=rank_key)],
             }
         )
-    return {"hours_left": hours_left, "editions": editions, "parts": parts}
+    return {
+        "hours_left": hours_left,
+        "editions": editions,
+        "parts": parts,
+        "floor": floor.view(site) if site else None,
+    }

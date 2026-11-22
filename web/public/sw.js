@@ -14,17 +14,19 @@ self.addEventListener("push", (event) => {
       body: data.body || "",
       icon: "/icon-192.png",
       badge: "/icon-192.png",
-      tag: data.card_id || "alert",
+      tag: data.card_id || data.url || "alert",
       requireInteraction: true,
-      data: { card_id: data.card_id || null },
+      data: { card_id: data.card_id || null, url: data.url || null },
     }),
   );
 });
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const card = event.notification.data && event.notification.data.card_id;
-  const url = card ? `/d/${encodeURIComponent(card)}?talk=1` : "/";
+  const data = event.notification.data || {};
+  const card = data.card_id;
+  // A question for the site opens its count page; a decision opens the card ready to answer.
+  const url = data.url || (card ? `/d/${encodeURIComponent(card)}?talk=1` : "/");
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((wins) => {
       for (const w of wins) {
