@@ -12,6 +12,8 @@ right notification for the right person, and escalate until someone decides.
 Nothing here knows about the customer's parts or suppliers: alerts carry their own text.
 """
 
+from __future__ import annotations
+
 import json
 import secrets
 from dataclasses import asdict, dataclass, field

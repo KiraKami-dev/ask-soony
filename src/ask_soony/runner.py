@@ -16,7 +16,6 @@ import os
 import shutil
 import sys
 import threading
-import traceback
 from datetime import datetime
 from pathlib import Path
 
@@ -47,33 +46,46 @@ def mark_checked(**extra) -> None:
 
 
 def run_pipeline(paths: list[str], root: Path) -> str:
-    """Route changed paths through the installed modules. Returns a one-line outcome."""
-    try:
-        from ask_soony.dispatch import refresh  # Lucas/Farhan: verifier + predictor router
-    except ImportError:
-        return "pipeline: no dispatch module installed; drop recorded only"
-    predictor = None
-    try:
-        from ask_soony.config import Settings
-        from ask_soony.llm import make_backend
-        from ask_soony.predictor import ImpactAgent
-        from ask_soony.store import Store
+    """Route a drop through verification, prediction, dispatch and internal escalation."""
+    from ask_soony.alerts import AlertBook, Policy
+    from ask_soony.config import Settings
+    from ask_soony.dispatch import refresh
+    from ask_soony.dispatch.alerts import sync
+    from ask_soony.escalation import Escalator, Mailer, make_caller
+    from ask_soony.llm import make_backend
+    from ask_soony.predictor import ImpactAgent
+    from ask_soony.store import Store
 
-        s = Settings.from_env()
-        if s.llm_provider != "none":
-            backend = make_backend(s.llm_provider, s.llm_model, s.llm_api_key, s.llm_base_url,
-                                   s.llm_effort)
-            predictor = ImpactAgent(Store(s.data_dir), backend, state_dir())
-    except Exception as e:  # no LLM configured: the verifier still runs
-        print(f"pipeline: predictor off ({e})", file=sys.stderr)
-    store = Path(os.environ.get("ASK_DATA_DIR", "data/store"))
+    settings = Settings.from_env()
+    predictor = None
+    if settings.llm_provider != "none":
+        backend = make_backend(
+            settings.llm_provider, settings.llm_model, settings.llm_api_key,
+            settings.llm_base_url, settings.llm_effort,
+        )
+        predictor = ImpactAgent(Store(settings.data_dir), backend, state_dir())
+    dispatch_file = state_dir() / "dispatch.json"
+    routed = refresh(paths, root, settings.data_dir / "image_recognizer", dispatch_file, predictor)
+    store = Store(settings.data_dir)
     try:
-        routed = refresh(paths, root, store / "image_recognizer", state_dir() / "dispatch.json",
-                         predictor)
-        return f"pipeline: verifier={routed.verifier} predictor={routed.predictor}"
-    except Exception:
-        traceback.print_exc()
-        return "pipeline: failed (see log); UI keeps the last good state"
+        policy = Policy.load(settings.alert_policy)
+        book = AlertBook(store)
+        escalator = Escalator(
+            book,
+            policy,
+            make_caller(settings.call_provider),
+            Mailer.from_env(),
+            settings.public_url,
+        )
+        alert_ids = sync(
+            dispatch_file, state_dir() / "dispatch_alerts.json", book, policy, escalator
+        )
+    finally:
+        store.db.close()
+    return (
+        f"pipeline: verifier={routed.verifier} predictor={routed.predictor} "
+        f"alerts={len(alert_ids)}"
+    )
 
 
 def poll_once(store, client, dest: Path) -> tuple[list[str], bool]:
@@ -118,10 +130,35 @@ def loop(interval: int, stop: threading.Event | None = None) -> None:
         stop.wait(interval)
 
 
+def escalation_loop(interval: int = 30, stop: threading.Event | None = None) -> None:
+    """Continue policy escalation for dispatch alerts that have not been answered."""
+    from ask_soony.alerts import AlertBook, Policy
+    from ask_soony.config import Settings
+    from ask_soony.escalation import Escalator, Mailer, make_caller
+    from ask_soony.store import Store
+
+    settings = Settings.from_env()
+    stop = stop or threading.Event()
+    while not stop.is_set():
+        store = Store(settings.data_dir)
+        try:
+            policy = Policy.load(settings.alert_policy)
+            Escalator(
+                AlertBook(store), policy, make_caller(settings.call_provider),
+                Mailer.from_env(), settings.public_url,
+            ).tick()
+        except Exception as exc:
+            print(f"escalation failed: {exc}", file=sys.stderr)
+        finally:
+            store.db.close()
+        stop.wait(interval)
+
+
 def serve_with_loop(host: str, port: int, interval: int) -> None:
     import uvicorn
 
     threading.Thread(target=loop, args=(interval,), daemon=True, name="watcher").start()
+    threading.Thread(target=escalation_loop, daemon=True, name="escalation").start()
     uvicorn.run("ask_soony.api:app", host=host, port=port)
 
 

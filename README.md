@@ -38,7 +38,7 @@ Run it again any time to bring the folder up to date: only new or changed files 
 
 ## Platform: decision inbox (`ask-soony run`)
 
-One service: FastAPI serves the built UI (`web/dist`) and a JSON API over `data/state/`, and a background thread runs the watcher loop: poll the portal, mirror new files, record each new or changed file as a drop, and route the changed paths through the installed modules (`ask_soony.dispatch.refresh`: verifier and predictor). Missing modules or a failing step never stop the UI.
+One service: FastAPI serves the built UI (`web/dist`) and a JSON API over `data/state/`, and a background thread runs the watcher loop: poll the portal, mirror new files, record each new or changed file as a drop, verify and predict, then dispatch each new decision to the internal alert policy. The policy notifies, emails or calls the responsible Soony contact; supplier drafts remain approval-gated in the inbox. Invalid dispatch data or an incomplete alert policy raises an error instead of inventing an action.
 
 ```bash
 cd web && npm ci && npm run build && cd ..   # build the UI once
@@ -47,6 +47,8 @@ uv run ask-soony serve --port 8000           # UI + API only, over the files alr
 uv run ask-soony drop suppliers/<id>/notices/x.pdf [--from local.pdf]   # rehearse a live drop
 uv run python scripts/seed_demo_state.py [--calm | --drop]   # dev only: placeholder state from the portal files
 ```
+
+Before `run`, create `data/alert-policy.json` from `docs/alert-policy.example.json` and replace its example contacts. Its critical route decides whether the internal approver is notified, emailed, or called; it never sends a supplier message automatically.
 
 The UI reads the pipeline's `data/state/dispatch.json` (verifier decisions, editions, parts), the predictor's `data/state/impacts.json` and the shared shapes in `data/state/`. Source documents come from the image recognizer's readings in `data/store/image_recognizer/` (without them the art-book and statue findings cannot be made: run `python -m ask_soony.verifier.image_recognizer` first, or copy a teammate's readings). Each ready message in a decision becomes an action; one that commits money goes to the policy's approver of exceptions, routine supplier questions stay with the buyer. The seed script is only a fallback when no pipeline output exists. Slack and the time a line stops come from the launch plan's shift table, read at runtime (`src/ask_soony/launch.py`). Clicks write only to `data/state/` (`actions.json`, `decision_status.json`, `trust.json`); nothing is sent from the UI.
 
