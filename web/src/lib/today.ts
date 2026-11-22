@@ -149,11 +149,20 @@ export function claimOf(card: Card): Claim | null {
   const expects = /^\S+\s+by\b/.test(sv)
   const kind = docKind(d.source) || 'document'
   const owner = d.doc?.startsWith('suppliers/') && card.supplier_name ? `${shortName(card.supplier_name)}'s` : 'the'
+  // Our own count (verifier: stock + arriving vs still to pack), not a document's words, and a
+  // system side that is a verdict ("Plan says ok"), not a number: say it as what it is.
+  const counted = !d.doc && !docKind(d.source)
+  const verdict = !/\d/.test(sv)
   return {
-    sys: { index: pair.sys, ev: s, value: sv },
+    sys: {
+      index: pair.sys,
+      ev: s,
+      // "Plan says ok" -> "The plan says it is covered"
+      value: verdict ? sv.replace(/^(Plan|System)\b/, (w) => w.toLowerCase()).replace(/\bsays\b/i, 'says it is').replace(/\bok\b/i, 'covered') : sv,
+    },
     doc: { index: pair.doc, ev: d, value: dv },
-    pre: `${sysWho} ${expects ? 'expects' : 'says'} `,
-    mid: `, but ${owner} ${kind} says `,
+    pre: verdict ? (/^(plan|sap|system)\b/i.test(sv) ? 'The ' : '') : `${sysWho} ${expects ? 'expects' : 'says'} `,
+    mid: counted ? ', but we count ' : `, but ${owner} ${kind} says `,
     post: '.',
   }
 }

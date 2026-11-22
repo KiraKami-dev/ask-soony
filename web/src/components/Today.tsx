@@ -847,17 +847,35 @@ function doneFrom(card: Card, i: number, status?: string): string {
 const DbIcon = () => <Database aria-hidden="true" />
 const DocIcon = () => <FileText aria-hidden="true" />
 
+/** A source link inside a sentence: a span with button semantics, because a <button> cannot
+ * wrap across lines like text (a long value would break out and leave the full stop alone). */
+function Cite({ className, expanded, onClick, children }: { className?: string; expanded: boolean; onClick: () => void; children: ReactNode }) {
+  return (
+    <span
+      role="button"
+      tabIndex={0}
+      className={cn('cite', className)}
+      aria-expanded={expanded}
+      aria-haspopup="dialog"
+      onClick={onClick}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() } }}
+    >
+      {children}
+    </span>
+  )
+}
+
 function ClaimLine({ claim, late, open, onOpen }: { claim: Claim; late: boolean; open: number | null; onOpen: (i: number) => void }) {
   return (
     <>
       {claim.pre}
-      <button className="cite" aria-expanded={open === claim.sys.index} aria-haspopup="dialog" onClick={() => onOpen(claim.sys.index)}>
+      <Cite expanded={open === claim.sys.index} onClick={() => onOpen(claim.sys.index)}>
         {claim.sys.value}<DbIcon />
-      </button>
+      </Cite>
       {claim.mid}
-      <button className={cn('cite', late && 'late')} aria-expanded={open === claim.doc.index} aria-haspopup="dialog" onClick={() => onOpen(claim.doc.index)}>
+      <Cite className={late ? 'late' : undefined} expanded={open === claim.doc.index} onClick={() => onOpen(claim.doc.index)}>
         {claim.doc.value}<DocIcon />
-      </button>
+      </Cite>
       {claim.post}
     </>
   )
@@ -874,9 +892,9 @@ function Cited({ text, anchors, onOpen, open }: { text: string; anchors: Record<
     if (!hit || !/\d/.test(m[0])) continue
     parts.push(text.slice(last, m.index))
     parts.push(
-      <button key={m.index} className="cite" aria-expanded={open === hit.i} aria-haspopup="dialog" onClick={() => onOpen(hit.i)}>
+      <Cite key={m.index} expanded={open === hit.i} onClick={() => onOpen(hit.i)}>
         {m[0]}
-      </button>,
+      </Cite>,
     )
     last = (m.index ?? 0) + m[0].length
   }
