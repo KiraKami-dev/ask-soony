@@ -23,22 +23,22 @@
     "api_call_count": 1
   },
   "redaction": {
-    "replacements": 2617,
+    "replacements": 2620,
     "layers": {
       "betterleaks": 40,
       "connection_string": 0,
       "credential_key": 0,
       "credential_value": 130,
       "credentialed_uri": 0,
-      "entropy": 929,
+      "entropy": 930,
       "goredact": 8,
       "key_context": 0,
-      "pii": 1524,
+      "pii": 1526,
       "provider_token": 0,
       "shell_stdin": 0
     },
     "pii": {
-      "EMAIL": 1387,
+      "EMAIL": 1389,
       "IP": 72,
       "PHONE": 65
     }
