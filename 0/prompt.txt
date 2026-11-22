@@ -1,0 +1,54 @@
+"Two open decisions for you:
+1. Farhan / 34,800: should I send him the calculation (34,800 vs 6,800, because the verifier doesn't count deliveries before the end of packing), and build the fallback so the demo stays consistent?" he is at sleep. so if there is sth off, we should fix it I think
+
+---
+
+<task-notification>
+<task-id>a32203f8012f007ef</task-id>
+<tool-use-id>toolu_01HUtqxQBFjK5eQdz4StDSqK</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a32203f8012f007ef.output</output-file>
+<status>completed</status>
+<summary>Agent "Critique identity and build alternative" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I've built the minimal phone flow 20 to 24 and the desktop screen 25, and checked each one in headless Chrome. I skipped 10 to 14 as the new brief allowed.
+
+**Rules applied on every screen**
+- One typeface, Instrument Sans, in three sizes (34/18/13.5 on desktop, 27/17/13 on phone).
+- No boxes, chips, timelines or KPI numbers.
+- One blue for the main button.
+- Red appears only on the late "20,000 arrive Tue 24 Nov".
+- The highlighter appears only on the source crop.
+- Routine green appears only on the one routine line.
+- The only borders are the button and the bottom sheet.
+
+**The screens**
+- **20 Push:** only the notification card on a plain grey ground: "One decision before 10:00 · 20,000 game cards arrive after launch."
+- **21 Decision:** "Trucks leave in 13 h 30 min · 1 decision" at the top, then:
+  - a plain headline;
+  - one sentence with two tappable figures: "SAP expects 48,000 by Saturday", then the late "20,000 arrive Tue 24 Nov" in red;
+  - "For today: Standard runs out of cards at 17:00, three hours before the trucks";
+  - the recommendation with its cost, a big Approve, and quiet "Talk it through" and "Other options" links.
+- **22 Source sheet:** the Korean lines with 20,000 and 2026-11-24 highlighted, the English translation, "SAP says 48,000 due Sat 21 Nov · Purchase order, line 2", and one Back button. The decision stays dimmed behind it.
+- **23 Done:** "Done. Asked Boise for 20,000 cards." with an Undo link, then "3 more like this from PackRight. Handle them the same way?" One green line says there will be a test run first and that money still comes to you.
+- **24 All clear:** "Nothing needs you. On track for the trucks at 20:00." with "Watching 25 shipments · see" and the green "3 handled by your routines overnight · see · undo".
+- **25 Desktop:** a quiet "Needs you" list of three one-line items, the same decision in one column, and the routine line at the bottom.
+
+**Decision for you:** screen 23 doesn't quite add up. Approving Boise air freight doesn't create "3 more like this from PackRight"; that offer belongs to Saturday's artwork decision. For the demo, either reword it as "Next time a part lands after the trucks, ask the other supplier first, the price still comes to you", or make 23 the PackRight decision. I left the wording you specified.
+
+**Made up for the demo:** the Korean balance line in the crop, "25 shipments" and the Yantian item in the desktop list.
+
+Files are in `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/brand/`:
+- screens/20-lockscreen-push.html
+- screens/21-decision.html
+- screens/22-source-open.html
+- screens/23-done.html
+- screens/24-all-clear.html
+- screens/25-desktop-focus.html
+- shots/20 to 25 PNGs (phone at 2x)
+- gen/minimal.py (generates all six)</result>
+<usage><subagent_tokens>225019</subagent_tokens><tool_uses>9</tool_uses><duration_ms>150936</duration_ms></usage>
+</task-notification>
+
+---
+
+ok, build this for now
