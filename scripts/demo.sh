@@ -5,6 +5,10 @@
 #   CALLS=twilio scripts/demo.sh reset   same, with real notification calls (paid, ~USD 0.38/min)
 #   scripts/demo.sh restart    restart the demo server, keep its state (e.g. to switch calls off)
 #   scripts/demo.sh stop       stop the demo server
+#   scripts/demo.sh save-story save the demo state as it is now (e.g. a few cases decided)
+#   scripts/demo.sh story      restore that saved state and (re)start, like reset
+#   ASK_DEMO_OPEN=on ASK_DEMO_HOST=lighthouse.stenglein.dev scripts/demo.sh restart
+#                              same, without a password and with links to that host (for the jury)
 # Live keeps running on :8000 with data/state; the demo uses data/demo/state.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -43,6 +47,15 @@ PY
   echo "snapshot: $(ls "$SNAP" | wc -l | tr -d ' ') files in $SNAP"
 }
 
+STORY=data/demo/story
+save_story() { rm -rf "$STORY" && mkdir -p "$STORY" && cp -R "$STATE"/. "$STORY"/; echo "story: saved $(ls "$STORY" | wc -l | tr -d ' ') files"; }
+story() {
+  [ -d "$STORY" ] || { echo "no saved story; run save-story first" >&2; exit 2; }
+  stop
+  rm -rf "$STATE" && mkdir -p "$STATE" && cp -R "$STORY"/. "$STATE"/
+  start
+}
+
 stop() { tmux kill-session -t ask-soony-demo 2>/dev/null || true; }
 
 reset() {
@@ -56,11 +69,13 @@ start() {
   stop
   uv run python -m ask_soony.card_alerts forget "$STATE"  # phone alerts start afresh too
   PW="$(grep '^ASK_DASHBOARD_PASSWORD=' .env | cut -d= -f2-)"
+  [ "${ASK_DEMO_OPEN:-}" = on ] && PW=""  # open to anyone with the link; email stays recorded only
+  HOST="https://${ASK_DEMO_HOST:-ask-soony-demo.stenglein.dev}"
   tmux new-session -d -s ask-soony-demo "cd $PWD && \
     ASK_STATE_DIR=$STATE ASK_MAIL_DRY=on ASK_OUTBOX=off ASK_REPLY_POLL=off ASK_TEAMS=off \
     ASK_CALL_PROVIDER=${CALLS:-dry_run} ASK_CALL_AFTER_MIN=${ASK_CALL_AFTER_MIN:-15} SOONY_PORTAL_TOKEN= ASK_BACKGROUND=on ASK_LLM_PROVIDER=none \
-    ASK_DASHBOARD_PASSWORD='$PW' ASK_APP_URL=https://ask-soony-demo.stenglein.dev \
-    ASK_PUSH_CONTACT=https://ask-soony-demo.stenglein.dev ASK_PUBLIC_URL=https://ask-soony-demo.stenglein.dev \
+    ASK_DASHBOARD_PASSWORD='$PW' ASK_APP_URL=$HOST \
+    ASK_PUSH_CONTACT=$HOST ASK_PUBLIC_URL=$HOST \
     uv run uvicorn ask_soony.api:app --port $PORT 2>&1 | tee -a data/logs/demo.log"
   echo "demo: http://127.0.0.1:$PORT (calls: ${CALLS:-dry_run})"
 }
@@ -70,5 +85,7 @@ case "${1:-reset}" in
   reset) reset ;;
   restart) start ;;
   stop) stop ;;
-  *) echo "usage: $0 snapshot|reset|restart|stop" >&2; exit 2 ;;
+  save-story) save_story ;;
+  story) story ;;
+  *) echo "usage: $0 snapshot|reset|restart|stop|save-story|story" >&2; exit 2 ;;
 esac
