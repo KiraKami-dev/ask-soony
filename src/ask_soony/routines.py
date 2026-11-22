@@ -4,8 +4,9 @@ time. It writes a small Python routine from a fixed set of building blocks, whic
 Monty sandbox (pydantic-monty) on every check: no network, no files, no imports except the
 `soony` module below, type-checked against its stubs before it is saved.
 
-The trust ladder stays: a routine can carry out an option only if that option costs nothing;
-anything with a price still goes to a person (the routine can only notify about it). Every run
+The trust ladder stays: a routine can carry out an option only if it just communicates (an email
+or a message to a person) and costs nothing. Re-plans, allocations, orders and anything with a
+price still go to a person; the routine can only notify about them. Every run
 is recorded with what it printed and what it did, and every action it takes lands in the inbox
 history like a click, marked with the routine's name.
 
@@ -43,7 +44,8 @@ def open_cards() -> list[dict]:
     supplier_id, supplier_name, number (copies at risk or units short, may be None), deadline,
     evidence (list of {'source': str, 'value': str}), options (list of {'index': int,
     'action': str, 'cost': str | None, 'free': bool, 'channel': str | None, 'to': str | None,
-    'routine_type': str | None}). `free` is True when the option costs nothing."""
+    'routine_type': str | None}). `free` is True only for an option that just sends a message
+    (email or note) and costs nothing; re-plans, allocations and orders are never free."""
     ...
 
 def carry_out(card_id: str, option_index: int, reason: str) -> dict:
@@ -151,7 +153,7 @@ def _card_view(c: dict) -> dict:
                 "index": o.get("index", i),
                 "action": o.get("action"),
                 "cost": o.get("cost"),
-                "free": not _costs_money(o),
+                "free": automatable(o),
                 "channel": o.get("channel"),
                 "to": o.get("to"),
                 "routine_type": o.get("routine_type"),
@@ -164,6 +166,16 @@ def _card_view(c: dict) -> dict:
 def _costs_money(option: dict) -> bool:
     cost = str(option.get("cost") or "").strip().lower()
     return bool(cost) and cost not in ("none", "0", "free", "no cost", "-")
+
+
+# Routines may only carry out options that communicate (an email or a message to a person).
+# Re-plans, allocations and orders change the plan or commit money: never automatic, whatever
+# their cost text says.
+AUTOMATABLE_CHANNELS = {"email", "notify"}
+
+
+def automatable(option: dict) -> bool:
+    return option.get("channel") in AUTOMATABLE_CHANNELS and not _costs_money(option)
 
 
 class _Run:
@@ -194,8 +206,9 @@ class _Run:
         if not 0 <= int(option_index) < len(options):
             return {"ok": False, "status": "open", "error": "no such option"}
         opt = options[int(option_index)]
-        if _costs_money(opt):
-            return {"ok": False, "status": "open", "error": "costs money: a person decides"}
+        if not automatable(opt):
+            reason = "costs money" if _costs_money(opt) else "changes the plan"
+            return {"ok": False, "status": "open", "error": f"{reason}: a person decides"}
         step = {"do": "carry_out", "card": card_id, "option": opt.get("action"), "reason": reason}
         if self.dry:
             self.did.append({**step, "dry": True})

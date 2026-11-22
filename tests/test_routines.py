@@ -70,8 +70,35 @@ r["error"] or "none"
     assert rec["result"] == "costs money: a person decides" and agent_env["sent"] == []
 
 
+def test_plan_changes_are_never_automatic_even_without_a_price(agent_env, monkeypatch):
+    orig = api.build_state
+
+    def replan():
+        s = orig()
+        for c in s["cards"]:
+            c["options"] = [
+                {
+                    "index": 0,
+                    "action": "Re-plan: give stock to edition B",
+                    "cost": "none",
+                    "channel": None,
+                    "recommended": True,
+                }
+            ]
+        return s
+
+    monkeypatch.setattr(api, "build_state", replan)
+    code = """
+from soony import open_cards, carry_out
+c = open_cards()[0]
+r = carry_out(c["id"], 0, "try")
+str(c["options"][0]["free"]) + " " + str(r["error"])
+"""
+    rec = routines.run({"id": "r3", "name": "T", "code": code})
+    assert rec["result"] == "False changes the plan: a person decides"
+
+
 def test_sandbox_rejects_anything_but_the_building_blocks(agent_env):
     for bad in ("import os\nos.listdir('.')", "from soony import open_cards\nopen_cards(1)"):
         rec = routines.run({"id": "x", "name": "x", "code": bad}, dry=True)
         assert rec["ok"] is False and rec["error"]
-
