@@ -25,7 +25,7 @@
   --color-good: #16795d;
   /* The highlighter: only on source crops. */
   --color-mark: #ffe066;
-  --color-land: #eceff3;
+  --color-land: #ededea;
 }
 
 html, body, #root { height: 100%; }

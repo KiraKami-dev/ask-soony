@@ -1,15 +1,13 @@
-import { Check, ChevronRight, ExternalLink, FileSearch, MailCheck, MoreHorizontal, Phone, Sparkles, Workflow } from 'lucide-react'
-import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from 'react'
+import { Check, ChevronRight, Database, FileText } from 'lucide-react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { EvidenceItem, Trail } from '@/components/EvidenceDrawer'
-import { OpenAnchor, useAnchors, type Anchor } from '@/components/SourceAnchors'
-import { Button } from '@/components/ui/button'
+import { AnchorCrop, NUM_OR_ID, fileUrl, normTok, useAnchors, type Anchor } from '@/components/SourceAnchors'
 import { VoiceCall } from '@/components/VoiceCall'
+import { DONE_WORD, post, sentence, tidy, type Card, type Evidence, type State } from '@/lib/api'
+import { languageOf, replyFacts, routineActionOf, routineOf, sameIssueOn, when, type Group } from '@/lib/decisions'
 import {
-  DONE_WORD, costText, fmtNum, partName, post, sentence, tidy, until, type Card, type State,
-} from '@/lib/api'
-import {
-  languageOf, mismatchPair, replyFacts, routineActionOf, routineOf, sameIssueOn, sourceName, splitValue, when, type Group,
-} from '@/lib/decisions'
+  actionText, claimOf, costLine, costsMoney, docKind, forToday, headlineOf, recommendedIndex, shortName, summaryLine, type Claim,
+} from '@/lib/today'
 import { cn } from '@/lib/utils'
 import { PaneHints } from './routines/PaneHints'
 import { UndoAction } from './routines/Undo'
@@ -40,65 +38,56 @@ interface Props {
 const first = (s?: string) => (!s ? '' : /\s[a-z]/.test(s) ? s : (s.split(' ').find((w) => !w.endsWith('.')) ?? s))
 const typing = (t: EventTarget | null) =>
   t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))
+const lower = (t: string) => (t ? t[0].toLowerCase() + t.slice(1) : t)
 
+// One decision in Plan: Today's decision (headline, the contradiction with tappable sources, the
+// recommendation, one blue button), then the Plan-only parts as quiet folds below a hairline.
 export function DecisionPane({
   card, state, nowMs, group, direct, keys, onChanged, onDrawer, ringing, onRingingDone, offer,
 }: Props) {
-  const [sel, setSel] = useState(() => Math.max(0, card.options.findIndex((o) => o.recommended)))
-  const [mode, setMode] = useState<'idle' | 'edit' | 'escalate'>('idle')
-  const [text, setText] = useState('')
+  const [sel, setSel] = useState(() => recommendedIndex(card))
+  const [text, setText] = useState(() => card.options[recommendedIndex(card)]?.draft ?? '')
+  const [editing, setEditing] = useState(false)
   const [note, setNote] = useState('')
   const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
   const [confirm, setConfirm] = useState(false)
-  const [more, setMore] = useState(false)
-  const moreRef = useRef<HTMLDivElement>(null)
+  // The source opened under the sentence, as on Today: closed until a citation is tapped.
+  const [src, setSrc] = useState<number | null>(null)
+  const [linesEl, setLinesEl] = useState<HTMLDivElement | null>(null)
   const anchors = useAnchors(card.id)
-  // While the recommendation is out of view, the action bar says what Approve does.
-  const recRef = useRef<HTMLElement>(null)
-  const [recSeen, setRecSeen] = useState(true)
-  useEffect(() => {
-    const el = recRef.current
-    if (!el) return
-    const io = new IntersectionObserver(([e]) => setRecSeen(e.isIntersecting), { threshold: 0.4 })
-    io.observe(el)
-    return () => io.disconnect()
-  }, [sel])
 
   const opt = card.options[sel]
-  const due = until(card.deadline, nowMs)
   const other = card.routed_to_other || card.status === 'escalated'
   const closed = card.status !== 'open' && card.status !== 'escalated'
   const actionable = (!other || !!direct) && !closed && !!opt
   const who = first(card.approver) || 'the approver'
-  const part = card.part_name || partName(card.part, state.cards)
-  const pair = mismatchPair(card)
-  const rest = card.evidence.map((_, i) => i).filter((i) => !pair || (i !== pair.sys && i !== pair.doc))
-  const recommended = opt?.recommended || (sel === 0 && !card.options.some((o) => o.recommended))
+  const claim = claimOf(card)
+  const today = !closed ? forToday(card, state, nowMs) : null
+  const recommended = sel === recommendedIndex(card)
   const routine = closed ? routineOf(state, card.id) : null
   const undoId = routine ? routineActionOf(state, card.id) : null
   const facts = replyFacts(card)
   const same = group ? sameIssueOn(group) : null
-
-  useEffect(() => {
-    if (!more) return
-    const off = (e: MouseEvent) => { if (!moreRef.current?.contains(e.target as Node)) setMore(false) }
-    document.addEventListener('mousedown', off)
-    return () => document.removeEventListener('mousedown', off)
-  }, [more])
+  const late = card.level === 'red'
+  const emails = !!opt && opt.channel === 'email' && /@/.test(opt.to ?? '')
+  const money = !!opt && costsMoney(card, sel)
+  const edited = editing && text.trim() !== (opt?.draft ?? '').trim()
+  const shown = src
 
   async function act(fn: () => Promise<unknown>) {
-    setBusy(true)
-    try { await fn() } finally { setBusy(false); setConfirm(false) }
+    setBusy(true); setError('')
+    try { await fn(); onChanged() } catch (e) {
+      setError(`That did not go through: ${(e as Error).message}. Nothing was sent.`)
+    } finally { setBusy(false); setConfirm(false) }
   }
   const approve = () =>
-    act(async () => {
-      await post(`/api/cards/${card.id}/approve`, { option: sel, text: mode === 'edit' ? text : undefined })
-      setMode('idle')
-      onChanged()
-    })
-  const escalate = () =>
-    act(async () => { await post(`/api/cards/${card.id}/escalate`, { note }); setMode('idle'); onChanged() })
-  const dismiss = () => act(async () => { setMore(false); await post(`/api/cards/${card.id}/dismiss`); onChanged() })
+    act(() => post(`/api/cards/${encodeURIComponent(card.id)}/approve`, edited ? { option: sel, text } : { option: sel }))
+  const escalate = () => act(() => post(`/api/cards/${encodeURIComponent(card.id)}/escalate`, { note }))
+  const dismiss = () => act(() => post(`/api/cards/${encodeURIComponent(card.id)}/dismiss`))
+  // An email or money is said out loud first: one more press sends it.
+  const onApprove = () => (confirm ? void approve() : emails || money ? setConfirm(true) : void approve())
+  const pick = (i: number) => { setSel(i); setText(card.options[i]?.draft ?? ''); setEditing(false); setConfirm(false) }
 
   // Keyboard: a asks, Enter approves, Esc cancels. Never while typing.
   const approveRef = useRef(approve)
@@ -109,120 +98,83 @@ export function DecisionPane({
       if (typing(e.target) || e.metaKey || e.ctrlKey || e.altKey) return
       if (confirm && e.key === 'Enter') { e.preventDefault(); void approveRef.current() }
       else if (confirm && e.key === 'Escape') { e.preventDefault(); setConfirm(false) }
-      else if (!confirm && e.key.toLowerCase() === 'a' && actionable && mode === 'idle' && !busy) { e.preventDefault(); setConfirm(true) }
+      else if (!confirm && e.key.toLowerCase() === 'a' && actionable && !busy) { e.preventDefault(); setConfirm(true) }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [keys, confirm, actionable, mode, busy])
+  }, [keys, confirm, actionable, busy])
+
+  const decideBy = !closed && card.deadline
+    ? new Date(card.deadline).getTime() <= nowMs ? 'decide now' : `decide by ${when(card.deadline, nowMs)}`
+    : ''
+  const meta = [card.supplier_name || card.part_name, decideBy].filter(Boolean).join(' · ') || 'Soony'
 
   return (
-    <article className="pane-in space-y-6" aria-label={tidy(card.headline)}>
-      {/* identity and time */}
-      <div className="space-y-2">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-sm">
-          <span className="font-semibold text-ink-2">{[card.supplier_name, part].filter(Boolean).join(' · ') || 'Soony'}</span>
-          {card.deadline && !closed && (
-            <span className={cn('font-semibold tabular-nums', card.level === 'red' && due?.urgent ? 'text-stop' : 'text-ink')}>
-              Decide by {when(card.deadline, nowMs)}{due ? <span className="font-normal text-ink-3"> · {due.text}</span> : null}
-            </span>
-          )}
-        </div>
-        <h1 className="text-[24px] font-bold leading-tight tracking-tight sm:text-[28px]">{tidy(card.headline)}</h1>
-        {same && <p className="text-sm font-semibold text-ink-2">Same issue on {same}.</p>}
-      </div>
+    <article className="pane-in" aria-label={headlineOf(card, state)}>
+      <p className="t-small mb-4 text-ink-3">{meta}</p>
+      <h1 className="t-big text-ink">{headlineOf(card, state)}</h1>
+      {same && <p className="t-small mt-3 text-ink-3">Same issue on {same}.</p>}
 
-      {/* outcome so far */}
+      {/* where it stands */}
       {closed && (
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl bg-panel px-4 py-3 text-[15px] ring-1 ring-line">
-          <Check size={18} className={routine ? 'text-routine' : 'text-ok'} />
-          <span className="font-semibold">{DONE_WORD[card.status] ?? 'Done'}</span>
-          {card.ui?.at && <span className="text-ink-2">{when(card.ui.at, nowMs)}</span>}
-          {routine && (
-            <span className="inline-flex items-center gap-1 text-sm font-semibold text-routine">
-              <Workflow size={14} /> By routine · {routine}
-            </span>
-          )}
-          {undoId && <UndoAction actionId={undoId} onUndone={onChanged} className="ml-auto" />}
-        </div>
+        <p className="t-body mt-6 flex flex-wrap items-baseline gap-x-2 text-ink-2">
+          <Check size={17} strokeWidth={1.75} className="translate-y-0.5 self-center text-ink" />
+          <span className="text-ink">{DONE_WORD[card.status] ?? 'Done'}{card.ui?.at ? ` ${when(card.ui.at, nowMs)}` : ''}.</span>
+          {routine && <span className="t-small dot-routine text-routine">By your routine {routine}</span>}
+          {undoId && <UndoAction actionId={undoId} onUndone={onChanged} />}
+        </p>
       )}
       {closed && offer && <AutomateOffer card={card} offer={offer} />}
-
       {other && (
-        <div className="flex items-start gap-3 rounded-xl bg-panel px-4 py-3 text-[15px] text-ink-2 ring-1 ring-line">
-          <Phone size={18} className="mt-0.5 shrink-0 text-ink-3" />
-          <div>
-            <div className="font-semibold text-ink">{card.status === 'escalated' ? `Waiting for ${who}` : `With ${who}`}</div>
-            {card.reason && <div className="mt-0.5">{sentence(card.reason)}</div>}
-          </div>
-        </div>
+        <p className="t-body mt-6 text-ink-2">
+          <span className="text-ink">{card.status === 'escalated' ? `Waiting for ${who}.` : `With ${who}.`}</span>
+          {card.reason && <> {sentence(card.reason)}</>}
+        </p>
       )}
 
-      <PaneHints card={card} onChanged={onChanged} />
+      <div className="mt-6 empty:hidden"><PaneHints card={card} onChanged={onChanged} /></div>
 
       {facts && (
-        <div className={cn('flex items-start gap-2.5 rounded-xl px-4 py-3 text-[15px] ring-1', facts.late ? 'bg-stop/[0.05] ring-stop/25' : 'bg-good/5 ring-good/25')}>
-          <MailCheck size={18} className={cn('mt-0.5 shrink-0', facts.late ? 'text-stop' : 'text-good')} />
-          <span className="font-semibold text-ink">
-            {facts.text}
-            {facts.late && <span className="text-stop"> · after launch</span>}
-          </span>
-        </div>
+        <p className="t-body mt-6 text-ink">
+          {facts.text}{facts.late ? <span className="text-late">, after launch.</span> : '.'}
+        </p>
       )}
 
-      {/* the contradiction, with its source */}
-      {pair ? (
-        <Hero card={card} pair={pair} anchors={anchors.items} ready={anchors.ready} />
-      ) : (
-        card.number != null && card.number > 0 && (
-          <div className="rounded-xl bg-panel p-5 ring-1 ring-line">
-            <div className={cn('text-[44px] font-extrabold leading-none tabular-nums sm:text-[52px]', card.level === 'red' ? 'text-stop' : card.level === 'amber' ? 'text-warn' : 'text-ink')}>
-              {fmtNum(card.number)}
-            </div>
-            <div className="mt-2 text-[16px] text-ink-2">{card.number_label}</div>
-          </div>
-        )
+      {/* the contradiction, with its sources */}
+      <p className="t-body mt-6 text-ink-2">
+        {claim ? (
+          <ClaimLine claim={claim} late={late} open={shown} onOpen={(i) => setSrc(shown === i ? null : i)} />
+        ) : (
+          <Cited text={summaryLine(card)} anchors={anchors.items} open={shown} onOpen={(i) => setSrc(shown === i ? null : i)} />
+        )}
+      </p>
+      {shown != null && card.evidence[shown] && (
+        <Source card={card} ev={card.evidence[shown]} anchor={anchors.items?.[shown]?.[0]} ready={anchors.ready} onClose={() => setSrc(null)} />
       )}
-      {card.summary && <p className="text-[16px] leading-relaxed text-ink-2">{sentence(card.summary)}</p>}
-
-      {(rest.length > 0 || card.trail.length > 0) && (
-        <div className="divide-y divide-line border-y border-line">
-          {rest.length > 0 && (
-            <Fold title={`More evidence · ${rest.length}`}>
-              <div className="space-y-3">
-                {rest.map((i) => <EvidenceItem key={i} e={card.evidence[i]} anchors={anchors.items?.[i]} ready={anchors.ready} />)}
-              </div>
-            </Fold>
-          )}
-          {card.trail.length > 0 && (
-            <Fold title="How we know">
-              <Trail card={card} />
-            </Fold>
-          )}
-        </div>
+      {today && (
+        <p className="t-body mt-4 text-ink-2">For today: <span className="font-medium text-ink">{today.bold}</span>{today.rest}</p>
       )}
 
       {/* what to do */}
       {actionable && (
         <>
-          <section ref={recRef} className="rounded-xl bg-panel p-5 ring-1 ring-line">
-            <div className="text-xs font-bold uppercase tracking-wide text-ink-3">{recommended ? 'We recommend' : 'Your choice'}</div>
-            <div className="mt-1.5 text-[20px] font-bold leading-snug">{sentence(opt.action)}</div>
-            {opt.effect && <p className="mt-1 text-[16px] text-ink-2">{sentence(opt.effect)}</p>}
-            <div className="mt-3 inline-flex rounded-md bg-white px-2.5 py-1 text-sm font-semibold ring-1 ring-line">{costText(opt.cost)}</div>
-          </section>
+          <div className="mt-12">
+            <p className="t-small mb-1.5 text-ink-3">{recommended ? 'We recommend' : 'Your choice'}</p>
+            <p className="t-body text-ink">{actionText(card, sel)}</p>
+            <p className="t-body text-ink-2">{costLine(card, sel)}{opt.effect ? ` ${sentence(opt.effect)}` : ''}</p>
+          </div>
 
           {card.options.length > 1 && (
-            <ul className="-mt-3 space-y-0.5">
-              {card.options.map((o, i) =>
+            <ul className="mt-5" aria-label="Other options">
+              {card.options.map((_, i) =>
                 i === sel ? null : (
                   <li key={i}>
                     <button
-                      onClick={() => { setSel(i); setMode('idle'); setConfirm(false) }}
-                      className="flex w-full cursor-pointer items-start gap-2 rounded-lg px-3 py-2.5 text-left text-[15px] text-ink-2 hover:bg-panel"
+                      onClick={() => pick(i)}
+                      className="t-body block w-full cursor-pointer py-1.5 text-left text-ink-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-accent"
                     >
-                      <ChevronRight size={16} className="mt-0.5 shrink-0 text-ink-3" />
-                      <span className="min-w-0 font-medium"><span className="text-ink-3">Or: </span>{sentence(o.action)}</span>
-                      <span className="ml-auto shrink-0 pl-2 text-sm text-ink-3">{costText(o.cost)}</span>
+                      <span className="text-ink-3">Or </span>{lower(actionText(card, i))}{' '}
+                      <span className="t-small text-ink-3">{costLine(card, i)}</span>
                     </button>
                   </li>
                 ),
@@ -230,274 +182,240 @@ export function DecisionPane({
             </ul>
           )}
 
-          {mode === 'edit' && (
-            <textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              rows={7}
-              className="w-full rounded-xl border border-line p-4 text-[15px] leading-relaxed focus:outline-2 focus:outline-ok"
-              aria-label="Edit draft"
-            />
-          )}
-          {mode === 'escalate' && (
-            <div className="rounded-xl border border-line p-4">
-              <div className="text-xs font-semibold uppercase tracking-wide text-ink-3">Brief for {who}</div>
-              <p className="mt-1 text-[15px] text-ink-2">{tidy(card.escalation_brief)}</p>
-              <input
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                placeholder="Add one line (optional)"
-                className="mt-3 h-10 w-full rounded-lg border border-line px-3 text-[15px] focus:outline-2 focus:outline-ok"
-              />
-              <div className="mt-3 flex gap-2">
-                <Button size="sm" disabled={busy} onClick={escalate}>Send to {who}</Button>
-                <Button size="sm" variant="ghost" onClick={() => setMode('idle')}>Cancel</Button>
-              </div>
-            </div>
-          )}
-
-          {/* The action bar stays in view while the evidence scrolls. */}
-          <div className="sticky bottom-3 z-10 space-y-2 rounded-xl border border-line bg-white/95 p-3 shadow-[0_8px_24px_rgba(15,23,42,0.08)] backdrop-blur">
+          <div className="mt-8">
             {confirm && (
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-ok/5 px-3 py-2.5 text-[15px] ring-1 ring-ok/30" role="alert">
-                <span className="min-w-0 flex-1">
-                  Press <kbd>Enter</kbd> to approve: <span className="font-semibold">{sentence(opt.action)}</span>{' '}
-                  <span className="text-ink-2">({costText(opt.cost)})</span>
-                </span>
-                <span className="text-sm text-ink-3"><kbd>Esc</kbd> cancels</span>
-              </div>
-            )}
-            {!confirm && !recSeen && (
-              <p className="line-clamp-2 px-1 text-sm text-ink-2">
-                <span className="text-ink-3">{recommended ? 'We recommend: ' : 'Your choice: '}</span>
-                <span className="font-semibold text-ink">{sentence(opt.action)}</span> · {costText(opt.cost)}
+              <p className="t-small mb-3 text-ink-2" role="alert">
+                {emails ? <>This email goes to <span className="text-ink">{opt.to}</span>{edited ? ' with your text' : ''}. </> : null}
+                Approve: <span className="text-ink">{actionText(card, sel).replace(/\.$/, '')}</span> ({costLine(card, sel).replace(/\.$/, '')})
+                {keys && <span className="text-ink-3"> · <kbd>Enter</kbd> confirms, <kbd>Esc</kbd> cancels</span>}
               </p>
             )}
-            <div className="flex flex-wrap items-center gap-2 max-md:flex-nowrap max-md:has-[ul]:flex-wrap">
-              <Button disabled={busy} onClick={approve} className="px-6 max-md:flex-1 max-md:px-3">
-                <Check size={18} /> {mode === 'edit' ? 'Approve edited' : 'Approve'}
-                {keys && <kbd className="ml-1 border-white/40 bg-white/15 text-white">A</kbd>}
-              </Button>
-              <Voice card={card} onChanged={onChanged} ringing={ringing} onRingingDone={onRingingDone} />
-              <Button
-                variant="outline"
-                className="max-md:hidden"
-                disabled={!opt.draft && mode !== 'edit'}
-                title={opt.draft ? undefined : 'This option has no draft to edit'}
-                onClick={() => { setText(opt.draft ?? ''); setMode(mode === 'edit' ? 'idle' : 'edit') }}
-              >
-                Edit
-              </Button>
-              <Button variant="outline" className="max-md:hidden" onClick={() => setMode(mode === 'escalate' ? 'idle' : 'escalate')}>
-                Escalate
-              </Button>
-              <div ref={moreRef} className="relative ml-auto">
-                <Button variant="ghost" className="w-11 px-0" aria-label="More actions" onClick={() => setMore(!more)}>
-                  <MoreHorizontal size={18} />
-                </Button>
-                {more && (
-                  <div className="absolute bottom-12 right-0 z-20 w-60 rounded-xl border border-line bg-white p-1 shadow-lg">
-                    {opt.draft && (
-                      <MenuItem className="md:hidden" onClick={() => { setMore(false); setText(opt.draft ?? ''); setMode('edit') }}>Edit the draft</MenuItem>
-                    )}
-                    <MenuItem className="md:hidden" onClick={() => { setMore(false); setMode('escalate') }}>Escalate to {who}</MenuItem>
-                    <MenuItem disabled={busy} onClick={dismiss} hint="Nothing to do; take it off the list">Dismiss</MenuItem>
-                  </div>
+            {error && <p className="t-small mb-3 text-late" role="alert">{error}</p>}
+            <div className="flex flex-wrap items-center gap-6">
+              <button
+                onClick={onApprove}
+                disabled={busy}
+                className={cn(
+                  't-body inline-flex h-12 cursor-pointer items-center justify-center rounded-xl px-7 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-60',
+                  ringing ? 'bg-soft text-ink hover:bg-hair' : 'bg-accent text-white shadow-[0_1px_2px_rgba(35,72,208,.25)] hover:bg-[#1d3db5]',
                 )}
+              >
+                {busy ? 'Sending…' : confirm ? (emails ? 'Yes, send it' : 'Yes, approve') : edited ? 'Approve edited' : 'Approve'}
+              </button>
+              <div className={cn('t-body flex items-center gap-6', ringing && 'order-first w-full flex-col items-start gap-4 pb-2')}>
+                <VoiceCall card={card} onChanged={onChanged} ringing={ringing} onRingingDone={onRingingDone} quiet linesEl={linesEl} />
+                {confirm && <button onClick={() => setConfirm(false)} className="cursor-pointer text-ink-2 hover:text-ink">Cancel</button>}
               </div>
             </div>
           </div>
         </>
       )}
+      <div ref={setLinesEl} />
+
+      {!actionable && !closed && (
+        <div className="t-body mt-8"><VoiceCall card={card} onChanged={onChanged} ringing={ringing} onRingingDone={onRingingDone} quiet linesEl={linesEl} /></div>
+      )}
 
       {card.ui?.reply && (
-        <section className="rounded-r-xl border-l-4 border-good bg-good/5 px-4 py-3">
-          <div className="text-xs font-bold uppercase tracking-wide text-good">
-            Reply from {card.ui.reply_from || 'supplier'}{card.ui.reply_at ? ` · ${when(card.ui.reply_at, nowMs)}` : ''}
-          </div>
-          <p className="mt-1 text-[16px] font-medium leading-snug">{card.ui.reply}</p>
+        <section className="mt-12">
+          <p className="t-small text-ink-3">
+            Reply from {card.ui.reply_from || 'the supplier'}{card.ui.reply_at ? ` · ${when(card.ui.reply_at, nowMs)}` : ''}
+          </p>
+          <p className="t-body mt-1.5 text-ink">{card.ui.reply}</p>
           {card.ui.reply_text && (
-            <details className="mt-2">
-              <summary className="cursor-pointer text-sm text-ink-3">Original email</summary>
-              <pre className="mt-1 whitespace-pre-wrap break-words font-sans text-sm text-ink-2">{card.ui.reply_text}</pre>
+            <details className="group mt-2">
+              <summary className="t-small cursor-pointer list-none text-ink-3 hover:text-ink [&::-webkit-details-marker]:hidden">
+                <span className="border-b border-hair">Original email</span>
+              </summary>
+              <pre className="t-small mt-2 whitespace-pre-wrap break-words font-sans text-ink-2">{card.ui.reply_text}</pre>
             </details>
           )}
         </section>
       )}
 
-      {!actionable && !closed && <Voice card={card} onChanged={onChanged} ringing={ringing} onRingingDone={onRingingDone} />}
-
-      <button
-        onClick={() => onDrawer(card, 'evidence')}
-        className="inline-flex cursor-pointer items-center gap-1.5 text-sm font-semibold text-ink-2 hover:text-ink md:hidden"
-      >
-        <FileSearch size={16} /> Show all evidence
-      </button>
+      {/* Plan only: everything behind it, folded */}
+      <div className="mt-14 border-t border-hair">
+        {card.evidence.length > 0 && (
+          <Fold title="All evidence" n={card.evidence.length}>
+            <div className="space-y-7">
+              {claim && card.summary && <p className="t-body text-ink-2">{sentence(card.summary)}</p>}
+              {card.evidence.map((e, i) => <EvidenceItem key={i} e={e} anchors={anchors.items?.[i]} ready={anchors.ready} />)}
+              <button onClick={() => onDrawer(card, 'evidence')} className="t-small cursor-pointer text-ink-3 hover:text-ink">
+                <span className="border-b border-hair">Open beside the list</span>
+              </button>
+            </div>
+          </Fold>
+        )}
+        {card.trail.length > 0 && (
+          <Fold title="How we know" n={card.trail.length}>
+            <Trail card={card} />
+          </Fold>
+        )}
+        {actionable && opt.draft && (
+          <Fold title={emails ? 'Edit the email' : 'Edit the message'} onToggle={setEditing}>
+            {emails && (
+              <p className="t-small mb-2 text-ink-3">To {card.supplier_name ? `${shortName(card.supplier_name)} · ` : ''}{opt.to}</p>
+            )}
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              rows={8}
+              className="t-body w-full resize-y rounded-xl bg-soft p-4 leading-relaxed text-ink focus:outline-2 focus:outline-accent"
+              aria-label="Edit the message"
+            />
+            <p className="t-small mt-2 text-ink-3">
+              {edited ? 'Approve above sends your text.' : 'Change the text, then approve above.'}
+              {edited && <button onClick={() => setText(opt.draft ?? '')} className="uline ml-2">Reset</button>}
+            </p>
+          </Fold>
+        )}
+        {actionable && (
+          <Fold title={`Escalate to ${who}`}>
+            <p className="t-small text-ink-3">They get this brief:</p>
+            <p className="t-small mt-1 text-ink-2">{tidy(card.escalation_brief)}</p>
+            <div className="mt-4 flex flex-wrap items-center gap-4">
+              <input
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Add one line (optional)"
+                className="t-small h-10 min-w-0 flex-1 rounded-lg bg-soft px-3 focus:outline-2 focus:outline-accent"
+                aria-label={`Note for ${who}`}
+              />
+              <button disabled={busy} onClick={escalate} className="t-small cursor-pointer font-medium text-accent hover:underline disabled:opacity-60">
+                Send to {who}
+              </button>
+            </div>
+          </Fold>
+        )}
+        {actionable && (
+          <p className="t-small border-b border-hair py-4 text-ink-3">
+            Nothing to do?{' '}
+            <button disabled={busy} onClick={dismiss} className="uline">Dismiss it</button>
+          </p>
+        )}
+      </div>
     </article>
   )
 }
 
-// VoiceCall brings its own "Talk it through" button and transcript; it sits in the action row,
-// and takes the full width while ringing or once a transcript shows.
-function Voice(p: { card: Card; onChanged: () => void; ringing?: boolean; onRingingDone?: () => void }) {
+function Fold({ title, n, children, onToggle }: { title: string; n?: number; children: ReactNode; onToggle?: (open: boolean) => void }) {
   return (
-    <div
-      className={cn(
-        'min-w-0 [&>div]:mt-0 [&_ul]:max-h-56 [&_ul]:overflow-y-auto has-[ul]:basis-full',
-        '[&_button]:h-11 [&_button]:text-[15px] max-md:[&_button]:px-3 md:[&_button]:px-5',
-        p.ringing && 'order-first basis-full',
-      )}
-    >
-      <VoiceCall card={p.card} onChanged={p.onChanged} ringing={p.ringing} onRingingDone={p.onRingingDone} />
-    </div>
-  )
-}
-
-function MenuItem({ children, hint, className, ...rest }: { children: ReactNode; hint?: string } & ButtonHTMLAttributes<HTMLButtonElement>) {
-  return (
-    <button {...rest} className={cn('w-full cursor-pointer rounded-lg px-3 py-2 text-left text-[15px] font-semibold text-ink-2 hover:bg-panel', className)}>
-      {children}
-      {hint && <span className="block text-xs font-normal text-ink-3">{hint}</span>}
-    </button>
-  )
-}
-
-function Fold({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <details className="group">
-      <summary className="flex cursor-pointer list-none items-center gap-1.5 py-3 text-sm font-semibold text-ink-2 hover:text-ink [&::-webkit-details-marker]:hidden">
-        <ChevronRight size={16} className="transition-transform group-open:rotate-90" /> {title}
+    <details className="group border-b border-hair" onToggle={(e) => onToggle?.((e.currentTarget as HTMLDetailsElement).open)}>
+      <summary className="t-small flex cursor-pointer list-none items-center gap-2 py-4 text-ink-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-accent [&::-webkit-details-marker]:hidden">
+        <ChevronRight size={15} strokeWidth={1.75} className="text-ink-3 transition-transform group-open:rotate-90" />
+        {title}{n != null && <span className="text-ink-3">· {n}</span>}
       </summary>
-      <div className="pb-4">{children}</div>
+      <div className="fade pb-8 pl-[23px] pt-1">{children}</div>
     </details>
   )
 }
 
 /** After a decision by hand: offer to handle the next ones like it, in place. */
 function AutomateOffer({ card, offer }: { card: Card; offer: Offer }) {
-  const who = card.supplier_name
+  const who = shortName(card.supplier_name)
   return (
-    <section className="slide-in rounded-xl border border-routine/30 bg-routine/5 p-5" aria-live="polite">
-      <div className="text-[18px] font-bold leading-snug">
-        Done.{' '}
+    <section className="rise mt-10" aria-live="polite">
+      <p className="t-body text-ink">
         {offer.more > 0
           ? `${offer.more} more like this${who ? ` from ${who}` : ''}. Handle them the same way?`
           : 'Handle the next one like this on its own?'}
-      </div>
-      <p className="mt-1 text-[15px] text-ink-2">Money and plan changes still come to you.</p>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <Button onClick={offer.onYes} className="bg-routine hover:bg-[#6d28d9]"><Sparkles size={16} /> Show me the routine</Button>
-        <Button variant="outline" onClick={offer.onNext}>Next decision</Button>
-      </div>
-    </section>
-  )
-}
-
-// ---------------------------------------------------------------- hero
-
-const where = (a: Anchor) =>
-  a.kind === 'table' || a.kind === 'text' ? `row ${(a.row ?? 0) + 1}` : `p. ${a.page ?? 1}`
-const docName = (doc: string) => (doc.split('/').pop() ?? doc).replace(/\.[a-z0-9]+$/i, '').replace(/_/g, ' ')
-
-function Hero({
-  card, pair, anchors, ready,
-}: { card: Card; pair: { sys: number; doc: number }; anchors: Record<number, Anchor[]> | null; ready: boolean }) {
-  const s = card.evidence[pair.sys]
-  const d = card.evidence[pair.doc]
-  const sysA = anchors?.[pair.sys] ?? []
-  const docA = anchors?.[pair.doc] ?? []
-  // The paper side opens right away; the system's row is one click away.
-  const [pick, setPick] = useState<{ side: 'doc' | 'sys'; i: number } | null>(null)
-  const active = pick ? (pick.side === 'doc' ? docA : sysA)[pick.i] : docA[0] ?? null
-  const activeKey = pick ?? (docA[0] ? { side: 'doc' as const, i: 0 } : null)
-  const tone = card.level === 'red' ? 'stop' : card.level === 'amber' ? 'warn' : null
-  const lang = languageOf(d.source, d.language)
-  const page = d.page ?? docA[0]?.page
-  const docHead = `The document says${lang || page ? ` (${[lang, page ? `p. ${page}` : ''].filter(Boolean).join(', ')})` : ''}`
-  const sources = [
-    ...docA.map((a, i) => ({ side: 'doc' as const, i, a })),
-    ...sysA.map((a, i) => ({ side: 'sys' as const, i, a })),
-  ]
-
-  return (
-    <section className="space-y-3">
-      <div className="grid items-stretch gap-3 md:grid-cols-[1fr_auto_1fr]">
-        <Slab head="The system says" source={sourceName(s.source) || 'System'} value={s.value} />
-        <div className="grid place-items-center text-[28px] font-bold text-ink-3 max-md:-my-2" aria-label="does not match">≠</div>
-        <Slab head={docHead} source={sourceName(d.source) || 'Document'} value={d.value} tone={tone} />
-      </div>
-
-      {(d.quote || d.translation) && (
-        <div className="space-y-1 px-1">
-          {d.quote && <blockquote className="border-l-2 border-line pl-3 text-[15px] leading-relaxed text-ink">“{d.quote}”</blockquote>}
-          {d.translation && <p className="pl-3.5 text-sm text-ink-2">In English: {d.translation}</p>}
-        </div>
-      )}
-
-      {sources.length > 1 && (
-        <div className="flex flex-wrap gap-1.5">
-          {sources.map((x) => {
-            const on = activeKey?.side === x.side && activeKey.i === x.i
-            return (
-              <button
-                key={`${x.side}-${x.i}`}
-                onClick={() => setPick({ side: x.side, i: x.i })}
-                title={x.a.doc}
-                className={cn(
-                  'inline-flex max-w-full cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-sm',
-                  on ? 'border-ink bg-ink font-semibold text-white' : 'border-line text-ink-2 hover:bg-panel',
-                )}
-              >
-                <span className="shrink-0 font-semibold">{x.side === 'doc' ? 'Document' : 'System'}</span>
-                <span className="truncate">{docName(x.a.doc)}</span>
-                <span className={cn('shrink-0', on ? 'text-white/70' : 'text-ink-3')}>· {where(x.a)}</span>
-              </button>
-            )
-          })}
-        </div>
-      )}
-      {active ? (
-        <OpenAnchor anchor={active} />
-      ) : !ready ? (
-        <p className="px-1 text-sm text-ink-3">Looking for this in the documents…</p>
-      ) : d.doc ? (
-        <a
-          href={`/api/file?path=${encodeURIComponent(d.doc)}${d.page ? `#page=${d.page}` : ''}`}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-1.5 px-1 text-sm font-semibold text-ok hover:underline"
+      </p>
+      <p className="t-small dot-routine mt-3 text-routine">You'll see a test run first. Anything that costs money still comes to you.</p>
+      <div className="mt-6 flex items-center gap-6">
+        <button
+          onClick={offer.onYes}
+          className="t-body inline-flex h-12 cursor-pointer items-center rounded-xl bg-accent px-7 font-medium text-white hover:bg-[#1d3db5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
-          Open the document <ExternalLink size={14} />
-        </a>
-      ) : null}
+          Show me how
+        </button>
+        <button onClick={offer.onNext} className="t-body cursor-pointer text-ink-2 hover:text-ink">Not now</button>
+      </div>
     </section>
   )
 }
 
-function Slab({ head, source, value, tone }: { head: string; source: string; value: Card['evidence'][number]['value']; tone?: 'stop' | 'warn' | null }) {
-  const { big, rest } = splitValue(value)
-  const long = big.length > 14
+// ---------------------------------------------------------------- the sentence and its sources
+
+function ClaimLine({ claim, late, open, onOpen }: { claim: Claim; late: boolean; open: number | null; onOpen: (i: number) => void }) {
   return (
-    <div
-      className={cn(
-        'min-w-0 rounded-xl p-5 ring-1',
-        tone === 'stop' ? 'bg-stop/[0.05] ring-stop/25' : tone === 'warn' ? 'bg-warn/[0.06] ring-warn/25' : 'bg-white ring-line',
-      )}
-    >
-      <div className={cn('text-xs font-bold uppercase tracking-wide', tone === 'stop' ? 'text-stop' : tone === 'warn' ? 'text-warn' : 'text-ink-3')}>
-        {head}
-      </div>
-      <div className="mt-0.5 text-sm text-ink-2">{source}</div>
-      <div
-        className={cn(
-          'mt-3 font-extrabold leading-none tabular-nums tracking-tight',
-          long ? 'text-[28px] leading-tight' : 'text-[40px] sm:text-[48px]',
-          tone === 'stop' ? 'text-stop' : tone === 'warn' ? 'text-warn' : 'text-ink',
-        )}
-      >
-        {big}
-      </div>
-      {rest && <div className="mt-2 text-[16px] font-medium leading-snug text-ink-2">{rest}</div>}
-    </div>
+    <>
+      {claim.pre}
+      <button className="cite" aria-expanded={open === claim.sys.index} onClick={() => onOpen(claim.sys.index)}>
+        {claim.sys.value}<Database aria-hidden="true" />
+      </button>
+      {claim.mid}
+      <button className={cn('cite', late && 'late')} aria-expanded={open === claim.doc.index} onClick={() => onOpen(claim.doc.index)}>
+        {claim.doc.value}<FileText aria-hidden="true" />
+      </button>
+      {claim.post}
+    </>
   )
+}
+
+/** A sentence whose numbers, when found in a source, open that source. */
+function Cited({ text, anchors, onOpen, open }: { text: string; anchors: Record<number, Anchor[]> | null; onOpen: (i: number) => void; open: number | null }) {
+  if (!text) return null
+  const flat = Object.entries(anchors ?? {}).flatMap(([i, as]) => as.map((a) => ({ i: Number(i), a })))
+  const parts: ReactNode[] = []
+  let last = 0
+  for (const m of text.matchAll(NUM_OR_ID)) {
+    const hit = flat.find((x) => x.a.matched.includes(normTok(m[0])))
+    if (!hit || !/\d/.test(m[0])) continue
+    parts.push(text.slice(last, m.index))
+    parts.push(
+      <button key={m.index} className="cite" aria-expanded={open === hit.i} onClick={() => onOpen(hit.i)}>{m[0]}</button>,
+    )
+    last = (m.index ?? 0) + m[0].length
+  }
+  parts.push(text.slice(last))
+  return <>{parts}</>
+}
+
+const SYS = /system|sap|erp/i
+const where = (a?: Anchor, ev?: Evidence) =>
+  a ? (a.kind === 'table' || a.kind === 'text' ? `row ${(a.row ?? 0) + 1}` : `page ${a.page ?? 1}`) : ev?.page ? `page ${ev.page}` : ''
+
+/** The source of one side, opened in place: the crop with the highlighter, then in English. */
+function Source({ card, ev, anchor: a, ready, onClose }: { card: Card; ev: Evidence; anchor?: Anchor; ready: boolean; onClose: () => void }) {
+  const isSys = SYS.test(ev.source ?? '')
+  const head = [
+    isSys ? (/\bSAP\b/.test(ev.source ?? '') ? 'SAP' : 'System') : card.supplier_name,
+    [docKind(ev.source), where(a, ev)].filter(Boolean).join(', '),
+    languageOf(ev.source, ev.language),
+  ].filter(Boolean).join(' · ')
+  const english = ev.translation ? ev.translation.split(' = ').pop() : null
+  const original = a ? fileUrl(a) : ev.doc ? `/api/file?path=${encodeURIComponent(ev.doc)}${ev.page ? `#page=${ev.page}` : ''}` : null
+  return (
+    <section className="fade mt-5" aria-label="Source">
+      <p className="t-small text-ink-3">{head}</p>
+      <div className="mt-2 overflow-hidden rounded-xl bg-soft p-3">
+        {a ? (
+          <AnchorCrop key={a.doc} anchor={a} />
+        ) : !ready ? (
+          <p className="t-small p-2 text-ink-3">Finding it in the documents…</p>
+        ) : (
+          <p className="t-small whitespace-pre-wrap p-2 leading-[1.9] text-ink-2"><Marked text={tidy(ev.quote) || String(ev.value ?? '')} value={String(ev.value ?? '')} /></p>
+        )}
+      </div>
+      {english && <p className="t-body mt-3 text-ink">{english}</p>}
+      <p className="t-small mt-3 flex gap-5">
+        {original && <a href={original} target="_blank" rel="noreferrer" className="text-accent hover:underline">Open original</a>}
+        <button onClick={onClose} className="cursor-pointer text-ink-3 hover:text-ink">Close</button>
+      </p>
+    </section>
+  )
+}
+
+/** The quote with the value's numbers highlighted (when no page or row was found). */
+function Marked({ text, value }: { text: string; value: string }) {
+  const nums = new Set((value.match(/\d[\d,.]*\d|\d/g) ?? []).map(normTok))
+  const parts: ReactNode[] = []
+  let last = 0
+  for (const m of text.matchAll(/\d[\d,.]*\d|\d/g)) {
+    if (!nums.has(normTok(m[0]))) continue
+    parts.push(text.slice(last, m.index), <mark key={m.index} className="rounded-[3px] bg-mark px-1 font-medium text-[#111]">{m[0]}</mark>)
+    last = (m.index ?? 0) + m[0].length
+  }
+  parts.push(text.slice(last))
+  return <>{parts}</>
 }

@@ -1,5 +1,5 @@
-import { useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { COLORS, fmtDay, fmtNum, fmtTime, partName, tidy, type Card, type ClockEdition, type Level, type State } from '@/lib/api'
+import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { fmtDay, fmtNum, fmtTime, partName, tidy, type Card, type ClockEdition, type Level, type State } from '@/lib/api'
 
 // The launch timeline: shift hours to scale, nights squeezed, a thick truck line at launch and a
 // "Too late" gutter past it. One lane per edition (packing bar, decide-by and runs-dry markers),
@@ -16,14 +16,18 @@ export interface LaunchTimelineProps {
 const TZ = 'Europe/Berlin'
 const HOUR = 3_600_000
 const NIGHT = 0.25 // a night hour gets a quarter of a shift hour's width
-const INK = '#0f172a'
-const INK2 = '#475569'
-const INK3 = '#64748b'
-const LINE = '#e2e8f0'
-const NIGHT_FILL = '#eef1f5'
-const OK = '#1d6fe0'
-const STOP = COLORS.red
-const SILENT = COLORS.grey
+// The app's tokens (index.css): ink, hairlines, the one blue for the selection, red only for
+// what misses the trucks.
+const INK = 'var(--color-ink)'
+const INK2 = 'var(--color-ink-2)'
+const INK3 = 'var(--color-ink-3)'
+const LINE = 'var(--color-hair)'
+const GROUND = 'var(--color-ground)'
+const NIGHT_FILL = 'var(--color-soft)'
+const BAR = '#c9c9ce'
+const OK = 'var(--color-accent)'
+const STOP = 'var(--color-late)'
+const SILENT = 'var(--color-ink-3)'
 const OPEN = new Set(['open', 'escalated'])
 
 const fmtDate = (ms: number) =>
@@ -35,8 +39,8 @@ const ms = (iso?: string | null) => (iso ? new Date(iso).getTime() : NaN)
 const ok = (n: number) => Number.isFinite(n)
 const clip = (t: string, n: number) => (t.length > n ? `${t.slice(0, Math.max(n - 1, 1)).trimEnd()}…` : t)
 
-/** Lane colour for a level: blue is kept for actions, so an edition on track packs in slate. */
-const barColour = (l: Level) => (l === 'blue' ? INK3 : COLORS[l])
+/** Red only for what misses the trucks; everything else packs in quiet grey. */
+const tone = (l: Level) => (l === 'red' ? STOP : INK3)
 
 /** A short readable name for what a card is about: the part, else the start of its headline. */
 function what(c: Card, cards: Card[], n = 34): string {
@@ -66,9 +70,8 @@ interface Tip { x: number; y: number; text: string }
 export function LaunchTimeline({ state, nowMs, selectedId, onSelect, compact = false }: LaunchTimelineProps) {
   const [ref, width] = useWidth()
   const [tip, setTip] = useState<Tip | null>(null)
-  const uid = useId().replace(/:/g, '')
   const clock = state.clock
-  const H = compact ? 120 : 196
+  const H = compact ? 116 : 176
 
   const model = useMemo((): Model | null => {
     if (!clock || !width) return null
@@ -111,14 +114,14 @@ export function LaunchTimeline({ state, nowMs, selectedId, onSelect, compact = f
   }, [clock, width, nowMs, compact])
 
   // Rows: tick row, one lane per edition, the inbound lane.
-  const tickH = compact ? 18 : 24
-  const laneH = compact ? 38 : 58
-  const inboundH = compact ? 22 : 44
+  const tickH = compact ? 20 : 28
+  const laneH = compact ? 36 : 52
+  const inboundH = compact ? 24 : 40
   const editions: ClockEdition[] = clock?.editions ?? []
 
   if (!clock) {
     return (
-      <div ref={ref} style={{ height: H }} className="grid place-items-center rounded-xl border border-line bg-panel text-[13px] text-ink-3">
+      <div ref={ref} style={{ height: H }} className="t-small grid place-items-center text-ink-3">
         No packing plan found in the portal yet
       </div>
     )
@@ -163,12 +166,12 @@ export function LaunchTimeline({ state, nowMs, selectedId, onSelect, compact = f
     }
 
     // ---- gutter items: late goods named on cards, then shipments a card links, both past launch
-    type Late = { key: string; at: number; title: string; sub: string; cards: string[]; level: Level }
+    type Late = { key: string; at: number; title: string; sub: string; cards: string[] }
     const late: Late[] = []
     for (const c of open) {
       const at = ms(c.arrives_at)
       if (!ok(at) || at < launch) continue
-      late.push({ key: `c-${c.id}`, at, title: fmtDate(at), sub: `${c.number != null ? `${fmtNum(c.number)} ` : ''}${what(c, state.cards, 30)}`, cards: [c.id], level: 'red' })
+      late.push({ key: `c-${c.id}`, at, title: fmtDate(at), sub: `${c.number != null ? `${fmtNum(c.number)} ` : ''}${what(c, state.cards, 30)}`, cards: [c.id] })
     }
     let laterUnlinked = 0
     for (const s of state.shipments) {
@@ -177,25 +180,19 @@ export function LaunchTimeline({ state, nowMs, selectedId, onSelect, compact = f
       const linked = open.filter((c) => c.shipment === s.id)
       if (!linked.length) { laterUnlinked += 1; continue }
       if (late.some((l) => linked.some((c) => l.cards.includes(c.id)))) continue
-      late.push({ key: `s-${s.id}`, at, title: fmtDate(at), sub: `${fmtNum(linked[0].number)} ${what(linked[0], state.cards, 30)}`, cards: linked.map((c) => c.id), level: 'red' })
+      late.push({ key: `s-${s.id}`, at, title: fmtDate(at), sub: `${fmtNum(linked[0].number)} ${what(linked[0], state.cards, 30)}`, cards: linked.map((c) => c.id) })
     }
     late.sort((a, b) => a.at - b.at)
-    const lateRowH = compact ? 24 : 40
+    const lateRowH = compact ? 22 : 38
     const lateMax = Math.max(1, Math.floor((lanesBottom - lanesTop - (compact ? 4 : 18)) / lateRowH))
     const lateShown = late.slice(0, lateMax)
     const lateMore = late.length - lateShown.length + laterUnlinked
 
-    const gx = x1 + (compact ? 10 : 16)
+    const gx = x1 + (compact ? 10 : 18)
     const truckLabel = `${compact ? '' : 'Trucks '}${fmtTime(new Date(launch).toISOString())}`
 
     return (
       <svg width={width} height={H} className="block select-none" role="img" aria-label="Launch timeline">
-        <defs>
-          <pattern id={`${uid}-hatch`} patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
-            <rect width="6" height="6" fill="#fdecec" />
-            <line x1="0" y1="0" x2="0" y2="6" stroke={STOP} strokeWidth="2.2" />
-          </pattern>
-        </defs>
 
         {/* nights */}
         {segs.filter((g) => !g.shift).map((g) => {
@@ -204,7 +201,7 @@ export function LaunchTimeline({ state, nowMs, selectedId, onSelect, compact = f
             <g key={`n-${g.a}`}>
               <rect x={a} y={lanesTop} width={Math.max(b - a, 0)} height={lanesBottom - lanesTop} fill={NIGHT_FILL} />
               {b - a >= 56 && !compact && (
-                <text x={(a + b) / 2} y={lanesBottom - 8} textAnchor="middle" fontSize={12} fill={INK3}>no shift</text>
+                <text x={(a + b) / 2} y={lanesBottom - 8} textAnchor="middle" fontSize={12} fill={INK3}>night</text>
               )}
             </g>
           )
@@ -222,28 +219,28 @@ export function LaunchTimeline({ state, nowMs, selectedId, onSelect, compact = f
           const underNow = (!compact && nowX != null && Math.abs(tx - nowX) < 44) || tx > x1 - (compact ? 58 : 104)
           return (
             <g key={`t-${tk.t}`}>
-              <line x1={tx} x2={tx} y1={lanesTop - 4} y2={lanesBottom} stroke={tk.day ? '#cbd5e1' : LINE} strokeDasharray={tk.day ? undefined : '2 3'} />
-              {!underNow && <text x={tx} y={tickH - 9} textAnchor={tx - x0 < 20 ? 'start' : 'middle'} fontSize={12} fontWeight={tk.day ? 600 : 400} fill={tk.day ? INK2 : INK3}>{tk.label}</text>}
+              <line x1={tx} x2={tx} y1={lanesTop} y2={lanesBottom} stroke={LINE} />
+              {!underNow && <text x={tx} y={tickH - 11} textAnchor={tx - x0 < 20 ? 'start' : 'middle'} fontSize={12} fill={tk.day ? INK2 : INK3}>{tk.label}</text>}
             </g>
           )
         })}
 
         {/* lane labels */}
         {editions.map((ed, i) => (
-          <text key={`l-${ed.edition}`} x={0} y={lanesTop + i * laneH + (compact ? 22 : 34)} fontSize={13} fontWeight={600} fill={INK}>{ed.label}</text>
+          <text key={`l-${ed.edition}`} x={0} y={lanesTop + i * laneH + (compact ? 22 : 32)} fontSize={13} fontWeight={500} fill={INK}>{ed.label}</text>
         ))}
-        <text x={0} y={lanesTop + editions.length * laneH + (compact ? 19 : 20)} fontSize={13} fontWeight={600} fill={INK2}>Inbound</text>
+        <text x={0} y={lanesTop + editions.length * laneH + (compact ? 19 : 20)} fontSize={13} fill={INK2}>Inbound</text>
 
         {/* edition lanes: bars under the past fade, words and markers above it */}
         {(['bars', 'top'] as const).map((layer) => (
           <g key={layer}>
             {layer === 'top' && nowX != null && nowX > x0 && (
-              <rect x={x0} y={lanesTop} width={nowX - x0} height={lanesBottom - lanesTop} fill="#fff" opacity={0.5} pointerEvents="none" />
+              <rect x={x0} y={lanesTop} width={nowX - x0} height={lanesBottom - lanesTop} fill={GROUND} opacity={0.55} pointerEvents="none" />
             )}
             {editions.map((ed, i) => (
               <EditionLane
                 key={ed.edition} layer={layer} ed={ed} top={lanesTop + i * laneH} compact={compact} model={model} nowMs={nowMs}
-                cards={open.filter((c) => c.edition === ed.edition)} all={state.cards} uid={uid}
+                cards={open.filter((c) => c.edition === ed.edition)} all={state.cards}
                 selected={sel} pick={pick} hover={hover} leave={leave} cardsBy={cardsBy}
               />
             ))}
@@ -257,10 +254,10 @@ export function LaunchTimeline({ state, nowMs, selectedId, onSelect, compact = f
         />
 
         {/* truck line and gutter */}
-        <rect x={x1} y={lanesTop} width={gutterW} height={lanesBottom - lanesTop} fill="#fff" />
-        <line x1={x1} x2={x1} y1={lanesTop - 6} y2={lanesBottom} stroke={INK} strokeWidth={3} />
-        <text x={x1 - 6} y={tickH - 9} textAnchor="end" fontSize={12} fontWeight={700} fill={INK}>{truckLabel}</text>
-        <text x={gx} y={tickH - 9} fontSize={12} fontWeight={700} fill={STOP}>Too late</text>
+        <rect x={x1} y={lanesTop} width={gutterW} height={lanesBottom - lanesTop} fill={GROUND} />
+        <line x1={x1} x2={x1} y1={lanesTop - 8} y2={lanesBottom} stroke={INK} strokeWidth={2} />
+        <text x={x1 - 8} y={tickH - 11} textAnchor="end" fontSize={12} fontWeight={500} fill={INK}>{truckLabel}</text>
+        <text x={gx} y={tickH - 11} fontSize={12} fontWeight={500} fill={STOP}>Too late</text>
         {lateShown.map((l, i) => {
           const y = lanesTop + (compact ? 14 : 20) + i * lateRowH
           const s = sel(l.cards)
@@ -273,16 +270,16 @@ export function LaunchTimeline({ state, nowMs, selectedId, onSelect, compact = f
               onFocus={(e) => hover(e, `${l.sub}: arrives ${l.title}`)} onBlur={leave}
             >
               <rect x={x1 + 2} y={y - 16} width={gutterW - 2} height={Math.max(lateRowH, 32)} fill="transparent" />
-              {s && <circle cx={gx + 5} cy={y - 4} r={9} fill="none" stroke={OK} strokeWidth={2} />}
-              <circle cx={gx + 5} cy={y - 4} r={5} fill={COLORS[l.level]} />
-              <text x={gx + 16} y={y} fontSize={compact ? 12 : 13} fontWeight={700} fill={STOP}>{compact ? fmtShort(l.at) : l.title}</text>
-              {!compact && <text x={gx + 16} y={y + 16} fontSize={12} fill={INK2}>{clip(l.sub, Math.floor((width - gx - 20) / 6.7))}</text>}
+              {s && <circle cx={gx + 3} cy={y - 4} r={7} fill="none" stroke={OK} strokeWidth={1.5} />}
+              <circle cx={gx + 3} cy={y - 4} r={3.5} fill={STOP} />
+              <text x={gx + 14} y={y} fontSize={compact ? 12 : 13} fontWeight={500} fill={STOP}>{compact ? fmtShort(l.at) : l.title}</text>
+              {!compact && <text x={gx + 14} y={y + 16} fontSize={12} fill={INK2}>{clip(l.sub, Math.floor((width - gx - 20) / 6.4))}</text>}
             </g>
           )
         })}
         {lateMore > 0 && (
           <text
-            x={gx} y={lanesBottom - 8} fontSize={12} fill={INK3}
+            x={gx} y={lanesBottom - 6} fontSize={12} fill={INK3}
             onMouseEnter={(e) => hover(e, `${lateMore} more shipment${lateMore === 1 ? '' : 's'} due after launch, none tied to an open decision`)} onMouseLeave={leave}
           >
             +{lateMore} later{compact ? '' : ', not on a card'}
@@ -292,13 +289,8 @@ export function LaunchTimeline({ state, nowMs, selectedId, onSelect, compact = f
         {/* now */}
         {nowX != null && (
           <g pointerEvents="none">
-            <line x1={nowX} x2={nowX} y1={lanesTop - 2} y2={lanesBottom} stroke={INK} strokeWidth={1} />
-            {!compact && (
-              <g>
-                <rect x={nowX - 20} y={2} width={40} height={17} rx={4} fill={INK} />
-                <text x={nowX} y={15} textAnchor="middle" fontSize={12} fontWeight={600} fill="#fff">now</text>
-              </g>
-            )}
+            <line x1={nowX} x2={nowX} y1={lanesTop - 8} y2={lanesBottom} stroke={INK} strokeWidth={1} />
+            {!compact && <text x={nowX} y={tickH - 11} textAnchor="middle" fontSize={12} fontWeight={500} fill={INK}>now</text>}
           </g>
         )}
       </svg>
@@ -310,7 +302,7 @@ export function LaunchTimeline({ state, nowMs, selectedId, onSelect, compact = f
       {body}
       {tip && (
         <div
-          className="pointer-events-none absolute z-20 max-w-[320px] -translate-x-1/2 -translate-y-full truncate rounded-md bg-ink px-2.5 py-1.5 text-[12px] font-medium text-white shadow-lg"
+          className="t-small pointer-events-none absolute z-20 max-w-[340px] -translate-x-1/2 -translate-y-full truncate rounded-lg bg-ink px-3 py-1.5 text-white shadow-[0_8px_24px_-10px_rgba(0,0,0,.35)]"
           style={{ left: Math.min(Math.max(tip.x, 120), Math.max(width - 120, 120)), top: tip.y - 6 }}
         >
           {tip.text}
@@ -348,19 +340,19 @@ interface Shared {
 interface Marker { key: string; x: number; kind: 'decide' | 'dry'; at: number; cards: Card[] }
 
 function EditionLane({
-  layer, ed, top, cards, all, uid, nowMs, cardsBy, compact, model, selected, pick, hover, leave,
+  layer, ed, top, cards, all, nowMs, cardsBy, compact, model, selected, pick, hover, leave,
 }: Shared & {
-  layer: 'bars' | 'top'; ed: ClockEdition; top: number; cards: Card[]; all: Card[]; uid: string; nowMs: number
+  layer: 'bars' | 'top'; ed: ClockEdition; top: number; cards: Card[]; all: Card[]; nowMs: number
   cardsBy: (id: string) => Card | undefined
 }) {
   const { x, x0, x1, segs, launch, start } = model
-  const barY = top + (compact ? 19 : 24)
-  const barH = compact ? 10 : 12
+  const barY = top + (compact ? 21 : 27)
+  const barH = compact ? 5 : 6
   const midY = barY + barH / 2
   const finish = ms(ed.finishes_at)
   const stop = ms(ed.stops_at)
   const end = ok(stop) ? stop : ok(finish) ? finish : launch
-  const colour = barColour(ed.level)
+  const colour = ed.level === 'red' ? INK3 : BAR
   const shifts = segs.filter((g) => g.shift)
   const pieces = (a: number, b: number) =>
     shifts.map((g) => [Math.max(g.a, a), Math.min(g.b, b)] as const).filter(([p, q]) => q > p)
@@ -376,7 +368,7 @@ function EditionLane({
     status = `makes the trucks${spare != null && spare > 0 ? ` · ${spare < 1 ? `${Math.round(spare * 60)} min` : `${Math.round(spare * 10) / 10} h`} spare` : ''}`
   } else {
     status = `runs out of time${ed.short_of_time ? ` · ${fmtNum(ed.short_of_time)} unpacked` : ''}`
-    statusColour = COLORS.amber
+    statusColour = STOP
   }
   if (compact) status = status.replace(/^(stops|stopped) \w+ /, '$1 ').replace('makes the trucks', 'on time')
   const endX = x(end)
@@ -408,12 +400,16 @@ function EditionLane({
         onMouseLeave={leave}
       >
         {pieces(start, end).map(([a, b]) => (
-          <rect key={`b-${a}`} x={x(a)} y={barY} width={Math.max(x(b) - x(a), 1)} height={barH} rx={2} fill={colour} />
+          <rect key={`b-${a}`} x={x(a)} y={barY} width={Math.max(x(b) - x(a), 1)} height={barH} rx={barH / 2} fill={colour} />
         ))}
+        {/* stopped: a light tint and one thin red line, no hatching */}
         {ok(stop) && stop < launch && pieces(stop, launch).map(([a, b]) => (
-          <rect key={`h-${a}`} x={x(a)} y={barY} width={Math.max(x(b) - x(a), 1)} height={barH} fill={`url(#${uid}-hatch)`} />
+          <g key={`h-${a}`}>
+            <rect x={x(a)} y={barY - 3} width={Math.max(x(b) - x(a), 1)} height={barH + 6} fill={STOP} opacity={0.06} />
+            <line x1={x(a)} x2={x(b)} y1={midY} y2={midY} stroke={STOP} strokeWidth={1.5} />
+          </g>
         ))}
-        {ok(stop) && stop < launch && <line x1={x(stop)} x2={x(stop)} y1={barY - 4} y2={barY + barH + 4} stroke={STOP} strokeWidth={2} />}
+        {ok(stop) && stop < launch && <line x1={x(stop)} x2={x(stop)} y1={barY - 5} y2={barY + barH + 5} stroke={STOP} strokeWidth={1.5} />}
         {ok(finish) && !ok(stop) && finish < launch && (
           <line x1={x(finish)} x2={x1} y1={midY} y2={midY} stroke={INK3} strokeWidth={1} strokeDasharray="2 3" />
         )}
@@ -423,14 +419,14 @@ function EditionLane({
 
   return (
     <g>
-      <text x={statusX} y={barY - (compact ? 3 : 6)} textAnchor={statusRight ? 'end' : 'start'} fontSize={compact ? 12 : 13} fontWeight={600} fill={statusColour}>
+      <text x={statusX} y={barY - (compact ? 5 : 8)} textAnchor={statusRight ? 'end' : 'start'} fontSize={compact ? 12 : 13} fontWeight={500} fill={statusColour}>
         {status}
       </text>
 
       {markers.map((m) => {
         const ids = m.cards.map((c) => c.id)
         const isSel = selected(ids)
-        const urgent = m.kind === 'dry' || m.at - nowMs < 3 * HOUR
+        const urgent = m.kind === 'dry'
         const fill = urgent ? STOP : INK
         const when = `${fmtDay(new Date(m.at).toISOString())} ${fmtTime(new Date(m.at).toISOString())}`
         const lead = m.cards[0]
@@ -438,7 +434,7 @@ function EditionLane({
           ? `Decide by ${when} · ${m.cards.length > 1 ? `${m.cards.length} decisions, first: ` : ''}${tidy(lead.headline)}`
           : `Runs dry ${when} · ${tidy(lead.headline)}`
         const isFirst = !compact && m.kind === 'decide' && !!first && ids.includes(first.id)
-        const s = compact ? 6 : 7
+        const s = compact ? 5 : 5.5
         return (
           <g
             key={m.key} className="cursor-pointer" tabIndex={0} role="button" aria-label={text}
@@ -446,22 +442,21 @@ function EditionLane({
             onMouseEnter={(e) => hover(e, text)} onMouseLeave={leave} onFocus={(e) => hover(e, text)} onBlur={leave}
           >
             <rect x={m.x - 16} y={midY - 16} width={32} height={32} fill="transparent" />
-            {isSel && <circle cx={m.x} cy={midY} r={s + 5} fill="#fff" stroke={OK} strokeWidth={2.5} />}
+            {isSel && <circle cx={m.x} cy={midY} r={s + 5} fill={GROUND} stroke={OK} strokeWidth={1.5} />}
             {m.kind === 'decide' ? (
-              <path d={`M${m.x} ${midY - s} L${m.x + s} ${midY} L${m.x} ${midY + s} L${m.x - s} ${midY} Z`} fill={fill} stroke="#fff" strokeWidth={1.5} />
+              <path d={`M${m.x} ${midY - s} L${m.x + s} ${midY} L${m.x} ${midY + s} L${m.x - s} ${midY} Z`} fill={fill} stroke={GROUND} strokeWidth={1.5} />
             ) : (
-              <path d={`M${m.x - s} ${midY - s + 1} L${m.x + s} ${midY - s + 1} L${m.x} ${midY + s} Z`} fill={STOP} stroke="#fff" strokeWidth={1.5} />
+              <path d={`M${m.x - s} ${midY - s + 1} L${m.x + s} ${midY - s + 1} L${m.x} ${midY + s} Z`} fill={STOP} stroke={GROUND} strokeWidth={1.5} />
             )}
             {m.cards.length > 1 && !compact && (
               <g>
-                <circle cx={m.x + s + 3} cy={midY - s - 1} r={7} fill="#fff" stroke={fill} strokeWidth={1.2} />
-                <text x={m.x + s + 3} y={midY - s + 3} textAnchor="middle" fontSize={10} fontWeight={700} fill={fill}>{m.cards.length}</text>
+                <text x={m.x} y={midY + s + 13} textAnchor="middle" fontSize={11} fontWeight={500} fill={INK2} stroke={GROUND} strokeWidth={3} paintOrder="stroke">{m.cards.length}</text>
               </g>
             )}
             {isFirst && (
               <text
                 x={Math.min(Math.max(m.x, x0 + 4), x1 - 8)} y={barY + barH + 18}
-                textAnchor={m.x < x0 + 60 ? 'start' : m.x > x1 - 160 ? 'end' : 'middle'} fontSize={12} fill={urgent ? STOP : INK2} fontWeight={600}
+                textAnchor={m.x < x0 + 60 ? 'start' : m.x > x1 - 160 ? 'end' : 'middle'} fontSize={12} fill={INK2}
               >
                 {`Decide by ${fmtTime(new Date(m.at).toISOString())} · ${what(first, all, 28)}`}
               </text>
@@ -478,7 +473,7 @@ function Inbound({
 }: Shared & { top: number; h: number; state: State; open: Card[] }) {
   const { x, x0, launch, start, windows } = model
   const y = top + h / 2 - (compact ? 0 : 2)
-  const r = compact ? 5 : 6
+  const r = compact ? 3.5 : 4
   const due: string[] = []
   const dots: { key: string; x: number; colour: string; hollow: boolean; cards: string[]; text: string }[] = []
   for (const s of state.shipments) {
@@ -487,7 +482,7 @@ function Inbound({
     const linked = open.filter((c) => c.shipment === s.id).map((c) => c.id)
     if (at <= start) { due.push(`${s.id} (${s.status.replace(/_/g, ' ')}, ETA ${s.eta})`); continue }
     dots.push({
-      key: `s-${s.id}`, x: x(at), colour: s.silent ? SILENT : COLORS[s.level] === COLORS.blue ? INK3 : COLORS[s.level],
+      key: `s-${s.id}`, x: x(at), colour: s.silent ? SILENT : tone(s.level),
       hollow: s.silent, cards: linked,
       text: `${s.id} · ${s.mode} · ${s.status.replace(/_/g, ' ')} · ETA ${s.eta}${s.silent ? ` · silent ${s.silent_hours ?? ''} h` : ''}`,
     })
@@ -495,7 +490,7 @@ function Inbound({
   for (const c of open) {
     const at = ms(c.arrives_at)
     if (!ok(at) || at >= launch || at <= start) continue
-    dots.push({ key: `c-${c.id}`, x: x(at), colour: COLORS[c.level], hollow: false, cards: [c.id], text: `Arrives ${fmtDay(c.arrives_at)} ${fmtTime(c.arrives_at)} · ${tidy(c.headline)}` })
+    dots.push({ key: `c-${c.id}`, x: x(at), colour: tone(c.level), hollow: false, cards: [c.id], text: `Arrives ${fmtDay(c.arrives_at)} ${fmtTime(c.arrives_at)} · ${tidy(c.headline)}` })
   }
   // Dots that share a spot stack upwards a little, so none hides another.
   const placed: { x: number; n: number }[] = []
@@ -504,7 +499,7 @@ function Inbound({
       {due.length > 0 && !compact && (
         <g onMouseEnter={(e) => hover(e, `ETA passed, not received: ${due.join(', ')}`)} onMouseLeave={leave}>
           <rect x={0} y={top + 24} width={x0 - 8} height={18} fill="transparent" />
-          <text x={0} y={top + 37} fontSize={12} fill={INK3}>{due.length} ETA passed</text>
+          <text x={0} y={top + 34} fontSize={12} fill={INK3}>{due.length} ETA passed</text>
         </g>
       )}
       {dots.map((d) => {
@@ -521,8 +516,8 @@ function Inbound({
             onMouseEnter={(e) => hover(e, d.text)} onMouseLeave={leave}
           >
             <rect x={cx - 16} y={cy - 16} width={32} height={32} fill="transparent" />
-            {clickable && selected(d.cards) && <circle cx={cx} cy={cy} r={r + 4} fill="none" stroke={OK} strokeWidth={2} />}
-            <circle cx={cx} cy={cy} r={r} fill={d.hollow ? '#fff' : d.colour} stroke={d.hollow ? SILENT : '#fff'} strokeWidth={d.hollow ? 1.8 : 1.5} />
+            {clickable && selected(d.cards) && <circle cx={cx} cy={cy} r={r + 4} fill="none" stroke={OK} strokeWidth={1.5} />}
+            <circle cx={cx} cy={cy} r={r} fill={d.hollow ? GROUND : d.colour} stroke={d.hollow ? INK2 : GROUND} strokeWidth={d.hollow ? 1.5 : 1} />
           </g>
         )
       })}

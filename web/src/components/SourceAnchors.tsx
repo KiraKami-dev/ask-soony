@@ -1,4 +1,3 @@
-import { ExternalLink, FileText, Image as ImageIcon, Table } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 
@@ -57,32 +56,29 @@ export function AnchorList({
   const [open, setOpen] = useState<number | null>(defaultOpen)
   if (!anchors) return null
   if (!anchors.length) {
-    return ready ? null : <p className="mt-3 text-sm text-ink-3">Looking for this in the documents…</p>
+    return ready ? null : <p className="t-small mt-3 text-ink-3">Looking for this in the documents…</p>
   }
   return (
     <div className="mt-3">
-      <div className="text-xs font-semibold uppercase tracking-wide text-ink-3">Found in</div>
-      <div className="mt-1.5 flex flex-wrap gap-1.5">
+      <p className="t-small flex flex-wrap gap-x-1.5 gap-y-1 text-ink-3">
+        <span>Found in</span>
         {anchors.map((a, i) => {
-          const Icon = a.kind === 'table' ? Table : a.kind === 'image' ? ImageIcon : FileText
           const where = a.kind === 'table' || a.kind === 'text' ? `row ${(a.row ?? 0) + 1}` : `page ${a.page}`
           return (
-            <button
-              key={i}
-              onClick={() => setOpen(open === i ? null : i)}
-              className={cn(
-                'inline-flex max-w-full cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-sm',
-                open === i ? 'border-ok bg-ok/10 font-semibold text-ok' : 'border-line text-ink-2 hover:bg-panel',
-              )}
-              title={a.doc}
-            >
-              <Icon size={14} className="shrink-0" />
-              <span className="truncate">{name(a.doc)}</span>
-              <span className="shrink-0 text-ink-3">· {where}{a.source === 'ocr' ? ' · scan' : ''}</span>
-            </button>
+            <span key={i} className="inline-flex min-w-0 max-w-full">
+              {i > 0 && <span className="mr-1.5">·</span>}
+              <button
+                onClick={() => setOpen(open === i ? null : i)}
+                aria-expanded={open === i}
+                className={cn('min-w-0 cursor-pointer truncate border-b text-left', open === i ? 'border-ink-3 text-ink' : 'border-hair text-ink-2 hover:text-ink')}
+                title={a.doc}
+              >
+                {name(a.doc)}, {where}{a.source === 'ocr' ? ', scan' : ''}
+              </button>
+            </span>
           )
         })}
-      </div>
+      </p>
       {open != null && anchors[open] && <AnchorView anchor={anchors[open]} />}
     </div>
   )
@@ -95,15 +91,10 @@ export function AnchorCrop({ anchor: a }: { anchor: Anchor }) {
 
 function AnchorView({ anchor: a }: { anchor: Anchor }) {
   return (
-    <div className="mt-3 rounded-lg border border-line bg-panel p-2">
+    <div className="fade mt-3 rounded-xl bg-soft p-3">
       {a.kind === 'table' ? <TableView a={a} /> : a.kind === 'text' ? <TextView a={a} /> : <PageView a={a} />}
-      <a
-        href={fileUrl(a)}
-        target="_blank"
-        rel="noreferrer"
-        className="mt-2 inline-flex items-center gap-1.5 px-1 text-sm font-semibold text-ok hover:underline"
-      >
-        Open original <ExternalLink size={14} />
+      <a href={fileUrl(a)} target="_blank" rel="noreferrer" className="t-small mt-2 inline-block px-1 text-accent hover:underline">
+        Open original
       </a>
     </div>
   )
@@ -128,7 +119,7 @@ function PageView({ a }: { a: Anchor }) {
   return (
     <div>
       <div
-        className="relative overflow-hidden rounded bg-white"
+        className="relative overflow-hidden rounded-lg bg-white"
         style={size ? { aspectRatio: `${cw * size.w} / ${ch * size.h}` } : { minHeight: 120 }}
       >
         <div
@@ -145,7 +136,7 @@ function PageView({ a }: { a: Anchor }) {
             boxes.map(([x0, y0, x1, y1], i) => (
               <div
                 key={i}
-                className="absolute rounded-[2px] bg-mark/60 mix-blend-multiply"
+                className="absolute rounded-[2px] bg-mark/70 mix-blend-multiply"
                 style={{
                   left: `${x0 * 100 - 0.3}%`,
                   top: `${y0 * 100 - 0.25}%`,
@@ -157,7 +148,7 @@ function PageView({ a }: { a: Anchor }) {
         </div>
       </div>
       {boxes.length > 0 && (
-        <button className="mt-2 cursor-pointer px-1 text-[13px] text-ink-3 hover:text-ink" onClick={() => setFull(!full)}>
+        <button className="t-small mt-2 cursor-pointer px-1 text-ink-3 hover:text-ink" onClick={() => setFull(!full)}>
           {full ? 'Zoom to the values' : 'Show full page'}
         </button>
       )}
@@ -177,25 +168,25 @@ function TableView({ a }: { a: Anchor }) {
     const el = hit.current, wrap = box.current
     if (el && wrap) wrap.scrollTop = el.offsetTop - wrap.clientHeight / 2
   }, [data])
-  if (!data) return <p className="p-2 text-sm text-ink-3">Loading table…</p>
+  if (!data) return <p className="t-small p-2 text-ink-3">Loading table…</p>
   const wanted = new Set(a.matched)
   const norm = (s: string) => s.replace(/(?<=\d)[,.' ](?=\d{3}(?!\d))/g, '').toUpperCase()
   return (
-    <div ref={box} className="relative max-h-[40vh] overflow-auto rounded bg-white">
-      {a.sheet && <div className="px-2 pt-2 text-xs font-semibold text-ink-3">Sheet: {a.sheet}</div>}
-      <table className="w-full border-collapse text-[13px] tabular-nums">
-        <thead className="sticky top-0 bg-panel">
-          <tr>{data.header.map((h, i) => <th key={i} className="whitespace-nowrap border-b border-line px-2 py-1 text-left font-semibold text-ink-2">{h}</th>)}</tr>
+    <div ref={box} className="relative max-h-[40vh] overflow-auto rounded-lg bg-white">
+      {a.sheet && <div className="t-small px-2.5 pt-2 text-ink-3">Sheet {a.sheet}</div>}
+      <table className="t-small w-full border-collapse tabular-nums">
+        <thead className="sticky top-0 bg-white">
+          <tr>{data.header.map((h, i) => <th key={i} className="whitespace-nowrap border-b border-hair px-2.5 py-1.5 text-left font-medium text-ink-3">{h}</th>)}</tr>
         </thead>
         <tbody>
           {data.rows.map((r) => (
-            <tr key={r.row} ref={r.hit ? hit : undefined} className={r.hit ? 'bg-mark/25' : ''}>
+            <tr key={r.row} ref={r.hit ? hit : undefined} className={r.hit ? 'bg-mark/20 text-ink' : 'text-ink-2'}>
               {r.cells.map((c, i) => (
                 <td
                   key={i}
                   className={cn(
-                    'whitespace-nowrap border-b border-line px-2 py-1',
-                    r.hit && [...wanted].some((w) => norm(c).includes(w)) && 'bg-mark font-semibold text-ink',
+                    'whitespace-nowrap border-b border-hair px-2.5 py-1.5',
+                    r.hit && [...wanted].some((w) => norm(c).includes(w)) && 'bg-mark font-medium text-[#111]',
                   )}
                 >
                   {c}
@@ -210,7 +201,7 @@ function TableView({ a }: { a: Anchor }) {
 }
 
 function TextView({ a }: { a: Anchor }) {
-  return <p className="whitespace-pre-wrap break-words rounded bg-mark/30 p-2 font-mono text-[13px]">{a.snippet}</p>
+  return <p className="t-small whitespace-pre-wrap break-words rounded-lg bg-white p-3 text-ink"><mark className="rounded-[3px] bg-mark/70 px-0.5 text-[#111]">{a.snippet}</mark></p>
 }
 
 // ---------------------------------------------------------------- inline citations
@@ -257,14 +248,11 @@ export function CitedText({
           <button
             key={i}
             onClick={() => onOpen(active === p.a ? null : p.a)}
-            title={`Found in ${p.a.doc}`}
-            className={cn(
-              'mx-0.5 inline-flex cursor-pointer items-baseline gap-1 rounded-md px-1.5 align-baseline font-bold underline decoration-dotted underline-offset-4',
-              active === p.a ? 'bg-yellow-300/70 text-ink' : 'bg-yellow-100 text-ink hover:bg-yellow-200',
-            )}
+            title={`Found in ${tag(p.a)}`}
+            aria-expanded={active === p.a}
+            className="cite"
           >
             {p.raw}
-            <span className="whitespace-nowrap text-[11px] font-semibold text-ink-3 no-underline">{tag(p.a)}</span>
           </button>
         ),
       )}
