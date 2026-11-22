@@ -183,6 +183,24 @@ export function Today(p: Props) {
 
 // ---------------------------------------------------------------- left list
 
+/** Key badges are chrome: show them only to someone who has used the keyboard on this device. */
+function useKeyboardUser(): boolean {
+  const read = () => { try { return localStorage.getItem('ask-keys') === '1' } catch { return false } }
+  const [on, setOn] = useState(read)
+  useEffect(() => {
+    if (on) return
+    const onKey = (e: KeyboardEvent) => {
+      if (/^[jkJK1-9]$/.test(e.key) && !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
+        try { localStorage.setItem('ask-keys', '1') } catch { /* private mode: this session only */ }
+        setOn(true)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [on])
+  return on
+}
+
 /** Steps routines prepared in "Ask me" mode: they wait for a look, so they lead the list. */
 function ReadyList({ state, onReview }: { state: State; onReview: Review }) {
   const live = useLive()
@@ -263,7 +281,7 @@ function QuietList({ order, card, onFocus, state, nowMs }: Props) {
   }, [card?.id, open])
   return (
     <div>
-      <p className="t-small mb-3 text-ink-3">Needs you · {plural(order.length, 'decision')}</p>
+      <p className="t-small mb-3 text-ink-3">Needs you</p>
       <ul ref={listRef} className="-mx-3.5">
         {shown.map(({ c, n }) => {
           const on = cardKey != null && rowKey(c, state) === cardKey
@@ -580,6 +598,7 @@ function Focus(p: Props & {
     { kind: 'escalate' }, { kind: 'dismiss' },
   ]
   const chosenKey = Math.max(0, choices.findIndex((c) => sameChoice(c, choice)))
+  const keys = useKeyboardUser()
 
   // Keyboard (desktop): j/k walk, a asks, Enter approves, Esc cancels.
   const ref = useRef({ approve, confirm, busy, emails, openReview, go, choose, choices, choice })
@@ -721,7 +740,7 @@ function Focus(p: Props & {
                   <span className="t-body block text-ink-2">{costLine(card, sel)}{opt.effect ? ` ${cap(tidy(opt.effect))}.`.replace(/\.\.$/, '.') : ''}</span>
                 )}
               </span>
-              {!phone && choices.length > 1 && chosenKey < 9 && <kbd className="t-small">{chosenKey + 1}</kbd>}
+              {!phone && keys && choices.length > 1 && chosenKey < 9 && <kbd className="t-small">{chosenKey + 1}</kbd>}
             </button>
           ) : choice.kind === 'escalate' ? (
             <>
@@ -759,7 +778,7 @@ function Focus(p: Props & {
                 className="t-body grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-4 py-2 text-left text-ink-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-accent"
               >
                 <span><span className="text-ink-3">Or </span>{label}</span>
-                {!phone && n < 9 && <kbd className="t-small">{n + 1}</kbd>}
+                {!phone && keys && n < 9 && <kbd className="t-small">{n + 1}</kbd>}
               </button>
             )
           })}
