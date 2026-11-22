@@ -906,7 +906,7 @@ def get_file(path: str):
 # globe_api (his original dashboard API); importing it also starts his opt-in background loops
 # (ASK_BACKGROUND=on, ASK_REPLY_POLL=on). The inbox's own state stays at /api/state.
 
-from ask_soony import anchors, calls, cardtools, globe_api, push, replies, teams, voice  # noqa: E402
+from ask_soony import anchors, calls, cardtools, globe_api, push, replies, routines, teams, voice  # noqa: E402
 from ask_soony.basic_auth import BasicAuth  # noqa: E402
 from ask_soony.globe_api import (  # noqa: E402,F401  used by the routers as api.<name>
     ROOT,
@@ -919,7 +919,7 @@ from ask_soony.globe_api import (  # noqa: E402,F401  used by the routers as api
 )
 
 get_state = globe_api.get_state
-for _router in (voice.router, push.router, cardtools.router, replies.router, calls.router, anchors.router, teams.router):
+for _router in (voice.router, push.router, cardtools.router, replies.router, calls.router, anchors.router, teams.router, routines.router):
     app.include_router(_router)
 _GLOBE_ROUTES = {"/api/feed", "/api/network", "/api/mode", "/api/cards/{card_id}/action"}
 app.router.routes.extend(r for r in globe_api.app.router.routes if getattr(r, "path", None) in _GLOBE_ROUTES)

@@ -58,6 +58,9 @@ def start() -> None:
         from ask_soony import anchors
 
         anchors.ensure_index()  # evidence anchoring: index portal files (cached by hash)
+        from ask_soony import routines
+
+        routines.start_background()  # routines the agent wrote, run in the Monty sandbox
         for loop in (_watcher, _escalation):
             threading.Thread(target=_guard(loop), daemon=True, name=loop.__name__).start()
         os.environ.setdefault("ASK_REPLY_POLL", "on")
