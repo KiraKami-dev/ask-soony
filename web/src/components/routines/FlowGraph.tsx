@@ -4,7 +4,7 @@ import type { State } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { funnel, lookAlikeConds, type Funnel } from './funnel'
 import { StepIcon, merge, type Mark, type Row } from './RoutineFlow'
-import { PALETTE, condWords, paletteKey, triggerText, type Cond, type Run, type Spec, type Step } from './types'
+import { PALETTE, condWords, paletteKey, triggerText, unavailable, type Cond, type Run, type Spec, type Step } from './types'
 
 // The routine as a calm node editor (n8n-like), drawn from the recipe alone and edited in place.
 // Nodes only for the parts that stand on their own, connected by port-and-hairline links: one
@@ -145,9 +145,10 @@ function Node({
           aria-label={`Remove “${title}”`}
           title="Remove"
           className={cn(
-            'absolute grid cursor-pointer place-items-center rounded-full bg-white text-ink-3 shadow-[0_0_0_1px_var(--color-hair)] transition-opacity hover:text-ink focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-accent',
-            'right-2 top-1/2 h-9 w-9 -translate-y-1/2',
-            'lg:-right-2.5 lg:-top-2.5 lg:h-6 lg:w-6 lg:translate-y-0 lg:opacity-0 lg:group-focus-within:opacity-100 lg:group-hover:opacity-100',
+            // The same quiet ✕ as a condition line: no ring, a soft circle on hover.
+            'absolute grid cursor-pointer place-items-center rounded-full text-ink-3 transition-opacity hover:bg-soft hover:text-ink focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-accent',
+            'right-1.5 top-1.5 h-9 w-9',
+            'lg:right-2 lg:top-2 lg:h-6 lg:w-6 lg:opacity-0 lg:group-focus-within:opacity-100 lg:group-hover:opacity-100',
           )}
         >
           <X size={13} />
@@ -188,7 +189,7 @@ function useEditor(spec: Spec, onChange?: (s: Spec) => void, disabled?: boolean)
   const removeStep = (id: string) => change({ then: spec.then.filter((s) => s.id !== id) })
   const addStep = (key: string, at = spec.then.length) => {
     const p = PALETTE.find((x) => x.key === key)
-    if (!p) return
+    if (!p || unavailable(key, spec.on)) return
     const steps = [...spec.then]
     steps.splice(at, 0, p.make())
     change({ then: steps })
@@ -233,7 +234,7 @@ function useEditor(spec: Spec, onChange?: (s: Spec) => void, disabled?: boolean)
     }
   }
   const edgeOf = (id: string): Edge => (drag && drop?.id === id && !(drag.kind === 'step' && drag.id === id) ? drop.edge : null)
-  return { editable, palette, removeCond, removeStep, addStep, stepDrag, edgeOf, drag, setDrag, end }
+  return { editable, palette, removeCond, removeStep, addStep, stepDrag, edgeOf, drag, setDrag, end, on: spec.on }
 }
 type Editor = ReturnType<typeof useEditor>
 
@@ -284,24 +285,26 @@ function AddStep({ ed, wide }: { ed: Editor; wide?: boolean }) {
           )}
         >
           <p className="t-small px-3 pb-1 pt-2 text-ink-3">Add a step at the end, or drag one into place</p>
-          {ed.palette.map((p) => (
+          {ed.palette.map((p) => { const why = unavailable(p.key, ed.on); return (
             <button
               key={p.key}
               type="button"
               role="menuitem"
-              draggable
+              disabled={!!why}
+              title={why ?? undefined}
+              draggable={!why}
               onDragStart={(e) => { e.dataTransfer.setData('text/plain', JSON.stringify({ kind: 'palette', key: p.key })); ed.setDrag({ kind: 'palette', key: p.key }) }}
               onDragEnd={ed.end}
               onClick={() => { ed.addStep(p.key); setOpen(false) }}
-              className="flex w-full cursor-pointer items-start gap-3 rounded-xl px-3 py-2.5 text-left outline-none hover:bg-soft focus-visible:bg-soft"
+              className="flex w-full cursor-pointer items-start gap-3 rounded-xl px-3 py-2.5 text-left outline-none hover:bg-soft focus-visible:bg-soft disabled:cursor-default disabled:opacity-50 disabled:hover:bg-transparent"
             >
               <span className="mt-px grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-soft text-ink-2"><StepIcon step={p.make()} size={14} className="text-ink-2" /></span>
               <span className="min-w-0">
                 <span className="t-small block font-medium text-ink">{p.label}</span>
-                <span className="t-small block text-ink-3">{p.hint}</span>
+                <span className="t-small block text-ink-3">{why ?? p.hint}</span>
               </span>
             </button>
-          ))}
+          ) })}
         </div>
       )}
     </div>

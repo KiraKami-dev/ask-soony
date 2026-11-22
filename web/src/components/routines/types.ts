@@ -123,6 +123,16 @@ export const PALETTE: { key: string; label: string; hint: string; make: () => St
   { key: 'ask_status', label: 'Ask for a status', hint: 'Emails the supplier for where the shipment is', make: () => ({ id: newId('s'), do: 'ask_status', text: 'Ask the supplier for the shipment status' }) },
 ]
 
+/** Steps that only make sense on some triggers (routines.py STEP_ON); the reason, when not here. */
+const STEP_ON: Record<string, { on: string[]; why: string }> = {
+  chase: { on: ['waiting', 'replies'], why: 'Only on routines that watch messages waiting for an answer' },
+  ask_status: { on: ['shipments'], why: 'Only on routines that watch shipments' },
+}
+export function unavailable(key: string, on: string | undefined): string | null {
+  const r = STEP_ON[key]
+  return r && !r.on.includes(on ?? 'decisions') ? r.why : null
+}
+
 export function paletteKey(s: Step): string | null {
   if (s.do === 'log' || s.do === 'chase' || s.do === 'call' || s.do === 'ask_status') return s.do
   if (s.do === 'notify' && (s.channel === 'phone' || s.channel === 'teams')) return s.channel
