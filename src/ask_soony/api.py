@@ -402,11 +402,13 @@ _docs_cache: dict[str, Any] = {}
 
 def documents_by_part() -> dict[str, list[dict]]:
     """Source documents the image recognizer read, keyed by the part ids on their lines."""
-    base = readings_dir()
-    stamp = max((p.stat().st_mtime for p in base.glob("*/verdict.json")), default=0)
+    from ask_soony.verifier.baseline import reading_metas  # live store, then frozen baseline
+
+    metas = reading_metas(readings_dir())
+    stamp = (len(metas), max((p.stat().st_mtime for p in metas), default=0))
     if _docs_cache.get("stamp") != stamp:
         out: dict[str, list[dict]] = {}
-        for meta_path in sorted(base.glob("*/meta.json")):
+        for meta_path in metas:
             try:
                 meta = json.loads(meta_path.read_text(encoding="utf-8"))
                 v = json.loads((meta_path.parent / "verdict.json").read_text(encoding="utf-8"))

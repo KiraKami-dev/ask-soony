@@ -1,0 +1,10 @@
+{
+  "about": "Documents the image recognizer never reads. Decided by the team, with the reason. Matched by path: a new version of the file stays ignored.",
+  "documents": [
+    {
+      "path": "suppliers/SUP-0010_Hwaseong_Memory/contracts/SUP-0010_LTA_Amendment_3_redline.pdf",
+      "reason": "Redline: its meaning is in the strike-through, which the text layer loses. Reading it right needs page images; not worth the time for the hackathon (Farhan, 22 Nov).",
+      "decided": "2026-11-22"
+    }
+  ]
+}

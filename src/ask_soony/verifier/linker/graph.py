@@ -72,7 +72,7 @@ def build(root: Path, readings: Path | None = None) -> Graph:
         all_records += produced
         source_rows.append(row)
 
-    if readings is not None and readings.is_dir():
+    if readings is not None:  # a missing live store still gets the frozen baseline
         current_sha = {s.path: s.sha256 for s in sources}
         read_records, read_rows = load_readings(readings, current_sha)
         known_parts = {r["material_id"] for r in all_records if r["kind"] == "part"}

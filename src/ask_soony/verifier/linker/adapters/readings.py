@@ -16,6 +16,7 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
+from ask_soony.verifier.baseline import BASELINE_DIR, reading_metas
 from ask_soony.verifier.linker.normalize import clean, count_number
 from ask_soony.verifier.linker.records import make_record
 
@@ -79,13 +80,17 @@ def final_values(values: list[dict]) -> dict:
     return standing
 
 
-def _current_readings(readings_dir: Path, current_sha: dict[str, str]) -> list[Path]:
+def _current_readings(
+    readings_dir: Path | None, current_sha: dict[str, str], baseline: Path | None = BASELINE_DIR
+) -> list[Path]:
     """
-    One reading per document. A document read twice (its file changed in between) keeps only
+    One reading per document, from the live store and the frozen baseline (see verifier.baseline;
+    only for files in the portal). A document read twice (its file changed in between) keeps only
     the reading of its current version; with no current reading, the old ones stay, marked stale.
     """
+    metas = reading_metas(readings_dir, baseline, set(current_sha))
     by_doc: dict[str, list[tuple[Path, str | None]]] = {}
-    for meta_path in sorted(readings_dir.glob("*/meta.json")):
+    for meta_path in metas:
         try:
             meta = json.loads(meta_path.read_text())
         except json.JSONDecodeError:
@@ -99,15 +104,18 @@ def _current_readings(readings_dir: Path, current_sha: dict[str, str]) -> list[P
     return chosen
 
 
-def load_readings(readings_dir: Path, current_sha: dict[str, str]) -> tuple[list[dict], list[dict]]:
+def load_readings(
+    readings_dir: Path | None, current_sha: dict[str, str], baseline: Path | None = BASELINE_DIR
+) -> tuple[list[dict], list[dict]]:
     """
-    Records from every successful reading. Returns (records, source rows for the summary).
+    Records from every successful reading: the frozen baseline, plus the live store for file
+    versions the baseline lacks (None: no baseline). Returns (records, source rows for the summary).
 
     current_sha maps each portal path to its current checksum, so a reading of an older version
     of a file is still loaded but marked (attrs.read_sha256 differs), never silently trusted.
     """
     records, rows = [], []
-    for meta_path in _current_readings(readings_dir, current_sha):
+    for meta_path in _current_readings(readings_dir, current_sha, baseline):
         verdict_path = meta_path.parent / "verdict.json"
         try:
             meta = json.loads(meta_path.read_text())
@@ -118,7 +126,7 @@ def load_readings(readings_dir: Path, current_sha: dict[str, str]) -> tuple[list
         verdict = json.loads(verdict_path.read_text())
         doc_path = meta["path"]
         source = ReadingSource(
-            f"{readings_dir.name}/{meta_path.parent.name}/verdict.json",
+            f"{meta_path.parent.parent.name}/{meta_path.parent.name}/verdict.json",
             hashlib.sha256(verdict_path.read_bytes()).hexdigest(),
         )
         keys = _references(verdict)
@@ -151,6 +159,7 @@ def load_readings(readings_dir: Path, current_sha: dict[str, str]) -> tuple[list
             "read_sha256": meta.get("sha256"),
             "current_sha256": current_sha.get(doc_path),
             "model": meta.get("model"),
+            "reader": meta_path.parent.parent.name,  # live store or the frozen baseline
         }
         reading = make_record(
             "reading",
