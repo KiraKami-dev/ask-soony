@@ -45,7 +45,11 @@ export function Routines({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [request?.k])
 
-  const decided = state.cards.filter((c) => ['approved', 'sent', 'escalated', 'dismissed'].includes(c.status))
+  // Decisions not automated yet; a card with a routine (or an open draft) is not offered again.
+  const automatedBy = new Map(items.filter((r) => r.created_from).map((r) => [r.created_from!, r.name]))
+  const decided = state.cards.filter(
+    (c) => ['approved', 'sent', 'escalated', 'dismissed'].includes(c.status) && draft?.routine.created_from !== c.id,
+  )
   const active = items.filter((r) => r.enabled).length
 
   async function suggest(cardId: string) {
@@ -126,16 +130,20 @@ export function Routines({
             ))}
 
             <div className="pt-2 text-xs font-semibold uppercase tracking-wide text-ink-3">Automate a decision you made</div>
-            {decided.length === 0 && <p className="text-sm text-ink-3">Nothing decided yet.</p>}
+            {decided.length === 0 && <p className="text-sm text-ink-3">{draft ? 'Review the suggestion above.' : 'Nothing decided yet.'}</p>}
             {decided.map((c) => (
               <div key={c.id} className="flex items-center justify-between gap-3 rounded-lg border border-line px-3 py-2">
                 <div className="min-w-0">
                   <div className="truncate text-[15px] font-medium">{c.headline}</div>
                   <div className="text-xs text-ink-3">{c.status}{c.ui?.at ? ` · ${fmtDay(c.ui.at)} ${fmtTime(c.ui.at)}` : ''}</div>
                 </div>
-                <Button size="sm" variant="outline" disabled={!!busy} onClick={() => suggest(c.id)}>
-                  <Sparkles size={14} /> {busy === c.id ? 'Writing…' : 'Automate cards like this'}
-                </Button>
+                {automatedBy.has(c.id) ? (
+                  <span className="shrink-0 text-sm font-semibold text-ok">Automated · {automatedBy.get(c.id)}</span>
+                ) : (
+                  <Button size="sm" variant="outline" disabled={!!busy} onClick={() => suggest(c.id)}>
+                    <Sparkles size={14} /> {busy === c.id ? 'Writing…' : 'Automate cards like this'}
+                  </Button>
+                )}
               </div>
             ))}
           </div>
