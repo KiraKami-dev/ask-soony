@@ -145,7 +145,7 @@ export function CaseFlow({ card, state, nowMs, className, onDoc }: { card: Card;
     <ol className="grid grid-cols-[minmax(0,1fr)]">
       {steps.map((s, i) => (
         <Fragment key={s.key}>
-          {i > 0 && <li aria-hidden="true"><Link dashed={s.tone === 'next'} /></li>}
+          {i > 0 && <li aria-hidden="true"><Link dashed={s.tone === 'next'} short={!detail} /></li>}
           <li className="min-w-0"><Node s={s} nowMs={nowMs} compact={!detail} onDoc={onDoc} /></li>
         </Fragment>
       ))}

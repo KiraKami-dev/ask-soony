@@ -509,10 +509,10 @@ const port = 'h-[7px] w-[7px] shrink-0 rounded-full border border-ink-3/45 bg-wh
  * A connector between two nodes, n8n style: a port dot on the node it leaves, a hairline, and a
  * small head on the node it enters. Across on a wide screen (`across`), down otherwise.
  */
-export function Link({ across, dashed }: { across?: boolean; dashed?: boolean }) {
+export function Link({ across, dashed, short }: { across?: boolean; dashed?: boolean; short?: boolean }) {
   const line = dashed ? 'border-dashed border-ink-3/35' : 'border-ink-3/40'
   const down = (
-    <div className="ml-[24px] flex h-7 w-[9px] flex-col items-center">
+    <div className={cn('ml-[24px] flex w-[9px] flex-col items-center', short ? 'h-4' : 'h-7')}>
       <span className={cn(port, '-mt-[4px]')} />
       <span className={cn('w-0 flex-1 border-l', line)} />
       <svg width="9" height="5" viewBox="0 0 9 5" className="mb-px block text-ink-3/55"><path d="M1 0.5 L4.5 4.5 L8 0.5" {...stroke} /></svg>
