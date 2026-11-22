@@ -761,7 +761,15 @@ def build_strip(cards: list[dict], root: Path | None, clock: PackClock, cur: dat
         # A stop in the past stays where it was: the line stood still from then on (moving it to
         # 'now' would make it creep on every poll).
         finishes = None if stops else clock.finishes(cur, k)
-        first = sorted(mine, key=rank_key)[0] if mine else None
+        # What breaks first is the card whose shortfall sets the line's limit (the largest copies
+        # at risk, as edition_copies_at_risk takes the max), not simply the most urgent card;
+        # otherwise a stop caused by one part is pinned on another part's decision.
+        limiting = [c for c in mine if c.get("number_label") == "copies at risk" and (c.get("number") or 0) > 0]
+        first = (
+            max(limiting, key=lambda c: (c.get("number") or 0, LEVEL_RANK.get(c["level"], 0)))
+            if limiting
+            else (sorted(mine, key=rank_key)[0] if mine else None)
+        )
         breaks = None
         if first:
             breaks = {"text": first.get("part") or first.get("headline"), "deadline": first.get("deadline"),
