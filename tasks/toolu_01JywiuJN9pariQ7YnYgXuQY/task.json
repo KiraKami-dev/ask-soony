@@ -1,0 +1,20 @@
+{
+  "tool_use_id": "toolu_01JywiuJN9pariQ7YnYgXuQY",
+  "agent_id": "a1852ea2dac6f8c35",
+  "subagent_type": "general-purpose",
+  "task_description": "Restyle Plan, Suppliers, evidence, login",
+  "files": [
+    "web/src/components/DecisionList.tsx",
+    "web/src/components/DecisionPane.tsx",
+    "web/src/components/EvidenceDrawer.tsx"
+  ],
+  "token_usage": {
+    "input_tokens": 160,
+    "cache_creation_tokens": 249469,
+    "cache_read_tokens": 14534712,
+    "output_tokens": 74489,
+    "api_call_count": 75
+  },
+  "started_at": "2026-11-22T04:56:11.950834+01:00",
+  "completed_at": "2026-11-22T05:09:07.70422+01:00"
+}
