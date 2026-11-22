@@ -1,0 +1,307 @@
+<task-notification>
+<task-id>ad1a74cf80bf7ecf7</task-id>
+<tool-use-id>toolu_01VDXskj6L2rxvMtEvdVGKwJ</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/ad1a74cf80bf7ecf7.output</output-file>
+<status>completed</status>
+<summary>Agent "Re-research slides, criteria, interviews" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>The sources mostly back our direction. The biggest gaps are: no Plan B, no count of copies at risk on the cards, no detection of data that stops updating, and no price or cost-per-copy for the business case. Sources: the deep-dive slides (32 slides including speaker notes), both PDFs and both transcripts, all read in full. I wrote nothing to the repo; only scripts and text extracts are in `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/research/`.
+
+## 1. What the jury wants to see or will ask
+
+- **Show what we found** (slide 28 notes): "On Sunday we want to see your agents work on Soony's real, messy data, and we want to hear **what they found that Soony's team missed**." Felix's side also said: "some big problems in the data you should already at least try to find… before the data shows."
+- **The one rule** (slide 28 notes): "agents that read, decide, act and talk to people. A dashboard on top of a spreadsheet is not enough."
+- **Drops are found, not announced** (slide 30 notes): "Your agents have to notice it, work out what it means, and decide whether it matters for Sunday… One example shows something new appearing, the other shows something that stops changing. **Your agents need to watch for both.**"
+- **Mistakes** (Judging p.3, "Strong"): "The team can explain **what happens when the system gets something wrong**." Have an answer ready for the 2 minutes of questions.
+- **Taste** (Judging p.3): "Soony's team has ten minutes and forty dashboards… **a clear recommendation and one click to act**… the moment a human has to decide."
+- **Demo format** (Judging p.4): 3 minutes in the order problem, system ("Live"), business. Tips: "Start the demo early. Slides are support, not the show." "Go deep, not wide." "If the Wi-Fi dies, your demo video saves you. Still, the live run is what counts."
+- **Business** (Judging p.2): "Why would Soony pay for it, and **roughly how much**?" Strong means "a number the customer cares about, and a clear path to the next ten customers." Weak means "The market is huge."
+- **Autonomy and trust** (Felix, 554s): "in the demo it makes sense that you can like stop at some point and say like here's an approval… **But this can also run autonomously. It should be able to run autonomously.**"
+- **Scope** (Felix, 1093s): the product "should be generalizable… don't focus so much on the software actually being able to scale."
+- **Handling messy data** (Nils, 848s): "it's not about how deep you know the data but like that **you can handle like this sort of data**."
+
+## 2. Interview quotes for the pitch
+
+**Felix, Senior Buyer**
+- On finding out too late (37s): "your tool… has to tell me, **before the supplier does, that something will not arrive. Otherwise I would not use it.**" (Already in our notes.)
+- On acting on signals (60s): "not with hundred percent accuracy. But… that you at least try to take action if you see some signals."
+- **New**, on why waiting for approvers fails (612s). This supports our phone call when critical: "if we need to wait for approvals of certain people all the time for this critical game release, **it will take ages because they don't look into the notifications, they don't do shit**."
+- **New**, on trust building up over time (554s). This is the routines story in his own words: "once they use it and see… that this decision that the AI recommends are mostly or like very often the correct one… **at some point they flip the switch and let it run autonomously.**"
+- **New**, on who approves (320s, 377s): "person A has an approval budget of 10,000 euro… [another] four million… a hierarchy." Also: "different for every enterprise… **this is what we actually do, building up those approval chains.**" This lines up with "money always stays human" and with approval limits you can configure.
+- **New**, on contradictions (505s): "sometimes one source of information is wrong, sometimes the other. **In the end I don't care. I want that the process works.**"
+- On transparency alone (114s): "it solves the problem of transparency, but in the end if it doesn't arrive…"
+
+**Nils, IT**
+- **New**, on repetition (230s to 300s), our strongest argument for routines. Asked for his most annoying task: "going into my email box… we got this new receipt coming in… and then me having to put that into our ERP." Asked "For every single order?": "Yeah." Asked whether mails reach him from outside or are forwarded inside the company: "Mostly internal."
+- On errors found late (329s): an error gets noticed "weeks or months later"; he then goes "into our table, look, compare… fix it."
+- On trust in automation (438s): "I can trust the system. I think there would be less error. **If [it's] uncertain, I would want to know, or if it's a big delivery.**" This fits confidence thresholds on routines.
+- On the dream (519s, 740s): "if the SAP is like the ultimate source of truth that would be the best thing… **If I can fully trust my data, I would sleep a lot better.**"
+- On wrong receipts (84s): "we reclaim it and then… finance… will handle it." Agents must not edit supplier documents.
+- **New**, on the cause (541s): "unclear processes… different people have different preferred ways."
+- On scope (191s, 706s): email-only "would already help"; a two-way SAP integration "out of scope for the weekend."
+
+## 3. Numbers for the business case
+
+All of these are from slides 19 to 22 and the brief:
+- 487,000 pre-orders. Day-one demand is 640,000 Standard and 72,000 Collector's, every Collector's copy numbered and pre-ordered.
+- Still to pack: 128,000 Standard and 25,200 Collector's.
+- 30 packing hours left. Collector's needs 28 of them, so it has **2 hours of slack**, and "**every hour it waits for a part costs 900 copies**."
+- Standard runs on 3 lines and needs 21 hours, so it has 9 hours of slack.
+- Sea from Busan takes 36 days, so "Anything ordered from Asia today arrives after the launch."
+- For scale: Lio serves 175+ enterprises, and the six risk types "happen every week in every company that buys things" (slide 26).
+- Approval limits from Felix: €10,000 and €4M (his example, not real data).
+
+**Missing:** no source gives a price or margin per copy, or the cost of a missing copy. Maren Vogt (CPO) is the persona for "what a missing copy costs" and we have not interviewed her. If a Sun 09:00 slot is still possible, ask her. Otherwise, state an assumption clearly as one.
+
+## 4. Gaps and contradictions
+
+- **Plan B.** Felix: transparency alone does not ship games. Our cards point out conflicts but do not suggest an alternative. Karton Nowak is the only supplier that can still deliver in time.
+- **Impact on Sunday.** Cards should say "X Collector's copies at risk, cell idle Y hours" rather than only "doc ≠ SAP." That is the number the customer cares about.
+- **Something that stops changing.** Slide 30 asks us to catch data that goes quiet (`updated_at` frozen). Our document-reading flow does not obviously cover this.
+- **"What did you find that they missed."** We need two or three concrete findings ready to name.
+- **When the system is wrong.** We need an explicit answer: anchors show where a number came from, routines have limits and can be reverted, money stays with a human.
+- **Pricing and the next ten customers.** No price and no named other customer segments yet.
+- **Possible tensions with our direction:**
+  - Felix "I don't care" which source is right: cards must end in an action, not in a debate over which source wins.
+  - Nils: never correct supplier documents. Reclaim instead, and finance handles it.
+  - Felix "I would not focus on" detailed approval chains: keep it to one configurable limit.
+  - Mail replies do not change portal data, so supplier replies only update our local state.
+
+## 5. Opening wording (first 30 seconds)
+
+- **Option A:** "Soony's head of procurement told us: 'We find out at the dock.' On Saturday Felix, their senior buyer, told us: 'Your tool has to tell me before the supplier does that something won't arrive. Otherwise I won't use it.' The Collector's cell has two hours of slack, and every hour it waits for a part costs 900 numbered copies. So we built agents that read every supplier document, in Korean, Chinese, Polish and English, and catch the problem before it hits the dock."
+- **Option B (leads into routines):** "Nils from Soony's IT spends his days copying supplier receipts into SAP, 'for every single order'. Errors surface 'weeks or months later'. Felix told us his approvers 'don't look into the notifications'. So our agents check every document against SAP, call the right person when it's critical, and after one human yes they write a routine for next time. Money always stays human."
+- **Closing line:** "As Nils put it: 'If I can fully trust my data, I would sleep a lot better.'"</result>
+<usage><subagent_tokens>93782</subagent_tokens><tool_uses>7</tool_uses><duration_ms>66403</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>a28c76731f4d8240c</task-id>
+<tool-use-id>toolu_01E7W1vZmPjsUUnWeQpxZoEe</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/a28c76731f4d8240c.output</output-file>
+<status>completed</status>
+<summary>Agent "UI designer: routine visualization and editing" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I looked at all 7 screenshots, `Routines.tsx`, `App.tsx`, `DecisionCard.tsx`, `Rail.tsx`, `StatusStrip.tsx`, `VoiceCall.tsx`, `button.tsx`, `index.css` and `routines.py`. Here is the plan, most important first.
+
+## 1. The model: the LLM writes a spec, a compiler writes the code
+
+**Recommendation:** the LLM returns only a structured spec. A small Python compiler (about 40 lines in `routines.py`) turns that spec into the same `soony` Python, which still runs in the Monty sandbox. "Show the code" stays; it now shows compiled code.
+
+Why this and not "the structure describes the LLM's code":
+- **Safety.** Drag-and-drop and text edits change data, never code. The "costs money comes to you" rule is added by the compiler, so it cannot be left out.
+- **Demo reliability.** The sandbox can't reject a draft anymore, so the repair round goes away. Before/after is a plain JSON comparison.
+- **Time.** A description-only structure would drift from the code after the first edit, and the screen would show something the routine doesn't do.
+
+Spec shape (replaces `code` in the writer prompt's JSON; `name` and `description` stay):
+```json
+{"when":[{"id":"c1","field":"evidence|option_action|option_to|supplier_name|supplier_country|kind",
+          "op":"contains|is|in","value":"ready for pick-up","text":"the papers say goods are ready for pick-up"}],
+ "then":[{"id":"s1","do":"carry_out","match":{"to":"DC site lead","action_contains":"collect"},
+          "text":"Send the collect message to the DC site lead"},
+         {"id":"s2","do":"notify","channel":"phone|teams|both","text":"Tell me on Teams"},
+         {"id":"s3","do":"log","text":"Note it in the history"}]}
+```
+- Conditions are combined with AND. Every card is handled once (the compiler always uses `first_time`).
+- The "costs money" rule is not in the spec; it is always added.
+- IDs must stay stable across edits; the prompt says "keep ids of unchanged items".
+
+Two backend gaps:
+- `notify()` always sends both phone and Teams. It needs a `channel` argument, otherwise "also tell me on Teams" changes nothing.
+- "Only for Polish suppliers" needs `supplier_country` in `_card_view` (from master data). Without it, the editor must answer "I can't filter by country yet" rather than guess.
+
+## 2. How one routine looks (`RoutineFlow`)
+
+Card frame: `rounded-xl border border-line bg-white p-4`.
+- **Header:** name (`text-[16px] font-bold`) and a real switch (`h-5 w-9 rounded-full`, `bg-ok` when on, `bg-line` when off). It replaces the On/Off pill, which looks like a button.
+- **Stats line** (`text-sm text-ink-3`): "Handled 3 cards · Last ran 03:39 · Nothing to do". Add a `handled` counter on the backend, because `runs` keeps only the last 20.
+- **Blocks:** stacked vertically, joined by a connector (`ml-6 h-3 w-px bg-line`). Each block is `rounded-lg border border-line px-3 py-2.5 text-[15px]` with a label column `w-14 text-xs font-bold uppercase tracking-wide`.
+  - **When** (label `text-ink-3`): conditions as chips, `rounded-md bg-panel px-2 py-1 text-sm ring-1 ring-line`. Show the `text` phrase, never the field names.
+  - **Then** (label `text-ok`): one row per step with a lucide icon:
+    - `Send` for "carry out"
+    - `Smartphone` / `MessageSquare` for "tell me" (phone / Teams)
+    - `NotebookPen` for the log
+  - **Always** (fixed, `border-dashed bg-panel`, `Lock` icon): "Costs money? It comes to you to decide." No delete button and not draggable.
+- **Footer:** "Run now" and "Delete" (keep the current ones), then "Show the code", collapsed.
+
+## 3. Editing (about 3 hours, in this order)
+
+**Build (45 min): the change box.**
+- Under the blocks: an input (`h-10 rounded-lg border-line`) with placeholder "Change it in your words, e.g. “also tell me on Teams”", plus a small button "Change".
+- New endpoint `POST /api/routines/{id}/edit {instruction}`. The LLM gets the old spec and the allowed fields, returns a new spec; the server compiles it, does a dry run, and returns `{before, after, preview}`.
+- The client compares blocks by ID:
+  - Added: `bg-ok/5 ring-1 ring-ok/40` with a small "New" tag.
+  - Removed: `opacity-60 line-through` with a "Removed" tag in `text-stop`.
+  - Changed: the old phrase struck through, then the new one.
+- Below that, "Test on today's inbox:" with the existing `Steps` component. Buttons: "Apply change" (disabled if the test failed) and "Keep as is".
+
+**Build (30 min): direct manipulation, no library.**
+- An × on hover removes a condition chip or a step (re-compile, then the same review step before saving).
+- Native HTML5 drag-and-drop (`draggable`, `onDragOver`) reorders "Then" steps.
+- A small palette under "Then" with three chips you can drag or click: "Tell me on my phone", "Tell me on Teams", "Note it in the history".
+
+**Don't build:**
+- A node-graph or canvas editor.
+- Dragging new conditions in (they need value entry; use the change box).
+- Picking a different carry-out target by dragging.
+- Editable Python.
+- Changing a routine live by voice during the call.
+
+## 4. Where routines live and how they show up
+
+- **Location:** keep the side sheet, widened to `sm:max-w-[560px]`. A separate page isn't worth it in 3 hours.
+  - Rename the button "Routines" and always show the label.
+  - Swap the `Cog` icon for `Workflow`; the cog reads as settings and its badge reads as a notification.
+  - Remove the second "Routines" pill floating over the Europe map inset (screenshots 6 and 7).
+- **Draft view:** same `RoutineFlow` in `border-2 border-ok/50 bg-ok/5`, with the test run between the blocks and the buttons "Turn on" / "Not now".
+- **Cards a routine handled:** add a `via` field to activity items (the backend already passes `via: "routine: &lt;name&gt;"` to `approve`). Those rows get a chip: `Workflow` icon, `text-xs font-semibold text-ok bg-ok/10 rounded px-1.5`, "By routine · Tell DC site lead to collect at port". Clicking it opens the sheet scrolled to that routine.
+- **Paid options a routine looked at:** the card stays in "Needs you" with a line above the buttons: "Your routine ‘…’ checked this. It costs money, so it's yours."
+- **"Automate this" offer.** Right now there are two that disagree:
+  - The bottom toast covers the map and legend.
+  - `DecisionCard.tsx` lines 201–212 show a different, hard-coded "Send routine ETA chasers… Allow always / Ask me each time".
+
+  Replace both with one panel pinned at the top of the right column (`rounded-xl border-2 border-ok/40 bg-ok/5 p-4`):
+  - "Approved: Collect game card case from the port"
+  - "Handle the next one like this on its own?"
+  - "You'll see what it would do before it starts. Anything that costs money still comes to you."
+  - Buttons: "Show me how" (writes the draft and opens the sheet) and "Not now".
+- **After a voice call:**
+  - When the call ends with a decision, the same panel appears inside the call area, headed "You decided this on the phone."
+  - Add a realtime tool, `suggest_routine(instruction)`, for when the buyer says "do that automatically next time". The server drafts it, the assistant replies "I've drafted it. Check it on screen before it starts", and a push says "Routine draft ready to review".
+  - Voice never turns a routine on.
+
+## 5. Quick wins for consistency
+
+1. One way of offering automation and one set of words for it (see section 4).
+2. Cost wording: "none" (screenshot 1) and "No cost" (screenshot 7) both appear. Use "No cost" everywhere.
+3. Section headings: "NEEDS YOU" is `text-sm font-bold`, the sheet headings are `text-xs font-semibold`. Pick one: `text-xs font-semibold uppercase tracking-wide text-ink-3`.
+4. The list of decided cards shows the raw lowercase status ("approved"). Use the existing `DONE_WORD` map and give titles two lines (`line-clamp-2`) instead of cutting them off.
+5. The floating "Enable alerts" pill covers the Activity list (screenshot 7). Move it into the header next to the bell.
+6. Mobile (screenshot 5): the status strip runs off the screen and the header buttons wrap under it. On small screens, hide "Breaks first" and use `min-w-0`.
+7. Collector's shows "−7 h slack" while "On track". Show "–" or "+7 h" instead; a negative number next to "On track" reads as a bug.
+8. The notify title in `push.send` starts with an emoji ("⚙️ {name}"). Use "Routine: {name}" to match the plain, emoji-free UI.
+
+### Time plan
+| Task | Time |
+|---|---|
+| Spec, compiler, writer prompt changes, `notify` channel | 45 min |
+| `RoutineFlow` and draft view | 45 min |
+| Change box, before/after, test run | 45 min |
+| Remove, reorder, palette | 30 min |
+| "By routine" chips, one offer panel, voice offer | 15 min |
+
+### Critical files
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/routines.py
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/components/Routines.tsx
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/App.tsx
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/components/DecisionCard.tsx
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/components/Rail.tsx
+- /Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/web/src/components/VoiceCall.tsx</result>
+<usage><subagent_tokens>66555</subagent_tokens><tool_uses>13</tool_uses><duration_ms>92337</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>ad0f41a0d38eecaee</task-id>
+<tool-use-id>toolu_01JCyvMngwNphKD319mUxJU4</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-jonasstenglein-OtherProjects-StartMunichHack-ask-soony/3021cc1a-f777-4712-b18b-d31b6ece5ff1/tasks/ad0f41a0d38eecaee.output</output-file>
+<status>completed</status>
+<summary>Agent "Find real document vs SAP cases" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I found five more verified contradictions. One gap first: **there is no second shipment sitting at a port or terminal in the current data.** The only "discharged / available for pick-up" entry is NHSU4471921. Case 4 below is the closest match: goods physically ready and waiting on a Soony action, while SAP shows them as moving.
+
+All cases are on GH6 parts. "Row" means the line number in the file, with the header as line 1. All paths are under `data/portal/`.
+
+---
+
+**1. Art book stock booked at 80,000 when 8,000 arrived (type c, Collector's)**
+- **Supplier:** SUP-0028 Karton Nowak.
+- **Part:** CMP-GAM-008 Art Book Grand Heist 6 (96 p, hardcover).
+- **PO:** 4500318768 line 3, ordered 8,000.
+- **SAP/ERP:**
+  - `soony/erp/goods_receipts.csv` row 393: GR 5000413065, 2026-11-18, qty_ordered 8000, **qty_received 80000**, DN WZ-261116-473, remark "over delivery accepted".
+  - `soony/erp/stock_snapshot.csv` row 25: batch 5000413065 = 80,000.
+  - `soony/context/launch_plan_GH6.xlsx` sheet Parts, row 9: ERP stock 91,300, cover 66,100, status "ok".
+- **Document:** `soony/receiving/DC-HAM/20261118_WZ-261116-473.jpg`, page 1. The printed "Ilość" (quantity) "80.000" is struck through and "**8 000**" is handwritten beside it. Packages: 40, gross weight 360 kg (which fits 8,000 books, not 80,000). Received by Meyer K. on 18.11.2026.
+- **Why it matters:** real stock is 1,200 + 10,100 + 8,000 = 19,300 against 25,200 needed for the remaining CE pack-out. That is **5,900 copies short**, about 6.5 hours of CE cell time against 2 hours of slack. The cell stops on Sunday afternoon, and every CE copy is numbered and pre-ordered.
+- **Card headline:** "We have 19,300 art books, not 91,300. The Collector's cell runs out about 5,900 copies early."
+- **Action:** accept Karton Nowak's offer `suppliers/SUP-0028_Karton_Nowak/notices/Oferta_tryb_ekspresowy_2026-11-21.pdf`, item 2. Quote: "8 000 szt. … nadwyżka z produkcji, na magazynie … załadunek w 4 h od zamówienia" / "8,000 pcs, overrun from production, in our finished-goods store, loaded within 4 h of your order", at the "Annex A price".
+  - Cost: about EUR 16,800 at list price, no surcharge. Truck Poznań to Hamburg is about 9 hours.
+  - Contact: Agnieszka Nowak.
+  - Deadline: the offer says "valid 24 h" from 21.11, so order **now**.
+  - Also have Felix/receiving correct GR 5000413065.
+
+**2. Statue lot that failed inspection is counted as usable stock (type c, Collector's)**
+- **Supplier:** SUP-0018 Pune Diecast Works.
+- **Part:** CMP-GAM-010 Statue "The Getaway" (die-cast, 18 cm).
+- **PO:** 4500318727 line 1, 5,600 pcs.
+- **SAP/ERP:**
+  - `goods_receipts.csv` row 391: GR 5000413063, 2026-11-17, 5600/5600, no remark.
+  - `stock_snapshot.csv` row 30: batch 5000413063 = 5,600 (unrestricted).
+  - Launch plan Parts row 11: stock 27,400, cover 2,200, "ok".
+- **Document:** `soony/receiving/DC-HAM/inspection_report_5000413063.pdf`, page 1. Quotes:
+  - "9 of 125 statues with paint defects on the base"
+  - "Lot does not meet AQL. Booked to stock as 'unrestricted' by receiving because the supplier is listed as active. Blocking requested from Supplier Quality. Use only under a concession signed by Supplier Quality and the Category Lead."
+- **Second contradiction on the same supplier:**
+  - The order confirmation (`suppliers/SUP-0018_Pune_Diecast_Works/order_confirmations/OA26657853_4500318727.pdf`) says "Supplier status: approved for serial supply to Soony".
+  - The vendor master (`suppliers/SUP-0018_Pune_Diecast_Works/profile.json`) says `"qualification": {"status": "conditional", ... "validUntil": "2026-10-30"}` and "review by Supplier Quality open".
+  - Policy PP-07 §5 limits conditional releases to 90 days.
+- **Why it matters:** usable stock is 21,800 against 25,200 needed, so **3,400 CE copies are short**. No statue arrives before launch: the next ones are NHSU6120458 (ETA 11-27) and NHMU8536079 (ETA 11-28). The CPO memo says "No copy leaves Hamburg with a part that is not released."
+- **Card headline:** "5,600 statues on the shelf failed inspection. Without them we are 3,400 Collector's copies short."
+- **Action (free, internal):** ask Supplier Quality and Mei Lin (Category Lead) for a decision today. Either sign a concession, or 100% sort the lot; at about 7% defective, roughly 5,200 good statues are expected. Separately, flag the expired qualification for Pune's December POs.
+
+**3. 64,000 cover sleeves in stock are artwork rev B, which may no longer be packed (type c, wrong revision, Standard)**
+- **Supplier:** SUP-0029 Guangzhou PackRight.
+- **Part:** CMP-GAM-004 Cover Sleeve Grand Heist 6 (USK/PEGI); supplier part number PR-SL-0604.
+- **PO:** 4500318738 line 1, 64,000.
+- **SAP/ERP:**
+  - `purchase_orders_2025H2-2026.csv` row 233: delivered 2026-11-17.
+  - `goods_receipts.csv` row 392: GR 5000413064, 64000/64000.
+  - `stock_snapshot.csv` row 17: batch 5000413064 = 64,000.
+  - Launch plan Parts row 6: sleeve stock 186,000, cover 78,000, "ok".
+  - `soony/master/bom_delta_2026-11-21.csv`: ECN-2026-118, rev B → C, "parts to rev B must not be packed", effective 2026-11-21.
+- **Document:** `suppliers/SUP-0029_Guangzhou_PackRight/order_confirmations/OA26182346_4500318738.pdf`, page 1: "Artwork PR-SL-0604: rev. B (GH6_sleeve_revB.pdf)". The delivery note scan `soony/receiving/DC-HAM/20261117_SN-261014-585.jpg` matches: PR-SL-0604, 64,000.
+  - Every Karton Nowak sleeve confirmation, e.g. `OA26837842_4500318768.pdf`, instead says "druk wg pliku rev. C" / "Printed to artwork rev. C".
+- **Same issue on future orders:** the scan `PL_NHMU7718206_4500318752.pdf` (OCR) reads "Artwork: rev. B (GH6_sleeve_revB.pdf)" for 150,000 sleeves. This is launch plan Inbound row 8. All open PackRight sleeve POs (4500318752, 765, 774, 786) are confirmed rev B.
+- **Why it matters:** usable rev C sleeves are 48,000 + 74,000 + 20,000 (Karton Nowak truck, PO 4500318775 line 2, expected 21.11) = 142,000 against 128,000 needed. Cover is **14,000, not 78,000**. If the Nowak truck slips, Standard runs about 6,000 short.
+- **Card headline:** "64,000 sleeves in stock have the old age rating. They must not go into a box."
+- **Action (free):** have DC-HAM (Katrin Jansen) block batch 5000413064. Confirm with Karton Nowak that the 20,000 rev C sleeves arrived. Write to Lin Hui at PackRight to switch the open POs to rev C.
+
+**4. Boise card shipment is packed but on hold at their dock (closest to the port case; also type b)**
+- **Supplier:** SUP-0011 Boise Semi.
+- **Part:** CMP-GAM-001 Game Card 128 GB – Grand Heist 6.
+- **PO:** 4500318769 line 2, 36,000.
+- **SAP/ERP:**
+  - `purchase_orders_2025H2-2026.csv` row 276: incoterm **DDP Hamburg**, promised 2026-11-23, open.
+  - `open_shipments.csv` row 19: SHP-2026-04314, AWB 020-48113304, ETD 2026-11-21, ETA 2026-11-23, "booked".
+  - Launch plan Inbound row 5 lists it the same way.
+- **Document:** `suppliers/SUP-0011_Boise_Semi/order_confirmations/OA26144214_4500318769.pdf`, page 1. Quote: "Your order states 'DDP Hamburg'. We do not accept this term. **The shipment is packed and on hold at our dock.** We release it to the carrier once Buyer confirms EXW Boise in writing, or nominates its own forwarder."
+  - All other Boise order confirmations also say "DDP is not agreed", so SAP's incoterm is wrong for the whole supplier.
+- **Why it matters:** these are 36,000 GH6 game cards, the Standard bottleneck, and the CPO memo sends cards to Collector's first. SAP thinks they take off on Saturday, but nothing moves until Soony replies. Its ETA was already Monday 23.11, so it does not change Sunday's count. It does decide how fast short copies (including Hwaseong's 20,000) are backfilled.
+- **Card headline:** "Boise is holding 36,000 game cards at its dock until we confirm EXW."
+- **Action:** Felix confirms EXW Boise in writing to Megan Ortiz. That is free, but freight is then added to the invoice per contract §4.1. Category Lead to approve the freight if needed.
+
+**5. Hwaseong container sits near Hamburg, frozen at "in delivery", with no receipt (weak, GH5 cards)**
+- **Supplier:** SUP-0010 Hwaseong Memory.
+- **Part:** CMP-GAM-002 Game Card 64 GB – Grand Heist 5.
+- **PO:** 4500318733 line 2 (13,000) and 4500318735 line 1 (11,000).
+- **SAP/ERP:** `open_shipments.csv` row 3: SHP-2026-04281, container NHMU8213939, ETA 2026-11-20, status `in_delivery`. Position 53.5075 / 9.785 is in the Hamburg harbour area. `updated_at` has not changed since 2026-11-19T12:00. There is no goods receipt.
+- **Document:** none. The logistics tracker `soony/logistics/open_shipments_tracker_v37_FINAL_final2.xlsx`, row 3, still says "in transit". So this is "the system has stopped updating", not a supplier document.
+- **Why it matters:** low. These are GH5 reprint cards on the shared Standard lines, not GH6 parts. Use it only as a demo of "the next one like it" if a non-GH6 example is acceptable.
+- **Card headline:** "Container NHMU8213939 has been 'in delivery' in Hamburg for two days with no receipt."
+- **Action:** Felix calls carrier LSP-01 or the terminal. Free.
+
+---
+
+**Anti-finding (do not show this as a problem):** launch plan Parts row 13 flags CMP-MAG-005 magnets as "CHECK", short by 100,800. The PackRight collector's box confirmations (e.g. `OA26144355_4500318747.pdf`) say "lid closure magnets RM-N42-D0401 (4 pcs per box) are fitted in our plant and included in the unit price". The BOM counts them twice. The rare-earth export notice only affects collector's box deliveries after 2026-12-01.
+
+Scratch scripts and extracted text are in `/Users/jonasstenglein/.claude/jobs/3021cc1a/tmp/scout/`. Nothing in the repo was changed.</result>
+<usage><subagent_tokens>148139</subagent_tokens><tool_uses>20</tool_uses><duration_ms>173118</duration_ms></usage>
+</task-notification>
+
+---
+
+do one more round of subagents. and also improve / polish / rewrite the entire ui (with expert feedback) to be an actual usable product.

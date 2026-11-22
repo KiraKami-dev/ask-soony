@@ -1,0 +1,57 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M80J97TCJCQF5WGKFP69AEYA",
+  "strategy": "manual-commit",
+  "branch": "jonas/alert-platform",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "src/ask_soony/routines.py",
+    "tests/test_routines.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt",
+      "assets_manifest": "/0/assets/manifest.json"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 26,
+    "cache_creation_tokens": 35886,
+    "cache_read_tokens": 7402938,
+    "output_tokens": 18621,
+    "api_call_count": 13,
+    "subagent_tokens": {
+      "input_tokens": 32,
+      "cache_creation_tokens": 49424,
+      "cache_read_tokens": 1551031,
+      "output_tokens": 24070,
+      "api_call_count": 14
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 1210,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 63,
+      "credentialed_uri": 0,
+      "entropy": 238,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 885,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 788,
+      "IP": 32,
+      "PHONE": 65
+    }
+  }
+}

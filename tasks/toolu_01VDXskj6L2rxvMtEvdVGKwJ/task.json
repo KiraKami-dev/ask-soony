@@ -1,0 +1,15 @@
+{
+  "tool_use_id": "toolu_01VDXskj6L2rxvMtEvdVGKwJ",
+  "agent_id": "ad1a74cf80bf7ecf7",
+  "subagent_type": "general-purpose",
+  "task_description": "Re-research slides, criteria, interviews",
+  "token_usage": {
+    "input_tokens": 10,
+    "cache_creation_tokens": 89913,
+    "cache_read_tokens": 278131,
+    "output_tokens": 5528,
+    "api_call_count": 5
+  },
+  "started_at": "2026-11-22T03:40:54.345894+01:00",
+  "completed_at": "2026-11-22T03:42:00.692723+01:00"
+}
