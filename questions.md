@@ -18,3 +18,7 @@ Office hours are 10 minutes per person. Only questions the data can't answer and
 
 7. **Can we write back to SAP (block a lot, correct a receipt), or only propose changes?**
 8. **Can our agent read and send from the buyers' supplier inbox?**
+
+## Answers we got
+
+- **Nils (Sun 22 Nov):** finding one inconsistency in the data takes his team about **30 minutes, by hand**. We check 20 new scans plus a 50-row Excel update against SAP in **under a minute** (measured ~45–50 s), so 10 hours of manual work becomes under a minute. He found that very cool. Use it in the pitch: "On Sunday, Nils told us one inconsistency takes his team 30 minutes…"
