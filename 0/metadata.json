@@ -1,0 +1,153 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M818N3XX92P82ENQE0VSKPT4",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T09:16:25.896908Z",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 3,
+  "save_step_count": 2,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "401ab341828e",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 34,
+    "cache_creation_tokens": 16629,
+    "cache_read_tokens": 10388166,
+    "output_tokens": 10648,
+    "api_call_count": 14,
+    "subagent_tokens": {
+      "input_tokens": 72,
+      "cache_creation_tokens": 65965,
+      "cache_read_tokens": 5003684,
+      "output_tokens": 43595,
+      "api_call_count": 36
+    },
+    "subagent_tokens_complete": true
+  },
+  "session_token_usage": {
+    "input_tokens": 3170,
+    "cache_creation_tokens": 3119239,
+    "cache_read_tokens": 709562784,
+    "output_tokens": 1284984,
+    "api_call_count": 1377,
+    "subagent_tokens": {
+      "input_tokens": 3268,
+      "cache_creation_tokens": 6932457,
+      "cache_read_tokens": 239965381,
+      "output_tokens": 1888761,
+      "api_call_count": 1563
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 2253,
+    "layers": {
+      "betterleaks": 34,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 88,
+      "credentialed_uri": 0,
+      "entropy": 754,
+      "goredact": 8,
+      "key_context": 0,
+      "pii": 1383,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1246,
+      "IP": 72,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 274
+  },
+  "summary": {
+    "intent": "Build a hackathon product (ask-soony) for the Lio 'Keep the Line Running' challenge: an agent loop that polls the Soony portal, finds contradictions in supply data, and acts on them (supplier emails, approvals, phone alerts), plus a demo instance and pitch material for the 12:00 Sunday hand-in.",
+    "outcome": "Analysed the data and found the Collector's Edition shortfall (overbooked art books, failed statues) and later drops. Built a versioned poller, agent, approval flow, Maren's Launch view, a dry-mail demo instance with reset script, a demo script and README, and a phone-alert bridge to cases. Keypad calls work end to end; gpt-realtime calls were unstable in noise, and voice fixes were committed and restarted for retest.",
+    "learnings": {
+      "repo": [
+        "Portal API has only /files, /files/{path} and /archive.zip; no webhooks or notifications. Change detection must poll and compare SHA-256, and files are replaced under the same name.",
+        "data/ (raw data, scans, notes) and .env are gitignored; confidential data must stay out of code and git. Notes live in data/notes/.",
+        "Team workflow uses CLAUDE.md and PROGRESS.md; tasks are claimed with a 'Now' line in PROGRESS.md.",
+        "Live (ask-soony.stenglein.dev) and demo (ask-soony-demo.stenglein.dev) are separate instances behind a Cloudflare tunnel. The demo sends emails dry (recorded in data/demo/state/dry_outbox.json). Control it with scripts/demo.sh reset|snapshot|stop|restart; CALLS=twilio|openai enables real calls.",
+        "Live and demo servers share one alert database, so the alert-to-case link is stored per state folder; ASK_CARD_ALERTS=off disables the bridge on live.",
+        "OpenAI realtime webhook is configured in the OpenAI project settings (not the repo) and pointed at the live server. It had to be changed to the demo URL for demo calls, otherwise live could act on the call.",
+        "Twilio built-in voice with keypad (1 approve, 2 escalate, 3 reject) works reliably. gpt-realtime via SIP hits noise-triggered interruptions, 'active response' errors and connection drops; fixed with semantic VAD, a single response and sideband reconnect.",
+        "Web frontend polls state every 5s (POLL_MS=5000) and routines every 15s, so phone decisions show on both Today and Launch within about 5s.",
+        "Mailbox sync previously wrote back a stale copy of the action log and lost records; fixed by appending under the shared lock (dd71984).",
+        "CSV reader and verifier were made robust to encodings and unnamed or extra columns after new drops arrived."
+      ],
+      "code": [],
+      "workflow": [
+        "Entire only checkpoints when repo files change; sessions with no repo changes log 'no files modified, skipping checkpoint'. Hooks did fire.",
+        "Subagents were useful for bulk cross-checking (200 order confirmations, 59 scans) and for building features in parallel (phone bridge, Maren view) while docs were written in the main thread.",
+        "Verify UI fixes in a real browser (e.g. pressing J repeatedly and recording the highlighted row) rather than relying on type checks alone.",
+        "Ask before actions that cost money or send external messages (calls about $0.38/min, supplier emails); keep the switches off by default and under explicit user control.",
+        "Rehearse the demo end to end on the demo instance, then reset, to catch broken sentences and flows."
+      ]
+    },
+    "friction": null,
+    "open_items": null
+  }
+}
