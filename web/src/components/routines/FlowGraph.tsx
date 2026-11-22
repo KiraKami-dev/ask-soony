@@ -118,9 +118,8 @@ function Arrow({ wide, dashed, side }: { wide?: boolean; dashed?: boolean; side?
   )
 }
 
-export function FlowGraph({ spec, run, wide }: { spec: Spec; run?: Run; wide?: boolean }) {
+function nodesFor(spec: Spec, run: Run | undefined, wide: boolean) {
   const c = count(spec, run)
-  const sendAt = spec.then.findIndex((s) => s.do === 'carry_out')
   const guard = (
     <Node
       wide={wide}
@@ -133,46 +132,36 @@ export function FlowGraph({ spec, run, wide }: { spec: Spec; run?: Run; wide?: b
       active={!!c?.guard}
     />
   )
-  // Columns of the main path. Conditions stack in one column (they all have to hold); the step
-  // that sends carries the guard as a side branch.
-  const columns: { key: string; node: ReactNode }[] = [
-    {
-      key: 'trigger',
+  const trigger = (
+    <Node
+      wide={wide}
+      icon={<Radar size={15} className="text-ok" />}
+      tone="bg-ok/10"
+      title={triggerText(spec.on).title}
+      text={triggerText(spec.on).text}
+      badge={run?.dry ? 'Test run' : undefined}
+    />
+  )
+  const conditions = spec.when.map((cond, i) => ({
+    key: cond.id,
+    node: (
+      <Node
+        wide={wide}
+        icon={<Filter size={15} className="text-amber-700" />}
+        tone="bg-amber-50"
+        title={i === 0 ? 'If' : 'And'}
+        text={condWords(cond)}
+        badge={i === spec.when.length - 1 && c ? `${c.matched} matched` : undefined}
+        active={i === spec.when.length - 1 && !!c?.matched}
+      />
+    ),
+  }))
+  const steps = spec.then.map((s) => {
+    const badge = c?.byStep.get(s.id)
+    return {
+      key: s.id,
+      sends: s.do === 'carry_out',
       node: (
-        <Node
-          wide={wide}
-          icon={<Radar size={15} className="text-ok" />}
-          tone="bg-ok/10"
-          title={triggerText(spec.on).title}
-          text={triggerText(spec.on).text}
-          badge={run?.dry ? 'Test run' : undefined}
-        />
-      ),
-    },
-    {
-      key: 'when',
-      node: (
-        <div className="flex flex-col">
-          {spec.when.map((cond, i) => (
-            <div key={cond.id}>
-              {i > 0 && <Arrow />}
-              <Node
-                wide={wide}
-                icon={<Filter size={15} className="text-amber-700" />}
-                tone="bg-amber-50"
-                title={i === 0 ? 'If' : 'And'}
-                text={condWords(cond)}
-                badge={i === spec.when.length - 1 && c ? `${c.matched} matched` : undefined}
-                active={i === spec.when.length - 1 && !!c?.matched}
-              />
-            </div>
-          ))}
-        </div>
-      ),
-    },
-    ...spec.then.map((s, i) => {
-      const badge = c?.byStep.get(s.id)
-      const node = (
         <Node
           wide={wide}
           icon={<StepIcon step={s} size={15} className={s.do === 'call' ? 'text-white' : undefined} />}
@@ -183,32 +172,117 @@ export function FlowGraph({ spec, run, wide }: { spec: Spec; run?: Run; wide?: b
           badge={badge}
           active={!!badge}
         />
-      )
-      if (i !== sendAt) return { key: s.id, node }
+      ),
+    }
+  })
+  return { guard, trigger, conditions, steps }
+}
+
+/**
+ * The wide view reads like a sentence in two lanes: WHEN (trigger, then every condition) left to
+ * right, then a turn down into THEN (the steps) left to right. Lanes wrap instead of running off
+ * the edge; the guard hangs below the step it protects, or sits in its own ALWAYS lane.
+ */
+function Lanes({ spec, run }: { spec: Spec; run?: Run }) {
+  const { guard, trigger, conditions, steps } = nodesFor(spec, run, true)
+  const hasSend = steps.some((s) => s.sends)
+  const chain = (items: { key: string; node: ReactNode }[]) =>
+    items.map((it, i) => (
+      <div key={it.key} className="flex items-start">
+        {i > 0 && <div className="mt-[21px] shrink-0 px-1 text-ink-3/70"><Right /></div>}
+        {it.node}
+      </div>
+    ))
+  const lane = (label: string, body: ReactNode, last = false) => (
+    <div className="grid grid-cols-[64px_minmax(0,1fr)] gap-x-3">
+      <div className="flex flex-col items-center pt-[18px]">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-ink-3">{label}</span>
+        {!last && (
+          <div className="mt-2 flex flex-1 flex-col items-center text-ink-3/70">
+            <div className="w-px flex-1 bg-current" />
+            <svg width="10" height="7" viewBox="0 0 10 7" aria-hidden className="block"><path d="M1.5 1 L5 6 L8.5 1" {...stroke()} /></svg>
+          </div>
+        )}
+      </div>
+      <div className="flex min-w-0 flex-wrap items-start gap-y-5 pb-6">{body}</div>
+    </div>
+  )
+  return (
+    <div className="flex flex-col">
+      {lane('When', chain([{ key: 'trigger', node: trigger }, ...conditions]))}
+      {lane(
+        'Then',
+        chain(
+          steps.map((s) => ({
+            key: s.key,
+            node: s.sends ? (
+              <div className="flex flex-col">
+                {s.node}
+                <div className="ml-[26px] text-ink-3/70"><Down dashed /></div>
+                {guard}
+              </div>
+            ) : (
+              s.node
+            ),
+          })),
+        ),
+        hasSend,
+      )}
+      {!hasSend && lane('Always', guard, true)}
+    </div>
+  )
+}
+
+export function FlowGraph({ spec, run, wide }: { spec: Spec; run?: Run; wide?: boolean }) {
+  const { guard, trigger, conditions, steps } = nodesFor(spec, run, false)
+  const sendAt = steps.findIndex((s) => s.sends)
+  // Narrow: one vertical path; conditions stack (they all have to hold); the step that sends
+  // carries the guard as a side branch.
+  const columns: { key: string; node: ReactNode }[] = [
+    { key: 'trigger', node: trigger },
+    {
+      key: 'when',
+      node: (
+        <div className="flex flex-col">
+          {conditions.map((cond, i) => (
+            <div key={cond.key}>
+              {i > 0 && <Arrow />}
+              {cond.node}
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    ...steps.map((s, i) => {
+      if (i !== sendAt) return { key: s.key, node: s.node }
       return {
-        key: s.id,
+        key: s.key,
         node: (
-          <div className={cn('flex flex-col sm:flex-row sm:items-start', wide && 'lg:flex-col')}>
-            <div className={cn('min-w-0 sm:flex-[3]', wide && 'lg:flex-none')}>{node}</div>
-            <Arrow wide={wide} side dashed />
-            <div className={cn('min-w-0 pl-6 sm:flex-[2] sm:pl-0', wide && 'lg:flex-none')}>{guard}</div>
+          <div className="flex flex-col sm:flex-row sm:items-start">
+            <div className="min-w-0 sm:flex-[3]">{s.node}</div>
+            <Arrow side dashed />
+            <div className="min-w-0 pl-6 sm:flex-[2] sm:pl-0">{guard}</div>
           </div>
         ),
       }
     }),
   ]
   if (sendAt < 0) columns.push({ key: 'guard', node: guard })
-
-  return (
-    <div className="relative">
-      <div className={cn('flex flex-col', wide && 'lg:flex-row lg:items-start lg:overflow-x-auto lg:pb-2')}>
-        {columns.map((col, i) => (
-          <div key={col.key} className={cn('flex min-w-0 flex-col', wide && 'lg:flex-row lg:items-start')}>
-            {i > 0 && <Arrow wide={wide} dashed={col.key === 'guard'} />}
-            {col.node}
-          </div>
-        ))}
-      </div>
+  const vertical = (
+    <div className="flex flex-col">
+      {columns.map((col, i) => (
+        <div key={col.key} className="flex min-w-0 flex-col">
+          {i > 0 && <Arrow dashed={col.key === 'guard'} />}
+          {col.node}
+        </div>
+      ))}
     </div>
+  )
+  if (!wide) return vertical
+  return (
+    <>
+      <div className="hidden lg:block"><Lanes spec={spec} run={run} /></div>
+      <div className="lg:hidden">{vertical}</div>
+    </>
   )
 }
