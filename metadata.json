@@ -1,0 +1,54 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M80QFA6E0YTTZD0P67RK8Z91",
+  "strategy": "manual-commit",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "web/src/App.tsx",
+    "web/src/components/Routines.tsx",
+    "web/src/components/Today.tsx",
+    "web/src/components/TopBar.tsx",
+    "web/src/components/VoiceCall.tsx",
+    "web/src/components/routines/Diagram.tsx",
+    "web/src/components/routines/FlowGraph.tsx",
+    "web/src/components/routines/PaneHints.tsx",
+    "web/src/components/routines/Proposals.tsx",
+    "web/src/components/routines/RoutineCard.tsx",
+    "web/src/components/routines/RoutineFlow.tsx",
+    "web/src/components/routines/Undo.tsx",
+    "web/src/components/routines/live.ts",
+    "web/src/components/routines/types.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt",
+      "assets_manifest": "/0/assets/manifest.json"
+    }
+  ],
+  "redaction": {
+    "replacements": 1478,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 66,
+      "credentialed_uri": 0,
+      "entropy": 437,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 951,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 854,
+      "IP": 32,
+      "PHONE": 65
+    }
+  }
+}
