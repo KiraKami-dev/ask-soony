@@ -456,3 +456,45 @@ def test_repeated_decisions_become_a_suggestion(agent_env, monkeypatch):
     monkeypatch.setattr(api, "build_state", decided)
     out = routines.suggestions()
     assert len(out) == 1 and out[0]["count"] == 2 and set(out[0]["card_ids"]) == {"gap-X", "gap-Y"}
+
+
+def test_carry_out_matches_all_listed_words_and_a_supplier_email():
+    import json as _json
+
+    from ask_soony import routines
+
+    code = routines.compile_spec(
+        {
+            "on": "decisions",
+            "when": [
+                {"id": "c1", "field": "headline", "op": "contains", "value": "rev", "text": "t"}
+            ],
+            "then": [
+                {
+                    "id": "s1",
+                    "do": "carry_out",
+                    "text": "t",
+                    "match": {"to": "supplier", "action_contains": "make po,rev"},
+                }
+            ],
+        }
+    )
+    ns: dict = {}
+    src = code.split("handled = 0")[0]
+    src = "\n".join(line for line in src.splitlines() if not line.startswith("from soony"))
+    exec(src, ns)  # only the helper functions, no sandbox calls
+    card = {
+        "options": [
+            {"action": "Tell the buyer", "to": "A Buyer", "channel": "notify"},
+            {
+                "action": "Ask PackRight to make PO 4500000001 to rev C",
+                "to": "x@example.com",
+                "channel": "email",
+            },
+        ]
+    }
+    assert (
+        ns["pick"](card, {"to": "supplier", "action_contains": "make po,rev"}) is card["options"][1]
+    )
+    assert ns["pick"](card, {"to": "supplier", "action_contains": "make po,rev D"}) is None
+    assert _json.dumps(ns["pick"](card, {"to": "buyer"}))

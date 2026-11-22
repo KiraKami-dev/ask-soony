@@ -1198,12 +1198,19 @@ def fill(template, item):
 
 
 def pick(card, match):
+    to = str(match.get("to") or "").lower()
+    words = [w.strip() for w in str(match.get("action_contains") or "").lower().split(",")]
+    words = [w for w in words if w]
     for o in card["options"]:
-        to = str(match.get("to") or "").lower()
-        words = str(match.get("action_contains") or "").lower()
-        if to and to not in str(o["to"] or "").lower():
+        target = str(o["to"] or "").lower()
+        if to == "supplier":
+            # "the supplier": an email option to an address, not a person inside the company
+            if o.get("channel") != "email" or "@" not in target:
+                continue
+        elif to and to not in target:
             continue
-        if words and words not in str(o["action"] or "").lower():
+        action = str(o["action"] or "").lower()
+        if not all(w in action for w in words):
             continue
         return o
     return None
