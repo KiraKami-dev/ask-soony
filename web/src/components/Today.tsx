@@ -392,7 +392,7 @@ function Focus(p: Props & {
       setError(`That did not go through: ${(e as Error).message}. Nothing was sent.`)
     } finally { setBusy(false); setConfirm(false) }
   }
-  const approve = (text?: string, head?: MailHead) =>
+  const approve = (text?: string, head?: MailHead, force?: boolean) =>
     act(async () => {
       const edited = text != null && text.trim() !== (opt?.draft ?? '').trim()
       const changes = head
@@ -404,7 +404,7 @@ function Focus(p: Props & {
         : {}
       const r = await post<{ action?: { id?: string; status?: string; to?: string } }>(
         `/api/cards/${encodeURIComponent(card.id)}/approve`,
-        { option: sel, ...(edited ? { text } : {}), ...changes },
+        { option: sel, ...(edited ? { text } : {}), ...changes, ...(force ? { force: true } : {}) },
       )
       const status = r.action?.status
       const at = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
@@ -685,7 +685,7 @@ function Focus(p: Props & {
           busy={busy}
           error={error}
           voice={emailPrepared}
-          onSend={() => { setReview(false); void approve(draft, mail) }}
+          onSend={(force) => { setReview(false); void approve(draft, mail, force) }}
         />
       )}
     </article>
@@ -726,6 +726,22 @@ function useContacts(cardId: string, open: boolean): Contact[] {
   return list
 }
 
+interface Sent { at: string; kind: string; to: string; subject: string; signed?: string | null }
+/** Emails that already went to this supplier about this card, from the app or by hand. */
+function useRecentSends(cardId: string, open: boolean): Sent[] {
+  const [list, setList] = useState<Sent[]>([])
+  useEffect(() => {
+    if (!open) return
+    let live = true
+    fetch(`/api/cards/${encodeURIComponent(cardId)}/recent_sends`)
+      .then((r) => (r.ok ? r.json() : { sends: [] }))
+      .then((j) => live && setList(j.sends ?? []))
+      .catch(() => {})
+    return () => { live = false }
+  }, [cardId, open])
+  return list
+}
+
 function EmailReview({
   open, onOpenChange, cardId, head, onHead, supplier, draft, onDraft, cost, busy, error, onSend, voice,
 }: {
@@ -733,9 +749,11 @@ function EmailReview({
   voice?: boolean
   open: boolean; onOpenChange: (o: boolean) => void; cardId: string; head: MailHead; onHead: (h: MailHead) => void
   supplier: string
-  draft: string; onDraft: (t: string) => void; cost: string | null; busy: boolean; error: string; onSend: () => void
+  draft: string; onDraft: (t: string) => void; cost: string | null; busy: boolean; error: string; onSend: (force?: boolean) => void
 }) {
   const contacts = useContacts(cardId, open)
+  const earlier = useRecentSends(cardId, open)
+  const last = earlier[earlier.length - 1]
   const label = (c: Contact) => (c.name ? `${c.name} · ${c.email}` : c.email)
   const toContact = contacts.find((c) => c.email === head.to)
   const others = contacts.filter((c) => c.email !== head.to)
@@ -820,15 +838,23 @@ function EmailReview({
             rows={10}
             className="t-body mt-4 w-full resize-y rounded-xl bg-soft p-4 leading-relaxed text-ink focus:outline-2 focus:outline-accent"
           />
+          {last && (
+            <p className="t-small mt-3 text-ink" role="alert">
+              Already sent {last.kind === 'sent_outside' ? 'from the shared mailbox' : 'from here'} at{' '}
+              {new Date(last.at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+              {last.signed ? ` by ${last.signed}` : ''}: <span className="text-ink-2">“{last.subject}”</span>.
+              {earlier.length > 1 ? ` ${earlier.length} emails on this case lately.` : ''} Sending again may order twice.
+            </p>
+          )}
           {cost && <p className="t-small mt-3 text-ink-2">This commits money: <span className="text-ink">{cost}</span>.</p>}
           {error && <p className="t-small mt-3 text-late" role="alert">{error}</p>}
           <div className="mt-6 flex items-center gap-6">
             <button
-              onClick={onSend}
+              onClick={() => onSend(!!last)}
               disabled={busy || !draft.trim()}
               className="t-body inline-flex h-12 cursor-pointer items-center justify-center rounded-xl bg-accent px-7 font-medium text-white hover:bg-[#1d3db5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-60"
             >
-              {busy ? 'Sending…' : 'Send email'}
+              {busy ? 'Sending…' : last ? 'Send anyway' : 'Send email'}
             </button>
             <Dialog.Close className="t-body cursor-pointer text-ink-2 hover:text-ink">Cancel</Dialog.Close>
           </div>

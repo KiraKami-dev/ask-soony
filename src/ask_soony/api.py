@@ -19,6 +19,7 @@ import json
 import math
 import os
 import re
+import sys
 import threading
 import uuid
 from collections import Counter
@@ -31,7 +32,7 @@ from fastapi import Body, FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from ask_soony import floor, launch_view, tracking
+from ask_soony import floor, launch_view, supplier_master, tracking
 from ask_soony import launch as launch_clock
 from ask_soony.launch import PackClock
 
@@ -931,11 +932,20 @@ def verifier_cards(
     return out
 
 
+def event_impacts() -> dict:
+    """The event impact agent's results keyed by event: event_impacts.json, plus an older
+    impacts.json when it is keyed by event (the paper check keeps a list there)."""
+    out: dict = {}
+    for name in ("impacts.json", "event_impacts.json"):
+        data = read_json(name, None)
+        if isinstance(data, dict):
+            out.update(data)
+    return out
+
+
 def event_cards(net: dict, statuses: dict, trust: dict) -> list[dict]:
-    """News and notice impacts from the event impact agent (state/impacts.json keyed by event)."""
-    data = read_json("impacts.json", [])
-    if not isinstance(data, dict):
-        return []
+    """News and notice impacts from the event impact agent (event_impacts.json, by event)."""
+    data = event_impacts()
     nodes = net.get("nodes") or {}
     out = []
     for eid, r in data.items():
@@ -1323,6 +1333,12 @@ def build_state() -> dict:
         cur,
     )
     cards += tracking.state_cards(tracked, net, cur, clock, cards)
+    try:  # newer supplier profiles and bank detail notices against the master data
+        cards += supplier_master.cards(
+            net, cur, read_json("decision_status.json", {}), viewer_name(root)
+        )
+    except Exception as e:  # one unreadable profile must not take Today down
+        print(f"supplier master check failed: {e!r}", file=sys.stderr)
     names = part_names(root)
     for c in cards:
         if c.get("site_question") and not c.get("part_name"):
@@ -1444,6 +1460,14 @@ def _record(card_id: str, status: str, action: dict) -> dict:
     return action
 
 
+@app.get("/api/cards/{card_id}/recent_sends")
+def card_recent_sends(card_id: str) -> dict:
+    """What already went to this card's supplier about it lately, from the app or by hand."""
+    from ask_soony.outbox import recent_sends
+
+    return {"sends": recent_sends(_card(card_id))}
+
+
 @app.get("/api/cards/{card_id}/contacts")
 def card_contacts(card_id: str) -> dict:
     """Who this card's email may go to (known contacts only) and the default subject."""
@@ -1471,6 +1495,14 @@ def approve(card_id: str, body: dict = Body(default_factory=dict)) -> dict:
     # an email option to a known supplier address goes out now; anything else is only recorded.
     from ask_soony.cardtools import deliver
 
+    if opt.get("channel") == "email" and not body.get("force"):
+        from ask_soony.outbox import recent_sends
+
+        # The mailbox is shared: someone may have sent this by hand already. Ask before sending
+        # it twice (the review sheet shows it and offers "Send anyway").
+        earlier = recent_sends(card)
+        if earlier:
+            raise HTTPException(409, {"duplicate": earlier[-1], "count": len(earlier)})
     cc = body.get("cc") or []
     sent = deliver(
         card,

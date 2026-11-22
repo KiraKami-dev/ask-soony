@@ -65,6 +65,9 @@ def start() -> None:
         for loop in (_watcher, _escalation, _papercheck):
             threading.Thread(target=_guard(loop), daemon=True, name=loop.__name__).start()
         os.environ.setdefault("ASK_REPLY_POLL", "on")
+        from ask_soony import outbox
+
+        outbox.start_background()  # shared mailbox: what others sent to suppliers, by hand too
     replies.start_background()
     from ask_soony import teams
 
