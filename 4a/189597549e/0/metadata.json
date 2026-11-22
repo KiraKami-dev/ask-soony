@@ -1,0 +1,92 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "4a189597549e",
+  "session_id": "3e974626-16b1-44b6-a759-523971a88176",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T10:27:52.578727Z",
+  "branch": "image-plugin-pipeline",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "src/ask_soony/dispatch/__init__.py",
+    "src/ask_soony/verifier/image_recognizer/README.md",
+    "src/ask_soony/verifier/image_recognizer/gate.py",
+    "tests/conftest.py"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-sonnet-5-5",
+  "turn_id": "aad9bd1a3a0a",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 12,
+    "cache_creation_tokens": 50013,
+    "cache_read_tokens": 391471,
+    "output_tokens": 3796,
+    "api_call_count": 6
+  },
+  "session_token_usage": {
+    "input_tokens": 220,
+    "cache_creation_tokens": 682619,
+    "cache_read_tokens": 20990374,
+    "output_tokens": 114189,
+    "api_call_count": 96
+  },
+  "redaction": {
+    "replacements": 50,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 20,
+      "goredact": 0,
+      "key_context": 16,
+      "pii": 14,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 14,
+      "IP": 0,
+      "PHONE": 0
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01UsQLp8pAHY5a546dFGsYX5",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "strategize"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "aad9bd1a3a0a",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 617,
+        "end": 618,
+        "entry_ids": [
+          "11691e05-627f-4bd4-94f1-f8f50ed76814"
+        ],
+        "tool_use_id": "toolu_01UsQLp8pAHY5a546dFGsYX5"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01UsQLp8pAHY5a546dFGsYX5"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: strategize",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 1
+  }
+}
