@@ -1,8 +1,10 @@
-import { Loader2, Phone, Sparkles, Workflow } from 'lucide-react'
+import { CircleCheck, Loader2, Phone, Sparkles, Workflow } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
-import { fmtDay, fmtTime, type State } from '@/lib/api'
+import { fmtDay, fmtTime, tidy, type State } from '@/lib/api'
+import { pendingOf, refreshLive, useLive } from './routines/live'
+import { ProposalItem } from './routines/Proposals'
 import { RoutineCard } from './routines/RoutineCard'
 import { body, call, type Routine, type Run } from './routines/types'
 
@@ -41,7 +43,12 @@ export function Routines({
       if (r.ok) setItems((await r.json()).routines)
       if (d.ok) setVoice(((await d.json()).drafts ?? []).filter((x: VoiceDraft) => x?.routine?.id))
     } catch { /* offline for a moment: keep the last list */ }
+    void refreshLive(0)
   }, [])
+  // Proposals and "would handle" follow the app's own refresh of the state.
+  useEffect(() => { void refreshLive() }, [state.now, state.last_check_at])
+  const live = useLive()
+  const proposals = pendingOf(live)
   useEffect(() => { void load() }, [load])
   useEffect(() => {
     void load()
@@ -84,6 +91,8 @@ export function Routines({
   const decided = state.cards.filter((c) => c.status in DECIDED && !drafting.has(c.id))
   const active = items.filter((r) => r.enabled).length
   const writingCard = state.cards.find((c) => c.id === writing)
+  const forYou = waiting.length + proposals.length
+  const cardHead = (id?: string | null) => (id ? tidy(state.cards.find((c) => c.id === id)?.headline) || undefined : undefined)
 
   async function suggest(cardId: string) {
     setWriting(cardId); setError(''); setDraft(null)
@@ -105,14 +114,18 @@ export function Routines({
     <>
       <button
         onClick={() => setOpen(true)}
-        title={waiting.length ? `Routines: ${waiting.length} draft${waiting.length === 1 ? '' : 's'} from your call waiting` : 'Routines: what the agents do on their own'}
-        aria-label={waiting.length ? `Routines, ${waiting.length} waiting for you` : active ? `Routines, ${active} on` : 'Routines'}
+        title={
+          proposals.length ? `Routines: ${proposals.length} waiting for your OK`
+            : waiting.length ? `Routines: ${waiting.length} draft${waiting.length === 1 ? '' : 's'} from your call waiting`
+            : 'Routines: what the agents do on their own'
+        }
+        aria-label={forYou ? `Routines, ${forYou} waiting for you` : active ? `Routines, ${active} on` : 'Routines'}
         className="relative inline-flex h-9 cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border border-line bg-white px-2.5 text-sm font-semibold text-ink-2 hover:bg-panel lg:px-3"
       >
         <Workflow size={16} className={active ? 'text-ok' : ''} />
         <span className="hidden lg:inline">Routines</span>
-        {waiting.length > 0 ? (
-          <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-ok px-1 text-[10px] font-bold text-white ring-2 ring-white">{waiting.length}</span>
+        {forYou > 0 ? (
+          <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-routine px-1 text-[10px] font-bold text-white ring-2 ring-white">{forYou}</span>
         ) : active > 0 && (
           <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-white px-1 text-[10px] font-bold text-ok ring-1 ring-ok/40">{active}</span>
         )}
@@ -126,6 +139,16 @@ export function Routines({
             </SheetDescription>
           </div>
           <div className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
+            {proposals.length > 0 && (
+              <section className="space-y-2" aria-label="Waiting for your OK">
+                <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-routine">
+                  <CircleCheck size={13} /> Waiting for your OK · {proposals.length}
+                </h3>
+                {proposals.map((p) => (
+                  <ProposalItem key={p.id} p={p} context={cardHead(p.card_id) ?? (p.shipment_id ? `Shipment ${p.shipment_id}` : undefined)} onDone={onChanged} />
+                ))}
+              </section>
+            )}
             {waiting.length > 0 && (
               <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ok">
                 <Phone size={13} /> Drafted from your call

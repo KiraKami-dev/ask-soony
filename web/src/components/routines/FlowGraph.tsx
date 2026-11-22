@@ -2,7 +2,7 @@ import { Filter, Lock, Radar } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { StepIcon } from './RoutineFlow'
-import type { Run, Spec, Step } from './types'
+import { condWords, triggerText, type Run, type Spec, type Step } from './types'
 
 // The routine as an automatic flow graph (n8n style), drawn from the recipe alone: trigger →
 // one node per condition → one node per step, with the fixed guard as a side path off the step
@@ -28,6 +28,10 @@ function count(spec: Spec, run?: Run): Counts | null {
       if (n) byStep.set(s.id, `${n} told`)
     }
     if (s.do === 'log' && noted) byStep.set(s.id, `${noted} noted`)
+    const did_ = (k: Step['do']) => did.filter((d) => d.do === k).length
+    if (s.do === 'chase' && did_('chase')) byStep.set(s.id, `${did_('chase')} chased`)
+    if (s.do === 'ask_status' && did_('ask_status')) byStep.set(s.id, `${did_('ask_status')} asked`)
+    if (s.do === 'call' && did_('call')) byStep.set(s.id, `${did_('call')} called`)
   }
   const handled = typeof run.result === 'number' ? run.result : new Set(did.map((d) => d.card)).size
   return { matched: handled, byStep, guard: refused }
@@ -36,27 +40,35 @@ function count(spec: Spec, run?: Run): Counts | null {
 function stepTitle(s: Step): string {
   if (s.do === 'carry_out') return 'Send it'
   if (s.do === 'log') return 'Note it'
+  if (s.do === 'chase') return 'Chase once'
+  if (s.do === 'ask_status') return 'Ask for a status'
+  if (s.do === 'call') return 'Call you'
   return s.channel === 'phone' ? 'Tell you on your phone' : s.channel === 'teams' ? 'Tell you on Teams' : 'Tell you'
 }
 
 function Node({
-  icon, tone, title, text, badge, active, dashed, wide,
-}: { icon: ReactNode; tone: string; title: string; text: string; badge?: string; active?: boolean; dashed?: boolean; wide?: boolean }) {
+  icon, tone, title, text, badge, active, dashed, wide, person,
+}: {
+  icon: ReactNode; tone: string; title: string; text: string; badge?: string; active?: boolean; dashed?: boolean; wide?: boolean
+  /** The step reaches a person (a call): its own emphasis. */
+  person?: boolean
+}) {
   return (
     <div
       className={cn(
         'relative w-full min-w-0 rounded-xl border p-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.04)]',
         wide && 'lg:w-[210px] lg:shrink-0',
-        dashed ? 'border-dashed border-ink-3/40 bg-panel' : 'border-line bg-white',
+        dashed ? 'border-dashed border-ink-3/40 bg-panel' : person ? 'border-routine/40 bg-routine/5' : 'border-line bg-white',
         active && 'ring-2 ring-emerald-500/35',
       )}
       title={text}
     >
+
       <div className="flex items-start gap-2.5">
         <div className={cn('grid h-8 w-8 shrink-0 place-items-center rounded-lg', tone)}>{icon}</div>
         <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-1.5">
-            <div className="truncate text-[13px] font-semibold text-ink">{title}</div>
+          <div className="flex items-start justify-between gap-1.5">
+            <div className="line-clamp-2 min-w-0 text-[13px] font-semibold leading-snug text-ink">{title}</div>
             {badge && (
               <span
                 className={cn(
@@ -69,6 +81,7 @@ function Node({
             )}
           </div>
           <div className={cn('mt-0.5 line-clamp-2 text-[12.5px] leading-snug text-ink-2', wide && 'lg:line-clamp-3')}>{text}</div>
+          {person && <div className="mt-1 text-[11px] font-bold uppercase tracking-wide text-routine">Rings a person</div>}
         </div>
       </div>
     </div>
@@ -130,8 +143,8 @@ export function FlowGraph({ spec, run, wide }: { spec: Spec; run?: Run; wide?: b
           wide={wide}
           icon={<Radar size={15} className="text-ok" />}
           tone="bg-ok/10"
-          title="Every portal check"
-          text="New files, replies and open decisions, about every minute"
+          title={triggerText(spec.on).title}
+          text={triggerText(spec.on).text}
           badge={run?.dry ? 'Test run' : undefined}
         />
       ),
@@ -148,7 +161,7 @@ export function FlowGraph({ spec, run, wide }: { spec: Spec; run?: Run; wide?: b
                 icon={<Filter size={15} className="text-amber-700" />}
                 tone="bg-amber-50"
                 title={i === 0 ? 'If' : 'And'}
-                text={cond.text}
+                text={condWords(cond)}
                 badge={i === spec.when.length - 1 && c ? `${c.matched} matched` : undefined}
                 active={i === spec.when.length - 1 && !!c?.matched}
               />
@@ -162,8 +175,9 @@ export function FlowGraph({ spec, run, wide }: { spec: Spec; run?: Run; wide?: b
       const node = (
         <Node
           wide={wide}
-          icon={<StepIcon step={s} size={15} />}
-          tone={s.do === 'log' ? 'bg-panel ring-1 ring-line' : 'bg-ok/10'}
+          icon={<StepIcon step={s} size={15} className={s.do === 'call' ? 'text-white' : undefined} />}
+          tone={s.do === 'log' ? 'bg-panel ring-1 ring-line' : s.do === 'call' ? 'bg-routine' : 'bg-ok/10'}
+          person={s.do === 'call'}
           title={stepTitle(s)}
           text={s.text}
           badge={badge}

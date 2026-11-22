@@ -1,7 +1,7 @@
-import { BellRing, GripVertical, Lock, MessageSquare, NotebookPen, Plus, Send, Smartphone, X } from 'lucide-react'
+import { BellRing, GripVertical, Lock, MailWarning, MessageSquare, NotebookPen, PackageSearch, Phone, Plus, Radar, Send, Smartphone, X } from 'lucide-react'
 import { useState, type DragEvent, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
-import { PALETTE, paletteKey, type Channel, type Cond, type Spec, type Step } from './types'
+import { PALETTE, condWords, paletteKey, triggerText, type Channel, type Cond, type Spec, type Step } from './types'
 
 // One routine as blocks a buyer reads at a glance: WHEN (conditions), THEN (steps in order) and
 // the fixed ALWAYS guard. With `before` it shows what a change does, block by block. With
@@ -44,24 +44,30 @@ function Tag({ mark, moved }: { mark: Mark; moved?: boolean }) {
   return null
 }
 
-function Phrase({ row }: { row: Row<{ text: string }> }) {
-  if (row.mark === 'changed' && row.old && row.old.text !== row.item.text) {
+function Phrase<T extends { text: string }>({ row, words = (x) => x.text }: { row: Row<T>; words?: (x: T) => string }) {
+  const now = words(row.item)
+  const was = row.old ? words(row.old) : now
+  if (row.mark === 'changed' && was !== now) {
     return (
       <span>
-        <span className="text-ink-3 line-through">{row.old.text}</span>{' '}
-        <span>{row.item.text}</span>
+        <span className="text-ink-3 line-through">{was}</span>{' '}
+        <span>{now}</span>
       </span>
     )
   }
-  return <span className={cn(row.mark === 'removed' && 'line-through')}>{row.item.text}</span>
+  return <span className={cn(row.mark === 'removed' && 'line-through')}>{now}</span>
 }
 
 const markClass = (m: Mark) =>
   m === 'added' ? 'bg-ok/5 ring-1 ring-ok/40' : m === 'removed' ? 'opacity-60' : m === 'changed' ? 'ring-1 ring-ok/40' : ''
 
-export function StepIcon({ step, size = 16 }: { step: Pick<Step, 'do' | 'channel'>; size?: number }) {
-  if (step.do === 'carry_out') return <Send size={size} className="text-ok" />
-  if (step.do === 'log') return <NotebookPen size={size} className="text-ink-3" />
+export function StepIcon({ step, size = 16, className }: { step: Pick<Step, 'do' | 'channel'>; size?: number; className?: string }) {
+  if (step.do === 'carry_out') return <Send size={size} className={className ?? 'text-ok'} />
+  if (step.do === 'log') return <NotebookPen size={size} className={className ?? 'text-ink-3'} />
+  if (step.do === 'chase') return <MailWarning size={size} className={className ?? 'text-ok'} />
+  if (step.do === 'ask_status') return <PackageSearch size={size} className={className ?? 'text-ok'} />
+  // A call reaches a person: it carries the routine colour wherever it shows.
+  if (step.do === 'call') return <Phone size={size} className={className ?? 'text-routine'} />
   return <ChannelIcon channel={step.channel} size={size} />
 }
 
@@ -159,6 +165,11 @@ export function RoutineFlow({
   return (
     <div>
       <Block label="When">
+        <div className="mb-2 flex items-center gap-1.5 text-sm font-medium text-ink">
+          <Radar size={14} className="shrink-0 text-ok" />
+          {triggerText(spec.on).title}
+          {before && before.on !== spec.on && <Tag mark="changed" />}
+        </div>
         <div className="flex flex-wrap gap-1.5">
           {when.map((row) => (
             <span
@@ -168,7 +179,7 @@ export function RoutineFlow({
                 markClass(row.mark),
               )}
             >
-              <Phrase row={row} />
+              <Phrase row={row} words={condWords} />
               <Tag mark={row.mark} moved={false} />
               {editable && row.mark !== 'removed' && (
                 <RemoveButton label="Remove this condition" onClick={() => removeCond(row.item.id)} />
@@ -200,6 +211,7 @@ export function RoutineFlow({
                     'group flex items-start gap-2 rounded-md px-1.5 py-1.5 text-[15px] leading-snug',
                     markClass(row.mark),
                     editable && live && 'cursor-grab hover:bg-panel active:cursor-grabbing',
+                    row.item.do === 'call' && row.mark === 'same' && 'bg-routine/5 ring-1 ring-routine/25',
                     drag?.kind === 'step' && drag.id === row.item.id && 'opacity-40',
                   )}
                 >
@@ -207,7 +219,10 @@ export function RoutineFlow({
                     <GripVertical size={14} className={cn('mt-0.5 shrink-0 text-ink-3 opacity-0', live && 'group-hover:opacity-100')} />
                   )}
                   <span className="mt-0.5 shrink-0"><StepIcon step={row.item} /></span>
-                  <span className="min-w-0 flex-1"><Phrase row={row} /></span>
+                  <span className="min-w-0 flex-1">
+                    <Phrase row={row} />
+                    {row.item.do === 'call' && <span className="mt-0.5 block text-xs font-semibold text-routine">Rings a person</span>}
+                  </span>
                   <Tag mark={row.mark} moved={row.moved} />
                   {editable && live && <RemoveButton label="Remove this step" onClick={() => removeStep(row.item.id)} />}
                 </div>

@@ -3,6 +3,7 @@ import { useState, type ReactNode } from 'react'
 import { DONE_WORD, ago, fmtNum, partName, tidy, until, type Card, type Level, type State } from '@/lib/api'
 import { sameIssueOn, when, type Group, type Sections } from '@/lib/decisions'
 import { cn } from '@/lib/utils'
+import { UndoAction } from './routines/Undo'
 
 interface Props {
   state: State
@@ -68,21 +69,29 @@ export function DecisionList(p: Props) {
               <>
                 <span className="absolute inset-y-2 left-0 w-[3px] rounded-full bg-routine" />
                 <span className="line-clamp-2 text-[14px] font-semibold leading-snug text-ink">{tidy(h.text)}</span>
-                <span className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-routine">
-                  <Workflow size={12} className="shrink-0" />
-                  <span className="truncate">By routine · {h.routine}</span>
-                  {h.at && <span className="ml-auto shrink-0 font-medium text-ink-3">{when(h.at, p.nowMs)}</span>}
+                <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-semibold text-routine">
+                  <span className="flex min-w-0 flex-1 items-center gap-1.5">
+                    <Workflow size={12} className="shrink-0" />
+                    <span className="truncate">By routine · {h.routine}</span>
+                  </span>
+                  {h.at && <span className="shrink-0 font-medium text-ink-3">{when(h.at, p.nowMs)}</span>}
+                  {h.actionId && <UndoAction actionId={h.actionId} />}
                 </span>
               </>
             )
+            // A div, not a button: the row holds its own Undo button.
             return h.card ? (
-              <button
+              <div
                 key={h.key}
+                role="button"
+                tabIndex={0}
                 onClick={() => p.onSelect(h.card!.id)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && e.target === e.currentTarget) p.onSelect(h.card!.id) }}
+                aria-current={p.selectedId === h.card.id ? 'true' : undefined}
                 className={cn(rowCls, p.selectedId === h.card.id && 'bg-panel')}
               >
                 {body}
-              </button>
+              </div>
             ) : (
               <div key={h.key} className={cn(rowCls, 'cursor-default hover:bg-transparent')}>{body}</div>
             )

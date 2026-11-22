@@ -3,7 +3,7 @@
 // knows about a specific supplier, part or number: it all comes from the cards and the strip.
 
 import {
-  DECIDED, LEVEL_RANK, fmtDay, fmtTime, tidy, viaOf, type ActivityItem, type Card, type State, type StripItem,
+  DECIDED, LEVEL_RANK, fmtDay, fmtNum, fmtTime, tidy, viaOf, type ActivityItem, type Card, type State, type StripItem,
 } from '@/lib/api'
 
 /** Several cards with the same problem (same supplier, same headline once numbers are removed). */
@@ -53,6 +53,29 @@ export const routineOf = (state: State, cardId: string): string | null => {
   return v?.kind === 'routine' ? v.name : null
 }
 
+/** The action a routine took, for undo; null when the item carries no action id. */
+export const actionIdOf = (a?: ActivityItem | null): string | null => (a ? a.action_id || a.id || null : null)
+export const routineActionOf = (state: State, cardId: string): string | null =>
+  actionIdOf(state.activity.find((x) => x.card === cardId && viaOf(x)?.kind === 'routine'))
+
+const fmtLong = (iso: string) => {
+  const d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(iso) ? `${iso}T12:00:00Z` : iso)
+  return Number.isNaN(d.getTime())
+    ? tidy(iso)
+    : new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'Europe/Berlin' }).format(d)
+}
+
+/** "Hwaseong confirms 20,000 on Tue 24 Nov", plus whether that date misses the launch. */
+export function replyFacts(card: Card): { text: string; late: boolean } | null {
+  const u = card.ui ?? {}
+  const qty = u.reply_quantity
+  if (!u.reply_date && (qty == null || qty === '')) return null
+  const who = u.reply_from || card.supplier_name || 'The supplier'
+  const n = typeof qty === 'number' ? fmtNum(qty) : qty ? tidy(String(qty)) : ''
+  const what = n ? `${n}${card.part_name ? ` ${card.part_name}` : ''}` : 'delivery'
+  return { text: `${who} confirms ${what}${u.reply_date ? ` on ${fmtLong(u.reply_date)}` : ''}`, late: u.reply_after_launch === true }
+}
+
 export interface Handled {
   key: string
   card?: Card
@@ -60,6 +83,8 @@ export interface Handled {
   at?: string
   routine: string | null
   status?: string
+  /** Set when the routine's action can be undone. */
+  actionId?: string | null
 }
 
 export interface Sections {
@@ -84,14 +109,14 @@ export function sections(state: State): Sections {
     const r = routineOf(state, c.id)
     if (r) {
       const a = state.activity.find((x) => x.card === c.id && viaOf(x)?.kind === 'routine')
-      handled.push({ key: c.id, card: c, text: c.headline, at: a?.at ?? c.ui?.at, routine: r, status: c.status })
+      handled.push({ key: c.id, card: c, text: c.headline, at: a?.at ?? c.ui?.at, routine: r, status: c.status, actionId: actionIdOf(a) })
     } else done.push(c)
   }
   // Routine work that is not tied to a card on screen still counts as handled.
   state.activity.forEach((a: ActivityItem, i) => {
     const v = viaOf(a)
     if (v?.kind !== 'routine' || (a.card && state.cards.some((c) => c.id === a.card))) return
-    handled.push({ key: `act-${i}`, text: a.text, at: a.at, routine: v.name })
+    handled.push({ key: `act-${i}`, text: a.text, at: a.at, routine: v.name, actionId: actionIdOf(a) })
   })
   const t = (x?: string) => (x ? new Date(x).getTime() : 0)
   handled.sort((a, b) => t(b.at) - t(a.at))

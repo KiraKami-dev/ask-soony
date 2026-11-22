@@ -58,6 +58,8 @@ export interface Card {
     status?: string; at?: string; note?: string
     // Supplier reply tied back by the alert agent (replies.py)
     reply?: string; reply_from?: string; reply_at?: string; reply_text?: string
+    /** Facts read from the reply: the date and quantity the supplier commits to. */
+    reply_date?: string | null; reply_quantity?: number | string | null; reply_after_launch?: boolean | null
   }
   escalation_brief: string
 }
@@ -109,6 +111,9 @@ export interface ActivityItem {
   at?: string; text: string; kind: string; detail?: string | null; card?: string
   /** Who handled it: "inbox", "voice" or "routine: <name>". Missing on older items. */
   via?: string | null
+  /** The action behind it, for undo (POST /api/routines/actions/{id}/undo). Missing: no undo. */
+  action_id?: string | null
+  id?: string | null
 }
 
 export interface State {

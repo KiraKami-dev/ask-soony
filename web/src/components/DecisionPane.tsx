@@ -1,4 +1,4 @@
-import { Check, ChevronRight, ExternalLink, FileSearch, MoreHorizontal, Phone, Sparkles, Workflow } from 'lucide-react'
+import { Check, ChevronRight, ExternalLink, FileSearch, MailCheck, MoreHorizontal, Phone, Sparkles, Workflow } from 'lucide-react'
 import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { EvidenceItem, Trail } from '@/components/EvidenceDrawer'
 import { OpenAnchor, useAnchors, type Anchor } from '@/components/SourceAnchors'
@@ -8,9 +8,11 @@ import {
   DONE_WORD, costText, fmtNum, partName, post, sentence, tidy, until, type Card, type State,
 } from '@/lib/api'
 import {
-  languageOf, mismatchPair, routineOf, sameIssueOn, sourceName, splitValue, when, type Group,
+  languageOf, mismatchPair, replyFacts, routineActionOf, routineOf, sameIssueOn, sourceName, splitValue, when, type Group,
 } from '@/lib/decisions'
 import { cn } from '@/lib/utils'
+import { PaneHints } from './routines/PaneHints'
+import { UndoAction } from './routines/Undo'
 
 export interface Offer {
   /** Open cards left that look like the one just decided. */
@@ -73,6 +75,8 @@ export function DecisionPane({
   const rest = card.evidence.map((_, i) => i).filter((i) => !pair || (i !== pair.sys && i !== pair.doc))
   const recommended = opt?.recommended || (sel === 0 && !card.options.some((o) => o.recommended))
   const routine = closed ? routineOf(state, card.id) : null
+  const undoId = routine ? routineActionOf(state, card.id) : null
+  const facts = replyFacts(card)
   const same = group ? sameIssueOn(group) : null
 
   useEffect(() => {
@@ -138,6 +142,7 @@ export function DecisionPane({
               <Workflow size={14} /> By routine · {routine}
             </span>
           )}
+          {undoId && <UndoAction actionId={undoId} onUndone={onChanged} className="ml-auto" />}
         </div>
       )}
       {closed && offer && <AutomateOffer card={card} offer={offer} />}
@@ -149,6 +154,18 @@ export function DecisionPane({
             <div className="font-semibold text-ink">{card.status === 'escalated' ? `Waiting for ${who}` : `With ${who}`}</div>
             {card.reason && <div className="mt-0.5">{sentence(card.reason)}</div>}
           </div>
+        </div>
+      )}
+
+      <PaneHints card={card} onChanged={onChanged} />
+
+      {facts && (
+        <div className={cn('flex items-start gap-2.5 rounded-xl px-4 py-3 text-[15px] ring-1', facts.late ? 'bg-stop/[0.05] ring-stop/25' : 'bg-good/5 ring-good/25')}>
+          <MailCheck size={18} className={cn('mt-0.5 shrink-0', facts.late ? 'text-stop' : 'text-good')} />
+          <span className="font-semibold text-ink">
+            {facts.text}
+            {facts.late && <span className="text-stop"> · after launch</span>}
+          </span>
         </div>
       )}
 

@@ -6,7 +6,8 @@ import { fmtTime } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { FlowGraph } from './FlowGraph'
 import { ChannelIcon, RoutineFlow, StepIcon } from './RoutineFlow'
-import { body, call, didLines, summarise, type Routine, type Run, type Spec } from './types'
+import { setMode } from './live'
+import { MODES, body, call, didLines, modeOf, summarise, type Mode, type Routine, type Run, type Spec } from './types'
 
 // One routine: header with its switch and last-run line, the flow graph or the editable block
 // list, and the change-and-review loop. A change (in words or by hand) is never saved straight
@@ -50,13 +51,43 @@ export function TestResult({ run, spec, title = "Test on today's inbox" }: { run
           {lines.map((l, i) => (
             <li key={i} className="flex items-start gap-2 text-ink">
               <span className="mt-0.5 shrink-0">
-                {l.kind === 'send' ? <StepIcon step={{ do: 'carry_out' }} size={14} /> : l.kind === 'note' ? <StepIcon step={{ do: 'log' }} size={14} /> : <ChannelIcon channel={l.channel} size={14} />}
+                {l.kind === 'send' ? <StepIcon step={{ do: 'carry_out' }} size={14} />
+                  : l.kind === 'note' ? <StepIcon step={{ do: 'log' }} size={14} />
+                  : l.kind === 'tell' ? <ChannelIcon channel={l.channel} size={14} />
+                  : <StepIcon step={{ do: l.kind }} size={14} />}
               </span>
               <span className="min-w-0">{l.text}</span>
             </li>
           ))}
         </ul>
       )}
+    </div>
+  )
+}
+
+/** "Ask me · Do it and tell me · Do it quietly": how much the routine may do on its own. */
+export function TrustControl({
+  value, onChange, disabled, dim,
+}: { value: Mode; onChange: (m: Mode) => void; disabled?: boolean; dim?: boolean }) {
+  return (
+    <div role="radiogroup" aria-label="How it acts" className={cn('inline-flex max-w-full rounded-lg bg-panel p-0.5 ring-1 ring-line', dim && 'opacity-60')}>
+      {MODES.map((m) => (
+        <button
+          key={m.key}
+          type="button"
+          role="radio"
+          aria-checked={value === m.key}
+          disabled={disabled}
+          title={m.hint}
+          onClick={() => value !== m.key && onChange(m.key)}
+          className={cn(
+            'cursor-pointer whitespace-nowrap rounded-md px-2 py-1 text-[12.5px] font-semibold disabled:cursor-default',
+            value === m.key ? 'bg-white text-routine shadow-sm ring-1 ring-routine/30' : 'text-ink-3 hover:text-ink',
+          )}
+        >
+          {m.label}
+        </button>
+      ))}
     </div>
   )
 }
@@ -98,6 +129,17 @@ export function RoutineCard({
   const [words, setWords] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [expanded, setExpanded] = useState(false)
+  // Shown right away; the server's answer (or a failure) settles it.
+  const [mode, setModeLocal] = useState<Mode | null>(null)
+  const shownMode = mode ?? modeOf(routine)
+  async function changeMode(m: Mode) {
+    setModeLocal(m); setError('')
+    try { await setMode(routine.id, m); onChanged() } catch (e) {
+      setModeLocal(null)
+      const why = (e as Error).message
+      setError(/404|not found/i.test(why) ? 'Trust levels are not available on the server yet.' : `Could not change how it acts: ${why}.`)
+    }
+  }
 
   const spec = routine.spec
   const working = review?.after ?? routine
@@ -253,6 +295,14 @@ export function RoutineCard({
           />
         )}
       </div>
+      {!draft && (
+        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          <TrustControl value={shownMode} onChange={changeMode} disabled={!!busy} dim={!routine.enabled} />
+          <span className="text-[13px] text-ink-3">
+            {routine.enabled ? MODES.find((m) => m.key === shownMode)?.hint : 'Off. Switch it on to let it act.'}
+          </span>
+        </div>
+      )}
 
       {content}
       {error && <p className="mt-3 rounded-lg bg-stop/10 p-3 text-sm text-stop">{error}</p>}
