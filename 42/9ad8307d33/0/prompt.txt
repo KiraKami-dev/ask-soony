@@ -1,0 +1,1037 @@
+@challenge_docs/ has the challenge, @inconsistencies_soony.md @inconsistencies_suppliers.md and @questions.md are my gathered insights or the most important things to solve, but the problem to be solved should be transferrable , meaning the solution should be of a problem that recurs a lot . brainstorm the shit out of it . dont get drowning in the data but see the big picture
+
+---
+
+add your questions to @questions.md , clear the junk, make it short and focussed
+
+---
+
+so in short, the best thing is to build a verifier ?
+
+---
+
+store this in short in strategy.md. 1 in itself is already going to be super complicated ? so lets not jump to 4
+
+---
+
+are @inconsistencies_soony.md and @inconsistencies_suppliers.md also focussed ? if not make them lean and focussed ?
+
+---
+
+so we got green light for the IT Guy for questions , but i dont understand 7 and 8 ?
+
+---
+
+hi, had the it meeting, he said the two biggest problems are : it would be his dream if the ERP can be clean and 100 % trustworthy AND reduce human error ( reciepts and other things ) which they have to manually type in. Our verifier will do the first, so if we can do nail that , then second thing if we 1 is done well.
+
+---
+
+didn't get that info but probably the way dataset is there, we should be able to figure something out
+
+---
+
+ok lets just with the verifier.
+
+What do we have to build ? 
+Supplier and buyer docs disagree on shipment records and when we find inconsistencies , we don't know which one to believe, so we have to figure how methods for that. so we need an agent (or a bunch of them ) to cross check through csv, pdf or other image receipts etc and maybe in some cases its impossible to clarify on our own data, so we have to decide who to reach out. 
+
+Does all that sound correct ? /strategize
+
+---
+
+what is EXW ?
+Also that table in 2 is a banger. create a folder called verifier and put it in .md there. and list the 5 things (evidences) in it. Add the relations you made in 3 as well. 
+What is PO ?
+
+Yeah you're right, linking documents will be half the work. 
+
+What is packright. 
+
+Comparing the pdfs will be tricky, we need some image model but i dont want to train anything, it would be too much work for this.
+
+Claim store idea is good. 
+
+Dont add anything to strategy anymore, lets only do it within the verifier folder
+
+---
+
+also the verifier scripts should also go in here, the first part is building a linking system for all the records, which is missing in your @verifier/README.md btw
+
+---
+
+as i understand PO is generated from soony and fed into SAP. What's the "confirmation" in first table first row of the readme. And how is "shipping" different from "shipping document" . actually modify that table to add a column to reflect how owns that specific document
+
+---
+
+ok, now lets proceed with code, breakdown how you plan to build the linker
+
+---
+
+linker should have its own folder within verifier. 
+umm why sqlite and not a pandas dataframe ?
+yes tests are essential .
+
+/strategize
+
+---
+
+ok go ahead
+
+---
+
+add the m table to linker_strategy.md , then i want a walk through in the code
+
+---
+
+here is my review of the code, tell me what you think about it ? 
+
+## Review of M1
+
+**Verdict:** M1 is solid, and it does what `linker_strategy.md` says it does. I made no changes. I fixed nothing, so the list below is a to-do list.
+
+- **Tests and build:** All 50 tests pass. The build runs on the real portal (318 files) in about a second.
+- **Findings it produces:**
+  - The 3 receipts with no PO (the pins, S13).
+  - 11 shipments missing from the tracker (S6).
+  - The duplicate supplier profiles.
+- **Unknown files:** The 38 `unknown` files are reported, not dropped.
+- **Legacy line numbers:** The `00010` → 1 guess holds. Legacy receipts link 100%, and `00510` → 51 matches the cancellation lines in the new export. The "(to verify)" in the README can go.
+- **Supplier and material agreement:** I checked supplier and material ids across linked receipts and POs on the real data. There are 0 mismatches.
+- **Reading material:** I used `docs/challenge.md` and `strategy.md`, not the PDFs directly. `docs/challenge.md` is compiled from those PDFs, and `pdftotext` returned nothing for the summary PDF.
+
+### Fix before M2
+
+1. **Duplicate profiles pick the stale record.**
+   - **What differs:** The CSV and JSON for SUP-0018 and SUP-0029 disagree, and the issue says only "Same record in 2 rows".
+     - Pune: JSON status is `watch` with `validUntil 2026-10-30` (expired as of today), CSV says `active`.
+     - PackRight: JSON status is `at risk` with the export-licence note, CSV says `active`.
+   - **Where the stale one wins:** `trace` calls `drop_duplicates("record_id")` ([__main__.py:61](verifier/linker/__main__.py#L61)), so the older CSV wins. The resolver builds from both with no precedence.
+   - **Fix:** Merge by `exported_at` into one supplier record, keep both versions, and emit a `conflict` issue naming the differing fields.
+   - **Why it matters:** This is a real "paper beats system" finding, and it is currently lost.
+
+2. **Shipment ↔ PO links are labelled `exact` but only match PO number and material, not line.**
+   - **Example:** SHP-2026-04281 (ETA 20 Nov) links to PO lines 4500318733/1, /3 and /4. Those were delivered and received on 13–16 Nov.
+   - **Why it matters:** This breaks the principle "exact links are certain, fuzzy ones are marked". The 100% coverage for `shipment_to_po_line` is overstated. M3's line-level matching for P2 would inherit these wrong links.
+   - **Fix:** Use a distinct method such as `po_level`, or restrict candidates to undelivered lines.
+
+3. **Hardcoded status vocabulary at [rules.py:205](verifier/linker/rules.py#L205).**
+   - **The bug:** `status == "open"` never matches the 129 legacy lines, whose statuses are `GL` and `LO`. The `open_line_received` check therefore only covers the new export.
+   - **Fix:** Normalise status in the adapters to a small canonical set.
+
+4. **The tracker-gap finding has no priority.**
+   - **What it reports:** 11 of the 25 feed shipments are missing from the tracker. 10 of those are `booked` and haven't left yet. Only SHP-2026-04310 is in transit, and that one is the urgent gap.
+   - **Fix:** Carry the shipment status in the issue, or sort by it.
+
+### Worth doing, not urgent
+
+- **No supplier links.** `HUB_KINDS` and the README keys table mention suppliers, but no rule links anything to a supplier record, so `trace` never shows one. Nothing guards supplier or material agreement across links either. It is clean today only by luck.
+- **Documents are matched by filename regex only**, which contradicts the first principle ("recognise files by contents"). The README admits this, so align the principle text or the M2/M3 plan.
+- **Cancellation lines aren't linked to the line they cancel.** They are just PO lines with negative quantity. Net open quantity needs that link later.
+- **`trace` crosses into other POs** through shared shipments, for example 4500318735/1 appears when tracing 4500318733. That is useful, but it isn't marked as a hop.
+- **Housekeeping:**
+  - `verifier/linker/` is untracked, so commit it.
+  - `PROGRESS.md` has no line for this work, which `AGENTS.md` requires.
+  - `--root data/portal` is relative to the current directory.
+  - Nothing connects the linker to Jonas's watcher in `src/ask_soony/watcher.py`, so it only sees whatever is already in `data/portal`.
+
+### Fit with the strategy
+
+M1 is the right foundation for the three claim types in `strategy.md`: quantity received, quantity and date shipped, and quality status. Do items 1–3 first. Then M2 is cheap and unlocks S2 (inspection ↔ batch). The S1 and P2 pitch moments (handwritten 8,000 and the 28,000 shipping advice) need reading document contents, so M3 and the Reader step carry the demo.
+/strategize
+
+---
+
+sure, lets go ahead with this
+
+---
+
+explain what the @verifier/linker/normalize.py file does ?
+
+---
+
+more suggestions : 
+
+## Review of M1.1 + M2
+
+**Verdict:** Good work. I made no changes. The fixes from my last review landed, and M2 works end to end on the real data.
+
+- **Checks:** 69 tests pass, ruff is clean, and the real build is clean and fast.
+- **Real data:** Every one of the 202 confirmations and 60 scans links. The S2 inspection and P2 shipping-advice chains both trace correctly.
+- **New rules are tested:** versions, `link_agreement`, `po_line_state` and `po_level` all have tests.
+
+### My earlier findings
+
+| # | Finding | Status |
+|---|---|---|
+| 1 | Duplicate profiles pick the stale record | ✅ Both versions kept (`entity@source`), linked by `same_entity`, and differing fields are named (Pune `active` vs `watch`, PackRight `active` vs `at risk`). One gap, see below. |
+| 2 | Shipment ↔ PO links labelled `exact` | ✅ Now `po_level`, shown in the coverage table. |
+| 3 | Hardcoded `"open"` and legacy `GL`/`LO` | ✅ `po_line_state` is derived from quantity and delivery date. On real data: 365 delivered, 79 open, 3 cancellations, and all legacy lines are covered. |
+| 4 | Tracker gap not prioritised | ◐ Status, mode and ETA are now in each issue, but the list is still unranked. |
+| 5 | No supplier links | ◐ `check_link_agreement` guards supplier and material agreement (0 conflicts today). There are still no `*_to_supplier` links. |
+| — | Trace crosses into other POs | ◐ The `↪ other order` marker works. See the first item under "Worth fixing". |
+
+### Worth fixing
+
+1. **`trace` marks other orders but keeps expanding through them.**
+   - **Example:** `trace 4500318735` (the P2 order) pulls in PO 4500318733's confirmation, receipts, scans and stock because both POs share SHP-2026-04281. The output runs to about 20 lines and mixes two orders.
+   - **Fix:** Show the other-order records but don't expand from them.
+
+2. **The unconfirmed-line finding is mostly noise.**
+   - **What it reports:** 23 lines. Only 7 are open: Hwaseong 2, Pune 2 (`awaiting_approval`), Karton 3. Those 7 are the P7/P12/P15 signal. The other 16 are old, delivered lines.
+   - **Fix:** Report open lines as the finding and demote delivered ones. This is the same ranking problem as the tracker gap, where 10 of 11 are `booked`.
+
+3. **The version diff drops fields only one version has.**
+   - **What gets lost:** The JSON profile has `qualification_valid_until 2026-10-30` (Pune's conditional release, expired as of today), `notes` and `exported_at`. The CSV has none of them, so the intersection ignores them. The issue shows only `status`.
+   - **Fix:** List one-sided fields too, and surface `exported_at` so the judge can tell which version is newer.
+
+4. **Confirmation key is `OA<conf>` only.** If two files shared a confirmation number but had different POs, they would be reported as two versions of one entity. It doesn't happen today. Using `OA<conf>_<PO>` as the key is safe.
+
+5. **Docs are stale.**
+   - `linker_strategy.md` still lists M2 as "next". It's done at filename level.
+   - [README.md:111](verifier/README.md#L111) still says "Documents … not linked yet (M2)".
+   - The principles line about contents confirming the filename is M3 work, so keep it.
+
+### Limits
+
+- **Confirmation links are PO-level only.** A PO counts as confirmed if any confirmation exists, even if only one of its lines is covered. That is correct for M2 and is exactly what M3 refines.
+- **Shipping advice ties to the PO, not the line.** Advice 4500318735 links to both lines, 11,000 and 48,000. M3 needs the document contents to pick the 48,000 line.
+/strategize
+
+---
+
+"About 30 minutes, with tests." what do you mean ? 30 mins for what ?
+
+---
+
+ok build it
+
+---
+
+<pasted_content id="809a">
+## Review of M2.1
+
+**Verdict:** All five items are done and work on the real data. One new problem: the live/closed logic hides four receipts that it shouldn't.
+
+- **Checks:** 77 tests pass, ruff is clean, and the build still takes about a second.
+- **Trace:** `trace 4500318735` is now short. It shows the other order's PO lines but doesn't expand them.
+- **Version issues:** Both profile conflicts now show the one-sided fields. For Pune that includes `qualification_valid_until=2026-10-30`, plus `as_of: unknown (csv) vs 2026-11-21T17:12 (json)`.
+- **Other fixes:**
+  - The 16 delivered, unconfirmed lines are demoted, leaving the 7 open ones.
+  - Tracker gaps are sorted by ETA.
+  - The confirmation key now includes the PO.
+  - The README and strategy docs are current.
+  - The `parse_number` space bug is fixed.
+
+### Needs fixing: receipts without a scan are closed too eagerly
+
+The build reports "3 live, + 4 closed" for goods receipts without a delivery-note scan. The four closed ones are:
+- 5000412993
+- 5000413016
+- 5000413044 (88,000 units, 6 Nov)
+- 5000413050 (54,000 units, 11 Nov)
+
+None of the four has a stock row. They are closed only because their PO line is delivered. Every receipt sits on a delivered line, so that fact says nothing about whether the receipt still matters.
+
+"No stock row" is also a finding of its own. Six of the 25 November receipts have no stock batch, including these two big ones. The code treats the missing row as "used up", and nothing in the data says that.
+
+This is the "unknown is not hidden" rule being broken. The S14 signal could be in the closed group. The test `test_receipt_inherits_closed_from_used_up_batch…` only covers a stock row with quantity 0. It never covers the missing-row case, which is the real one.
+
+**Fix:**
+- Let a receipt inherit liveness only from stock: a row with quantity above 0 is live, and a row with quantity 0 is closed.
+- A missing row stays live, which fits "unknown is not hidden".
+- A delivered PO line should not close a receipt. It should close only PO-line issues.
+- Add a test for the no-stock-row case.
+
+### Minor
+
+- **`as_of` formats are mixed.** Shipments use a timestamp with a timezone, stock uses a plain date, and the JSON profiles use a timestamp. "Newer beats older" will compare strings across formats. Normalise to UTC ISO in the adapters.
+- **`issues` command ignores the new fields.** The `issues` command prints no `live` or `due`, so closed and live rows look the same. Add the columns or a `--live` flag.
+- **Housekeeping:** These changes are uncommitted (13 modified files plus the new `test_priority.py`), and `PROGRESS.md` still has no line for this work.
+
+### Next
+
+Fix the receipt inheritance first. It's a few lines in `rules.py` plus one test. After that, M3 can start, and the first target is the 4500318735 shipping advice (11,000 vs 48,000 line).
+</pasted_content id="809a">
+
+---
+
+ok, tell me in short what you've built, what were the problems i made you fix in the last 3 iterations ? use layman.md
+
+---
+
+what's next step ? is the linker ready ?
+
+---
+
+no api key, we will have to use claude sdk, but is there any other more faster way ? claude model will take a while to run through each image right ? /strategize
+
+---
+
+i also have 20 dollar api credits for open ai, do you think that would last ?
+
+---
+
+how about we use claude sdk to run on all files right now and see what kind of errors happen, if we see there only 4-5 kinds of errors which keep happening we implement some hardcoding solution ? or smaller cheaper vision model ?
+
+---
+
+build it to use claude sdk sonnet 3, make sure to save thoughts of the sonnet run as well for each file several jsons so we can check how it thinks, and its verdict on each file should also be also saved. create it with a tqdm in a separate folder in verifier called image_recognizer/ . then i will run it on the long run and go away. how long do you think the whole loop for the same would take with the claude sdk
+
+---
+
+what do you think about my suggestions : 
+
+<pasted_content id="809a">
+## Review of the image recognizer
+
+**Verdict:** The design is sound and the first results are accurate. Fix the points below before the full 277-document run. I made no changes.
+
+I couldn't run the whole thing. Your two completed outputs were what I had, so I read those. Lint is clean. I didn't call the API myself.
+
+### What I verified
+
+- **S1 delivery note (WZ-261116-473):** I checked the output against the actual image. It is correct on every field.
+  - Printed `80.000` is recorded as crossed out, and handwritten `8 000` as its own value.
+  - The `RECEIVED 18.11.2026 DC-HAM` stamp, the `Meyer K.` signature, the empty remarks box and the cut-off description are all captured.
+  - It didn't mistake the carrier reference `PO 33338` for a PO number.
+- **S1 in the SAP data:** Goods receipt 5000413065 books `qty_received 80000`, with `qty_ordered 8000` and the remark "over delivery accepted". Stock holds 80,000. The scan and the PO agree on 8,000, so this is a clean "paper beats system" result once the reader's output is joined to the linker's records.
+- **P2 shipping advice:** The advice gives 48,000 ordered, 28,000 shipped, 5 of 7 ULDs, and a balance flight on 23 Nov. It carries the AWB. This resolves the ambiguity that the linker's filename-level links left open (the 48,000 line, not the 11,000 line).
+- **Cost and speed:** Each document takes 3–5 turns, 12–21 seconds and $0.10–0.14, so the full run is roughly $30–35 and about 20 minutes at concurrency 4.
+- **Design:**
+  - Reading only (no judging).
+  - Values kept as written, with printed/handwritten/stamped and crossed-out flags.
+  - Reads are keyed by checksum, so new files in a drop only cost a new read.
+  - Isolated: one tool, no project settings, and the prompt treats document text as data.
+  - The folder name `<path>__<sha12>` matches the linker's `source` and `source_sha256`.
+  - Nothing is hardcoded.
+
+### Fix before the full run
+
+1. **Number-format trap for the linker.**
+   - **The bug:** The reader keeps `"80.000"` as a string, which is right. But `parse_number("80.000")` in the linker returns **80.0**, and `parse_number("48,000", decimal_comma=True)` returns 48.0.
+   - **Why it matters:** The judge would read the S1 printed value as 80 and treat "80.000 vs 8 000" as nothing. Polish and German documents use dots as thousands separators.
+   - **Fix:** Add a locale-aware parser that uses the document's `languages`, or a plausibility check against the PO. Do this before the reader output is wired into the judge.
+
+2. **Stamp dates land in `statements`, not `values`.** The `18.11.2026` receipt stamp is recorded as a free-text statement. The prevent feature (prefilling the goods receipt from the scan) needs the received date as a field. The schema already has `written: "stamped"`, so add a line to the prompt: "dates and numbers in stamps are values".
+
+3. **S2 has no structured outcome.** For the inspection report, the lot result should be a field (pass / fail / conditional) with lot size, sample size and defect counts. Today it would only come out as prose in `statements` or `red_flags`. Run `inspection_report_5000413063.pdf` before the full run, because it is the third claim type in `strategy.md`.
+
+### Worth doing
+
+- **Free-text `field` names.** The two samples already differ (`quantity_delivered`, `quantity_shipped`, `uld_shipped`, `delivery_date_balance`). That is fine for a discovery run. After it, tally the names and freeze the core ones into an enum, with `other` plus a label.
+- **No per-value legibility.** Confidence exists only per document. For handwriting (8 vs 3), add a per-value flag.
+- **Retry wait holds a worker.** The 30–90 s retry sleep in [run.py:process](verifier/image_recognizer/run.py) holds the semaphore, so one flaky document stalls a slot. Release the semaphore before the sleep.
+- **No tests, though the README promises behaviour.** `select_jobs`, `is_done` (a changed file is re-read), `_clean` (image bytes dropped) and `_not_retryable` are pure and cheap to test. `pytest verifier` already covers this path.
+- **`_summarise`:** The `count` lambda with `noqa` is convoluted. `collections.Counter` does it in one line.
+- **Not covered:** `.docx`/`.xlsx` documents (the CPO memo and the supplier price lists) are not read. Price is one of the five disagreement types, so cover them later.
+
+### Overlap and coordination
+
+- **Existing extraction code.** `src/ask_soony/extract.py` and `src/ask_soony/llm/` already turn files into text or page images and call Anthropic. Jonas's line in `PROGRESS.md` ("LLM analysis of each change") overlaps with this reader. Talk to Jonas before building the join, so you don't end up with two readers. The 202 confirmation PDFs are text and could go through text extraction rather than a vision agent.
+- **Deployment.** The README says "no API key", which holds on your machine. For a deployed prototype, confirm the production path (API key, or the SDK's bundled CLI) before Sunday.
+- **`PROGRESS.md`** doesn't mention the image recognizer yet.
+
+### Next step
+
+Run the S2 inspection report, then one Polish notice and one contract with Annex C. Together with the two documents already read, they cover all the claim types. Then run the rest. After that, the linker's M3 step is an adapter that loads `verdict.json` into claims and checks the filename key against the key inside the document. For the S1 note it would find 5000413065, SAP 80,000 vs the note's 8,000.
+</pasted_content id="809a">
+
+/strategize
+
+---
+
+yes
+
+---
+
+good job, but some more suggestions before full run : 
+
+<pasted_content id="809a">
+## Review of the image recognizer changes
+
+**Verdict:** Every point from my last review is fixed, and the five outputs are accurate. Two small things need fixing before the full 277-document run, and `.gitignore` needs attention. I made no changes.
+
+- **Checks:** 87 tests pass (6 new for the recognizer) and ruff is clean.
+- **My limits:** I read your five outputs and compared them with the sources. I didn't call the API myself.
+
+### Fixes verified
+
+| Earlier finding | Result |
+|---|---|
+| Number-format trap | ✅ Each value now has a `number`: the printed `80.000` gives 80000 and handwritten `8 000` gives 8000. |
+| Stamp dates | ✅ `received_date 18.11.2026` is a stamped value now. |
+| S2 outcome | ✅ New `decisions` array. The inspection report gives `outcome: fail`, with the concession conditions, and lot 5,600, sample 125, defective 9, accept 3 and reject 4 match the PDF. |
+| Per-value legibility | ✅ `legible` is on every value. |
+| Retry held a worker slot | ✅ The semaphore is released before the sleep. |
+| `_summarise` | ✅ It uses `Counter`. |
+| Tests | ✅ Added. |
+
+### Output quality
+
+- **Karton notice:** The downtime dates (21 Nov 14:00 to 23 Nov 06:00) and the 15,000-per-36 h digital capacity are right. The notice date is 2026-11-09, as expected.
+- **PackRight contract:** Annex C is mapped line by line. `CMP-MAG-005` comes out as "included in CMP-GAM-007", which is the magnets-are-fitted case from `strategy.md`. Force majeure for rare-earth export limits and the 90-day sub-supplier approval are captured too.
+
+### Fix before the full run
+
+1. **Old-schema output will be skipped.**
+   - **The bug:** `is_done` ([run.py:81](verifier/image_recognizer/run.py#L81)) checks only the file checksum.
+   - **The stale file:** The shipping advice was read before the schema change. It has no `number`, `legible` or `decisions`, and the full run would skip it.
+   - **Fix:** Store a hash of the schema and prompt (plus model and effort) in `meta.json`, and have `is_done` compare it. Add a test.
+   - **Workaround for now:** Delete that one folder, or pass `--force`.
+
+2. **Field names drift between runs.** The same S1 line was `quantity_delivered` in the first run and `quantity_shipped` in the latest. The judge keys on these names, so freeze a core enum (ordered, shipped, delivered, received, balance, and so on) with `other` plus a label. You don't need to wait for the full run.
+
+3. **`.gitignore` has an uncommitted change.** It undoes your own commit `12340c5` ("Track portal data to see changes"): `data/portal` is tracked in HEAD (332 files), but the working tree now ignores all of `data/`. New portal drops would stop showing up in `git status`. It also drops the `soony-data/` ignore. If you didn't mean this, run `git checkout -- .gitignore`. Separately, `AGENTS.md` says not to commit portal data, so confirm that tracking it is a team decision.
+
+### Minor
+
+- **The reader asserts "today".** The Karton red flag says "Today is 2026-11-21, so this deadline may already have passed". The model took that from the machine clock. Add a prompt rule that the reader makes no claims relative to the current date, and leave those to the judge.
+- **No test for the retry path.**
+
+### Next
+
+1. Fix items 1 and 3, then run all documents (about $32 and 20 minutes).
+2. Write the join adapter that loads `verdict.json` into claims and checks the filename key against the key inside the document.
+3. For S1 it would find receipt 5000413065: SAP 80,000 vs the note's 8,000, with PO `qty_ordered 8000` backing the note.
+</pasted_content id="809a">
+
+/strategize
+
+---
+
+yeah the gitignore change was mine, dont change that. data shouldn't be ignored because it gets updated randomly thoughout the challenge, dont ignore it, green light on other thiings before the rune
+
+---
+
+<pasted_content id="809a">
+was quite fast, did it run properly ? 
+
+
+(ask-soony) farhanhassan@FB-MAC-013 ask-soony % time uv run python -m verifier.image_recognizer --only Shipping_advice_020-48113256
+1 documents under /Users/farhanhassan/ask-soony/data/portal → /Users/farhanhassan/ask-soony/data/store/image_recognizer  (model claude-sonnet-5-5)
+reading: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:17<00:00, 17.28s/doc, cost=$0.05, err=0, ok=1]
+{
+  "documents": 5,
+  "by_status": {
+    "ok": 5
+  },
+  "by_document_type": {
+    "delivery_note": 1,
+    "shipping_advice": 1,
+    "inspection_report": 1,
+    "notice": 1,
+    "contract": 1
+  },
+  "by_verdict": {
+    "has_warnings": 3,
+    "has_corrections": 1,
+    "clean": 1
+  },
+  "with_red_flags": 5,
+  "total_cost_usd": 0.5421
+}
+uv run python -m verifier.image_recognizer --only Shipping_advice_020-4811325  2.16s user 0.63s system 15% cpu 18.093 total
+(ask-soony) farhanhassan@FB-MAC-013 ask-soony %
+</pasted_content id="809a">
+
+---
+
+was the run jsons saved somewhere ?
+
+---
+
+ok now time for full run , give code
+
+---
+
+i ran the full run, analyse the results
+
+---
+
+ah my claude usage was exhausted , so the process stopped in the middle, now i have capacity again, can we resume it, or have to start the whole thing again ?
+
+---
+
+the runs is still happening but there were a lot of json errors in terminal what were those ?
+
+---
+
+no undo that change, if they're only 6 files, we skip them for now as the scanning used quite a lot of my claude usage, just make a note to read them later. and now summarize what we learned from the scanning, can we bin all the error in 4-5 categories ?
+
+---
+
+sure, and also is all this now in the linker as well ?
+
+---
+
+some suggestions /strategize 
+
+<pasted_content id="809a">
+number is wrong for dotted thousands.
+
+Evidence: Ten Chinese-language SN notes read 19.000 as 19, 122.000 as 122 and 14.600 as 14.6, against SAP's 19,000, 122,000 and 14,600. Only the Polish and German cases were covered in the prompt.
+Inconsistency: The reader even flagged the ambiguity on DN-261119-197 and then guessed.
+Fix: Don't rely on the model for this. Normalise in the join code. A raw value like \d{1,3}(\.\d{3})+ on a whole-piece unit (PCS) is thousands. The raw value is kept, so nothing is lost.
+The corrections array is mostly noise. 21 of the 22 entries are signatures and receiving stamps that the model itself labels "not a correction". The overall verdict.status is right (only 1 has_corrections). The cheapest fix is downstream: derive corrections from the values, meaning any value with crossed_out, or any handwritten value. A prompt change would mean re-reading the 68 delivery notes (about $6).
+
+Caveat on my own check
+I compared confirmations against POs naively (261 lines: 35 quantities and 42 dates differ). Many of those are legitimate changes the supplier confirmed, and I didn't map units or lines. Treat it as a lead for the judge, not as a finding.
+
+Next
+Fix the buffer and re-run the 6 failures.
+Write the adapter that loads verdict.json into claims, with the number normalisation from item 2.
+Join to the linker. The first three results to show are:
+S1 (receipt 5000413065, SAP 80,000 vs note 8,000).
+The three unbooked notes against their PO lines.
+28,000 shipped vs 48,000 ordered, across the shipping advice, the 21 Nov note and the PO line.
+</pasted_content id="809a">
+
+---
+
+sure
+
+---
+
+some suggestions : 
+
+## Review of the M3 linker join
+
+**Verdict:** The join works and finds three of the planned findings on real data. There are two gaps worth fixing, one of which you've already spotted. I made no changes.
+
+- **Checks:** 100 tests pass (9 new ones for readings) and ruff is clean.
+- **`.gitignore`:** Resolved.
+
+### What works (run on the real data)
+
+| Finding | Result |
+|---|---|
+| S1 | Receipt 5000413065: paper 8,000 (handwritten; printed 80,000 crossed out), SAP received 80,000, ordered 8,000, remark "over delivery accepted". |
+| P2 | PO line 4500318735/2: shipped 28,000 of 48,000, balance 20,000 expected 24 Nov. It also names the delivery note DN-261120-726 that received 28,000, and picks the right line (the 48,000 one) by matching the ordered figure. |
+| S2 | Stock batch 5000413063: 5,600 in stock although the lot failed (9 of 125 defective, accept 3), with the concession conditions. |
+
+- **Reader error fixes are applied on load.** `count_number` turns `19.000` into 19000, and it is restricted to count fields, so a price like `1.520` stays 1.52. Corrections are derived from values. Supplier part numbers are mapped from Annex C with no hand-typed table.
+- **Adapts to new drops by itself.** The three "delivered on paper, not booked" notes are gone from the output because `goods_receipts_update.csv` booked them. The linker picked that up with no code change.
+
+### Gaps
+
+1. **The wrong-part pallet is invisible.**
+   - **What's wrong:** WZ-261120-732 (receipt 5000413071): the paper and SAP both say 20,000, so the quantity check passes. But the handwritten note says `1 Pal. = GH5 Sleeves!`, and SAP's own remark says 4,000 pieces of CMP-GAM-005 were booked as CMP-GAM-004. That makes 16,000 GH6 sleeves, not 20,000.
+   - **Why it slipped through:** Deriving corrections from values drops the handwritten text remark, and the reader's red flag is never surfaced.
+   - **Fix (a):** A general check that a receipt remark names a part number different from the line's material ("remark names another part").
+   - **Fix (b):** Surface the reader's red flags for delivery notes whose receipt is live.
+   - **Why:** This is the "in stock in the system but not on the shelf" case, and the strongest live-demo finding.
+
+2. **`open_line_received` is now noisy.** It reports four lines with the message "no delivery date" (previously 0). One is a genuine partial (4500318735/2, received 28,000 of 48,000, remark "partial delivery"). The other three are fully received lines (SAP just hasn't marked them delivered). Compare the received sum with the ordered quantity. A partial should get a different message or none, and a fully received line is a minor SAP-lag note.
+
+### Smaller points
+
+- **The P2 "feed says 48,000" claim isn't a record.** The shipment feed has no quantity column. The 48,000 / ETA 21 Nov figure lives in the `Inbound` sheet of `launch_plan_GH6.xlsx`, which is still an unknown file. Advice expected 24 Nov vs plan 21 Nov isn't flagged. Add this sheet together with `stock_update_2026-11-21.xlsx`, which your README already lists as next.
+- **Old readings of a changed file.** If a document changes, the old reading's folder remains and both load. `check_readings_match_files` flags the stale one, but the joins and checks would double-count. Skip readings whose checksum is not the current one when a current reading exists.
+- **6 documents still unread.** The summary still shows the same 6 buffer errors, including the Karton and Dongguan supply agreements. Karton's contains §3.2 (express orders), and that is the capacity evidence. Fix and re-run (about $1).
+- **Uncommitted.** `readings.py`, `test_readings.py` and the other changes are not committed.
+
+### Suggested order
+
+1. Fix gap 1 (remark names another part) and gap 2.
+2. Add the `launch_plan` Inbound and `stock_update` adapters.
+
+---
+
+<pasted_content id="809a">
+Yes, the plan is sound. Skipping fix (b) is right, and I'd re-run the 6 files. The bigger point is what step 2 unlocks.
+
+### The stock update changes the priority
+
+I read `stock_update_2026-11-21.xlsx` (read-only). It has the late-shift book stock and the packed counts: CE 60,300 of 72,000 packed, Standard 602,000 of 640,000. Combined with your findings, it gives a shortfall number.
+
+These are my rough numbers, assuming 1 part per copy and that I haven't read the BOM:
+
+| Part | Book stock | Phantom or bad | Real | Needed (CE 11,700 left) | Gap |
+|---|---|---|---|---|---|
+| Art book (008) | 77,800 | 72,000 (S1: 80,000 booked, 8,000 real) | about 5,800 | 11,700 | **about 5,900 short** |
+| Statue (010) | 13,900 | 5,600 (failed lot) | 8,300 | 11,700 | **about 3,400 short** |
+| Game card (001) | 42,900 | none | 42,900 | 49,700 (STD 38,000 + CE 11,700) | **about 6,800 short**, and the 20,000 balance lands 24 Nov, after launch |
+
+So the system says "fine" and the paper says the CE cell stops. That is the "price it" step from `strategy.md`, expressed as copies at risk. It answers the brief's own line, "the system says we are fine, my gut says we are not", with a number and a cause per part. I'd make this the headline of the pitch.
+
+The step 2 adapters are what feed it:
+- The `stock_update` adapter gives the latest stock and the remaining demand.
+- The `Inbound` adapter gives the "due 21 Nov" claim that the advice contradicts.
+
+### Suggested order
+
+1. **Step 2 adapters** (about 1 hour).
+2. **Adjusted stock and shortfall per part** (about 1–2 hours). Book stock minus findings, against remaining demand from the BOM, giving copies at risk per edition. Verify the arithmetic above against the BOM first.
+3. **Act.** One real action per finding, with a "who to ask" from your own routing table:
+   - Hamburg: count the art books.
+   - Approver (PP-07): decide on the failed statue lot.
+   - Hwaseong: ask about the balance flight.
+   - Karton: ask about express capacity (needs the contract that failed to read).
+4. **One screen** of decision cards (finding, copies at risk, who to ask, one-click send), then deploy, deck and video.
+5. **Re-run the 6 failed files in the background now** (about $1).
+
+### Risks
+
+- **Verifier depth vs hand-in.** The jury scores pitch, business case, live action and taste. The linker is already deep. Step 3 onward is where the remaining points are, and the deadline is Sun 12:00. Cap further linker work.
+- **Deployment.** The reader needs a Claude login or API key. Ship the existing readings (keyed by checksum) with the deployment and keep the live reader for new drops only, with an API key.
+- **Overlap with teammates.** Akshat (product direction) and Jonas (watcher) may be building the same "act" layer. Check in tonight, so the decision cards sit on one shared findings table and nothing is built twice.
+- **Fix (b) later.** Reader red flags are fine as supporting detail on a card, but not as findings on their own.
+
+No code was changed. I'd start with the BOM check on the shortfall numbers, because it decides whether the headline holds.
+</pasted_content id="809a">
+
+/strategize
+
+---
+
+ignore the 6 files for now as well, go ahead with everything else
+
+---
+
+some suggestions : 
+
+## Review: step 2, `impact/` and `act/`
+
+**Verdict:** This is the strongest piece so far, and it should be the core of the pitch. I found one presentation problem and one missed opportunity that could matter more than anything else on Sunday. I made no changes.
+
+- **Checks:** 107 tests pass and ruff is clean. I count 107, not the 110 you reported, and I haven't traced the difference.
+
+### What's right
+
+- **The numbers hold.** `verifier.impact` reproduces my rough arithmetic, now from the BOM and the data.
+  - Art books: gap 5,900 (book 77,800, minus 72,000 phantom).
+  - Statues: gap 3,400 (book 13,900, minus the 5,600 failed lot).
+  - Game cards: gap 6,800 (42,900 against 49,700).
+  - The magnets are correctly left out, because `CMP-MAG-005` is fitted inside `CMP-GAM-007`.
+- **New finding.** 64,000 sleeves in stock are revision B, but ECN-2026-118 says revision B must not be packed (`old_revision_in_stock`). It is derived from a change notice plus a supplier confirmation, with nothing hardcoded.
+- **Per-cause cards:** Each card shows system says vs paper says, options and a routed message. The routing follows your own table:
+  - Hamburg for counts.
+  - The supplier for what shipped.
+  - The Head of Procurement for the statue concession, with the vacant Category Lead rule from PP-07 applied.
+- **The Karton offer card is correct.** I first suspected the email's "at the normal price" contradicted a 35% surcharge. It doesn't: the surcharge is on item 1 (rush printing), and the art books (item 2) are at the Annex A price. So 8,000 × 2.10 = 16,800 EUR is right.
+
+### Needs fixing
+
+1. **The "at risk" headline double-counts closable gaps.**
+   - **Problem:** STD shows `at risk 32,000` (clear cases, `CMP-GAM-003`), yet 350,000 are at the Hamburg terminal waiting for pickup. `at_risk()` ignores supply options entirely.
+   - **Why it matters:** The card is titled correctly, but a headline total would overstate the risk by 32,000, and a jury member will notice.
+   - **Fix:** Show the gap before and after the options that can arrive before launch.
+     - Art books: closed by Karton's 8,000.
+     - Cases: closed by collecting the container.
+     - Statues: only via a concession (the other 10,000 arrive 27 Nov).
+     - Game cards: nothing arrives in time (36,000 on 23 Nov), so about **6,800 STD copies are really at risk**.
+
+2. **No deadline on the cards.** The Karton offer is valid 24 hours from 21 Nov, loads within 4 hours of ordering, and the truck drives about 9 hours.
+   - **Arithmetic (mine, so treat as approximate):** Real art-book stock of 5,800 covers about 6.4 hours of the CE cell at 900 per hour. If Sunday packing starts at 06:00, the next 8,000 must be at the dock by about 12:30. Subtracting 13 hours (4 loading plus 9 driving) gives an **order deadline around Saturday 23:30**.
+   - **Why it matters:** A "latest order time" on each card (needed-by minus lead time) turns a list of issues into "do this in the next hour". It is the best demo moment available, and the data already contains every input.
+
+3. **Cards that say "block it" don't ask whether it's already packed.** The stock update shows 90,000 sleeves used today while 64,000 revision-B sleeves sit in stock. The cards should ask Hamburg which sleeve batch the lines have been pulling, and whether any packed copies carry the old mark.
+
+### Smaller points
+
+- **Sending:** "Nothing is sent automatically" (mailto and copy text) is safe, but the challenge's one rule is "agents write, escalate, act". Jonas owns supplier email and calls (see `PROGRESS.md`). Hand him `data/store/decision_cards.json` as his input, since `messages` already has `to_email`, subject and body. Sender addresses must be registered in the portal first.
+- **Tests:**
+  - `act/` has none.
+  - The new linker rules `old_revision_in_stock` and `plan_vs_paper` have no direct tests.
+  - The planning adapters and `parse_count` aren't tested directly.
+  - The three impact tests cover the flow, not those pieces.
+- **Cards with no gap.** The two sleeve cards show `at_risk: 0` (usable 48,000 against 38,000 needed). That is correct, but label them "stock blocked, no gap" so they don't read as noise.
+- **Uncommitted.** Everything under `act/`, `impact/` and `planning.py` is not committed.
+
+/strategize
+
+---
+
+ok
+
+---
+
+ok, now in short and layman, explain me what all have we done once we started working on the image recognizer
+
+---
+
+whoa what was impact and act, go in depth and explain it to me
+
+---
+
+how was act developed , what was the reasoning ? how did you know who to reach out to, and what decision to take to solve the problem ?
+
+---
+
+implement 1, 
+
+can problem 3 be fixed with some light model we can run from hugging face ? its just translation from english to all the others.
+
+---
+
+actually leave the translation idea in some .md file . since outgoing messages is not my job, my job is finding problems and suggesting recommendations . engineering messages from those are my colleagues jobs, we leave it to them
+
+---
+
+guess we dont need to do anything more now ?
+
+---
+
+use all .md to update @README.md with running instructions . actually the current readme is more like instructions for us as team mates and not for judges. so call it instructions and move it somewhere right a new one explaining the cool tools we've built in short with code how to run them.
+
+---
+
+hi, we did good work last night, since then my colleagues updated the code even more, come up to speed with the changes
+
+---
+
+we have bigger problem, here is my discussion with a colleague, do you understand the issue ? 
+
+<pasted_content id="809a">
+farhan.hassan7777 — 08:58
+@hardworker , is API faster then sdk, or makes no difference?
+hardworker
+APP
+ — 08:58
+The API isn't faster because it's an API. It's faster because Lucas changed what it does:
+
+Your SDK version: an agent loop. Claude Code runs as a subprocess, thinks, can take several turns per doc, writes transcript files. Powerful, slow-ish.
+Lucas's version: one vision call per document, strict JSON out, no tools, no loop, and a small model (gpt-5.4-mini, effort medium).
+
+Measured: the readings on Jonas's machine took 5.9–8.4 s per doc (median ~6.4 s, 4 docs, all fine). I have no timing data for your SDK runs, so I can't give you an honest "X times faster". But one call vs a loop is faster almost by definition.
+
+The question that actually matters isn't speed, it's accuracy on the hard scans. Your findings.md run used Sonnet on 283 docs and still had reader errors (the 5.000 → 5 misreads). Now it's a mini model. Before the demo, re-run the art-book delivery note (WZ-261116-473, the crossed-out 80,000 → handwritten 8,000) and check it still catches it. If mini misses that, we lose our best moment to save 6 seconds.
+farhan.hassan7777 — 09:01
+Sonnet took 25 seconds per document, plan was to run it for the full 268 documents and store their results, learn from the errors and then use a smaller cheaper model, give it the learning from previous run as context ,for live demo, the max we would have is 20 new image scans , worst case scenario, you think it's a good plan? @hardworker
+hardworker
+APP
+ — 09:02
+Yes, good plan. It's how you'd do it in production: expensive model once for the backlog, cheap model for the trickle. The math works too:
+• Backlog: 268 × 25 s ≈ 1.9 h sequential, but run.py already has a concurrency setting, so it's way less in parallel. One-off anyway.
+• Live: 20 new scans × ~6.4 s (mini) ≈ 2 min sequential, seconds in parallel. Even Sonnet for 20 scans in parallel is ~1–2 min. Demo-safe either way.
+
+But one trap in the current code ⚠️ run.py caches by checksum + a fingerprint of schema, prompts, model and effort. So:
+Switch the model from Sonnet to mini → every Sonnet reading counts as stale → it re-reads all 268 with mini. Your expensive baseline gets silently replaced.
+Add "learnings" to the prompt → prompt changes → fingerprint changes → same thing.
+Fix: keep the Sonnet readings as a frozen baseline store, and only run mini on checksums that aren't in it.
+
+On "learnings as context": your findings.md already shows the reader errors are mostly deterministic: the thousands dot (5.000 → 5), stamps listed as corrections, PR-… part numbers. Those are fixed better in code in the linker (you already do that) than as prompt hints a mini model may ignore. Use the prompt only for the fuzzy stuff (handwriting, crossed-out numbers).
+
+And test it: run mini on the 5–6 scans behind real cards (esp. the art-book note) and diff against Sonnet. If it matches there, ship it.
+</pasted_content id="809a">
+
+---
+
+yes, we switch back to claude sdk for now and also put the special cases like the handwritten mistakes which claude caught but gpt mini didn,  in a test case so whenever we change our model, we can decide whether its trustworthy or not. /strategize
+
+---
+
+ah we have the sonnet runs stored, ok then we dont need to do claude sdk run again. 
+
+No we use claude code only for now, in development, it will never go through in production, production will always use open ai api. 
+
+We dont have to hide the confidential files because nothing in this product will go public, it will alll be proprietary with the challenge organizers.
+
+Once we nail down our tests sets, then we can think running openai . everything makes sense ?
+
+---
+
+lets run the baseline data into a different folder ( copy it dont cut it, otherwise older .py files will break ). i will announce to the team that this for baseline and shouldn't be hampered. so we solve both conflicts
+
+---
+
+no. move baseline data to verifier folder, it will need to go in repo as well
+
+---
+
+ignore the 6 failed runs for the next development, now give me your plan to fix our main issue
+
+---
+
+good, make a folder called current_tasks/ , put a .md file in that explaining your reasoning of the problem and intended solve(should be lean) and put a gitignore inside that folder with a star in it. and. go build it
+
+---
+
+my suggestions : 
+
+<pasted_content id="809a">
+## Review: reading baseline and model gate
+
+**Verdict:** The design fixes the real problem, and the code is clean. I have three things to fix before you trust the gate, and one repo-size issue. I made no changes.
+
+- **Checks:** 174 tests pass and ruff is clean.
+- **Free gate:** `gate --readings …/baseline_sonnet` runs without model calls and prints TRUSTED.
+- **Baseline:** All 283 readings share one fingerprint (`claude-sonnet-5-5`, same schema), and every value has a `number`.
+
+### What works
+
+- **Loader:** `reading_metas` reads the live store first and falls back to the baseline by (path, checksum). It works when the live store is missing, drops failed reads, and leaves out files that are not in the portal. The linker and `api.py` get the baseline for free.
+- **Reader skip:** `run_all` never re-reads a file version the baseline has, even with `--force`. The test also checks that the baseline files are byte-identical afterwards, and that `--ignore-baseline` reads all.
+- **Gate scratch folder:** It reads only the golden documents into `data/store/gate/<model>_<effort>`, never the live store or baseline. It exits non-zero unless every must-catch case passes.
+- **Scoring by fact, not field name:** Numbers pass through the linker's own `_value` fix first, so a reader error that code already repairs doesn't count against the model.
+
+### Golden facts: what I checked independently
+
+All eight cases are `confirmed: false` and were drafted from Sonnet, so "baseline passes" proves nothing yet. I checked them against sources that are not Sonnet:
+
+| Case | Checked against | Result |
+|---|---|---|
+| Art-book note | The scan itself, plus PO 4500318768 | ✅ |
+| Statue inspection | The PDF text (5,600 / 125 / 9 / 3, "does not meet AQL") | ✅ |
+| Game-card advice | The PDF text (48,000 / 28,000 / 20,000, balance delivery 2026-11-24, AWB) | ✅ |
+| Karton rush offer | The PDF text (8 000 pcs, 4 h loading, about 9 h drive) | ✅ |
+| Sleeve rev. C | `OA26324887` text and PO line (65,000, rev. C) | ✅ |
+| Thousands dot | The scan: `134.000` and `23.000`, and SAP's 134,000 and 23,000 | ✅ Harder than described: a red seal overlaps the unit and packages cells. |
+| Two lines, same part | SAP receipts 5,000 and 5,500 | ✅ by SAP only |
+| Wrong-pallet remark | SAP's own receipt remark names the GH5 pallet | ✅ by SAP only |
+
+You can flip `confirmed` for the first six. Look at the last two scans yourself before flipping them.
+
+### Fix before trusting the gate
+
+1. **Several checks are too loose.** `{"value": 9}`, `{"value": 3}`, `{"value": 125}`, `{"value": 8000}` and `{"value": 20000}` match any value on any field. A weak model could pass the statue case with `packages=3`. Tie each to a field prefix (`defective`, `accept_number`, `sample_size`, `quantity`).
+2. **The gate has one hard case and no negative controls.**
+   - **One hard case:** There is a single handwritten correction (the art book). Mini's likely failures aren't tested.
+   - **Likely failures:** Inventing a correction on a clean note, or reading a signature or stamp as a quantity.
+   - **Fix:** Add two or three clean notes with a "no crossed-out or handwritten quantity" check kind.
+3. **A live reading silently shadows the baseline.** "Live wins for the same file version" means a mini re-read (`--ignore-baseline`, or a gate output copied into the live store) replaces the Sonnet reading for the linker and API, which is the silent downgrade this task set out to prevent. Safer: the baseline wins unless the live reading's reader passed the gate, or an explicit flag is set. At minimum, show `reader` and `model` on each card's evidence.
+
+### Repo size
+
+The baseline is 18 MB, committed in `65e23a8`. 15 MB of that is `transcript.json` and 1.1 MB is `thinking.json`. Nothing reads either. The transcripts contain document text and tool output (AGENTS.md says portal data stays out of commits). Keep `verdict.json` and `meta.json` (about 2 MB). The history already holds the large version; whether that matters depends on whether it was pushed.
+
+### Coverage gaps
+
+7 of 290 portal documents have no baseline reading:
+- **The 6 that failed with Sonnet:** 4 scans and the Karton and Dongguan supply agreements. The Karton contract carries the §3.2 express-order and capacity terms.
+- **A new drop:** `SUP-0010_LTA_Amendment_3_redline.pdf`. A redline is a strike-through document, so it's a natural golden candidate once read.
+
+Mini will read these unvalidated, and the golden set has no contract case. I'd read these 7 once with a strong model, then add a Karton contract case.
+
+### Smaller points
+
+- **`same_file`:** A changed file is only flagged ("other file version"), not failed. A case written for an old checksum is no longer valid, so it should fail or be marked invalid.
+- **Skip key:** The reader skips by checksum alone, while the loader matches (path, checksum). No two portal files have identical bytes today (I checked), so there is no effect now. Skipping by (path, checksum) would match.
+- **Status list:** `current_tasks/reading_baseline.md` still shows items 1–4 open. The diff covers all four, with 3 pending your confirmation and 4 pending your mini run.
+- **`api.py`:** The small edit is fine. The cache stamp changed from a float to a tuple, which only affects the first comparison.
+
+### Next
+
+1. Tighten the loose checks and add two clean-note controls.
+2. Run `gate --model gpt-5.4-mini` (about 8 calls).
+3. Strip the transcripts from the baseline.
+4. Read the 7 uncovered documents with a strong model.
+</pasted_content id="809a">
+
+/strategize
+
+---
+
+ok lets pick A, just dont run anything on your own, give me code so i can see tqdm
+
+---
+
+some comments : 
+
+The transcripts are still in the baseline. add correctly skips them, but the existing 283 folders still hold transcript.json (15 MB of the 18 MB) and thinking.json. Delete those two files from the existing folders. The history still has them from 65e23a8.
+
+Every golden case is still confirmed: false. I verified six of the eight original cases against sources other than Sonnet last time (listed in my previous review). You can flip those to true. For the two I only checked through SAP (the two-lines note and the wrong-pallet remark), look at the scans yourself first. The three new controls also need your look.
+
+<pasted_content id="809a">
+Smaller
+Reader skip key: The reader still skips by checksum alone. It's harmless today, since no two portal files have identical bytes.
+Status file: Update current_tasks/reading_baseline.md. All four items now exist in code, with 3 and 4 waiting on your confirmation and your mini run.
+</pasted_content id="809a">
+
+/strategize
+
+---
+
+ok
+
+---
+
+where are those 5 cases, and what needs to be checked in them
+
+---
+
+yes you are correct on all, i've checked all by eye update
+
+---
+
+transcripts were deleted , verify/
+lets do 3 first , give code, did we make the necessary tests ? if so then give code for 3, then we do 2.
+
+---
+
+i have api key , i can paste it, which file ?
+
+---
+
+how much would gpt 5.4 would cost for the 7 docs ? and are you sure its only running on those and not all ?
+
+---
+
+lets do A, why do we need 3 commits ?
+
+---
+
+they ran, check terminal and tell me if it worked
+
+---
+
+ok ran them again, did it work ?
+
+---
+
+we now mark that one document completely ignored everywhere, we do not pursue it anymore, make a note of it. its not worth the time
+
+---
+
+so this mini would not need to scan everything and it will have the knowledge of the baseline we established ?
+
+---
+
+ran the code for mini, what does the terminal reveal
+
+---
+
+try
+
+---
+
+ran again , what does the terminal say ?
+
+---
+
+and how much the runs cost
+
+---
+
+is everything ready to be merged ?
+
+---
+
+is the main repo readme also updated ?
+
+---
+
+install with entire, then check then push
+
+---
+
+just push everything, fuck the rules
+
+---
+
+github doesnt show in the commit history
+
+---
+
+i dont see commits
+
+---
+
+hi, so just to understand, now if we get new data. coming in, the verifier will fire up, check what's consistent or not, and the ui plugged in will warn right away ?
+
+---
+
+oh shit, how we missed it, update the @current_tasks/ and lets fire up a strategy
+
+---
+
+also what's the time complexity, when we get a new data, how long does it take for us to verify everything and arrive at verdicts for each case
+
+---
+
+yes start
+
+---
+
+yes
+
+---
+
+no i meant once we get the new data, starting then, how long does it take, continue working in the background while you answer this
+
+---
+
+i meant if there are 20 new scans and 50 row xls update , then how long for the whole change to take place
+
+---
+
+and can the accuracy and robustness can be quoted to be 100 %
+
+---
+
+i want to ask the id guy that we can provide x amount of accuracy robustness within y seconds, is that valuable or not (not pitching right now, but asking when he's out to help )
+
+---
+
+i just asked , so for them , a single inconsistency which can be found within the dataset takes them 30 mins since they have to do it manually, we can do 20 of them in a less than a minute , he found it very cool
+
+---
+
+save it somewhere ,
+
+some code suggestions : 
+
+<pasted_content id="809a">
+Caveman was read.
+
+## Review: live reading
+
+**Verdict:** Good. The design is sound, nothing is broken, and I'd ship it after two small fixes.
+
+**Checks:**
+- 365 tests pass.
+- Ruff is clean on the changed files. The 217 errors elsewhere were already there.
+- `refresh` runs synchronously from the poll loop, so `asyncio.run` inside `read_unread` is safe.
+
+### What works
+- **Read before link.** `read_unread` runs before `build`. Changed documents go first and retries follow. The baseline, the ignore list and non-document files are skipped.
+- **The gate is enforced.** `trusted.json` holds `gpt-5.4-mini / medium / 571da4d6…` with all 11 cases. A prompt or schema change without a gate run fails `test_the_committed_trust_matches_the_current_reader`.
+- **Failures never stop the pipeline.** A missing key, an untrusted reader or a failed read gets a reason in `dispatch.json → reading`. There is also a try/except in `dispatch` and a cap of 30 documents per refresh.
+- **Tests force the reader off.** The `conftest` autouse fixture sets `ASK_READER=off`, so no test calls a model.
+
+### Fix before the demo
+
+1. **A document that keeps failing is retried every poll.**
+   - `is_done` only counts `status == ok`, so a bad file (like the 4 scans that hit the buffer limit before) is re-read every 300 s.
+   - Each retry costs a model call, and a bad file could fail all weekend.
+   - Add an attempt count to `meta.json` and stop after 2 or 3 tries. Keep the file listed as `unread: "failed 3×"` so it stays visible.
+
+2. **The free gate can write a Sonnet entry into `trusted.json`.**
+   - `gate --readings baseline_sonnet` also reaches `_record`.
+   - The baseline meta has a model, an effort and a fingerprint (`claude-sonnet-5-5 / high / ef7ff7…`), so the free run adds that reader to the committed file.
+   - It doesn't break anything now, because live reading uses OpenAI and the fingerprint includes the model. But it dirties the file and records a reader that can't run live.
+   - Record trust only when the gate ran a model, which is the `args.model` branch.
+
+### Smaller
+- **Rehearsal (step 6) isn't done.** Run it before you call this finished. Drop a copy of a handwritten scan under a new name, poll once, and check that the card changes. Everything else here is tested with a fake reader, so a real call hasn't run end to end.
+- **The server needs `OPENAI_API_KEY` and the matching reader settings.** Without them, live reading stays off and the unread documents show up in `reading.unread`. That is safe, but it means nothing is read.
+- **`trusted.json` is hand-editable.** It is committed, so anyone can add a fingerprint. That's fine for the hack, but it's a convention, not security.
+- **`reading` is in `dispatch.json` but not in the UI.** You noted this is Jonas's call. For the demo, a one-line "N documents unread" banner would show the jury that nothing is silently missing.
+- **Nothing is committed.** Seven files are changed or untracked, including `live.py`, `test_live.py` and `trusted.json`.
+</pasted_content id="809a">
+
+/strategize
+
+---
+
+go ahead
+
+---
+
+what rehearsal, is the image recognizer plugged in now ?
+
+---
+
+ok its running on terminal now, lets see
+
+---
+
+yes fix
+
+---
+
+ran, check
+
+---
+
+yes commit and push
