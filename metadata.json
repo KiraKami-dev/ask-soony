@@ -1,0 +1,49 @@
+{
+  "branch": "llm-task-update",
+  "checkpoint_id": "c64753b62454",
+  "checkpoints_count": 12,
+  "cli_version": "0.13.4",
+  "files_touched": [
+    "scripts/demo_cards.py",
+    "tests/test_clock.py"
+  ],
+  "redaction": {
+    "layers": {
+      "betterleaks": 34,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 90,
+      "credentialed_uri": 0,
+      "entropy": 804,
+      "goredact": 8,
+      "key_context": 0,
+      "pii": 1400,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1263,
+      "IP": 72,
+      "PHONE": 65
+    },
+    "replacements": 2322
+  },
+  "sessions": [
+    {
+      "assets_manifest": "/0/assets/manifest.json",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "metadata": "/0/metadata.json",
+      "prompt": "/0/prompt.txt",
+      "transcript": "/0/full.jsonl"
+    }
+  ],
+  "strategy": "manual-commit",
+  "token_usage": {
+    "api_call_count": 40,
+    "cache_creation_tokens": 98069,
+    "cache_read_tokens": 22155686,
+    "input_tokens": 99,
+    "output_tokens": 21221
+  }
+}
