@@ -46,7 +46,8 @@ function fixesFor(state: State, s: StripItem): Card[] {
   return state.cards.filter((c) => ids.has(c.id) && OPEN.has(c.status))
 }
 
-type Bit = { text: string; late?: boolean }
+/** open: the case this phrase is about; the verdict links it, one click from verdict to act. */
+type Bit = { text: string; late?: boolean; open?: string }
 
 const floorOf = (state: State, edition: string) => state.launch?.floor?.editions?.[edition]
 
@@ -94,13 +95,17 @@ function verdictBits(state: State, nowMs: number): Bit[] {
         const mine = fixes.length - theirs.length
         const who = [...new Set(theirs.map((c) => firstName(c.approver ?? c.signoff ?? '') || 'someone'))]
         const since = theirs[0]?.ui?.at ? ` since ${when(theirs[0].ui.at, nowMs)}` : ''
+        const first = fixes.find((c) => !(c.status === 'escalated' || c.routed_to_other)) ?? fixes[0]
+        out.push({ text: ', ' })
         out.push({
+          open: first?.id,
           text: mine > 0 && theirs.length === 0
-            ? `, unless ${mine} ${mine === 1 ? 'decision goes' : 'decisions go'} through.`
+            ? `unless ${mine} ${mine === 1 ? 'decision goes' : 'decisions go'} through`
             : mine === 0
-              ? `, unless ${who.join(' and ')} ${who.length === 1 && theirs.length === 1 ? 'approves the decision' : 'approve'} (waiting${since}).`
-              : `, unless ${mine} of your decisions and ${theirs.length} with ${who.join(' and ')} go through.`,
+              ? `unless ${who.join(' and ')} ${who.length === 1 && theirs.length === 1 ? 'approves the decision' : 'approve'} (waiting${since})`
+              : `unless ${mine} of your decisions and ${theirs.length} with ${who.join(' and ')} go through`,
         })
+        out.push({ text: '.' })
       }
     } else if (s.finishes_at) {
       const spare = s.slack_hours
@@ -139,7 +144,16 @@ export function Launch({ state, nowMs, phone, onOpen, role = null }: Props) {
       <div className={cn('mx-auto w-full max-w-[960px]', phone ? 'px-6 pb-8 pt-6' : 'px-8 pb-12 pt-14')}>
         <p className="t-small mb-4 text-ink-3">{launch ? `Trucks leave ${when(launch, nowMs)}` : 'Launch time unknown'}</p>
         <h1 className="t-big max-w-[820px] text-ink">
-          {bits.map((b, i) => <span key={i} className={cn(b.late && 'text-late')}>{b.text}</span>)}
+          {bits.map((b, i) => b.open ? (
+            <a
+              key={i}
+              href={`/d/${encodeURIComponent(b.open)}`}
+              onClick={(e) => { e.preventDefault(); onOpen(b.open!) }}
+              className="underline decoration-ink-3/40 decoration-2 underline-offset-[6px] hover:decoration-ink"
+            >
+              {b.text}
+            </a>
+          ) : <span key={i} className={cn(b.late && 'text-late')}>{b.text}</span>)}
         </h1>
         {gaps.length > 0 && (
           <div className="t-body mt-6 max-w-[760px] text-ink">
