@@ -2153,3 +2153,7 @@ also why do we need the 1 when we have cmd enter
 ---
 
 then only show the 1 if more options shown. hand-in is at 12:45
+
+---
+
+also the paprove cmd enter on left bar is not neded as approve has it
