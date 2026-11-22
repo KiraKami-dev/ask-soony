@@ -204,6 +204,7 @@ class Erp:
     shipments: list[dict] = field(default_factory=list)
     suppliers: dict[str, dict] = field(default_factory=dict)  # id -> {dir, profile, parts}
     snapshot: str = ""
+    site: str = "our distribution center"  # where parts are delivered, from sites.csv
 
     @property
     def po_numbers(self) -> set[str]:
@@ -344,6 +345,14 @@ def load_erp(root: Path) -> Erp:
     erp.bom = _csv_rows(root, "soony/master", "bom*.csv", ("parent_id", "child_id", "qty_per"))
     erp.ecns = _csv_rows(root, "soony/master", "*.csv", ("child_id", "rev_old", "rev_new"))
     erp.products = _csv_rows(root, "soony/master", "products*.csv", ("product_id",))
+    dcs = [
+        r
+        for r in _csv_rows(root, "soony/master", "sites*.csv", ("site_id", "type"))
+        if (r.get("type") or "").lower() == "dc"
+    ]
+    if dcs:
+        city = (dcs[0].get("city") or "").strip()
+        erp.site = f"DC {city}" if city else (dcs[0].get("name") or erp.site)
     for r in _csv_rows(root, "soony/master", "components*.csv", ("component_id", "description")):
         erp.components[r["component_id"]] = r
     for r in _csv_rows(root, "soony/master", "components*.csv", ("component_id", "field", "new")):
@@ -1013,7 +1022,7 @@ def _alternatives(erp: Erp, material: str, sid: str | None, need: float) -> list
                 other,
                 f"Ask {_name(erp, other)} for {fmt(need)} {_desc(erp, material)} before launch",
                 "covers the gap if they have stock",
-                f"we need up to {fmt(need)} {_desc(erp, material)} ({material}) at DC Hamburg "
+                f"we need up to {fmt(need)} {_desc(erp, material)} ({material}) at {erp.site} "
                 f"before {erp.launch_at.strftime('%a %-d %b %H:%M')}. Can you deliver from "
                 "stock? Please reply with quantity, earliest arrival and price.",
                 rec=not out,
@@ -1112,7 +1121,7 @@ def rule_late_or_short(docs: list[Doc], erp: Erp) -> list[Hit]:
                     f"{fmt(late)} arrive {'after launch' if after else 'late'}",
                     summary=(
                         f"{_name(erp, sid)}'s {d.type.replace('_', ' ')} says {fmt(late)} of PO "
-                        f"{po} arrive{' in Hamburg on ' + fmt_day(when) if when else ' later'}"
+                        f"{po} arrive{f' at {erp.site} on ' + fmt_day(when) if when else ' later'}"
                         f"{', after launch' if after else ''}. SAP still shows "
                         f"{fmt(ordered)} due {fmt_day(promised)}."
                     ),
@@ -1483,7 +1492,7 @@ def _receipt_hit(erp: Erp, d: Doc, g: dict, booked: float, paper: float, ln: dic
                     f"Order {_name(erp, osid)}'s {fmt(o['qty'])} {desc} from stock",
                     f"covers {fmt(min(o['qty'], cover['short']))} of the {fmt(cover['short'])} gap",
                     f"thank you for your offer ({Path(o['doc'].rel).name}). We would like to order "
-                    f"the {fmt(o['qty'])} {desc} ({mat}) from your stock, delivered to DC Hamburg."
+                    f"the {fmt(o['qty'])} {desc} ({mat}) from your stock, delivered to {erp.site}."
                     "\n\nPlease load them on the next truck and send us the truck details and the "
                     "delivery note number.",
                 )
