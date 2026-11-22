@@ -1,6 +1,6 @@
 import { Check, Menu, UserRound } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { firstNameOf, type Role } from '@/lib/role'
+import { roleTitle, type Role } from '@/lib/role'
 import { cn } from '@/lib/utils'
 
 export type Page = 'today' | 'launch' | 'suppliers' | 'routines' | 'history'
@@ -34,11 +34,11 @@ interface Props {
 
 interface RoleProps { role: Role | null; onRole: (r: Role | null) => void; people: { buyer?: string | null; approver?: string | null } }
 
-/** The two people this device can be, as "I'm Felix · opens on Today". Unnamed ones are left out. */
+/** The two roles this device can be, by title: "Head of Procurement · what needs a signature". */
 function roleChoices({ people }: Pick<RoleProps, 'people'>): { role: Role; label: string; lands: string }[] {
   const out: { role: Role; label: string; lands: string }[] = []
-  if (people.buyer) out.push({ role: 'buyer', label: `I'm ${firstNameOf(people.buyer)}`, lands: 'opens on Today' })
-  if (people.approver) out.push({ role: 'approver', label: `I'm ${firstNameOf(people.approver)}`, lands: 'launch and what needs her' })
+  if (people.buyer) out.push({ role: 'buyer', label: roleTitle('buyer', people.buyer), lands: 'every case' })
+  if (people.approver) out.push({ role: 'approver', label: roleTitle('approver', people.approver), lands: 'what needs a signature' })
   return out
 }
 
@@ -186,17 +186,17 @@ function RoleMenu({ role, onRole, people }: RoleProps) {
     document.addEventListener('keydown', esc)
     return () => { document.removeEventListener('mousedown', off); document.removeEventListener('keydown', esc) }
   }, [open])
-  const name = role === 'approver' ? people.approver : role === 'buyer' ? people.buyer : null
+  const name = role ? roleTitle(role, role === 'approver' ? people.approver : people.buyer) : null
   return (
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        aria-label={name ? `Using this as ${firstNameOf(name)}` : 'Who is using this?'}
+        aria-label={name ? `Using this as ${name}` : 'Who is using this?'}
         aria-expanded={open}
         className="flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-2 text-ink-3 hover:bg-soft hover:text-ink focus-visible:outline-2 focus-visible:outline-accent"
       >
         <UserRound size={16} />
-        {name && <span>{firstNameOf(name)}</span>}
+        {name && <span>{name}</span>}
       </button>
       {open && (
         <div className="absolute right-0 top-10 z-30 w-64 rounded-2xl bg-ground p-1.5 shadow-[0_12px_40px_-12px_rgba(0,0,0,.28)]">

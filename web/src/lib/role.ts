@@ -47,3 +47,9 @@ export function mattersToApprover(
   const me = firstNameOf(approver)
   return !!me && (firstNameOf(c.signoff) === me || firstNameOf(c.approver) === me)
 }
+
+/** 'Dr. Maren Vogt, Head of Procurement' -> 'Head of Procurement'; no title given: the role's name. */
+export function roleTitle(role: Role, label?: string | null): string {
+  const t = (label ?? '').split(',').slice(1).join(',').trim()
+  return t || (role === 'buyer' ? 'Buyer' : 'Approver')
+}
