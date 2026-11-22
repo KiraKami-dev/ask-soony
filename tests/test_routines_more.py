@@ -318,11 +318,11 @@ def test_mode_route(agent_env):
     c = agent_env["client"]
     body = {"id": "m1", "name": "N", "description": "d", "spec": PICKUP}
     assert c.post("/api/routines", json=body).json()["ok"]
-    assert c.get("/api/routines").json()["routines"][0]["mode"] == "tell"  # default
-    assert c.post("/api/routines/m1/mode", json={"mode": "ask"}).json()["mode"] == "ask"
+    assert c.get("/api/routines").json()["routines"][0]["mode"] == "ask"  # new: asks first
+    assert c.post("/api/routines/m1/mode", json={"mode": "tell"}).json()["mode"] == "tell"
     assert c.post("/api/routines/m1/mode", json={"mode": "loud"}).status_code == 400
     c.post("/api/routines", json={**body, "name": "N2"})  # a new version keeps its mode
-    assert c.get("/api/routines").json()["routines"][0]["mode"] == "ask"
+    assert c.get("/api/routines").json()["routines"][0]["mode"] == "tell"
 
 
 # ---------------------------------------------------------------- undo

@@ -1411,7 +1411,8 @@ def suggest(card_id: str) -> dict:
         spec_help=SPEC_HELP, card=json.dumps(_card_view(card), ensure_ascii=False), action=action
     )
     draft = _ask_for_spec(prompt)
-    draft.update(id=uuid.uuid4().hex[:8], created_from=card_id, enabled=False, mode="tell")
+    # Trust ladder: a new routine prepares its actions for one-tap approval until switched up.
+    draft.update(id=uuid.uuid4().hex[:8], created_from=card_id, enabled=False, mode="ask")
     return {"routine": draft, "preview": run(draft, dry=True)}
 
 
@@ -1536,7 +1537,8 @@ def save_routine(body: Draft):
                 "handled": 0,
             }
         )
-        mode = data.get("mode") if data.get("mode") in MODES else mode_of(old or {})
+        default = mode_of(old) if old else "ask"  # new routines start by asking first
+        mode = data.get("mode") if data.get("mode") in MODES else default
         items = [r for r in items if r.get("id") != body.id] + [{**data, **keep, "mode": mode}]
         _save(items)
     return {"ok": True}
