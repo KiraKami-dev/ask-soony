@@ -9,7 +9,7 @@ flowchart LR
 ```
 
 ## Now
-- Akshat (01:40): branch akshat/integration = platform + integration/verifier + jonas/alert-agent; inbox runs on real pipeline output (art books with Maren, Hwaseong chaser with Felix); next: team decides on merging the draft PR, deploy
+- Akshat (01:21): platform + verifier + predictor + alert agent merged to main (PR #6), inbox runs on real pipeline output; next: fix stale art-book deadline, calm opening, deploy
 - Farhan: verification: claim extraction from documents + three-way match (PO ↔ confirmation ↔ receipt) — see plan.md §5
 - Lucas: arrival forecast: rules for ETA + road leg, silence detection, news/notice risks, alternatives — see plan.md §5
 - Jonas (00:37): alert agent on branch `jonas/alert-agent` (on top of Akshat's dashboard): voice conversation per card (gpt-realtime), PWA push alerts, send drafted supplier mail after a spoken yes, supplier replies tied back to the card (Hwaseong: remaining 20,000 game cards arrive Tue 24 Nov, too late), phone calls via Twilio; next: auto-escalation critical card → push → call, then merge with Akshat
