@@ -1,6 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog'
-import { ArrowLeft, Check, Database, FileText } from 'lucide-react'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { Check, Database, FileText } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { AnchorCrop, NUM_OR_ID, fileUrl, normTok, useAnchors, type Anchor } from '@/components/SourceAnchors'
 import { VoiceCall, type Prepared, type ScreenWhat } from '@/components/VoiceCall'
 import { pendingOf, undoAction, useLive } from '@/components/routines/live'
@@ -8,7 +8,7 @@ import { UndoAction } from '@/components/routines/Undo'
 import { ProposalLines, ProposalSheet, RoutineLine, WouldLine, groupProposals } from '@/components/routines/Proposals'
 import type { Proposal } from '@/components/routines/types'
 import { DONE_WORD, post, sentence, tidy, type Card, type Evidence, type State } from '@/lib/api'
-import { actionIdOf, languageOf, replyFacts, routineActionOf, routineOf, splitValue, when } from '@/lib/decisions'
+import { actionIdOf, languageOf, replyFacts, routineActionOf, routineOf, sections, splitValue, when, type Handled } from '@/lib/decisions'
 import {
   actionText, claimOf, costLine, costsMoney, docKind, forToday, headlineOf, launchStatus, ordinal, plural,
   recommendedIndex, routineCount, shortName, shortTitle, summaryLine, type Claim,
@@ -54,13 +54,22 @@ interface Props {
   pending: number
   /** A case opened by link (/d/<id>) that is no longer open: shown as it stands, not decided. */
   caseCard?: Card | null
-  /** Arrived from Plan: a quiet way back. */
-  onBack?: (() => void) | null
+  /** Opens any case (open, passed on or closed) on Today: /d/<id>. */
+  onOpenCase: (cardId: string) => void
+  /** Phone: a change opens "All cases" (the status line's "N decisions"). */
+  allReq?: number
   onDrawer: Drawer
 }
 
 /** Opens the review sheet for what routines prepared. */
 type Review = (items: Proposal[]) => void
+
+/** What the primary button will do. */
+type Choice = { kind: 'option'; i: number } | { kind: 'escalate' } | { kind: 'dismiss' }
+const sameChoice = (a: Choice, b: Choice) => a.kind === b.kind && (a.kind !== 'option' || a.i === (b as { i: number }).i)
+/** The recommended option; without options, pass it on (or, with nobody to pass it to, dismiss). */
+const defaultChoice = (card: Card): Choice =>
+  card.options.length ? { kind: 'option', i: recommendedIndex(card) } : card.approver ? { kind: 'escalate' } : { kind: 'dismiss' }
 
 const typing = (t: EventTarget | null) =>
   t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))
@@ -74,6 +83,24 @@ export function Today(p: Props) {
   const callCard = call ? state.cards.find((c) => c.id === call.id) ?? call : null
   const focusCard = callCard ?? card
   const view = callCard ? 'decide' : done ? 'done' : p.caseCard ? 'case' : card ? 'decide' : 'clear'
+
+  // The folded groups below "Needs you": which are open. Phone: all of them sit behind "All cases".
+  const [openGroups, setOpenGroups] = useState<Set<GroupKey>>(new Set())
+  const [allCases, setAllCases] = useState(false)
+  const allRef = useRef<HTMLDivElement>(null)
+  const reveal = (g?: GroupKey) => {
+    if (g) setOpenGroups((o) => new Set(o).add(g))
+    if (phone) setAllCases(true)
+    window.setTimeout(() => (g ? document.getElementById(`group-${g}`) : allRef.current)?.scrollIntoView({ block: 'start', behavior: 'smooth' }), 50)
+  }
+  const allReq = p.allReq ?? 0
+  useEffect(() => { if (allReq) reveal() }, [allReq]) // eslint-disable-line react-hooks/exhaustive-deps
+  const toggleGroup = (g: GroupKey) =>
+    setOpenGroups((o) => { const n = new Set(o); if (n.has(g)) n.delete(g); else n.add(g); return n })
+  const activeId = p.caseCard?.id ?? (view === 'decide' ? focusCard?.id : null) ?? null
+  const groups = (
+    <CaseGroups state={state} nowMs={nowMs} phone={phone} open={openGroups} onToggle={toggleGroup} activeId={activeId} onOpen={p.onOpenCase} onChanged={p.onChanged} />
+  )
 
   const foot = <FootLines handled={handled} onRoutines={() => p.onRoutines()} nowMs={nowMs} center={!phone} />
 
@@ -92,26 +119,33 @@ export function Today(p: Props) {
         doneText={done && done.card.id === focusCard!.id ? done.text : undefined}
       />
     ) : (
-      <AllClear state={state} nowMs={nowMs} handled={handled} onRoutines={p.onRoutines} onReview={setReview} onChanged={p.onChanged} go={p.go} />
+      <AllClear state={state} nowMs={nowMs} handled={handled} onRoutines={p.onRoutines} onReview={setReview} onChanged={p.onChanged} go={p.go} onReveal={reveal} />
     )
   const sheet = (
     <ProposalSheet items={review} ctx={state} onClose={() => setReview(null)} onChanged={p.onChanged} />
-  )
-  const back = p.onBack && (
-    <button
-      onClick={p.onBack}
-      className={cn('t-small inline-flex cursor-pointer items-center gap-1.5 text-ink-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-accent', phone ? 'mb-6' : 'absolute -top-14 left-0')}
-    >
-      <ArrowLeft size={15} strokeWidth={1.75} aria-hidden="true" />Plan
-    </button>
   )
 
   if (phone) {
     return (
       <main className="mx-auto w-full max-w-[560px] px-7 pb-[220px] pt-5">
-        {back}
         {body}
         {view === 'decide' && handled > 0 && <div className="mt-14">{foot}</div>}
+        <div ref={allRef} className="mt-16 scroll-mt-20">
+          {allCases ? (
+            <div className="fade space-y-8">
+              <div className="flex items-baseline justify-between">
+                <p className="t-small text-ink-3">All cases</p>
+                <button onClick={() => setAllCases(false)} className="t-small cursor-pointer text-ink-3 hover:text-ink">hide</button>
+              </div>
+              {p.order.length > 0 && <QuietList {...p} onFocus={(id) => { p.onFocus(id); setAllCases(false); window.scrollTo(0, 0) }} />}
+              {groups}
+            </div>
+          ) : (
+            <button onClick={() => setAllCases(true)} className="t-small cursor-pointer text-ink-3 hover:text-ink">
+              <span className="border-b border-hair">All cases</span>
+            </button>
+          )}
+        </div>
         {sheet}
       </main>
     )
@@ -120,10 +154,12 @@ export function Today(p: Props) {
   return (
     <div className="relative flex-1">
       <div className="mx-auto grid w-full max-w-[1440px] grid-cols-[240px_minmax(0,640px)] gap-x-16 px-12 pb-32 pt-24 xl:grid-cols-[300px_640px] xl:gap-x-[124px] xl:px-24">
-        <aside aria-label="Needs you">
+        <aside aria-label="Cases" className="space-y-10">
           {p.order.length > 0 && <QuietList {...p} />}
+          {groups}
+          {!phone && <p className="t-small text-ink-3"><kbd>J</kbd> <kbd>K</kbd> move · <kbd>1</kbd>–<kbd>9</kbd> choose · <kbd>A</kbd> go</p>}
         </aside>
-        <main className="relative min-w-0">{back}{body}</main>
+        <main className="relative min-w-0">{body}</main>
       </div>
       {view !== 'clear' && view !== 'case' && <div className="fixed inset-x-0 bottom-8 z-10 flex justify-center">{foot}</div>}
       {sheet}
@@ -173,8 +209,132 @@ function QuietList({ order, card, onFocus, state, nowMs }: Props) {
         })}
       </ul>
       {more > 0 && <p className="t-small mt-2 text-ink-3">+{more} more</p>}
-      <p className="t-small mt-6 text-ink-3"><kbd>J</kbd> <kbd>K</kbd> to move, <kbd>A</kbd> to approve</p>
     </div>
+  )
+}
+
+// ---------------------------------------------------------------- the folded groups
+
+type GroupKey = 'waiting' | 'handled' | 'done'
+const firstWord = (s?: string) => (s ?? '').split(' ').find((w) => !w.endsWith('.')) || ''
+
+/**
+ * Below "Needs you": what waits on others, what routines handled and what you decided. Folded
+ * with a count; a row opens the case in focus (read-only once it is closed).
+ */
+function CaseGroups({
+  state, nowMs, phone, open, onToggle, activeId, onOpen, onChanged,
+}: {
+  state: State; nowMs: number; phone: boolean; open: Set<GroupKey>; onToggle: (g: GroupKey) => void
+  activeId: string | null; onOpen: (id: string) => void; onChanged: () => void
+}) {
+  const sec = useMemo(() => sections(state), [state])
+  const row = { nowMs, activeId, onOpen }
+  const groups: { key: GroupKey; title: string; n: number; routine?: boolean; rows: ReactNode }[] = [
+    {
+      key: 'waiting', title: 'Waiting on others', n: sec.waiting.length,
+      rows: sec.waiting.map((c) => (
+        <CaseRow key={c.id} {...row} card={c} title={shortTitle(c, state)} dot="hollow"
+          sub={[`${c.status === 'escalated' ? 'Waiting for' : 'With'} ${firstWord(c.approver) || 'the approver'}`, c.ui?.at ? `since ${when(c.ui.at, nowMs)}` : '']} />
+      )),
+    },
+    {
+      key: 'handled', title: 'Handled for you', n: sec.handled.length, routine: true,
+      rows: sec.handled.map((h) => <HandledCase key={h.key} h={h} state={state} {...row} onChanged={onChanged} />),
+    },
+    {
+      key: 'done', title: 'Decided by you', n: sec.done.length,
+      rows: sec.done.map((c) => {
+        // A sent email cannot be taken back, so no Undo for it.
+        const undo = c.status !== 'sent' ? actionIdOf(state.activity.find((x) => x.card === c.id)) : null
+        return (
+          <CaseRow key={c.id} {...row} card={c} title={shortTitle(c, state)} dot="quiet"
+            sub={[DONE_WORD[c.status] ?? 'Done', c.ui?.at ? when(c.ui.at, nowMs) : '']}
+            undo={undo ? <UndoAction actionId={undo} onUndone={onChanged} /> : null} />
+        )
+      }),
+    },
+  ]
+  const shown = groups.filter((g) => g.n > 0)
+  if (!shown.length) return null
+  return (
+    <div className={cn('space-y-5', phone && 'space-y-6')}>
+      {shown.map((g) => {
+        const on = open.has(g.key)
+        return (
+          <section key={g.key} id={`group-${g.key}`} className="scroll-mt-24">
+            <button
+              onClick={() => onToggle(g.key)}
+              aria-expanded={on}
+              className="t-small flex w-full cursor-pointer items-baseline gap-2 text-left text-ink-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-accent"
+            >
+              <span className={cn(g.routine && 'dot-routine text-routine')}>{g.title} · {g.n}</span>
+              <span className="border-b border-hair">{on ? 'hide' : 'show'}</span>
+            </button>
+            {on && <ul className="fade -mx-3.5 mt-2">{g.rows}</ul>}
+          </section>
+        )
+      })}
+    </div>
+  )
+}
+
+type CaseRowBase = { nowMs: number; activeId: string | null; onOpen: (id: string) => void }
+
+/** One quiet case line: dot, title, where it stands; a div with role=button so it can hold Undo. */
+function CaseRow({
+  card, title, dot, sub, undo, routine, activeId, onOpen,
+}: CaseRowBase & { card: Card; title: string; dot: 'hollow' | 'quiet' | 'routine'; sub: string[]; undo?: ReactNode; routine?: string }) {
+  const on = activeId === card.id
+  return (
+    <li>
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => onOpen(card.id)}
+        onKeyDown={(e) => { if (e.key === 'Enter' && e.target === e.currentTarget) { e.preventDefault(); onOpen(card.id) } }}
+        aria-current={on ? 'true' : undefined}
+        className={cn(
+          't-small grid w-full cursor-pointer grid-cols-[8px_1fr] items-baseline gap-3.5 rounded-[10px] px-3.5 py-2.5 text-left focus-visible:outline-2 focus-visible:outline-accent',
+          on ? 'bg-soft text-ink' : 'text-ink-2 hover:text-ink',
+        )}
+      >
+        <i aria-hidden="true" className={cn('h-[7px] w-[7px] -translate-y-px rounded-full', on ? 'bg-accent' : dot === 'routine' ? 'bg-routine' : 'bg-ground ring-1 ring-ink-3/50')} />
+        <span className="min-w-0">
+          <span className={cn('line-clamp-2', on && 'font-medium')}>{title}</span>
+          <span className="flex flex-wrap items-center gap-x-2 text-ink-3">
+            {routine && <span className="truncate text-routine">{routine}</span>}
+            {sub.filter(Boolean).map((x, i) => <span key={i} className="flex items-center gap-x-2">{(i > 0 || routine) && <span aria-hidden="true">·</span>}{x}</span>)}
+            {undo && <><span aria-hidden="true">·</span><span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>{undo}</span></>}
+          </span>
+        </span>
+      </div>
+    </li>
+  )
+}
+
+function HandledCase({ h, state, nowMs, activeId, onOpen, onChanged }: CaseRowBase & { h: Handled; state: State; onChanged: () => void }) {
+  const undo = h.actionId && h.status !== 'sent' ? <UndoAction actionId={h.actionId} onUndone={onChanged} /> : null
+  const who = h.routine ? `‘${h.routine}’` : 'A routine'
+  const sub = [(h.status && DONE_WORD[h.status]) || 'Done', h.at ? when(h.at, nowMs) : '']
+  if (h.card) {
+    return <CaseRow card={h.card} title={shortTitle(h.card, state)} dot="routine" routine={who} sub={sub} undo={undo} nowMs={nowMs} activeId={activeId} onOpen={onOpen} />
+  }
+  // Routine work without a case on screen: shown, not opened.
+  return (
+    <li>
+      <div className="t-small grid grid-cols-[8px_1fr] items-baseline gap-3.5 px-3.5 py-2.5 text-ink-2">
+        <i aria-hidden="true" className="h-[7px] w-[7px] -translate-y-px rounded-full bg-routine" />
+        <span className="min-w-0">
+          <span className="line-clamp-2">{tidy(h.text)}</span>
+          <span className="flex flex-wrap items-center gap-x-2 text-ink-3">
+            <span className="truncate text-routine">{who}</span>
+            {h.at && <><span aria-hidden="true">·</span>{when(h.at, nowMs)}</>}
+            {undo && <><span aria-hidden="true">·</span>{undo}</>}
+          </span>
+        </span>
+      </div>
+    </li>
   )
 }
 
@@ -189,12 +349,15 @@ function Focus(p: Props & {
   doneText?: string
 }) {
   const { card, state, nowMs, phone } = p
-  const [sel, setSel] = useState(() => recommendedIndex(card))
+  // What will happen: one of the card's options, passing it on, or dismissing it. The recommended
+  // option is preselected; any "Or …" line takes its place.
+  const [choice, setChoice] = useState<Choice>(() => defaultChoice(card))
+  const sel = choice.kind === 'option' ? choice.i : -1
+  const setSel = (i: number) => setChoice({ kind: 'option', i })
   const [confirm, setConfirm] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [others, setOthers] = useState(false)
-  const [passOn, setPassOn] = useState(false)
   const [note, setNote] = useState('')
   const [source, setSource] = useState<number | null>(null)
   // What the voice assistant prepared and reads out; "yes" or a tap confirms it.
@@ -208,8 +371,8 @@ function Focus(p: Props & {
   const anchors = useAnchors(card.id)
   const claim = claimOf(card)
   const today = forToday(card, state, nowMs)
-  const opt = card.options[sel]
-  const recommended = sel === recommendedIndex(card)
+  const opt = sel >= 0 ? card.options[sel] : undefined
+  const recommended = sel >= 0 && sel === recommendedIndex(card)
   const money = opt ? costsMoney(card, sel) : false
   const emails = !!opt && opt.channel === 'email' && /@/.test(opt.to ?? '')
   const late = card.level === 'red'
@@ -281,10 +444,17 @@ function Focus(p: Props & {
       return { text: 'Taken off the list.', sub: 'Nothing was sent.', actionId: r?.id ?? null }
     })
   const onApprove = () => (emails ? openReview() : money ? setConfirm(true) : void approve())
+  /** The primary button, following the choice. */
+  const go = () => (choice.kind === 'escalate' ? void escalate() : choice.kind === 'dismiss' ? void dismiss() : onApprove())
+  const choose = (c: Choice) => { setChoice(c); setOthers(false); setConfirm(false); setError('') }
+  const choices: Choice[] = [
+    ...card.options.map((_, i): Choice => ({ kind: 'option', i })),
+    { kind: 'escalate' }, { kind: 'dismiss' },
+  ]
 
   // Keyboard (desktop): j/k walk, a asks, Enter approves, Esc cancels.
-  const ref = useRef({ approve, confirm, busy, emails, openReview })
-  ref.current = { approve, confirm, busy, emails, openReview }
+  const ref = useRef({ approve, confirm, busy, emails, openReview, go, choose, choices, choice })
+  ref.current = { approve, confirm, busy, emails, openReview, go, choose, choices, choice }
   useEffect(() => {
     if (phone) return
     const onKey = (e: KeyboardEvent) => {
@@ -292,10 +462,16 @@ function Focus(p: Props & {
       const k = e.key
       if (ref.current.confirm && k === 'Enter') { e.preventDefault(); void ref.current.approve() }
       else if (k === 'Escape') { setConfirm(false); setOthers(false) }
-      else if ((k === 'a' || k === 'A') && opt && !ref.current.busy) {
+      else if ((k === 'a' || k === 'A') && !ref.current.busy) {
         e.preventDefault()
-        if (ref.current.emails) ref.current.openReview()
+        if (ref.current.choice.kind !== 'option') ref.current.go()
+        else if (!opt) return
+        else if (ref.current.emails) ref.current.openReview()
         else setConfirm(true)
+      }
+      else if (/^[1-9]$/.test(k)) {
+        const c = ref.current.choices[Number(k) - 1]
+        if (c) { e.preventDefault(); ref.current.choose(c) }
       }
       else if (k === 'j' || k === 'k' || k === 'ArrowDown' || k === 'ArrowUp') {
         const i = p.order.findIndex((c) => c.id === card.id)
@@ -310,7 +486,10 @@ function Focus(p: Props & {
   const decideBy = card.deadline ? (new Date(card.deadline).getTime() <= nowMs ? 'decide now' : `decide by ${when(card.deadline, nowMs)}`) : ''
   const meta = [card.supplier_name || card.part_name, decideBy].filter(Boolean).join(' · ')
 
-  const actions = opt && (
+  const primaryLabel =
+    choice.kind === 'escalate' ? 'Pass it on' : choice.kind === 'dismiss' ? 'Dismiss' : emails ? 'Review email' : 'Approve'
+  const quietPrimary = choice.kind === 'dismiss'
+  const actions = (opt || choice.kind !== 'option') && (
     <div className={cn(phone ? 'fixed inset-x-0 bottom-0 z-20 bg-gradient-to-t from-ground from-70% to-ground/0 px-6 pb-[max(28px,env(safe-area-inset-bottom))] pt-8' : 'mt-8')}>
       <div className={cn(phone && 'mx-auto max-w-[520px]')}>
         {confirm && (
@@ -324,16 +503,16 @@ function Focus(p: Props & {
           {p.doneText ? (
             <p className="t-body text-ink" role="status"><Check size={18} strokeWidth={1.75} className="mr-2 inline -translate-y-px" />Done. {p.doneText}</p>
           ) : <button
-            onClick={confirm ? () => approve() : onApprove}
+            onClick={confirm ? () => approve() : go}
             disabled={busy}
             className={cn(
               'inline-flex cursor-pointer items-center justify-center rounded-xl font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-60 t-body',
-              // While the alert rings, Answer is the one blue button.
-              p.ringing ? 'bg-soft text-ink hover:bg-hair' : 'bg-accent text-white shadow-[0_1px_2px_rgba(35,72,208,.25)] hover:bg-[#1d3db5]',
+              // While the alert rings, Answer is the one blue button; dismissing is never blue.
+              p.ringing || quietPrimary ? 'bg-soft text-ink hover:bg-hair' : 'bg-accent text-white shadow-[0_1px_2px_rgba(35,72,208,.25)] hover:bg-[#1d3db5]',
               phone ? 'h-[54px] w-full rounded-[14px]' : 'h-12 px-7',
             )}
           >
-            {busy ? 'Sending…' : confirm ? 'Yes, approve' : emails ? 'Review email' : 'Approve'}
+            {busy ? (choice.kind === 'dismiss' ? 'Dismissing…' : 'Sending…') : confirm ? 'Yes, approve' : primaryLabel}
           </button>}
           <div className={cn('flex items-center', phone ? 't-small gap-7' : 't-body gap-6', p.ringing && 'order-first w-full flex-col gap-4 pb-2 lg:items-start')}>
             <VoiceCall
@@ -377,54 +556,61 @@ function Focus(p: Props & {
         <p className="t-body mt-4 text-ink-2">For today: <span className="font-medium text-ink">{today.bold}</span>{today.rest}</p>
       )}
 
-      {opt && (
+      {(opt || choice.kind !== 'option') && (
         <div className={cn(phone ? 'mt-9' : 'mt-12')}>
-          <p className="t-small mb-1.5 text-ink-3">{recommended ? 'We recommend' : 'Your choice'}</p>
-          <p className="t-body text-ink">{actionText(card, sel)}{phone && <span className="text-ink-2"> {costLine(card, sel)}</span>}</p>
-          {!phone && (
-            <p className="t-body text-ink-2">{costLine(card, sel)}{opt.effect ? ` ${cap(tidy(opt.effect))}.`.replace(/\.\.$/, '.') : ''}</p>
+          <p className="t-small mb-1.5 text-ink-3">
+            {recommended ? 'We recommend' : 'You chose'}
+            {!recommended && card.options.length > 0 && (
+              <> · <button onClick={() => choose({ kind: 'option', i: recommendedIndex(card) })} className="uline">back to our recommendation</button></>
+            )}
+          </p>
+          {opt ? (
+            <>
+              <p className="t-body text-ink">{actionText(card, sel)}{phone && <span className="text-ink-2"> {costLine(card, sel)}</span>}</p>
+              {!phone && (
+                <p className="t-body text-ink-2">{costLine(card, sel)}{opt.effect ? ` ${cap(tidy(opt.effect))}.`.replace(/\.\.$/, '.') : ''}</p>
+              )}
+            </>
+          ) : choice.kind === 'escalate' ? (
+            <>
+              <p className="t-body text-ink">Pass it on to {card.approver || 'the approver'}.</p>
+              <p className="t-small mt-2 text-ink-3">They get this brief:</p>
+              <p className="t-small mt-1 text-ink-2">{tidy(card.escalation_brief)}</p>
+              <input
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Add one line (optional)"
+                className="t-small mt-3 h-10 w-full rounded-lg bg-soft px-3 focus:outline-2 focus:outline-accent"
+                aria-label="Note for the approver"
+              />
+            </>
+          ) : (
+            <>
+              <p className="t-body text-ink">Dismiss: nothing to do.</p>
+              <p className="t-body text-ink-2">It leaves your list. Nothing is sent.</p>
+            </>
           )}
         </div>
       )}
 
       {others && (
         <div className="fade mt-8 space-y-1" aria-label="Other options">
-          {card.options.map((_, i) =>
-            i === sel ? null : (
+          {choices.map((c, n) => {
+            if (sameChoice(c, choice)) return null
+            const label = c.kind === 'option' ? (
+              <>{actionText(card, c.i).replace(/^./, (x) => x.toLowerCase())}{' '}<span className="t-small text-ink-3">{costLine(card, c.i)}</span></>
+            ) : c.kind === 'escalate' ? <>pass it on to {card.approver || 'the approver'}</> : <>dismiss: nothing to do</>
+            return (
               <button
-                key={i}
-                onClick={() => { setSel(i); setOthers(false); setConfirm(false) }}
-                className="t-body block w-full cursor-pointer py-2 text-left text-ink-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-accent"
+                key={n}
+                onClick={() => choose(c)}
+                className="t-body grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-4 py-2 text-left text-ink-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-accent"
               >
-                <span className="text-ink-3">Or </span>{actionText(card, i).replace(/^./, (c) => c.toLowerCase())}{' '}
-                <span className="t-small text-ink-3">{costLine(card, i)}</span>
+                <span><span className="text-ink-3">Or </span>{label}</span>
+                {!phone && n < 9 && <kbd className="t-small">{n + 1}</kbd>}
               </button>
-            ),
-          )}
-          {!passOn ? (
-            <button onClick={() => setPassOn(true)} className="t-body block w-full cursor-pointer py-2 text-left text-ink-2 hover:text-ink">
-              <span className="text-ink-3">Or </span>pass it on to {card.approver || 'the approver'}
-            </button>
-          ) : (
-            <div className="py-2">
-              <p className="t-small text-ink-3">They get this brief:</p>
-              <p className="t-small mt-1 text-ink-2">{tidy(card.escalation_brief)}</p>
-              <div className="mt-3 flex flex-wrap items-center gap-4">
-                <input
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  placeholder="Add one line (optional)"
-                  className="t-small h-10 min-w-0 flex-1 rounded-lg bg-soft px-3 focus:outline-2 focus:outline-accent"
-                  aria-label="Note for the approver"
-                />
-                <button disabled={busy} onClick={escalate} className="t-small cursor-pointer font-medium text-accent hover:underline">Send</button>
-                <button onClick={() => setPassOn(false)} className="t-small cursor-pointer text-ink-3 hover:text-ink">Cancel</button>
-              </div>
-            </div>
-          )}
-          <button disabled={busy} onClick={dismiss} className="t-body block w-full cursor-pointer py-2 text-left text-ink-2 hover:text-ink">
-            <span className="text-ink-3">Or </span>dismiss: nothing to do
-          </button>
+            )
+          })}
           <EvidenceLinks card={card} onDrawer={p.onDrawer} className="pt-2" />
         </div>
       )}
@@ -770,8 +956,8 @@ function DoneView(p: Props & { done: DoneInfo }) {
 // ---------------------------------------------------------------- all clear
 
 function AllClear({
-  state, nowMs, handled, onRoutines, onReview, onChanged, go,
-}: { state: State; nowMs: number; handled: number; onRoutines: (r?: { cardId: string; k: number }) => void; onReview: Review; onChanged: () => void; go: (p: string) => void }) {
+  state, nowMs, handled, onRoutines, onReview, onChanged, go, onReveal,
+}: { state: State; nowMs: number; handled: number; onRoutines: (r?: { cardId: string; k: number }) => void; onReview: Review; onChanged: () => void; go: (p: string) => void; onReveal: (g: GroupKey) => void }) {
   const waiting = state.cards.filter((c) => (c.status === 'open' && c.routed_to_other) || c.status === 'escalated').length
   const live = useLive()
   const pending = pendingOf(live)
@@ -782,9 +968,9 @@ function AllClear({
       <p className="t-body mt-6 text-ink-2">{launchStatus(state, nowMs)}</p>
       <div className="t-small mt-10 grid gap-3.5 text-ink-2">
         <span>Watching {plural(state.shipments.length, 'shipment')}<button className="uline ml-1.5" onClick={() => go('/suppliers')}>see</button></span>
-        {waiting > 0 && <span>{plural(waiting, 'decision')} with others<button className="uline ml-1.5" onClick={() => go('/plan')}>see</button></span>}
+        {waiting > 0 && <span>{plural(waiting, 'decision')} with others<button className="uline ml-1.5" onClick={() => onReveal('waiting')}>see</button></span>}
         {handled > 0 && (
-          <RoutineLine links={[{ label: 'see', onClick: () => onRoutines() }, { label: 'undo', onClick: () => go('/plan#handled') }]}>
+          <RoutineLine links={[{ label: 'see', onClick: () => onRoutines() }, { label: 'undo', onClick: () => onReveal('handled') }]}>
             {handled} handled by your routines {new Date(nowMs).getHours() < 11 ? 'overnight' : 'today'}
           </RoutineLine>
         )}
@@ -875,7 +1061,7 @@ function EvidenceLinks({ card, onDrawer, className }: { card: Card; onDrawer: Dr
 
 // ---------------------------------------------------------------- a case that is not open any more
 
-/** A decided or passed-on case, opened from Plan: where it stands, why, and Undo where it works. */
+/** A decided or passed-on case, opened from the list or Launch: where it stands, why, and Undo where it works. */
 function CaseView({ card, state, nowMs, onChanged, onDrawer }: { card: Card; state: State; nowMs: number; onChanged: () => void; onDrawer: Drawer }) {
   const [source, setSource] = useState<number | null>(null)
   const anchors = useAnchors(card.id)

@@ -77,6 +77,10 @@ export interface StripItem {
   breaks_first: { text?: string; deadline?: string; stops_at?: string | null; card: string } | null
   finishes_at?: string | null
   stops_at?: string | null
+  remaining?: number | null
+  rate_per_hour?: number | null
+  packed_as_of?: string | null
+  short_of_time?: number | null
 }
 
 /** One edition on the packing clock: when its line finishes, or stops for want of parts. */
@@ -106,6 +110,44 @@ export interface Clock {
   windows: [string, string][]
   editions: ClockEdition[]
 }
+/** One shipment or lot on its way for a part, as the verifier counted it. */
+export interface Inbound {
+  reference: string | null
+  quantity: number | null
+  eta: string | null
+  /** Counted as arriving before packing ends. */
+  counted: boolean
+  reason: string | null
+  after_launch: boolean
+  supplier_id?: string | null
+  shipment: { id: string; status: string; mode: string; eta?: string; silent: boolean; silent_hours: number | null; note?: string | null } | null
+}
+/** One part of an edition's bill of materials (verifier's dispatch.json, GET /api/state launch). */
+export interface LaunchPart {
+  part: string
+  name: string
+  /** Without the launch title and brackets: 'Art Book'. */
+  short_name: string
+  editions: string[]
+  needed: number | null
+  usable: number | null
+  book_stock: number | null
+  book_as_of: string | null
+  gap: number | null
+  /** Copies this part cannot cover; null when the data does not say. */
+  short: number | null
+  /** When the line runs out of it; null when it lasts, or unknown (shared part, no rate). */
+  runs_dry: string | null
+  shared: boolean
+  inbound: Inbound[]
+  /** Open or passed-on cases about it, most urgent first. */
+  cards: string[]
+}
+export interface LaunchData {
+  hours_left: number | null
+  editions: { edition: string; day_one: number | null }[]
+  parts: LaunchPart[]
+}
 export interface EventItem { id: string; at: string; path?: string; file?: string; node?: string }
 export interface ActivityItem {
   at?: string; text: string; kind: string; detail?: string | null; card?: string
@@ -126,6 +168,7 @@ export interface State {
   shipments: Shipment[]
   strip: StripItem[]
   clock?: Clock
+  launch?: LaunchData
   cards: Card[]
   inbox_ids: string[]
   calm: boolean

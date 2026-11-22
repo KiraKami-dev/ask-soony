@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertsButton } from '@/components/AlertsButton'
 import { EvidenceDrawer, type DrawerView } from '@/components/EvidenceDrawer'
-import { Plan } from '@/components/Plan'
+import { Launch } from '@/components/Launch'
 import { Routines, RoutinesLive } from '@/components/Routines'
 import { pendingOf, refreshNow, suggestionFor, useLive } from '@/components/routines/live'
 import { MapLegend, SupplierList, SupplyMap, type MapSelection } from '@/components/SupplyMap'
@@ -29,7 +29,7 @@ export default function App() {
   const [error, setError] = useState(false)
   const [nowMs, setNowMs] = useState(Date.now())
   const [path, setPath] = useState(window.location.pathname)
-  const [search, setSearch] = useState(window.location.search)
+  const [, setSearch] = useState(window.location.search)
   const [toast, setToast] = useState<string | null>(null)
   const [pulseNode, setPulseNode] = useState<string | null>(null)
   const [drafts, setDrafts] = useState(0)
@@ -144,25 +144,29 @@ export default function App() {
   }, [])
 
   const today = useMemo(() => (state ? todayOrder(state) : []), [state])
-  // Plan opens a case on Today, with a quiet way back.
+  // Launch and the folded groups on Today open a case on Today.
   const openCase = useCallback((id: string) => {
     setDone(null)
-    go(`/d/${encodeURIComponent(id)}?from=plan`)
+    go(`/d/${encodeURIComponent(id)}`)
   }, [go])
+  // Phone: the status line's "N decisions" opens Today's "All cases".
+  const [allReq, setAllReq] = useState(0)
 
-  // Old links (/plan?card=<id>) now open the case on Today.
-  const oldCard = path.startsWith('/plan') ? new URLSearchParams(search).get('card') : null
+  // Old links: /plan is now /launch; /plan?card=<id> opens the case on Today.
+  const oldPlan = path.startsWith('/plan')
   useEffect(() => {
-    if (oldCard) window.history.replaceState(null, '', `/d/${encodeURIComponent(oldCard)}?from=plan`)
-    if (oldCard) { setPath(window.location.pathname); setSearch(window.location.search) }
-  }, [oldCard])
+    if (!oldPlan) return
+    const card = new URLSearchParams(window.location.search).get('card')
+    window.history.replaceState(null, '', card ? `/d/${encodeURIComponent(card)}` : window.location.hash === '#handled' ? '/' : '/launch')
+    setPath(window.location.pathname); setSearch(window.location.search)
+  }, [oldPlan])
 
   if (!state) {
     return <div className="grid h-full place-items-center text-[15px] text-ink-3">{error ? 'Cannot reach the server.' : 'Loading…'}</div>
   }
 
   const single = path.match(/^\/d\/(.+)$/)
-  const page: Page | null = single || path === '/' ? 'today' : path.startsWith('/plan') ? 'plan' : path.startsWith('/suppliers') ? 'suppliers' : path.startsWith('/routines') ? 'routines' : 'today'
+  const page: Page | null = single || path === '/' ? 'today' : path.startsWith('/launch') ? 'launch' : path.startsWith('/suppliers') ? 'suppliers' : path.startsWith('/routines') ? 'routines' : 'today'
   // Routines is its own page; "Show me how" lands there drafting from the decision.
   const openRoutines = (request?: { cardId: string; k: number }) =>
     go(request ? `/routines?draft=${encodeURIComponent(request.cardId)}` : '/routines')
@@ -174,7 +178,7 @@ export default function App() {
       {truck && (open > 0 || !phone || done) && ' · '}
       {phone && open > 0 ? (
         page === 'today'
-          ? <button className="cursor-pointer hover:text-ink" onClick={() => go('/plan')}>{open} {open === 1 ? 'decision' : 'decisions'}</button>
+          ? <button className="cursor-pointer hover:text-ink" onClick={() => { if (page !== 'today' || single) go('/'); setAllReq(Date.now()) }}>{open} {open === 1 ? 'decision' : 'decisions'}</button>
           : `${open} ${open === 1 ? 'decision' : 'decisions'}`
       ) : done && open === 0 ? 'nothing else due' : open > 0 ? `${open} ${open === 1 ? 'decision needs' : 'decisions need'} you` : phone ? null : 'nothing needs you'}
     </>
@@ -212,7 +216,6 @@ export default function App() {
     const card = single
       ? pinnedOpen ?? (done ? null : today[0] ?? null)
       : today.find((c) => c.id === focusId) ?? today[0] ?? null
-    const fromPlan = !!single && new URLSearchParams(search).get('from') === 'plan'
     return (
       <div className="flex min-h-full flex-col bg-ground">
         {bar}
@@ -233,7 +236,8 @@ export default function App() {
           onRingingDone={stopRinging}
           pending={pending}
           caseCard={caseCard}
-          onBack={fromPlan ? () => go('/plan') : null}
+          onOpenCase={openCase}
+          allReq={allReq}
           onDrawer={(c, tab) => setDrawer({ card: c, tab })}
         />
         {overlays}
@@ -287,11 +291,11 @@ export default function App() {
     )
   }
 
-  // ------------------------------------------------------------ Plan: the overview, no decisions
+  // ------------------------------------------------------------ Launch: will we make the trucks?
   return (
     <div className="flex min-h-full flex-col bg-ground">
       {bar}
-      <Plan state={state} nowMs={nowMs} phone={narrow} onOpen={openCase} onChanged={load} />
+      <Launch state={state} nowMs={nowMs} phone={narrow} onOpen={openCase} />
       {overlays}
     </div>
   )

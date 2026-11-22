@@ -2,7 +2,7 @@ import { Menu } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
-export type Page = 'today' | 'plan' | 'suppliers' | 'routines'
+export type Page = 'today' | 'launch' | 'suppliers' | 'routines'
 
 export function Mark({ size = 20 }: { size?: number }) {
   return (
@@ -26,7 +26,7 @@ interface Props {
 
 const LINKS: { page: Page; label: string; path: string }[] = [
   { page: 'today', label: 'Today', path: '/' },
-  { page: 'plan', label: 'Plan', path: '/plan' },
+  { page: 'launch', label: 'Launch', path: '/launch' },
 ]
 
 // One quiet line: the mark, where the launch stands, and where to go.
@@ -105,7 +105,7 @@ function PhoneMenu({ page, go, bell, badge }: { page: Page | null; go: (p: strin
       </button>
       <div className={cn('absolute right-0 top-12 z-30 w-56 rounded-2xl bg-ground p-1.5 shadow-[0_12px_40px_-12px_rgba(0,0,0,.28)]', !open && 'hidden')}>
         {item(page === 'today', 'Today', () => go('/'))}
-        {item(page === 'plan', 'Plan', () => go('/plan'))}
+        {item(page === 'launch', 'Launch', () => go('/launch'))}
         {item(page === 'routines', <>Routines{badge > 0 && <span className="ml-1.5 text-routine">· {badge}</span>}</>, () => go('/routines'))}
         {item(page === 'suppliers', 'Suppliers', () => go('/suppliers'))}
         <div className="flex items-center justify-between px-3 pb-1 pt-2 text-[13px] text-ink-3">

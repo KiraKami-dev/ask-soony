@@ -388,7 +388,7 @@ export function MapLegend({ className }: { className?: string }) {
 
 const OPEN = new Set(['open', 'escalated'])
 
-/** Every supplier with its open issues; late ones first. Rows open the decision in Plan. */
+/** Every supplier with its open issues; late ones first. Rows open the decision on Today. */
 export function SupplierList({
   state, nowMs, selection, onSelect, onOpen,
 }: { state: State; nowMs: number; selection: MapSelection; onSelect: (s: MapSelection) => void; onOpen: (cardId: string) => void }) {
@@ -438,7 +438,7 @@ export function SupplierList({
                 {groups.length > 0 && (
                   <ul className="mt-1">
                     {groups.slice(0, 4).map((g) => <Issue key={g.key} c={g.lead} n={g.cards.length} state={state} nowMs={nowMs} onOpen={onOpen} />)}
-                    {groups.length > 4 && <li className="py-1">+{groups.length - 4} more in Plan</li>}
+                    {groups.length > 4 && <li className="py-1">+{groups.length - 4} more on Today</li>}
                   </ul>
                 )}
               </div>
