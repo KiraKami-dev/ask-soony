@@ -710,3 +710,7 @@ Everything here comes from reading code and data plus one read-only `build_state
 - `/Users/jonasstenglein/OtherProjects/StartMunichHack/ask-soony/src/ask_soony/predictor/__init__.py`</result>
 <usage><subagent_tokens>201676</subagent_tokens><tool_uses>44</tool_uses><duration_ms>450602</duration_ms></usage>
 </task-notification>
+
+---
+
+how does the updated state in open_shipments.csv happen then though? e.g. if nobody informs us before
