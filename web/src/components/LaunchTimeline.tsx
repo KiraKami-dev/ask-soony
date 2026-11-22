@@ -380,8 +380,10 @@ function EditionLane({
   if (compact) status = status.replace(/^(stops|stopped) \w+ /, '$1 ').replace('makes the trucks', 'on time')
   const endX = x(end)
   const approxW = status.length * (compact ? 6.4 : 7)
-  const statusRight = endX + approxW > x1 - 6
-  const statusX = statusRight ? x1 - 8 : Math.max(endX + 2, x0)
+  // A small, constant gap from the stop tick, so the label belongs to it without touching it.
+  const GAP = 6
+  const statusRight = Math.max(endX, x0) + GAP + approxW > x1 - 6
+  const statusX = statusRight ? x1 - 8 : Math.max(endX, x0) + GAP
 
   // Markers: decide-by diamonds and runs-dry triangles, clustered when they sit on top of each other.
   const raw: Marker[] = []
