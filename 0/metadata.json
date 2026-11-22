@@ -1,0 +1,177 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M80SDBVJ6YG1HRJ5170FGHCG",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T04:49:59.490768Z",
+  "branch": "jonas/today-flow",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "8008438cbaaa",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 9,
+    "cache_creation_tokens": 7335,
+    "cache_read_tokens": 867755,
+    "output_tokens": 3651,
+    "api_call_count": 5
+  },
+  "session_token_usage": {
+    "input_tokens": 2280,
+    "cache_creation_tokens": 2556176,
+    "cache_read_tokens": 519377895,
+    "output_tokens": 958002,
+    "api_call_count": 975,
+    "subagent_tokens": {
+      "input_tokens": 1772,
+      "cache_creation_tokens": 4379034,
+      "cache_read_tokens": 117911334,
+      "output_tokens": 1143918,
+      "api_call_count": 839
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 1544,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 66,
+      "credentialed_uri": 0,
+      "entropy": 474,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 980,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 883,
+      "IP": 32,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 213
+  },
+  "summary": {
+    "intent": "At START Hack Munich (Lio challenge 'Keep the Line Running'), the user wanted to analyze Soony's launch data, then build and polish a product: an agent that rechecks the launch plan against documents on every portal drop, flags contradictions, and drafts approved actions. The latest push was to make it general beyond Soony and to separate Today (decide) from Launch (overview).",
+    "outcome": "The data analysis found the Collector's Edition and game cards short despite the plan saying 'ok'. A deployed-style app was built with a poller, a team verifier pipeline, voice decisions with a two-step confirmation, routines, a Today/Launch split, a site-from-master-data generalization and a data-shape health check. Most work is committed locally on jonas/today-flow; pushing was not yet approved.",
+    "learnings": {
+      "repo": [
+        "Portal API has only list files, get file and archive.zip; no webhooks, so the loop must poll GET /api/v1/files and compare SHA-256, because files are replaced under the same name.",
+        "Data and notes live in gitignored data/; .env is gitignored and .env.example is committed; challenge data is confidential and must never be committed.",
+        "Team workflow files CLAUDE.md and PROGRESS.md exist; claim a task in PROGRESS.md. Constraints: ask before every push, no em dashes, no attribution trailers, never print tokens or keys.",
+        "Approving a card on real data sends real supplier emails, so tests and screenshot scripts must mock every non-GET request.",
+        "The uvicorn server on :8000 runs without reload, so backend changes need a restart; web/dist is served by FastAPI and must be rebuilt.",
+        "Entire hooks skip checkpoints when no repo files changed in a session, which is not a failure.",
+        "Spreadsheets are recognised by columns rather than filename; a renamed column is skipped silently, which motivated the datacheck module.",
+        "Soony-specific wording remains in the UI ('trucks' in about 30 places), and 'Hamburg' was replaced by the site from sites.csv."
+      ],
+      "code": [
+        {
+          "path": "src/ask_soony/cardtools.py",
+          "finding": "Voice decisions are now two-step: prepare_decision issues a one-time token (TTL 600 s, stored in voice_tokens.json) and decide requires token plus confirmed."
+        },
+        {
+          "path": "src/ask_soony/launch_view.py",
+          "finding": "New module that builds the 'launch' field in build_state() with per-part and per-edition numbers from dispatch.json and the packing clock."
+        },
+        {
+          "path": "src/ask_soony/routines.py",
+          "finding": "The suggestions endpoint /api/routines/suggestions finds decisions repeated at least twice with no routine yet; new routines default to mode 'ask'."
+        },
+        {
+          "path": "web/src/components/Launch.tsx",
+          "finding": "New page replacing Plan; the verdict, timeline, editions and parts, plus a data-health warning, all link to Today cases."
+        }
+      ],
+      "workflow": [
+        "Run multi-agent work in parallel: one subagent cross-checked 200 order confirmations and 59 scans, and UI builders ran while the backend was changed, with tell-the-owner messages to avoid file conflicts.",
+        "Verify UI changes with Playwright screenshots against the live app using mocked non-GET requests.",
+        "A subagent's claim about another editor in api.py turned out to be the assistant's own earlier commit, so check git state before trusting such notes."
+      ]
+    },
+    "friction": [
+      "The portal token was empty at the start, which blocked the data pull until the user supplied it.",
+      "The verifier ignored arrivals, giving a 34,800 game-card gap that is really 6,800; fixing it exposed a part-number-in-item reader bug.",
+      "Voice decisions executed without a real confirmation and the UI jumped to Done.",
+      "Repeated user rejection of cluttered or unprofessional designs, and fake Undo for sent emails.",
+      "Plan and Today duplicated each other, requiring a rework into Today and Launch.",
+      "Build failures from another builder's files blocked the rebuild for a while.",
+      "A circular import appeared when wiring the datacheck module.",
+      "The zsh $var: modifier broke shell commands.",
+      "A stray .vite/ cache folder appeared in the repo root."
+    ],
+    "open_items": [
+      "About 10 or more local commits on jonas/today-flow are unpushed and need the user's approval to push.",
+      "The live voice call with a microphone is untested, and an email edited on screen then confirmed by voice sends the original draft.",
+      "Replace 'trucks' wording with a per-customer cutoff label in the UI, and support multiple sites or rolling deadlines.",
+      "Rename suggestions for changed columns (with one-click OK) and an 'Ask Nils' IT email action are not built.",
+      "The README, demo script, video and deck for the Sun 12:00 hand-in are still to do; the PR handling (#5 vs jonas/today-flow) is undecided.",
+      "Register sender email addresses in the portal and send the real Karton Nowak art-book order and the Boise reply; whether data is the same for all teams is unknown.",
+      "Editing non-email messages before approving was lost with the old Plan pane.",
+      "The briefing page and doc still show the 14:00 state, not the 14:37 drop."
+    ]
+  }
+}
