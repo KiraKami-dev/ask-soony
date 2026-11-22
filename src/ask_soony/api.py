@@ -364,7 +364,8 @@ def cards_file() -> Path:
     if os.environ.get("ASK_CARDS_FILE"):
         return Path(os.environ["ASK_CARDS_FILE"])
     dispatch = state_dir() / "dispatch.json"
-    return dispatch if dispatch.exists() else Path("data/store/decision_cards.json")
+    store = Path(os.environ.get("ASK_DATA_DIR", "data/store"))
+    return dispatch if dispatch.exists() else store / "decision_cards.json"
 
 
 def readings_dir() -> Path:
