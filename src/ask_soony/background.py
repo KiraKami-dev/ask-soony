@@ -41,6 +41,15 @@ def _escalation() -> None:
     _escalation_loop(Settings.from_env())
 
 
+def _papercheck() -> None:
+    """Supplier documents against the ERP: at start and whenever the portal mirror changes
+    (cheap when nothing changed: LLM answers are cached by content hash)."""
+    from ask_soony import papercheck
+
+    if os.environ.get("ASK_PAPERCHECK", "on").lower() in ON:
+        papercheck.loop()
+
+
 def _guard(target):
     def run():
         try:
@@ -61,7 +70,7 @@ def start() -> None:
         from ask_soony import routines
 
         routines.start_background()  # routines the agent wrote, run in the Monty sandbox
-        for loop in (_watcher, _escalation):
+        for loop in (_watcher, _escalation, _papercheck):
             threading.Thread(target=_guard(loop), daemon=True, name=loop.__name__).start()
         os.environ.setdefault("ASK_REPLY_POLL", "on")
     replies.start_background()
