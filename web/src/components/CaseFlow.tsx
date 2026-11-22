@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowLeft, ArrowRight, FileInput, Inbox, ScanText, Scale, Send, ShieldCheck, TrendingDown } from 'lucide-react'
+import { ArrowDown, FileInput, Inbox, ScanText, Scale, Send, ShieldCheck, TrendingDown } from 'lucide-react'
 import { Fragment, useState, type ReactNode } from 'react'
 import { fmtNum, tidy, type Card, type Evidence, type State } from '@/lib/api'
 import { languageOf, sourceName, splitValue, when } from '@/lib/decisions'
@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 // look as a routine's diagram. Every node is read from the case itself (its trail, evidence,
 // impact, approval rule, options and status); a step the data does not have is left out, never
 // made up. Done steps are quiet, the step the case waits at is marked, what comes after is
-// dashed. Desktop: two nodes a row, turning like a snake; phone: one column.
+// dashed. One column, top to bottom; folded to one line on a phone.
 
 type Tone = 'done' | 'now' | 'next'
 interface Step { key: string; icon: ReactNode; kicker: string; title: string; text?: string; at?: string | null; tone: Tone; late?: boolean }
@@ -36,7 +36,7 @@ function stepsOf(card: Card, state: State, nowMs: number): Step[] {
     const lang = languageOf(paper?.source, paper?.language)
     out.push({
       key: 'read', icon: icon(ScanText), kicker: 'Reader', title: lang && lang !== 'English' ? `Read it (${lang})` : 'Read it',
-      text: paper ? `${sourceName(paper.source)}: ${short(tidy(String(paper.value)), 60)}` : short(tidy(read?.text)), at: read?.at, tone: 'done',
+      text: paper ? short(tidy(String(paper.value)), 80) : short(tidy(read?.text)), at: read?.at, tone: 'done',
     })
   }
   if (sys && paper) {
@@ -89,22 +89,24 @@ function Node({ s, nowMs }: { s: Step; nowMs: number }) {
   return (
     <div
       className={cn(
-        'min-w-0 rounded-xl px-3.5 py-3',
+        'min-w-0 rounded-xl px-3.5 py-2.5',
         s.tone === 'next'
           ? 'border border-dashed border-ink-3/40 bg-ground/70'
           : 'border border-hair bg-white shadow-[0_1px_2px_rgba(24,24,26,.04),0_6px_16px_-12px_rgba(24,24,26,.16)]',
         s.tone === 'now' && 'border-accent/50 shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-accent)_10%,transparent)]',
       )}
     >
-      <div className="flex items-start gap-2.5">
+      <div className="flex items-center gap-3">
         <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-lg [&>svg]:block', s.tone === 'now' ? 'bg-accent/10 text-accent' : 'bg-soft text-ink-2')}>{s.icon}</span>
         <div className="t-small min-w-0 flex-1 leading-tight">
-          <p className="flex justify-between gap-2 text-ink-3">
-            <span>{s.kicker}</span>
-            {s.at && <span className="tabular-nums">{when(s.at, nowMs)}</span>}
+          <p className="flex items-baseline justify-between gap-3">
+            <span className="min-w-0">
+              <span className="text-ink-3">{s.kicker} · </span>
+              <span className={cn('font-medium', s.tone === 'next' ? 'text-ink-2' : s.late ? 'text-late' : 'text-ink')}>{s.title}</span>
+            </span>
+            {s.at && <span className="shrink-0 tabular-nums text-ink-3">{when(s.at, nowMs)}</span>}
           </p>
-          <p className={cn('font-medium', s.tone === 'next' ? 'text-ink-2' : s.late ? 'text-late' : 'text-ink')}>{s.title}</p>
-          {s.text && <p className="mt-1 line-clamp-2 text-ink-3">{s.text}</p>}
+          {s.text && <p className="mt-0.5 line-clamp-2 text-ink-3">{s.text}</p>}
         </div>
       </div>
     </div>
@@ -132,44 +134,17 @@ export function CaseFlow({ card, state, nowMs, phone, className }: { card: Card;
     )
   }
 
-  let body: ReactNode
-  if (phone) {
-    body = (
-      <div className="grid gap-1">
-        {steps.map((s, i) => (
-          <Fragment key={s.key}>
-            {i > 0 && <span className={cn(arrow, 'h-4')}><ArrowDown size={13} /></span>}
-            <Node s={s} nowMs={nowMs} />
-          </Fragment>
-        ))}
-      </div>
-    )
-  } else {
-    // Rows of two; odd rows run right to left, so the flow turns down at the end of each row.
-    const rows: Step[][] = []
-    for (let i = 0; i < steps.length; i += 2) rows.push(steps.slice(i, i + 2))
-    body = (
-      <div className="grid grid-cols-[minmax(0,1fr)_28px_minmax(0,1fr)]">
-        {rows.map((row, r) => {
-          const ltr = r % 2 === 0
-          const [a, b] = row
-          const left = ltr ? a : b
-          const right = ltr ? b : a
-          const turnCol = ltr ? (b ? 3 : 1) : 1
-          return (
-            <Fragment key={r}>
-              <div style={{ gridColumn: 1 }}>{left && <Node s={left} nowMs={nowMs} />}</div>
-              <div style={{ gridColumn: 2 }} className={arrow}>{b && (ltr ? <ArrowRight size={14} /> : <ArrowLeft size={14} />)}</div>
-              <div style={{ gridColumn: 3 }}>{right && <Node s={right} nowMs={nowMs} />}</div>
-              {r < rows.length - 1 && (
-                <div style={{ gridColumn: turnCol }} className={cn(arrow, 'h-7')}><ArrowDown size={14} /></div>
-              )}
-            </Fragment>
-          )
-        })}
-      </div>
-    )
-  }
+  // One column, top to bottom, in the order the agents worked: no turns to follow.
+  const body = (
+    <ol className="grid">
+      {steps.map((s, i) => (
+        <Fragment key={s.key}>
+          {i > 0 && <li aria-hidden="true" className={cn(arrow, 'h-5')}><ArrowDown size={13} /></li>}
+          <li><Node s={s} nowMs={nowMs} /></li>
+        </Fragment>
+      ))}
+    </ol>
+  )
 
   return (
     <section aria-label="How we got here" className={className}>
