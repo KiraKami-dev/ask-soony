@@ -229,19 +229,29 @@ function ReadyList({ state, onReview }: { state: State; onReview: Review }) {
   )
 }
 
+/** The row a card sits in: look-alikes (same group, or supplier + kind + title shape) share one. */
+const rowKey = (c: Card, state: State) =>
+  c.group ?? `${c.supplier_id ?? c.supplier_name}|${c.kind}|${shortTitle(c, state).replace(/\d[\d,.]*/g, '#')}`
+
+/** One entry per row, in list order: the row's first card and how many it holds. */
+function rowsOf(order: Card[], state: State): { c: Card; n: number; key: string }[] {
+  const seen = new Map<string, { c: Card; n: number; key: string }>()
+  for (const c of order) {
+    const key = rowKey(c, state)
+    const e = seen.get(key)
+    if (e) e.n += 1
+    else seen.set(key, { c, n: 1, key })
+  }
+  return [...seen.values()]
+}
+
 function QuietList({ order, card, onFocus, state, nowMs }: Props) {
   // One line per problem: look-alikes fold into their first card.
-  const seen = new Map<string, { c: Card; n: number }>()
-  for (const c of order) {
-    const k = c.group ?? `${c.supplier_id ?? c.supplier_name}|${c.kind}|${shortTitle(c, state).replace(/\d[\d,.]*/g, '#')}`
-    const e = seen.get(k)
-    if (e) e.n += 1
-    else seen.set(k, { c, n: 1 })
-  }
-  const rows = [...seen.values()]
+  const rows = rowsOf(order, state)
+  const cardKey = card ? rowKey(card, state) : null
   // Five by default; all when asked, or when the case in focus sits further down (j/k, links).
   const [all, setAll] = useState(false)
-  const focusAt = rows.findIndex((r) => r.c.id === card?.id || (card && r.c.group && r.c.group === card.group))
+  const focusAt = rows.findIndex((r) => r.key === cardKey)
   // Once the focus opened the list, it stays open: collapsing it would make everything below jump.
   useEffect(() => { if (focusAt >= 5) setAll(true) }, [focusAt])
   const open = all || focusAt >= 5
@@ -256,7 +266,7 @@ function QuietList({ order, card, onFocus, state, nowMs }: Props) {
       <p className="t-small mb-3 text-ink-3">Needs you · {plural(order.length, 'decision')}</p>
       <ul ref={listRef} className="-mx-3.5">
         {shown.map(({ c, n }) => {
-          const on = card?.id === c.id
+          const on = cardKey != null && rowKey(c, state) === cardKey
           return (
             <li key={c.id}>
               <button
@@ -593,8 +603,10 @@ function Focus(p: Props & {
         if (c) { e.preventDefault(); ref.current.choose(c) }
       }
       else if (k === 'j' || k === 'k' || k === 'ArrowDown' || k === 'ArrowUp') {
-        const i = p.order.findIndex((c) => c.id === card.id)
-        const n = p.order[Math.min(p.order.length - 1, Math.max(0, i + (k === 'j' || k === 'ArrowDown' ? 1 : -1)))]
+        // Row by row, as the list shows them: a folded group of look-alikes is one step.
+        const rows = rowsOf(p.order, state)
+        const i = rows.findIndex((r) => r.key === rowKey(card, state))
+        const n = rows[Math.min(rows.length - 1, Math.max(0, i + (k === 'j' || k === 'ArrowDown' ? 1 : -1)))]?.c
         if (n && n.id !== card.id) { e.preventDefault(); p.onFocus(n.id) }
       }
     }
