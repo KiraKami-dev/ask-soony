@@ -10,7 +10,7 @@ import { Today, type DoneInfo } from '@/components/Today'
 import { TopBar, type Page } from '@/components/TopBar'
 import { DECIDED, DONE_WORD, fetchState, tidy, viaOf, type Card, type State } from '@/lib/api'
 import { actionIdOf } from '@/lib/decisions'
-import { mattersToApprover, roleFromParam, savedRole, saveRole, type Role } from '@/lib/role'
+import { firstNameOf, mattersToApprover, roleFromParam, savedRole, saveRole, type Role } from '@/lib/role'
 import { lookAlikes, repeatWords, todayOrder, trucksLeave } from '@/lib/today'
 
 const POLL_MS = 5000
@@ -262,9 +262,18 @@ export default function App() {
     const card = single
       ? pinnedOpen ?? (done ? null : today[0] ?? null)
       : today.find((c) => c.id === focusId) ?? today[0] ?? null
+    // Passed on to the person who signs: hers to answer, first in her inbox.
+    const approver = state.launch?.money?.approver
+    const forMe = role === 'approver'
+      ? state.cards.filter((c) => {
+        const r = c.signoff_request
+        return r?.kind === 'escalation' && !r.answer && !!approver && firstNameOf(r.to) === firstNameOf(approver)
+      })
+      : []
     return (
       <div className="flex min-h-full flex-col bg-ground">
         {bar}
+        {forMe.length > 0 && <ForYourOk cards={forMe} nowMs={nowMs} phone={narrow} />}
         <Today
           state={state}
           nowMs={nowMs}
@@ -370,4 +379,40 @@ async function hasRoutine(cardId: string): Promise<boolean> {
   } catch {
     return false
   }
+}
+
+/** Cases the buyer passed on for her OK: one click opens the sign-off page she knows from her phone. */
+function ForYourOk({ cards, nowMs, phone }: { cards: Card[]; nowMs: number; phone: boolean }) {
+  const [err, setErr] = useState<string | null>(null)
+  const open = async (id: string) => {
+    try {
+      const r = await fetch(`/api/cards/${encodeURIComponent(id)}/signoff/open`)
+      if (!r.ok) throw new Error()
+      window.location.assign((await r.json()).path)
+    } catch {
+      setErr('This one was answered already.')
+    }
+  }
+  return (
+    <section aria-label="Waiting for your OK" className={phone ? 'px-6 pt-4' : 'mx-auto w-full max-w-[960px] px-8 pt-6'}>
+      <h2 className="t-small text-ink-3">Waiting for your OK</h2>
+      <ul className="mt-2 divide-y divide-hair border-y border-hair">
+        {cards.map((c) => {
+          const asked = c.signoff_request?.asked_at
+          const min = asked ? Math.max(0, Math.round((nowMs - new Date(asked).getTime()) / 60000)) : null
+          return (
+            <li key={c.id}>
+              <button onClick={() => void open(c.id)} className="flex w-full cursor-pointer items-baseline justify-between gap-4 py-3 text-left hover:bg-soft">
+                <span className="min-w-0 text-ink">{tidy(c.headline)}</span>
+                <span className="t-small shrink-0 text-accent">
+                  Review{min != null && <span className="text-ink-3"> · asked {min < 60 ? `${min} min` : `${Math.floor(min / 60)} h`} ago</span>}
+                </span>
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+      {err && <p className="t-small mt-2 text-late">{err}</p>}
+    </section>
+  )
 }

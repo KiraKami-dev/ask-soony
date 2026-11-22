@@ -608,6 +608,33 @@ def post_answer(token: str, body: dict = Body(...)):
     raise HTTPException(400, "unknown answer")
 
 
+@router.get("/api/cards/{card_id}/signoff/open")
+def open_in_app(card_id: str):
+    """
+    The sign-off page for someone signed in to the app: a valid link to the newest unanswered
+    request of the case, without sending anything (the push went out when it was passed on).
+    """
+    api = _api()
+    req = latest_for(card_id)
+    if req is None or req.get("answer"):
+        raise HTTPException(409, "Nothing is waiting on anyone here.")
+    cur = api.now()
+    with _lock:
+        tokens = {
+            k: v for k, v in _tokens().items() if (api.parse_ts(v.get("expires_at")) or cur) > cur
+        }
+        token = next((k for k, v in tokens.items() if v.get("request") == req["id"]), None)
+        if token is None:
+            token = secrets.token_urlsafe(18)
+            tokens[token] = {
+                "request": req["id"],
+                "created_at": cur.isoformat(),
+                "expires_at": _expires().isoformat(),
+            }
+            api.write_json(TOKENS, tokens)
+    return {"path": f"/ok/{token}"}
+
+
 @router.post("/api/cards/{card_id}/signoff/resend")
 def resend(card_id: str):
     """Send the newest request of a case again (fresh link); for an escalation passed on before
