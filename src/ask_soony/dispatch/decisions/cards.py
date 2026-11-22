@@ -291,6 +291,13 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
         supplier = supplier or directory.primary.get(need.part)
         name, email, person = directory.contact(supplier)
         later = [s for s in need.supply if s["kind"] == "after_launch"]
+        # What the line can pack with: usable stock plus inbound that lands before packing ends
+        have = need.usable + need.arriving_in_time
+        arriving = (
+            f" + {_n(need.arriving_in_time)} arriving before packing ends"
+            if need.arriving_in_time
+            else ""
+        )
         card = Card(
             id=f"allocate-{need.part}",
             title=f"{desc}: {_n(need.gap)} short across {len(need.editions)} editions",
@@ -298,13 +305,23 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
             at_risk=need.gap,
             part=need.part,
             system_says=short[0]["context"] if short else f"Plan says {need.plan_status or 'ok'}",
-            paper_says=f"{_n(need.usable)} in stock for {_n(need.needed)} still to pack",
-            evidence=[i["context"] for i in short] + [f"Book stock {_n(need.book_stock)}"],
+            paper_says=f"{_n(need.usable)} in stock{arriving} for {_n(need.needed)} still to pack",
+            evidence=[i["context"] for i in short]
+            + [f"Book stock {_n(need.book_stock)} (as of {need.book_as_of})"]
+            + [
+                f"Counted as arriving: {a['reference']} {_n(a['quantity'])} due {a['eta']} "
+                f"({a['basis']})"
+                for a in need.arriving
+            ]
+            + [
+                f"Not counted: {a['reference']} {_n(a['quantity'])} ({a['reason']})"
+                for a in need.not_counted
+            ],
             options=[
                 f"{s['reference']}: {_n(s['quantity'])} arriving {s['eta']} (after launch)"
                 for s in later
             ],
-            decision=f"Which edition gets the {_n(need.usable)} {desc}?",
+            decision=f"Which edition gets the {_n(have)} {desc}?",
         )
         # A trade-off between editions is an exception to the plan: the policy's approver of exceptions
         approver = people.exception_approver()
@@ -317,7 +334,8 @@ def build_cards(result: Shortfall, issues: pd.DataFrame, records: pd.DataFrame) 
                 people.label(approver, f"approver of exceptions (see {people.policy_name})"),
                 None,
                 f"Decision needed: allocate {desc} between editions",
-                f"Hello,\n\nwe have {_n(need.usable)} {desc} for {_n(need.needed)} still to pack "
+                f"Hello,\n\nwe have {_n(have)} {desc} (stock{arriving}) for {_n(need.needed)} "
+                f"still to pack "
                 f"({', '.join(need.editions)}): {_n(need.gap)} short. Please decide which edition gets "
                 f"them first." + _signature(),
             )
