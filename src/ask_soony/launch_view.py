@@ -46,17 +46,37 @@ def _cards_for(part: dict, cards: list[dict]) -> list[dict]:
     return out
 
 
-def _ships_by_ref(ships_raw: list[dict], cur: datetime) -> dict[str, dict]:
-    from ask_soony.api import parse_ts, shipment_view
+def _ships_by_ref(
+    ships_raw: list[dict], cur: datetime, tracked: dict | None = None
+) -> dict[str, dict]:
+    """Shipments by carrier reference, with the reconciled status and clock-based silence of
+    tracking.py when given (`tracked`: shipment id -> derived)."""
+    from ask_soony.api import shipment_view
 
     silent_h = float(os.environ.get("ASK_SILENT_HOURS", "18"))
-    upds = [u for u in (parse_ts(r.get("updated_at")) for r in ships_raw) if u]
-    ref = max(upds) if upds else None
     out = {}
     for r in ships_raw:
-        v = shipment_view(r, cur, ref, silent_h)
+        v = shipment_view(r, cur, None, silent_h, (tracked or {}).get(r.get("shipment_id")))
         if v and r.get("reference"):
             out[str(r["reference"])] = v
+    return out
+
+
+def _shipment_out(s: dict) -> dict:
+    """The shipment on an inbound row. `status` keeps the list's words where the reconciled
+    status means the same (the page words "arrived_port", "in_delivery"); otherwise it is the
+    reconciled one ("received", "delayed", ...). `derived` carries the whole picture."""
+    out = {
+        k: s.get(k)
+        for k in ("id", "status", "list_status", "mode", "eta", "silent", "silent_hours", "note")
+    }
+    raw, now = s.get("list_status"), s.get("status")
+    if now == "at_port":
+        out["status"] = "arrived_port"
+    elif now == "in_transit" and raw == "in_delivery":
+        out["status"] = raw
+    if s.get("derived"):
+        out["derived"] = s["derived"]
     return out
 
 
@@ -81,12 +101,7 @@ def _inbound(part: dict, ships: dict[str, dict]) -> list[dict]:
                 "reason": reason,
                 "after_launch": after_launch,
                 "supplier_id": item.get("supplier_id"),
-                "shipment": {
-                    k: s.get(k)
-                    for k in ("id", "status", "mode", "eta", "silent", "silent_hours", "note")
-                }
-                if s
-                else None,
+                "shipment": _shipment_out(s) if s else None,
             }
         )
 
@@ -136,9 +151,11 @@ def build(
     cur: datetime,
     strip: list[dict],
     site=None,
+    tracked: dict | None = None,
 ) -> dict:
     """{hours_left, editions: [...], parts: [...], floor} for the Launch page. `site` is the
-    floor's picture (floor.prepare): reported counts per edition and per part."""
+    floor's picture (floor.prepare): reported counts per edition and per part. `tracked`: the
+    reconciled shipments (tracking.py), so an inbound row shows what really happened to it."""
     from ask_soony import floor
     from ask_soony.api import part_names, portal_root, rank_key
 
@@ -161,7 +178,7 @@ def build(
     live = [c for c in cards if c.get("status") in OPEN]
     parts = []
     short_names = part_names(portal_root())
-    ships = _ships_by_ref(ships_raw, cur)
+    ships = _ships_by_ref(ships_raw, cur, tracked)
     for p in data.get("parts") or []:
         if not isinstance(p, dict) or not p.get("part"):
             continue

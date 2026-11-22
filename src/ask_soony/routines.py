@@ -79,9 +79,11 @@ def replied_cards() -> list[dict]:
     ...
 
 def silent_shipments() -> list[dict]:
-    """Open shipments with id, supplier_id, supplier_name, silent_hours (hours since their last
-    update, relative to the newest update of any shipment), silent (past the silence
-    threshold), eta, status."""
+    """Open shipments with id, supplier_id, supplier_name, silent_hours (hours since anyone last
+    heard of the shipment: the list, goods receipts, the site, supplier documents or replies;
+    measured against the clock), silent (past the silence threshold and needed for the launch),
+    matters (carries a launch part that is short or due before the trucks leave), eta, status
+    (reconciled), list_status (what the hand-kept list says)."""
     ...
 
 def carry_out(card_id: str, option_index: int, reason: str) -> dict:
@@ -482,17 +484,23 @@ class _Run:
     def silent_shipments(self) -> list[dict]:
         from ask_soony import api
 
-        ships = self.state.get("shipments") or []
+        # Silence against the clock and across every source (tracking.py `derived`): a frozen
+        # shipment list no longer looks fresh, and received shipments are not silent.
+        ships = [
+            s
+            for s in self.state.get("shipments") or []
+            if (s.get("derived") or {}).get("status") != "received"
+        ]
         upds = [api.parse_ts(s.get("updated_at")) for s in ships]
-        ref = max((u for u in upds if u), default=None)
         names = {
             n.get("id"): n.get("name") for n in (self.state.get("map") or {}).get("nodes") or []
         }
         out = []
         for s, upd in zip(ships, upds, strict=True):
-            hours = s.get("silent_hours")
+            d = s.get("derived") or {}
+            hours = d.get("silent_hours") if d else s.get("silent_hours")
             if hours is None:
-                hours = _hours(upd, ref)
+                hours = _hours(upd, self.cur)
             if hours is None:
                 continue
             out.append(
@@ -507,8 +515,11 @@ class _Run:
                     "silent": bool(s.get("silent")),
                     "eta": s.get("eta"),
                     "status": s.get("status"),
+                    "list_status": s.get("list_status"),
+                    "matters": d.get("matters"),
                     "mode": s.get("mode"),
                     "updated_at": s.get("updated_at"),
+                    "last_heard": d.get("last_heard"),
                     "clock_hours": float(hours),
                 }
             )

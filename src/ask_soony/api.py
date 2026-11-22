@@ -31,7 +31,7 @@ from fastapi import Body, FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from ask_soony import floor, launch_view
+from ask_soony import floor, launch_view, tracking
 from ask_soony import launch as launch_clock
 from ask_soony.launch import PackClock
 
@@ -230,30 +230,45 @@ def load_network() -> dict:
     return {"nodes": nodes, "legs": legs, "shipments_raw": ships, "root": root}
 
 
-def shipment_view(raw: dict, cur: datetime, ref: datetime | None, silent_h: float) -> dict | None:
+def shipment_view(
+    raw: dict, cur: datetime, ref: datetime | None, silent_h: float, derived: dict | None = None
+) -> dict | None:
+    """One shipment for the map. Silence is measured against the clock, never against the
+    newest row of the list (a frozen list would look fresh); `ref` is kept for old callers and
+    ignored. With `derived` (tracking.py) status and silence come from every source: `silent` is
+    then "silent and needed for the launch", `status` the reconciled status and `list_status`
+    what the hand-kept list says."""
     etd, eta = parse_ts(raw.get("etd")), parse_ts(raw.get("eta"))
     upd = parse_ts(raw.get("updated_at"))
     if etd and eta and eta > etd:
         t = (cur - etd) / (eta - etd)
     else:
         t = 1.0 if (eta and cur >= eta) else 0.0
-    silent = bool(upd and ref and (ref - upd) >= timedelta(hours=silent_h))
+    hours = (cur - upd).total_seconds() / 3600 if upd else None
+    silent = bool(hours is not None and hours >= silent_h)
+    status = raw.get("status")
+    if derived:
+        hours, silent = derived.get("silent_hours"), bool(derived.get("alert"))
+        if derived.get("status") not in (None, "unknown"):
+            status = derived["status"]
+        if status in ("received", "arrived_not_booked"):
+            t = 1.0
     return {
         "id": raw.get("shipment_id"),
         "route_id": raw.get("route_id"),
         "mode": raw.get("mode"),
         "supplier_id": raw.get("supplier_id"),
-        "status": raw.get("status"),
+        "status": status,
+        "list_status": raw.get("status"),
         "etd": raw.get("etd"),
         "eta": raw.get("eta"),
         "updated_at": raw.get("updated_at"),
         "progress": max(0.0, min(1.0, t)),
         "departed": t > 0,
         "silent": silent,
-        "silent_hours": round((ref - upd).total_seconds() / 3600)
-        if (silent and upd and ref)
-        else None,
+        "silent_hours": round(hours) if (silent and hours is not None) else None,
         "note": raw.get("note") or None,
+        **({"derived": tracking.public(derived)} if derived else {}),
     }
 
 
@@ -1286,17 +1301,18 @@ def build_state() -> dict:
     net = load_network()
     root = net["root"]
     silent_h = float(os.environ.get("ASK_SILENT_HOURS", "18"))
-    upds = [u for u in (parse_ts(r.get("updated_at")) for r in net["shipments_raw"]) if u]
-    ref = max(upds) if upds else None
+    clock = launch_clock.load(root, tz())
+    # One reconciled truth per shipment (receipts, site answers, documents, replies, the list),
+    # silence against the clock. Shipments the list still shows as moving stay, with `derived`.
+    tracked = tracking.for_state(net, cur, clock)
     ships = {}
     for r in net["shipments_raw"]:
-        v = shipment_view(r, cur, ref, silent_h)
-        if v and v["id"] and v["status"] not in ("delivered", "received", "cancelled"):
+        v = shipment_view(r, cur, None, silent_h, tracked["shipments"].get(r.get("shipment_id")))
+        if v and v["id"] and v["list_status"] not in ("delivered", "received", "cancelled"):
             ships[v["id"]] = v
     cards = build_cards(net, ships)
     # The packing clock, with the site's reported counts in place of the projection, and the
     # questions to the site (stale counts, due shipments, uncounted book stock) as cards.
-    clock = launch_clock.load(root, tz())
     site = floor.prepare(root, clock, cur, net)
     cards += floor.cards(
         site,
@@ -1306,6 +1322,7 @@ def build_state() -> dict:
         viewer_name(root),
         cur,
     )
+    cards += tracking.state_cards(tracked, net, cur, clock, cards)
     names = part_names(root)
     for c in cards:
         if c.get("site_question") and not c.get("part_name"):
@@ -1354,7 +1371,9 @@ def build_state() -> dict:
 
     inbox = [c for c in open_cards if not c["routed_to_other"]]
     strip = build_strip(cards, root, clock, cur)
-    launch = launch_view.build(cards, net["shipments_raw"], clock, cur, strip, site)
+    launch = launch_view.build(
+        cards, net["shipments_raw"], clock, cur, strip, site, tracked=tracked["shipments"]
+    )
     if _promote_by_launch(cards, launch, clock):
         cards.sort(key=rank_key)
         open_cards = [c for c in cards if c["status"] == "open"]
@@ -1373,6 +1392,7 @@ def build_state() -> dict:
         "route_level": route_level,
         "badges": dict(badges),
         "shipments": list(ships.values()),
+        "tracker": tracked["tracker"],  # list_age_hours, frozen, contradicted, ...
         "strip": strip,
         "clock": build_clock(strip, clock, cur),
         "launch": launch,

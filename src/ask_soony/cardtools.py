@@ -189,6 +189,14 @@ def deliver(card: dict, option: dict, text: str | None) -> dict | None:
         from ask_soony import floor
 
         return floor.ask(card)
+    if option.get("channel") == "floor" and option.get("question"):  # a tracking card's option
+        from ask_soony import tracking
+
+        return tracking.ask_site(str(option["question"]))
+    if option.get("channel") == "email" and option.get("messages"):  # one email per supplier
+        from ask_soony import tracking
+
+        return tracking.send_each(card, option, text, supplier_addresses(), _send_mail)
     to = (option.get("to") or "").strip().lower()
     body = (text or option.get("draft") or "").strip()
     if option.get("channel") != "email" or not body or to not in supplier_addresses():

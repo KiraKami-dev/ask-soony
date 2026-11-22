@@ -5,7 +5,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { feature, mesh } from 'topojson-client'
 import type { GeometryCollection, Topology } from 'topojson-specification'
 import countries from 'world-atlas/countries-110m.json'
-import { LEVEL_RANK, type Card, type Leg, type Level, type MapNode, type State } from '@/lib/api'
+import { LEVEL_RANK, type Card, type Leg, type Level, type MapNode, type Shipment, type State } from '@/lib/api'
 import { groupCards, when } from '@/lib/decisions'
 import { shortTitle } from '@/lib/today'
 import { cn } from '@/lib/utils'
@@ -271,7 +271,7 @@ function Layer({ state, hoverRoutes, selection, onSelect, pulseNode, id, project
               cx={p.x} cy={p.y} r={(s.silent ? 4 : 3.5) * k} fill={s.silent ? GROUND : c} stroke={s.silent ? INK : GROUND}
               strokeWidth={s.silent ? 1.5 : 1} style={{ transition: 'fill .8s' }}
             >
-              <title>{`${s.id} · ${s.status}${s.silent_hours ? ` · silent ${s.silent_hours} h` : ''} · ETA ${s.eta ?? '?'}`}</title>
+              <title>{`${s.id} · ${s.derived?.label ?? s.status.replace(/_/g, ' ')}${s.silent_hours ? ` · silent ${s.silent_hours} h` : ''} · ETA ${s.eta ?? '?'}`}</title>
             </circle>
           </g>
         )
@@ -400,7 +400,9 @@ export function SupplierList({
       const ships = state.shipments.filter((s) => s.supplier_id === n.id)
       const silent = ships.filter((s) => s.silent)
       const late = cards.some((c) => c.level === 'red')
-      return { n, cards, groups, ships, silent, late }
+      // Shipments where another source knows more than the list ("List says booked · Hamburg received 21 Nov").
+      const truth = ships.filter((s) => s.derived && s.derived.contradictions.length > 0)
+      return { n, cards, groups, ships, silent, late, truth }
     })
     .sort((a, b) => Number(b.late) - Number(a.late) || b.silent.length - a.silent.length || b.cards.length - a.cards.length || a.n.name.localeCompare(b.n.name))
   const openN = rows.reduce((k, r) => k + r.cards.length, 0)
@@ -410,7 +412,7 @@ export function SupplierList({
         {rows.length} suppliers · {state.shipments.length} shipments · {openN} open {openN === 1 ? 'issue' : 'issues'}
       </p>
       <ul className="mt-6 space-y-7">
-        {rows.map(({ n, cards, groups, ships, silent, late }) => {
+        {rows.map(({ n, cards, groups, ships, silent, late, truth }) => {
           const on = selection.nodeId === n.id
           const hours = Math.max(0, ...silent.map((s) => s.silent_hours ?? 0))
           return (
@@ -434,7 +436,8 @@ export function SupplierList({
                 {silent.length > 0 && (
                   <p className="text-ink-2">No news on {silent.length === 1 ? silent[0].id : `${silent.length} shipments`}{hours ? ` for ${Math.round(hours)} h` : ''}.</p>
                 )}
-                {cards.length === 0 && silent.length === 0 && <p>Nothing open.</p>}
+                {truth.map((s) => <p key={s.id}>{truthLine(s)}</p>)}
+                {cards.length === 0 && silent.length === 0 && truth.length === 0 && <p>Nothing open.</p>}
                 {groups.length > 0 && (
                   <ul className="mt-1">
                     {groups.slice(0, 4).map((g) => <Issue key={g.key} c={g.lead} n={g.cards.length} state={state} nowMs={nowMs} onOpen={onOpen} />)}
@@ -448,6 +451,23 @@ export function SupplierList({
       </ul>
     </div>
   )
+}
+
+const LIST_WORDS: Record<string, string> = { arrived_port: 'at the port', in_delivery: 'out for delivery' }
+
+/** "SHP-2026-04311 received · List says booked · Hamburg booked 28,000 on 21 Nov". */
+function truthLine(s: Shipment): string {
+  const d = s.derived!
+  const listSays = s.list_status ? LIST_WORDS[s.list_status] ?? s.list_status.replace(/_/g, ' ') : null
+  const day = d.as_of ? new Date(d.as_of).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'Europe/Berlin' }) : null
+  const what =
+    d.status === 'received' && d.received
+      ? `Hamburg received ${d.received.qty.toLocaleString('en-US')}${day ? ` on ${day}` : ''}`
+      : `${d.source_label ?? 'Another source'}: ${d.label}${day ? ` (${day})` : ''}`
+  const heard = d.silent && d.silent_hours != null && d.status !== 'received' ? ` · no news for ${Math.round(d.silent_hours)} h` : ''
+  // The list is the best source left, but another sheet disagrees with it: show that.
+  if (d.source === 'tracker') return `${s.id} ${d.label} · ${d.contradictions[0]}${heard}`
+  return `${s.id} ${d.label}${listSays && listSays !== d.label ? ` · List says ${listSays}` : ''} · ${what}${heard}`
 }
 
 function Issue({ c, n, state, nowMs, onOpen }: { c: Card; n: number; state: State; nowMs: number; onOpen: (id: string) => void }) {

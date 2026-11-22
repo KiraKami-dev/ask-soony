@@ -111,9 +111,41 @@ export interface Floor {
 export interface MapNode { id: string; kind: 'supplier' | 'port' | 'dc' | 'site'; name: string; lat: number; lon: number; country?: string }
 export interface Leg { id: string; origin: string; destination: string; mode: string; via?: string; path: [number, number][] | null }
 export interface Shipment {
-  id: string; route_id: string; mode: string; supplier_id: string; status: string
-  eta?: string; etd?: string; progress: number; departed: boolean; silent: boolean; silent_hours?: number
+  id: string; route_id: string; mode: string; supplier_id: string
+  /** Reconciled status (tracking.py) when known, else what the list says. */
+  status: string
+  /** What the hand-kept shipment list says. */
+  list_status?: string
+  eta?: string; etd?: string; progress: number; departed: boolean
+  /** No news from any source for a while, and needed for the launch. */
+  silent: boolean; silent_hours?: number
   level: Level; note?: string
+  derived?: DerivedShipment
+}
+/** One shipment's truth from every source: receipts > site > documents and replies > the list. */
+export interface DerivedShipment {
+  status: 'booked' | 'departed' | 'in_transit' | 'at_port' | 'delayed' | 'arrived_not_booked' | 'received' | 'unknown'
+  label: string
+  as_of: string | null
+  source: 'receipt' | 'site' | 'document' | 'reply' | 'tracker' | 'list' | null
+  source_label: string | null
+  contradictions: string[]
+  last_heard: string | null
+  silent_hours: number | null
+  silent: boolean
+  matters: boolean
+  alert: boolean
+  copies: number | null
+  received: { qty: number; full: boolean; shipped: number | null; order_balance: number | null; receipts: string[] } | null
+  eta_passed: boolean
+  departure_overdue: boolean
+  tracker_status: string | null
+  claims: { source: string; label: string; status: string | null; at: string | null; text: string; anchor: { file?: string; row?: number; page?: number } }[]
+}
+/** The hand-kept shipment list itself: how old its newest row is and which rows other sources contradict. */
+export interface TrackerInfo {
+  file: string; rows: number; newest_update: string | null; list_age_hours: number | null
+  stale_after_hours: number; frozen: boolean; contradicted: string[]; received_in_list: string[]
 }
 export interface StripItem {
   edition: string; label: string; level: Level; status: string
@@ -213,6 +245,7 @@ export interface State {
   route_level: Record<string, Level>
   badges: Record<string, number>
   shipments: Shipment[]
+  tracker?: TrackerInfo
   strip: StripItem[]
   clock?: Clock
   launch?: LaunchData

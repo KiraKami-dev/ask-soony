@@ -264,7 +264,8 @@ def test_silent_shipment_gets_a_status_question(agent_env, tmp_path):
     _shipments(agent_env, tmp_path)
     r = _routine(ASK_SHIPMENT, rid="s1")
     ships = {s["id"]: s for s in routines._Run(r, dry=True).silent_shipments()}
-    assert ships["SH-2"]["silent_hours"] == 24 and ships["SH-1"]["silent_hours"] == 0
+    # against the clock (21:00), not against the newest row of the list
+    assert ships["SH-2"]["silent_hours"] == 25 and ships["SH-1"]["silent_hours"] == 1
     assert ships["SH-2"]["supplier_name"] == "Acme Paper"
     assert routines.run(r, dry=True)["did"][0]["shipment"] == "SH-2" and agent_env["sent"] == []
     rec = routines.run(r)
