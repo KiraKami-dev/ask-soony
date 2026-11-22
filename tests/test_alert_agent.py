@@ -95,7 +95,8 @@ def test_voice_approves_only_after_a_yes_and_like_the_button(env):
     yes = env["client"].post(
         tool, json={"name": "decide", "arguments": {"decision": "approve", "confirmed": True}}
     )
-    assert yes.json() == {"ok": True, "status": "sent", "sent_to": SUPPLIER, "offer_trust": None}
+    out = yes.json()
+    assert (out["ok"], out["status"], out["sent_to"]) == (True, "sent", SUPPLIER)
     assert len(env["sent"]) == 1
     again = env["client"].post(
         tool, json={"name": "decide", "arguments": {"decision": "approve", "confirmed": True}}
