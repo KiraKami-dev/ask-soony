@@ -125,7 +125,7 @@ export function RoutineCard({
       {dot}
       {ran ? (
         summarise(ran) === 'Nothing to do' && ran.ok ? (
-          <span>Watching · checked {fmtTime(ran.at)}, nothing to do right now</span>
+          <span>{routine.enabled ? `Watching · checked ${fmtTime(ran.at)}, nothing to do right now` : `Off · last ran ${fmtTime(ran.at)}`}</span>
         ) : (
           <span>Last ran {fmtTime(ran.at)}: <span className={cn(!ran.ok ? 'text-late' : 'text-ink-2')}>{summarise(ran).replace(/^./, (ch) => ch.toLowerCase())}</span></span>
         )

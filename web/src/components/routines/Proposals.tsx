@@ -96,7 +96,14 @@ export function groupProposals(items: Proposal[], ctx: Ctx): Group[] {
 export function RoutineLine({ children, links, className }: { children: ReactNode; links?: { label: string; onClick: () => void; busy?: boolean }[]; className?: string }) {
   return (
     <p className={cn('t-small text-ink-3', className)}>
-      <span className="dot-routine text-routine">{children}</span>
+      {links?.length ? (
+        // The text itself does what the first link does: the whole line is the target.
+        <button className="dot-routine cursor-pointer text-left text-routine hover:underline hover:decoration-hair hover:underline-offset-4" onClick={links[0].onClick} disabled={links[0].busy}>
+          {children}
+        </button>
+      ) : (
+        <span className="dot-routine text-routine">{children}</span>
+      )}
       {links?.map((l) => (
         <span key={l.label}>
           {' · '}
