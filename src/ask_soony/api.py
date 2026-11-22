@@ -18,6 +18,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import threading
 import uuid
 from collections import Counter
@@ -359,7 +360,82 @@ def build_cards(net: dict, ships: dict[str, dict]) -> list[dict]:
 
 
 def cards_file() -> Path:
-    return Path(os.environ.get("ASK_CARDS_FILE", "data/store/decision_cards.json"))
+    """The verifier's decisions: dispatch.json from the pipeline, else the older decision_cards.json."""
+    if os.environ.get("ASK_CARDS_FILE"):
+        return Path(os.environ["ASK_CARDS_FILE"])
+    dispatch = state_dir() / "dispatch.json"
+    return dispatch if dispatch.exists() else Path("data/store/decision_cards.json")
+
+
+def readings_dir() -> Path:
+    return Path(os.environ.get("ASK_DATA_DIR", "data/store")) / "image_recognizer"
+
+
+_approver_cache: dict[str, Any] = {}
+
+
+def exception_approver() -> str | None:
+    """Who approves exceptions per the approval policy, read by the verifier's people module from
+    the org charts and the policy. Cached per version of the verifier output."""
+    f, root = cards_file(), portal_root()
+    key = f"{f}:{f.stat().st_mtime if f.exists() else 0}:{root}"
+    if key not in _approver_cache:
+        name = None
+        try:
+            from ask_soony.dispatch.decisions.people import People
+            from ask_soony.verifier.linker import build
+
+            records = build(root, readings_dir()).records
+            people = People(records[records.kind == "reading"].to_dict("records"), None)
+            holder = people.exception_approver()
+            name = people.label(holder, "") or None
+        except Exception:  # verifier not installed or no readings: no named approver
+            name = None
+        _approver_cache.clear()
+        _approver_cache[key] = name
+    return _approver_cache[key]
+
+
+_docs_cache: dict[str, Any] = {}
+
+
+def documents_by_part() -> dict[str, list[dict]]:
+    """Source documents the image recognizer read, keyed by the part ids on their lines."""
+    base = readings_dir()
+    stamp = max((p.stat().st_mtime for p in base.glob("*/verdict.json")), default=0)
+    if _docs_cache.get("stamp") != stamp:
+        out: dict[str, list[dict]] = {}
+        for meta_path in sorted(base.glob("*/meta.json")):
+            try:
+                meta = json.loads(meta_path.read_text(encoding="utf-8"))
+                v = json.loads((meta_path.parent / "verdict.json").read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            verdict = v.get("verdict") or {}
+            flags = verdict.get("red_flags") if isinstance(verdict, dict) else None
+            doc = {
+                "source": " ".join(str(x) for x in (v.get("document_type", "").replace("_", " ").capitalize(),
+                                                    v.get("document_number")) if x),
+                "doc": meta.get("path"), "language": ", ".join(v.get("languages") or []),
+                "quote": (flags or [None])[0] or next((c.get("description") for c in v.get("corrections") or []
+                                                      if isinstance(c, dict) and c.get("description")), None),
+                "translation": (verdict.get("summary_en") if isinstance(verdict, dict) else None)
+                or next((st.get("text_en") for st in v.get("statements") or [] if st.get("text_en")), None),
+            }
+            for line in v.get("lines") or []:
+                if line.get("material_id"):
+                    out.setdefault(line["material_id"], []).append(doc)
+        _docs_cache.update(stamp=stamp, docs=out)
+    return _docs_cache["docs"]
+
+
+def fmt_dt(dt: datetime) -> str:
+    return dt.astimezone(tz()).strftime("%a %H:%M")
+
+
+def person_of(role: str | None) -> str | None:
+    """'Dr. Maren Vogt, Head of Procurement' -> 'Dr. Maren Vogt'; roles without a name stay."""
+    return role.split(",")[0].split(" (")[0].strip() if role else None
 
 
 def parse_when(value: Any) -> datetime | None:
@@ -399,56 +475,106 @@ def _base_card(cid: str, **kw) -> dict:
     return card
 
 
+_MONEY = re.compile(r"(\d[\d,.]*)\s*(EUR|USD|PLN|€|\$)")
+
+
 def verifier_cards(net: dict, statuses: dict, actions: list[dict], trust: dict, viewer: str) -> list[dict]:
-    """Decision cards from the verifier (`python -m ask_soony.verifier.act`), mapped to the UI card."""
+    """The verifier's decisions (dispatch.json `decisions`, or decision_cards.json `cards`) as UI cards.
+
+    Each ready message becomes an option (send it); the verifier's own option lines are facts about
+    supply and timing and go into the recommended option's effect. Routing (plan.md §5): a card
+    whose recommended action costs money, or whose recommendation is a decision message, goes to
+    the person who must decide; routine supplier questions and internal notes stay with the buyer.
+    """
+    f = cards_file()
     try:
-        data = json.loads(cards_file().read_text(encoding="utf-8"))
+        data = json.loads(f.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return []
+    items = data.get("decisions") or data.get("cards") or []
     nodes = net.get("nodes") or {}
-    made = datetime.fromtimestamp(cards_file().stat().st_mtime, tz()).isoformat()
+    made = datetime.fromtimestamp(f.stat().st_mtime, tz()).isoformat()
+    approver_of_exceptions = exception_approver() if items else None
+    descriptions = {str(p.get("part")): p.get("description") for p in data.get("parts") or [] if p.get("description")}
     out = []
-    for vc in data.get("cards") or []:
+    for vc in items:
         cid = str(vc.get("id") or "")
         if not cid:
             continue
         msgs = vc.get("messages") or []
+        facts = [str(x) for x in vc.get("options") or []]
         at_risk = num(vc.get("at_risk")) or 0
+        if_acted = num(vc.get("at_risk_if_acted"))
         runs_dry = _iso(vc.get("runs_dry"))
         level = "red" if at_risk and runs_dry else "amber" if at_risk or vc.get("blocked_only") else "blue"
-        supplier = next((sid for sid in nodes if any(sid in str(e) for e in [*(vc.get("evidence") or []),
-                         *(m.get("to_email") or "" for m in msgs)])), None)
+        supplier = next((sid for sid, n in nodes.items() if n.get("kind") == "supplier" and (
+            any(n.get("name") and n["name"] in str(m.get("to_role")) for m in msgs)
+            or any(sid in str(e) for e in vc.get("evidence") or []))), None)
+
         options = []
-        for i, text in enumerate(vc.get("options") or []):
-            m = msgs[i] if i < len(msgs) else None
+        for i, m in enumerate(msgs):
+            who = person_of(m.get("to_role")) or "recipient"
+            external = bool(m.get("to_email"))
+            subject = str(m.get("subject") or "")
+            names = [str(n.get("name")) for n in nodes.values() if n.get("name") and n["name"] in str(m.get("to_role"))]
+            cost_line = next((x for x in facts if _MONEY.search(x) and (not names or any(nm in x for nm in names))), None)
+            cost_m = _MONEY.search(cost_line) if cost_line and external else None
+            cost_value = num(cost_m.group(1)) if cost_m else None
+            commits = external and (cost_value or subject.lower().startswith("order"))
             options.append({
-                "index": i, "action": text, "cost": None, "effect": None, "recommended": i == 0,
-                "draft": (m or {}).get("body"), "to": (m or {}).get("to_email") or (m or {}).get("to_role"),
-                "channel": "email" if m else None, "routine_type": None,
+                "index": i,
+                "action": f"{'Email' if external else 'Message'} {who}: {subject}",
+                "cost": (f"about {cost_m.group(1)} {cost_m.group(2)}" if cost_m else "No cost"),
+                "cost_value": cost_value,
+                "effect": None, "recommended": False, "draft": m.get("body"),
+                "to": m.get("to_email") or m.get("to_role"), "to_role": m.get("to_role"),
+                "channel": "email" if external else "notify",
+                "routine_type": None if commits else ("supplier_question" if external else "internal_note"),
             })
-        if not options and msgs:
-            options = [{"index": i, "action": f"Send to {m.get('to_role')}: {m.get('subject')}", "cost": None,
-                        "effect": None, "recommended": i == 0, "draft": m.get("body"),
-                        "to": m.get("to_email") or m.get("to_role"), "channel": "email", "routine_type": None}
-                       for i, m in enumerate(msgs)]
-        approver = next((m.get("to_role") for m in msgs if m.get("to_role")), None)
+        rec = next((o for o in options if o["channel"] == "email"), options[0] if options else None)
+        if rec:
+            rec["recommended"] = True
+            saved = at_risk - if_acted if if_acted is not None else None
+            rec["effect"] = "; ".join([*([f"saves {saved:,.0f} copies if it lands in time"] if saved else []), *facts]) or None
+            options.remove(rec)
+            options.insert(0, rec)
+            for i, o in enumerate(options):
+                o["index"] = i
+        decision_msg = next((o for o in options if o["channel"] == "notify" and vc.get("decision")), None)
+        if rec and (rec.get("cost_value") or rec["routine_type"] is None and rec["channel"] == "email"):
+            approver = approver_of_exceptions or person_of((decision_msg or {}).get("to_role"))
+            reason = f"Commits money ({rec['cost']}): above the buyer's routine"
+        elif rec and rec is decision_msg:
+            approver = person_of(rec.get("to_role"))
+            reason = vc.get("decision")
+        else:
+            approver = viewer or None
+            reason = (f"Decision for {person_of(decision_msg['to_role'])}: {vc.get('decision')}"
+                      if decision_msg else "Routine, no cost")
+        if level == "red" and approver == viewer and approver_of_exceptions and rec and rec.get("cost_value"):
+            approver = approver_of_exceptions
         edition = str(vc.get("edition") or "").split(" + ")[0] or None
         status, ui = _ui_status(cid, statuses)
         called = next((a for a in reversed(actions) if str(a.get("decision_id")) == cid
                        and a.get("channel") == "call" and a.get("at")), None)
+        approver = person_of(approver)
+        deadline = parse_when(vc.get("act_by"))
+        if deadline and deadline < now():
+            reason = f"{reason} · The verifier's decide-by ({fmt_dt(deadline)}, as of the stock data) has passed"
         card = _base_card(
-            cid, kind="mismatch", part=vc.get("part"), headline=vc.get("title") or cid,
+            cid, kind="mismatch", part=descriptions.get(str(vc.get("part"))) or vc.get("part"), headline=vc.get("title") or cid,
             summary=vc.get("decision"), number=at_risk, edition=edition,
             deadline=_iso(vc.get("act_by")), runs_dry=runs_dry, level=level, status=status, ui=ui,
             approver=approver,
-            routed_to_other=bool(approver and viewer and first_name(viewer).lower() not in approver.lower()
-                                 and "buyer" not in approver.lower()),
-            reason=vc.get("decision"), called_at=called.get("at") if called else None,
+            routed_to_other=bool(approver and viewer and first_name(person_of(approver)) != first_name(viewer)),
+            reason=reason, called_at=called.get("at") if called else None,
             options=options, created_at=made,
             evidence=[{"source": "System says", "value": vc.get("system_says")},
                       {"source": "Paper says", "value": vc.get("paper_says")},
-                      *({"source": "Evidence", "quote": e} for e in vc.get("evidence") or [])],
-            trail=[{"agent": "Verification", "at": made, "text": "Linked the records and priced the gap."}],
+                      *({"source": "Evidence", "quote": e} for e in vc.get("evidence") or []),
+                      *documents_by_part().get(str(vc.get("part")), [])],
+            trail=[{"agent": "Verification", "at": made, "text": "Linked orders, receipts, scans and stock; priced the gap."},
+                   {"agent": "Routing", "at": made, "text": f"{reason} → {approver or 'buyer'}."}],
             supplier_id=supplier, supplier_name=(nodes.get(supplier) or {}).get("name"),
             trusted_types=[k for k, v in trust.items() if v == "allow_always"],
         )
@@ -525,6 +651,11 @@ def build_strip(cards: list[dict], root: Path | None, clock: PackClock, cur: dat
     (shift windows, rate, copies left), so a line never 'stops' at night."""
     launch = {str(e.get("edition")): e for e in (read_json("launch.json", {}).get("editions") or [])}
     labels = edition_labels(root)
+    try:  # the verifier prices copies at risk per edition without double counting shared parts
+        vdata = json.loads(cards_file().read_text(encoding="utf-8"))
+        verifier_at_risk = {str(e["product"]): num(e.get("at_risk")) or 0 for e in vdata.get("editions") or []}
+    except (OSError, json.JSONDecodeError, KeyError, AttributeError):
+        verifier_at_risk = {}
     keys: list[str] = list(launch)
     for k in [*labels, *(c["edition"] for c in cards if c.get("edition"))]:
         if k not in keys:
@@ -553,13 +684,15 @@ def build_strip(cards: list[dict], root: Path | None, clock: PackClock, cur: dat
         breaks = None
         if first:
             stops = parse_when(first.get("runs_dry")) or clock.line_stops(cur, k, first.get("number"))
+            if stops and stops < cur:  # already ran out per the data: the line stops when it next starts
+                stops = clock.after_packing_hours(cur, 0) or stops
             breaks = {"text": first.get("part") or first.get("headline"), "deadline": first.get("deadline"),
                       "stops_at": stops.isoformat() if stops else None, "card": first["id"]}
         strip.append({
             "edition": k, "label": label_of(k),
             "level": {3: "red", 2: "amber", 1: "grey", 0: "blue"}[worst],
             "status": {3: "Stops the line", 2: "At risk", 1: "Unclear", 0: "On track"}[worst],
-            "copies_at_risk": sum(c.get("number") or 0 for c in mine),
+            "copies_at_risk": verifier_at_risk.get(k, sum(c.get("number") or 0 for c in mine)),
             "slack_hours": slack,
             "breaks_first": breaks,
         })

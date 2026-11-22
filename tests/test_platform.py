@@ -19,28 +19,58 @@ def env(tmp_path, monkeypatch):
     store.mkdir()
     monkeypatch.setenv("ASK_PORTAL_DIR", str(portal))
     monkeypatch.setenv("ASK_STATE_DIR", str(state))
-    monkeypatch.setenv("ASK_CARDS_FILE", str(store / "decision_cards.json"))
+    monkeypatch.setenv("ASK_DATA_DIR", str(store))
     monkeypatch.setenv("ASK_NOW", "2030-06-01T21:00:00+02:00")
     from ask_soony import api
 
     return {"portal": portal, "state": state, "store": store, "client": TestClient(api.app)}
 
 
-def test_verifier_card_maps_to_inbox_and_strip(env):
-    (env["store"] / "decision_cards.json").write_text(json.dumps({"cards": [{
-        "id": "gap-X", "title": "300 copies short", "edition": "P-A", "at_risk": 300, "part": "Book",
-        "system_says": "book 800", "paper_says": "note 80", "evidence": ["scan of SUP-9 note"],
-        "options": ["Rush order"], "decision": "Approve the rush?", "act_by": "Sat 01 Jun 23:00",
-        "runs_dry": None,
-        "messages": [{"to_role": "Supplier", "to_email": "x@example.com", "subject": "s", "body": "b"}],
-    }]}))
+def _decision(**kw):
+    card = {
+        "id": "gap-X", "title": "300 copies short", "edition": "P-A", "at_risk": 300,
+        "at_risk_if_acted": 0, "part": "PART-1", "system_says": "book 800",
+        "paper_says": "note 80", "evidence": ["scan"], "decision": None,
+        "options": ["Accept Acme Paper's offer: 300 from stock (about 900 EUR at list price)"],
+        "act_by": "Sat 01 Jun 23:00", "runs_dry": None,
+        "messages": [
+            {"to_role": "Kim Lee, Site Lead", "to_email": None, "subject": "Please count",
+             "body": "count"},
+            {"to_role": "Acme Paper (Ann)", "to_email": "x@example.com",
+             "subject": "Order: 300 from stock", "body": "b"},
+        ],
+    }
+    card.update(kw)
+    return card
+
+
+def test_dispatch_decision_maps_to_inbox_and_strip(env):
+    (env["state"] / "dispatch.json").write_text(json.dumps({
+        "editions": [{"product": "P-A", "at_risk": 250}],
+        "parts": [{"part": "PART-1", "description": "Book"}],
+        "decisions": [_decision()],
+    }))
     s = env["client"].get("/api/state").json()
     card = next(c for c in s["cards"] if c["id"] == "gap-X")
-    assert card["supplier_id"] == "SUP-9" and card["options"][0]["draft"] == "b"
+    rec = card["options"][0]
+    assert rec["to"] == "x@example.com" and rec["cost"] == "about 900 EUR"
+    assert rec["routine_type"] is None  # commits money: never automatic
+    assert card["part"] == "Book" and card["supplier_id"] == "SUP-9"
     assert card["deadline"].startswith("2030-06-01T23:00")
     cell = next(x for x in s["strip"] if x["edition"] == "P-A")
-    assert cell["copies_at_risk"] == 300
+    assert cell["copies_at_risk"] == 250  # the verifier's edition total, not a card sum
     assert cell["breaks_first"]["stops_at"].startswith("2030-06-02T11:00")  # not at night
+
+
+def test_free_supplier_question_stays_with_buyer(env):
+    (env["state"] / "dispatch.json").write_text(json.dumps({"decisions": [_decision(
+        options=["Next flight after launch"],
+        messages=[{"to_role": "Acme Paper (Ann)", "to_email": "x@example.com",
+                   "subject": "Any quantity earlier?", "body": "b"}],
+    )]}))
+    card = env["client"].get("/api/state").json()["cards"][0]
+    assert card["options"][0]["routine_type"] == "supplier_question"
+    assert card["routed_to_other"] is False
 
 
 def test_event_impact_no_risk_is_logged_not_inboxed(env):

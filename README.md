@@ -48,7 +48,7 @@ uv run ask-soony drop suppliers/<id>/notices/x.pdf [--from local.pdf]   # rehear
 uv run python scripts/seed_demo_state.py [--calm | --drop]   # dev only: placeholder state from the portal files
 ```
 
-The UI reads the verifier's `data/store/decision_cards.json`, the predictor's `data/state/impacts.json` and the shared shapes in `data/state/` (findings, impacts, decisions, claims, events). Slack and the time a line stops come from the launch plan's shift table, read at runtime (`src/ask_soony/launch.py`). Clicks write only to `data/state/` (`actions.json`, `decision_status.json`, `trust.json`); nothing is sent from the UI.
+The UI reads the pipeline's `data/state/dispatch.json` (verifier decisions, editions, parts), the predictor's `data/state/impacts.json` and the shared shapes in `data/state/`. Source documents come from the image recognizer's readings in `data/store/image_recognizer/` (without them the art-book and statue findings cannot be made: run `python -m ask_soony.verifier.image_recognizer` first, or copy a teammate's readings). Each ready message in a decision becomes an action; one that commits money goes to the policy's approver of exceptions, routine supplier questions stay with the buyer. The seed script is only a fallback when no pipeline output exists. Slack and the time a line stops come from the launch plan's shift table, read at runtime (`src/ask_soony/launch.py`). Clicks write only to `data/state/` (`actions.json`, `decision_status.json`, `trust.json`); nothing is sent from the UI.
 
 ### Deploy
 
