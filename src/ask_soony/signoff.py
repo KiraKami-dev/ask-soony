@@ -82,6 +82,16 @@ def _same(a: str | None, b: str | None) -> bool:
     return bool(a and b) and _first(a) == _first(b)
 
 
+def target(card: dict, viewer: str | None, policy: str | None) -> str | None:
+    """Who "Pass it on" reaches: the case's approver, unless that is the buyer passing it on (a
+    routine case is the buyer's own) or nobody; then whoever the approval policy names for
+    exceptions. None when that is the buyer too, or nobody is named."""
+    to = card.get("approver")
+    if to and not _same(to, viewer):
+        return to
+    return policy if policy and not _same(policy, viewer) else None
+
+
 # ---------------------------------------------------------------- state files
 
 
@@ -302,7 +312,7 @@ def escalation(
     card: dict, option: Any, note: str, asked_by: str, asked_at: str | None = None
 ) -> dict | None:
     """Create and send the request for a passed-on card. None when there is nobody to ask."""
-    to = card.get("approver")
+    to = card.get("escalate_to")
     if not to:
         return None
     idx = _option_index(card, option, note or "")

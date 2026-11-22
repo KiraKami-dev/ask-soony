@@ -46,6 +46,8 @@ export interface Card {
   level: Level
   status: string
   approver?: string
+  /** Who "Pass it on" reaches: the approver, or the policy's approver when that is the viewer. */
+  escalate_to?: string | null
   /** Someone else signs this (approval policy); it stays with the viewer until passed on. */
   signoff?: string | null
   routed_to_other: boolean

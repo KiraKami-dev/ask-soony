@@ -102,7 +102,7 @@ function verdictBits(state: State, nowMs: number, role: Role | null = null): Bit
         const fixes = fixesFor(state, s)
         const theirs = fixes.filter((c) => c.status === 'escalated' || c.routed_to_other)
         const mine = fixes.length - theirs.length
-        const who = [...new Set(theirs.map((c) => nameOf(firstName(c.approver ?? c.signoff ?? '')) || 'someone'))]
+        const who = [...new Set(theirs.map((c) => nameOf(firstName((c.status === 'escalated' ? c.signoff_request?.to : null) ?? c.approver ?? c.signoff ?? '')) || 'someone'))]
         const mineWords = iSign && buyerFirst ? `${buyerFirst}'s` : 'your'
         const approves = who.length === 1 && who[0] !== 'you' && theirs.length === 1 ? 'approves the decision' : 'approve'
         const since = theirs[0]?.ui?.at ? ` since ${when(theirs[0].ui.at, nowMs)}` : ''
@@ -319,7 +319,7 @@ function PartRow({ p, state, nowMs, phone, onOpen }: { p: LaunchPart; state: Sta
   const lead = cases[0]
   const link = lead && (
     <button onClick={() => onOpen(lead.id)} className="uline cursor-pointer whitespace-nowrap">
-      → {lead.status === 'escalated' ? `with ${firstName(lead.approver) || 'the approver'}` : lead.routed_to_other ? `with ${firstName(lead.approver) || 'someone else'}` : 'decide'}
+      → {lead.status === 'escalated' ? `with ${firstName(lead.signoff_request?.to ?? lead.approver) || 'the approver'}` : lead.routed_to_other ? `with ${firstName(lead.approver) || 'someone else'}` : 'decide'}
       {cases.length > 1 ? ` · ${cases.length} cases` : ''}
     </button>
   )

@@ -1462,6 +1462,9 @@ def build_state() -> dict:
         open_cards = [c for c in cards if c["status"] == "open"]
         inbox = [c for c in open_cards if not c["routed_to_other"]]
     signoff.attach(cards)  # who a passed-on case or internal message reached, and their answer
+    policy_approver = exception_approver()
+    for c in cards:  # who "Pass it on" reaches: never the buyer themself
+        c["escalate_to"] = signoff.target(c, viewer_name(root), policy_approver)
     from ask_soony import card_alerts
 
     card_alerts.attach(cards)  # decided on a phone call: a line on the case's trail
@@ -1653,7 +1656,7 @@ def escalate(card_id: str, body: dict = Body(default_factory=dict)) -> dict:
         "escalated",
         {
             "kind": "escalate",
-            "to": card.get("approver"),
+            "to": card.get("escalate_to"),
             "brief": brief,
             "note": note,
             **({"option": body["option"]} if isinstance(body.get("option"), int) else {}),

@@ -72,7 +72,7 @@ type Choice = { kind: 'option'; i: number } | { kind: 'escalate' } | { kind: 'di
 const sameChoice = (a: Choice, b: Choice) => a.kind === b.kind && (a.kind !== 'option' || a.i === (b as { i: number }).i)
 /** The recommended option; without options, pass it on (or, with nobody to pass it to, dismiss). */
 const defaultChoice = (card: Card): Choice =>
-  card.options.length ? { kind: 'option', i: recommendedIndex(card) } : card.approver ? { kind: 'escalate' } : { kind: 'dismiss' }
+  card.options.length ? { kind: 'option', i: recommendedIndex(card) } : card.escalate_to ? { kind: 'escalate' } : { kind: 'dismiss' }
 
 const typing = (t: EventTarget | null) =>
   t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))
@@ -356,7 +356,7 @@ function CaseGroups({
         const again = c.status === 'escalated' && (signoffOpen(c) || !c.signoff_request)
         return (
           <CaseRow key={c.id} {...row} card={c} title={shortTitle(c, state)} dot="hollow"
-            sub={reached ? [reached] : [`${c.status === 'escalated' ? 'Waiting for' : 'With'} ${firstWord(c.approver) || 'the approver'}`, c.ui?.at ? `since ${when(c.ui.at, nowMs)}` : '']}
+            sub={reached ? [reached] : [`${c.status === 'escalated' ? 'Waiting for' : 'With'} ${firstWord((c.status === 'escalated' ? c.signoff_request?.to : null) ?? c.approver) || 'the approver'}`, c.ui?.at ? `since ${when(c.ui.at, nowMs)}` : '']}
             undo={again ? <SendAgain cardId={c.id} onSent={onChanged} /> : null} />
         )
       }),
@@ -592,7 +592,7 @@ function Focus(p: Props & {
   const escalate = (text: string = note, option?: number) =>
     act(async () => {
       const r = await post<{ id?: string; channels?: string[] }>(`/api/cards/${encodeURIComponent(card.id)}/escalate`, { note: text, ...(option != null ? { option } : {}) })
-      return { text: `Passed on to ${card.approver || 'the approver'}.`, sub: sentSub(signer || firstWord(card.approver ?? '') || 'the approver', r?.channels), actionId: r?.id ?? null }
+      return { text: `Passed on to ${card.escalate_to || 'the approver'}.`, sub: sentSub(firstWord(card.escalate_to ?? '') || 'the approver', r?.channels), actionId: r?.id ?? null }
     })
   const dismiss = () =>
     act(async () => {
@@ -612,7 +612,7 @@ function Focus(p: Props & {
   const choices: Choice[] = [
     // A half-done decision does not offer what was already done; indices stay the server's.
     ...card.options.flatMap((o, i): Choice[] => (o.done ? [] : [{ kind: 'option', i }])),
-    { kind: 'escalate' }, { kind: 'dismiss' },
+    ...(card.escalate_to ? [{ kind: 'escalate' } as Choice] : []), { kind: 'dismiss' },
   ]
   const chosenKey = Math.max(0, choices.findIndex((c) => sameChoice(c, choice)))
   const keys = useKeyboardUser()
@@ -779,7 +779,7 @@ function Focus(p: Props & {
             </button>
           ) : choice.kind === 'escalate' ? (
             <>
-              <p className="t-body text-ink">Pass it on to {card.approver || 'the approver'}.</p>
+              <p className="t-body text-ink">Pass it on to {card.escalate_to || 'the approver'}.</p>
               <p className="t-small mt-2 text-ink-3">They get this brief:</p>
               <p className="t-small mt-1 text-ink-2">{tidy(card.escalation_brief)}</p>
               <input

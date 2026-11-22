@@ -62,13 +62,13 @@ export function LaunchBrief({ state, nowMs, phone, role, onOpen }: Props) {
   const waiting = state.cards
     .filter((c) =>
       (c.status === 'sent' && !c.ui?.reply) ||
-      ((c.status === 'escalated' || c.routed_to_other) && c.status !== 'sent' && !isMe(c.signoff ?? c.approver)),
+      ((c.status === 'escalated' || c.routed_to_other) && c.status !== 'sent' && !isMe(c.signoff_request?.to ?? c.signoff ?? c.approver)),
     )
     .map((c) => ({ c, at: c.ui?.at ?? null }))
     .sort((a, b) => (a.at ? new Date(a.at).getTime() : Infinity) - (b.at ? new Date(b.at).getTime() : Infinity))
   const oldest = waiting[0]
   const whoOf = (c: Card) =>
-    c.status === 'sent' ? (c.site_question ? site : c.supplier_name ?? 'a supplier') : firstNameOf(c.signoff ?? c.approver) || 'someone'
+    c.status === 'sent' ? (c.site_question ? site : c.supplier_name ?? 'a supplier') : firstNameOf(c.signoff_request?.to ?? c.signoff ?? c.approver) || 'someone'
 
   const decisions = m?.pending_decisions ?? []
   const committed = m?.committed_today ?? []

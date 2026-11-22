@@ -215,3 +215,23 @@ def test_simulated_approval_for_the_demo(env, monkeypatch):
     # The link is answered: a late tap does nothing.
     r = env["client"].post(f"/api/ok/{_token(env['state'])}", json={"answer": "approve"})
     assert r.status_code == 409 and len(env["sent"]) == 1
+
+
+def test_target_never_sends_a_case_back_to_the_buyer():
+    policy = "Dr. Erika Example, Head of Procurement"
+    assert signoff.target({"approver": "Kim Lead"}, "Sam Buyer", policy) == "Kim Lead"
+    # Routine cases are the buyer's own: passing one on goes to the policy's approver.
+    assert signoff.target({"approver": "Sam Buyer"}, "Sam Buyer", policy) == policy
+    assert signoff.target({"approver": None}, "Sam Buyer", policy) == policy
+    assert signoff.target({"approver": "Sam Buyer"}, "Sam Buyer", None) is None
+    assert signoff.target({"approver": None}, "Sam Buyer", "Sam Buyer, Buyer") is None
+
+
+def test_escalate_with_nobody_to_ask_records_but_sends_nothing(env, monkeypatch):
+    from ask_soony import api
+
+    monkeypatch.setattr(signoff, "target", lambda *a: None)
+    assert _card(env)["escalate_to"] is None  # the inbox does not offer "Pass it on"
+    _escalate(env)
+    assert _card(env)["status"] == "escalated"
+    assert api.read_json(signoff.REQUESTS, {}) == {} and env["out"]["push"] == []
