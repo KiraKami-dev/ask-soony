@@ -124,8 +124,12 @@ export function RoutineCard({
       {routine.handled ? <span className="dot-routine text-routine">Handled {routine.handled} case{routine.handled === 1 ? '' : 's'}</span> : <span>Nothing handled yet</span>}
       {dot}
       {ran ? (
-        <span>Last ran {fmtTime(ran.at)}: <span className={cn(!ran.ok ? 'text-late' : 'text-ink-2')}>{summarise(ran).replace(/^./, (ch) => ch.toLowerCase())}</span></span>
-      ) : <span>Not run yet</span>}
+        summarise(ran) === 'Nothing to do' && ran.ok ? (
+          <span>Watching · checked {fmtTime(ran.at)}, nothing to do right now</span>
+        ) : (
+          <span>Last ran {fmtTime(ran.at)}: <span className={cn(!ran.ok ? 'text-late' : 'text-ink-2')}>{summarise(ran).replace(/^./, (ch) => ch.toLowerCase())}</span></span>
+        )
+      ) : <span>{routine.enabled ? 'Starting: checks within a minute' : 'Off'}</span>}
       {would > 0 && <>{dot}<span className="text-ink-2">Would handle {would} open case{would === 1 ? '' : 's'} now</span></>}
       {undoable && <>{dot}<UndoAction actionId={undoable.id} onUndone={onChanged} label="Undo its last step" /></>}
     </div>

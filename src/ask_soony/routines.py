@@ -1709,6 +1709,9 @@ def save_routine(body: Draft):
         mode = data.get("mode") if data.get("mode") in MODES else default
         items = [r for r in items if r.get("id") != body.id] + [{**data, **keep, "mode": mode}]
         _save(items)
+        on = bool(keep.get("enabled"))
+    if on:  # a routine that is on starts watching now, not at the next minute
+        _first_run(body.id)
     return {"ok": True}
 
 
@@ -1777,6 +1780,14 @@ def set_mode(rid: str, body: ModeBody):
     return _public(_get(rid))
 
 
+def _first_run(rid: str) -> None:
+    """Run a routine once right away (in its mode); a failure only shows on the routine."""
+    try:
+        run_now(rid)
+    except Exception as exc:  # the next minute's run will try again
+        log.warning("first run of %s failed: %s", rid, exc)
+
+
 @router.post("/api/routines/{rid}/toggle")
 def toggle_routine(rid: str, body: Toggle):
     with _lock:
@@ -1785,6 +1796,8 @@ def toggle_routine(rid: str, body: Toggle):
             if r.get("id") == rid:
                 r["enabled"] = body.enabled
         _save(items)
+    if body.enabled:  # switched on: check today's cases now
+        _first_run(rid)
     return _public(_get(rid))
 
 
