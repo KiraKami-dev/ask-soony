@@ -679,7 +679,15 @@ function Focus(p: Props & {
             {busy ? (choice.kind === 'dismiss' ? 'Dismissing…' : 'Sending…') : confirm ? 'Yes, approve' : primaryLabel}
             {!phone && keys && !busy && <span className="ml-3 text-[13px] font-normal opacity-70">⌘↵</span>}
           </button>}
-          <div className={cn('flex items-center', phone ? 't-small gap-7' : 't-body gap-6', p.ringing && 'order-first w-full flex-col gap-4 pb-2 lg:items-start')}>
+          <div className={cn(
+            'flex items-center',
+            // Phone: two equal, quiet buttons under the main one, big enough for a thumb; the
+            // other options first (they are about the decision), then talking it through.
+            phone && !p.ringing
+              ? 't-small grid w-full grid-cols-2 gap-2.5 [&>button]:h-11 [&>button]:w-full [&>button]:justify-center [&>button]:rounded-xl [&>button]:bg-soft [&>button]:text-ink [&>button:first-child]:order-2'
+              : phone ? 't-small gap-7' : 't-body gap-6',
+            p.ringing && 'order-first w-full flex-col gap-4 pb-2 lg:items-start',
+          )}>
             <VoiceCall
               card={card}
               onChanged={p.onChanged}
