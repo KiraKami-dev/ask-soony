@@ -1,0 +1,46 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M80EHBK2HB4C0YJS8MS8BVVP",
+  "strategy": "manual-commit",
+  "branch": "jonas/alert-platform",
+  "checkpoints_count": 2,
+  "files_touched": null,
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt",
+      "assets_manifest": "/0/assets/manifest.json"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 28,
+    "cache_creation_tokens": 16261,
+    "cache_read_tokens": 5114465,
+    "output_tokens": 14185,
+    "api_call_count": 12
+  },
+  "redaction": {
+    "replacements": 1150,
+    "layers": {
+      "betterleaks": 28,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 57,
+      "credentialed_uri": 0,
+      "entropy": 216,
+      "goredact": 2,
+      "key_context": 0,
+      "pii": 853,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 756,
+      "IP": 32,
+      "PHONE": 65
+    }
+  }
+}
