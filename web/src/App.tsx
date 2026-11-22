@@ -104,6 +104,7 @@ export default function App() {
               <DecisionCard
                 card={card}
                 nowMs={clock}
+                direct
                 offer={offer}
                 onOffer={setOffer}
                 onChanged={load}

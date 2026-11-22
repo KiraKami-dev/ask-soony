@@ -68,7 +68,7 @@ def run_pipeline(paths: list[str], root: Path) -> str:
         print(f"pipeline: predictor off ({e})", file=sys.stderr)
     store = Path(os.environ.get("ASK_DATA_DIR", "data/store"))
     try:
-        routed = refresh(paths, root, store / "image_recognizer", store / "decision_cards.html",
+        routed = refresh(paths, root, store / "image_recognizer", state_dir() / "dispatch.json",
                          predictor)
         return f"pipeline: verifier={routed.verifier} predictor={routed.predictor}"
     except Exception:
@@ -109,7 +109,10 @@ def loop(interval: int, stop: threading.Event | None = None) -> None:
                 what = "files (baseline)" if baseline else "new or changed files"
                 print(f"run: {len(paths)} {what}", file=sys.stderr)
                 print(run_pipeline(paths, dest), file=sys.stderr)
-            mark_checked()
+            if baseline:
+                mark_checked(files_read_since_06=len(paths))
+            else:
+                mark_checked()
         except Exception as e:  # network hiccups: keep watching
             print(f"run: poll failed: {e}", file=sys.stderr)
         stop.wait(interval)

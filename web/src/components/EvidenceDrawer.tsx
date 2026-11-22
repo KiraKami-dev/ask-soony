@@ -35,15 +35,21 @@ function Evidence({ card }: { card: Card }) {
         <section key={i} className="rounded-xl border border-line p-4">
           <div className="flex items-baseline justify-between gap-3">
             <div className="text-[15px] font-semibold">{e.source}</div>
-            {e.value != null && <div className="text-xl font-extrabold tabular-nums">{typeof e.value === 'number' ? e.value.toLocaleString('en-GB') : e.value}</div>}
+            {e.value != null && String(e.value).length <= 24 && <div className="text-xl font-extrabold tabular-nums">{typeof e.value === 'number' ? e.value.toLocaleString('en-GB') : e.value}</div>}
           </div>
+          {e.value != null && String(e.value).length > 24 && <p className="mt-1.5 text-[15px] font-semibold text-ink">{e.value}</p>}
           {e.quote && (
             <blockquote className="mt-3 border-l-4 border-line pl-3 text-[15px] text-ink">
               “{e.quote}”
               {e.language && <span className="ml-2 text-xs uppercase text-ink-3">{e.language}</span>}
             </blockquote>
           )}
-          {e.translation && <p className="mt-2 text-sm text-ink-2">Translation: {e.translation}</p>}
+          {e.translation && <p className="mt-2 text-sm text-ink-2">In English: {e.translation}</p>}
+          {e.doc && /\.(jpe?g|png|webp)$/i.test(e.doc) && (
+            <a href={`/api/file?path=${encodeURIComponent(e.doc)}`} target="_blank" rel="noreferrer">
+              <img src={`/api/file?path=${encodeURIComponent(e.doc)}`} alt={e.source ?? 'source document'} className="mt-3 max-h-80 w-full rounded-lg border border-line object-contain bg-panel" />
+            </a>
+          )}
           {e.doc && (
             <a
               href={`/api/file?path=${encodeURIComponent(e.doc)}`}
