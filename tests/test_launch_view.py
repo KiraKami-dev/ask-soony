@@ -1,4 +1,4 @@
-"""The Launch page's per-part rows in /api/state: when each part of the bill of materials runs dry."""
+"""The Launch page's per-part rows in /api/state: when each part runs dry."""
 
 import json
 
@@ -12,7 +12,8 @@ def env(tmp_path, monkeypatch):
     portal = make_portal(tmp_path / "portal", "400")  # 600 copies left at 50/h
     (portal / "soony" / "erp" / "open_shipments.csv").write_text(
         "shipment_id,mode,reference,supplier_id,route_id,etd,eta,status,updated_at,note\n"
-        "SHP-1,sea,CONT-1,SUP-1,RT-1,2030-05-01,2030-05-31,arrived_port,2030-06-01T10:00:00+02:00,at the port\n"
+        "SHP-1,sea,CONT-1,SUP-1,RT-1,2030-05-01,2030-05-31,arrived_port,"
+        "2030-06-01T10:00:00+02:00,at the port\n"
     )
     state, store = tmp_path / "state", tmp_path / "store"
     state.mkdir()
@@ -22,17 +23,44 @@ def env(tmp_path, monkeypatch):
     monkeypatch.setenv("ASK_DATA_DIR", str(store))
     monkeypatch.setenv("ASK_NOW", "2030-06-01T21:00:00+02:00")  # Saturday 21:00
     part = {"needed": 600, "usable": 600, "gap": 0, "per_copy": {"P-A": 1}, "editions": ["P-A"]}
-    (state / "dispatch.json").write_text(json.dumps({
-        "editions": [{"product": "P-A", "day_one": 1000}],
-        "parts": [
-            {**part, "part": "C-BOX", "description": "Box", "usable": 300, "gap": 300,
-             "not_counted": [{"reference": "CONT-1", "quantity": 500, "reason": "at the port"}]},
-            {**part, "part": "C-BOOK", "description": "Book"},
-            {**part, "part": "C-CARD", "description": "Card", "gap": 50, "editions": ["P-A", "P-B"]},
-        ],
-        "decisions": [{"id": "collect-C-BOX", "title": "Collect the boxes", "edition": "P-A", "part": "C-BOX",
-                       "at_risk": 300, "options": [], "messages": []}],
-    }))
+    (state / "dispatch.json").write_text(
+        json.dumps(
+            {
+                "editions": [{"product": "P-A", "day_one": 1000}],
+                "parts": [
+                    {
+                        **part,
+                        "part": "C-BOX",
+                        "description": "Box",
+                        "usable": 300,
+                        "gap": 300,
+                        "not_counted": [
+                            {"reference": "CONT-1", "quantity": 500, "reason": "at the port"}
+                        ],
+                    },
+                    {**part, "part": "C-BOOK", "description": "Book"},
+                    {
+                        **part,
+                        "part": "C-CARD",
+                        "description": "Card",
+                        "gap": 50,
+                        "editions": ["P-A", "P-B"],
+                    },
+                ],
+                "decisions": [
+                    {
+                        "id": "collect-C-BOX",
+                        "title": "Collect the boxes",
+                        "edition": "P-A",
+                        "part": "C-BOX",
+                        "at_risk": 300,
+                        "options": [],
+                        "messages": [],
+                    }
+                ],
+            }
+        )
+    )
     from ask_soony import api
 
     return TestClient(api.app)

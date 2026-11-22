@@ -298,13 +298,24 @@ def is_open(po_row: dict) -> bool:
     return status not in ("delivered", "cancelled", "canceled", "closed", "completed")
 
 
+# What the readers did with each file on the last load: {path: {"read": bool, "wanted": [...]}}.
+# The data check (datacheck.py) uses it to say which files are silently left out.
+READS: dict[str, dict] = {}
+
+
 def _csv_rows(root: Path, folder: str, pattern: str, need: tuple[str, ...]) -> list[dict]:
     """Rows of every CSV in folder matching pattern whose header has all `need` columns."""
     out: list[dict] = []
     base = root / folder
     for f in sorted(base.glob(pattern)) if base.is_dir() else []:
         rows = api.read_csv(f)
+        seen = READS.setdefault(str(f.relative_to(root)), {"read": False, "wanted": []})
+        if rows and pattern != "*.csv" and not all(c in rows[0] for c in need):
+            seen["wanted"].append(
+                {"pattern": pattern, "missing": [c for c in need if c not in rows[0]]}
+            )
         if rows and all(c in rows[0] for c in need):
+            seen["read"] = True
             out += [
                 {**r, "_file": str(f.relative_to(root)), "_row": i + 1} for i, r in enumerate(rows)
             ]
@@ -2078,6 +2089,9 @@ def loop(interval: int | None = None) -> None:
             try:
                 anchors.build_index()
                 run(write=True)
+                from ask_soony import datacheck
+
+                datacheck.check(root)
                 last = sig
             except Exception as e:  # keep the loop alive
                 log(f"run failed: {e!r}")

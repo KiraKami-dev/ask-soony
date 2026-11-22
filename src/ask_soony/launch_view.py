@@ -72,17 +72,23 @@ def _inbound(part: dict, ships: dict[str, dict]) -> list[dict]:
             return
         seen.add(key)
         s = ships.get(ref)
-        rows.append({
-            "reference": ref or None,
-            "quantity": _num(item.get("quantity")),
-            "eta": item.get("eta") or (s or {}).get("eta"),
-            "counted": counted,
-            "reason": reason,
-            "after_launch": after_launch,
-            "supplier_id": item.get("supplier_id"),
-            "shipment": {k: s.get(k) for k in ("id", "status", "mode", "eta", "silent", "silent_hours", "note")}
-            if s else None,
-        })
+        rows.append(
+            {
+                "reference": ref or None,
+                "quantity": _num(item.get("quantity")),
+                "eta": item.get("eta") or (s or {}).get("eta"),
+                "counted": counted,
+                "reason": reason,
+                "after_launch": after_launch,
+                "supplier_id": item.get("supplier_id"),
+                "shipment": {
+                    k: s.get(k)
+                    for k in ("id", "status", "mode", "eta", "silent", "silent_hours", "note")
+                }
+                if s
+                else None,
+            }
+        )
 
     for a in part.get("arriving") or []:
         add(a, True, a.get("basis"), False)
@@ -96,8 +102,9 @@ def _inbound(part: dict, ships: dict[str, dict]) -> list[dict]:
     return rows
 
 
-def build(cards: list[dict], ships_raw: list[dict], clock: PackClock, cur: datetime,
-          strip: list[dict]) -> dict:
+def build(
+    cards: list[dict], ships_raw: list[dict], clock: PackClock, cur: datetime, strip: list[dict]
+) -> dict:
     """{hours_left, editions: [...], parts: [...]} for the Launch page."""
     from ask_soony.api import part_names, portal_root, rank_key
 
@@ -108,7 +115,11 @@ def build(cards: list[dict], ships_raw: list[dict], clock: PackClock, cur: datet
     for s in strip:
         k = s["edition"]
         plan = clock.editions.get(k)
-        day_one = (plan.day_one if plan and plan.day_one is not None else _num((v_eds.get(k) or {}).get("day_one")))
+        day_one = (
+            plan.day_one
+            if plan and plan.day_one is not None
+            else _num((v_eds.get(k) or {}).get("day_one"))
+        )
         editions.append({"edition": k, "day_one": day_one})
 
     live = [c for c in cards if c.get("status") in OPEN]
@@ -130,22 +141,24 @@ def build(cards: list[dict], ships_raw: list[dict], clock: PackClock, cur: datet
         if short and len(eds) == 1:
             t = clock.line_stops(cur, eds[0], short)
             runs_dry = t.isoformat() if t else None
-        parts.append({
-            "part": p["part"],
-            "name": p.get("description") or p["part"],
-            "short_name": short_names.get(str(p["part"])) or p.get("description") or p["part"],
-            "editions": eds,
-            "needed": _num(p.get("needed")),
-            "usable": _num(p.get("usable")),
-            "book_stock": _num(p.get("book_stock")),
-            "book_as_of": p.get("book_as_of"),
-            "gap": gap,
-            "short": short,
-            # When the line runs out of this part; None when it lasts, the rate is unknown, or the
-            # part is shared by editions (then it depends on how the stock is split).
-            "runs_dry": runs_dry,
-            "shared": len(eds) > 1,
-            "inbound": _inbound(p, ships),
-            "cards": [c["id"] for c in sorted(mine, key=rank_key)],
-        })
+        parts.append(
+            {
+                "part": p["part"],
+                "name": p.get("description") or p["part"],
+                "short_name": short_names.get(str(p["part"])) or p.get("description") or p["part"],
+                "editions": eds,
+                "needed": _num(p.get("needed")),
+                "usable": _num(p.get("usable")),
+                "book_stock": _num(p.get("book_stock")),
+                "book_as_of": p.get("book_as_of"),
+                "gap": gap,
+                "short": short,
+                # When the line runs out of this part; None when it lasts, the rate is unknown, or
+                # the part is shared by editions (then it depends on how the stock is split).
+                "runs_dry": runs_dry,
+                "shared": len(eds) > 1,
+                "inbound": _inbound(p, ships),
+                "cards": [c["id"] for c in sorted(mine, key=rank_key)],
+            }
+        )
     return {"hours_left": hours_left, "editions": editions, "parts": parts}
