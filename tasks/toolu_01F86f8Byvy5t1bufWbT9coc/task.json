@@ -1,0 +1,22 @@
+{
+  "tool_use_id": "toolu_01F86f8Byvy5t1bufWbT9coc",
+  "agent_id": "ab9a08cd4f98c918f",
+  "subagent_type": "general-purpose",
+  "task_description": "Build routine flow UI and editing",
+  "files": [
+    "web/src/components/Routines.tsx",
+    "web/src/components/routines/FlowGraph.tsx",
+    "web/src/components/routines/RoutineCard.tsx",
+    "web/src/components/routines/RoutineFlow.tsx",
+    "web/src/components/routines/types.ts"
+  ],
+  "token_usage": {
+    "input_tokens": 104,
+    "cache_creation_tokens": 165351,
+    "cache_read_tokens": 5139235,
+    "output_tokens": 57454,
+    "api_call_count": 44
+  },
+  "started_at": "2026-11-22T03:45:46.896118+01:00",
+  "completed_at": "2026-11-22T03:57:16.530795+01:00"
+}

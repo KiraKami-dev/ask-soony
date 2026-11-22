@@ -1,0 +1,20 @@
+{
+  "tool_use_id": "toolu_01Aemw3axQDwsWDhcVQikVrf",
+  "agent_id": "ad6b5b0b5262f5468",
+  "subagent_type": "general-purpose",
+  "task_description": "Polish inbox, cards and header UI",
+  "files": [
+    "web/src/components/DecisionCard.tsx",
+    "web/src/components/Rail.tsx",
+    "web/src/components/StatusStrip.tsx"
+  ],
+  "token_usage": {
+    "input_tokens": 66,
+    "cache_creation_tokens": 117872,
+    "cache_read_tokens": 3343743,
+    "output_tokens": 33795,
+    "api_call_count": 33
+  },
+  "started_at": "2026-11-22T03:46:07.16034+01:00",
+  "completed_at": "2026-11-22T03:52:59.996082+01:00"
+}
