@@ -1207,6 +1207,13 @@ def _iso(dt: datetime | None) -> str | None:
 _hk_cache: dict[str, tuple[float, dict | None]] = {}
 
 
+def _newest_first(p: Path) -> tuple:
+    """A new tracker version (`..._v38.xlsx` next to `..._v37_FINAL.xlsx`) wins: the highest
+    version number in the name first, then the newest file."""
+    m = re.findall(r"(?:^|[_\-\s.])v(\d+)", p.stem, re.I)
+    return (-(int(m[-1]) if m else -1), -p.stat().st_mtime, str(p))
+
+
 def read_handkept(root: Path) -> dict | None:
     """The hand-kept shipment tracker, found by its columns (the verifier's "shipment_tracker"
     layout), not by its name: {file, sheet, rows: [{header: value, _row, _id}]}."""
@@ -1216,7 +1223,7 @@ def read_handkept(root: Path) -> dict | None:
     base = root / "soony"
     if not required or not base.is_dir():
         return None
-    for p in sorted(base.rglob("*.xls[xm]")):
+    for p in sorted(base.rglob("*.xls[xm]"), key=_newest_first):
         rel = str(p.relative_to(root))
         stamp = p.stat().st_mtime
         hit = _hk_cache.get(rel)

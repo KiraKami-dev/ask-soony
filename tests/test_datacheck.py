@@ -28,3 +28,18 @@ def test_new_file_nobody_reads_is_listed_once(tmp_path, monkeypatch):
     (root / "soony/erp/carrier_slots.csv").write_text("slot,dock\n1,A\n")
     assert [i["kind"] for i in datacheck.check(root)["issues"]] == ["unused"]
     assert datacheck.check(root)["issues"] == []  # known now; no repeat
+
+
+def test_new_file_of_another_format_is_listed_once(tmp_path, monkeypatch):
+    monkeypatch.setattr(api, "state_dir", lambda: tmp_path)
+    root = _portal(tmp_path, "po_number,material_id")
+    (root / "soony/context").mkdir(parents=True)
+    datacheck.check(root)
+    (root / "soony/context/slides.pptx").write_bytes(b"PK")
+    (root / "suppliers/SUP-1/notices").mkdir(parents=True)
+    (root / "suppliers/SUP-1/notices/delay.pdf").write_bytes(b"%PDF")  # the paper check reads it
+    (root / "suppliers/SUP-1/profile.json").write_text("{}")  # the supplier master reads it
+    issues = datacheck.check(root)["issues"]
+    assert [(i["kind"], i["file"]) for i in issues] == [("unused", "soony/context/slides.pptx")]
+    assert "PPTX" in issues[0]["text"]
+    assert datacheck.check(root)["issues"] == []

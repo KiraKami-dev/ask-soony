@@ -1114,6 +1114,10 @@ def rule_late_or_short(docs: list[Doc], erp: Erp) -> list[Hit]:
             ):
                 late = ordered - ln["shipped"]
                 what = f"{fmt(ln['shipped'])} shipped of {fmt(ordered)}"
+            elif (moved := _moved_to(d)) and promised <= launch_day < moved:
+                # A delay notice that names a new date but no confirmed quantity per line.
+                late, when = ln.get("qty") or ordered, moved
+                what = f"{fmt(late)} moved to {fmt_day(when)}"
             if late <= 0:
                 continue
             if when and when <= launch_day and when <= promised:
@@ -1181,6 +1185,17 @@ def rule_late_or_short(docs: list[Doc], erp: Erp) -> list[Hit]:
                 )
             )
     return hits
+
+
+def _moved_to(d: Doc) -> str | None:
+    """The new arrival date of a delay notice: the latest date its delay statements name, else
+    the latest date in the document (the new date often sits in the next sentence)."""
+    delays = [st for st in d.statements if st.get("kind") == "delay"]
+    if not delays:
+        return None
+    said = " ".join(f"{st.get('quote') or ''} {st.get('translation') or ''}" for st in delays)
+    dates = iso_dates(said) or iso_dates(d.text)
+    return max(dates) if dates else None
 
 
 def _late_side(d: Doc, what: str, ln: dict) -> dict:
@@ -1978,9 +1993,13 @@ def _merge_finding(old: dict | None, new: dict) -> dict:
     return out
 
 
-def write_state(cards: list[tuple[dict, dict, dict]], cur: datetime) -> dict:
+def write_state(
+    cards: list[tuple[dict, dict, dict]], cur: datetime, blind: list[str] | None = None
+) -> dict:
     """Merge by id: other entries stay, decision status (decision_status.json) is never touched,
-    and papercheck cards whose contradiction is gone are marked resolved."""
+    and papercheck cards whose contradiction is gone are marked resolved, unless an input file
+    could not be read (`blind`: a renamed column, say): then a vanished contradiction is no
+    proof, and the cards stay open until the data check is clean again."""
     findings = api.read_list("findings.json")
     by_id = {f.get("id"): f for f in findings}
     new_ids = {f["id"] for f, _, _ in cards}
@@ -1991,7 +2010,7 @@ def write_state(cards: list[tuple[dict, dict, dict]], cur: datetime) -> dict:
         if new:
             out.append(_merge_finding(f, new))
             done.add(fid)
-        elif f.get("origin") == ORIGIN and f.get("status") == "open":
+        elif f.get("origin") == ORIGIN and f.get("status") == "open" and not blind:
             f = {
                 **f,
                 "status": "resolved",
@@ -2049,12 +2068,22 @@ def run(write: bool = True, llm: bool | None = None, verbose: bool = True) -> li
         log("no portal data found (set ASK_PORTAL_DIR)")
         return []
     cur = api.now()
+    READS.clear()
     erp = load_erp(root)
+    # Inputs read before and unreadable now (a renamed column): files never read don't count.
+    ever = api.read_json("papercheck_reads.json", {}) or {}
+    blind = sorted(r for r, v in READS.items() if not v["read"] and v["wanted"] and ever.get(r))
+    if write:
+        api.write_json(
+            "papercheck_reads.json", {**ever, **{r: True for r, v in READS.items() if v["read"]}}
+        )
     _OFFERS.pop(str(root), None)
     model = make_llm(llm)
     cards, docs = build(erp, model, cur)
     if write:
-        write_state(cards, cur)
+        write_state(cards, cur, blind)
+    if blind:
+        log(f"not read (column changed): {', '.join(blind)}; open cards are kept open")
     if verbose:
         log(f"{len(docs)} documents with references, {len(cards)} contradictions")
         if model:

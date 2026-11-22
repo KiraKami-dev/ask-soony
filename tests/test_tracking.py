@@ -531,3 +531,17 @@ def test_handkept_file_found_by_its_columns_and_dated_by_the_store(tmp_path, mon
     con.close()
     changed, _ = tracking.file_times(tmp_path, hk["file"])
     assert changed.isoformat().startswith("2030-06-01T06:00")
+
+
+def test_newer_tracker_version_wins(tmp_path):
+    import openpyxl
+
+    (tmp_path / "soony" / "logistics").mkdir(parents=True)
+    for name, status in (("tracker_v9_FINAL.xlsx", "in transit"), ("tracker_v10.xlsx", "delayed")):
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.append(["Shipment", "Carrier", "Container/AWB", "POs", "ETA", "Status", "Comment"])
+        ws.append(["SH-1", "C", "X", "PO1", "2030-06-02", status, ""])
+        wb.save(tmp_path / "soony" / "logistics" / name)
+    hk = tracking.read_handkept(tmp_path)
+    assert hk["file"].endswith("tracker_v10.xlsx") and hk["rows"][0]["Status"] == "delayed"

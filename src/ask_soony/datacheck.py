@@ -4,7 +4,9 @@ Data check: say out loud when the customer's files change shape.
 Spreadsheets are recognised by their columns, so a renamed column silently drops a file from the
 picture ("the system says we're fine"). After every portal change this compares each CSV's header
 with the last run and with what the readers need, and lists what is no longer read, what lost
-columns, and new files nobody reads yet. It warns; it never guesses a rename on its own.
+columns, and new files nobody reads yet. Other formats (sheets, JSON, Word, PDFs, scans) are
+checked for the last one: a new file no reader picks up is listed instead of ignored. It warns;
+it never guesses a rename on its own.
 """
 
 from __future__ import annotations
@@ -35,6 +37,32 @@ def _verifier_reads(f: Path) -> bool:
         return classify(f)[0] != "unknown"
     except Exception:
         return False
+
+
+def _other_reader(rel: str, f: Path) -> str | None:
+    """Which part of the product reads a non-CSV portal file, or None."""
+    from ask_soony import papercheck
+    from ask_soony.predictor import is_event_path
+
+    suffix = f.suffix.lower()
+    if f.name.lower().startswith("profile.") and rel.startswith("suppliers/"):
+        return "supplier master"
+    if suffix in papercheck.DOC_SUFFIXES and not rel.startswith(papercheck.SYSTEM_FOLDERS):
+        return "paper check"
+    if is_event_path(rel):
+        return "event impact"
+    if suffix in (".xlsx", ".xlsm") and rel.startswith("soony/") and "/master/" not in rel:
+        return "tracking"  # every sheet under soony/ is matched against the shipments
+    if suffix == ".docx" and rel.startswith("soony/context/"):
+        try:
+            from ask_soony import memo
+
+            return "memo" if memo.READS_DOCX else None
+        except ImportError:
+            return None
+    if suffix in (".xlsx", ".xlsm", ".json") and _verifier_reads(f):
+        return "verifier"
+    return None
 
 
 def check(root: Path | None = None, now: datetime | None = None) -> dict:
@@ -92,7 +120,26 @@ def check(root: Path | None = None, now: datetime | None = None) -> dict:
                         "text": f"{f.name} is new and nobody reads it yet.",
                     }
                 )
-    out = {"checked_at": at, "headers": headers, "issues": issues}
+    # Files known at the last run; a state from before this check existed is a baseline too.
+    baseline = before.get("files") is None
+    known = set(before.get("files") or [])
+    files: list[str] = []
+    for f in sorted(root.rglob("*")):
+        if not f.is_file() or f.suffix.lower() == ".csv" or f.name.startswith("."):
+            continue
+        rel = str(f.relative_to(root))
+        files.append(rel)
+        if not baseline and rel not in known and _other_reader(rel, f) is None:
+            kind = f.suffix.lower().lstrip(".").upper() or "file"
+            issues.append(
+                {
+                    "kind": "unused",
+                    "file": rel,
+                    "missing": [],
+                    "text": f"{f.name} is new and nobody reads it yet ({kind}).",
+                }
+            )
+    out = {"checked_at": at, "headers": headers, "files": files, "issues": issues}
     api.write_json(STATE, out)
     return out
 

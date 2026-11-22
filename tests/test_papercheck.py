@@ -250,3 +250,40 @@ def test_demo_cards_reset_runs_papercheck(portal):
     assert json.loads((state / "routines.json").read_text())[0]["enabled"] is False
     backups = {p.name.split(".")[0] for p in state.glob("*.before-demo-*.json")}
     assert {"actions", "routines", "findings"} <= backups
+
+
+def test_delay_notice_with_new_date_is_late(tmp_path, monkeypatch):
+    """A notice that only says 'delayed, new date X' (no per-line confirmed date) still counts."""
+    files = dict(FILES)
+    files["soony/erp/purchase_orders.csv"] += (
+        "4500000006,1,SUP-3,PART-B,60,2.0,EUR,2030-06-01,open,Ann Buyer,DAP\n"
+    )
+    files["suppliers/SUP-3_Print/notices/delay.txt"] = (
+        "Delay notice\nYour order 4500000006\nPART-B Art Book, quantity: 60 pcs\n"
+        "Due to a machine breakdown the delivery is delayed. New delivery date: 2030-06-05.\n"
+    )
+    files["suppliers/SUP-3_Print/components.csv"] = "component_id,description\nPART-B,Art Book\n"
+    root = write_portal(tmp_path / "p2", files)
+    monkeypatch.setenv("ASK_PORTAL_DIR", str(root))
+    monkeypatch.setenv("ASK_STATE_DIR", str(tmp_path / "s2"))
+    monkeypatch.setenv("ASK_DATA_DIR", str(tmp_path / "store2"))
+    monkeypatch.setenv("ASK_NOW", "2030-06-01T21:00:00+02:00")
+    monkeypatch.setenv("ASK_PAPERCHECK_LLM", "off")
+    with anchors._lock:
+        anchors._index.clear()
+    anchors.build_index()
+    f, _, _ = by_id(papercheck.run(write=False))["paper-4500000006-PART-B"]
+    assert f["arrives_at"] == "2030-06-05"
+
+
+def test_renamed_column_does_not_resolve_open_cards(portal):
+    """A vanished contradiction is no proof while an input file cannot be read."""
+    root, state = portal
+    papercheck.run(write=True)
+    before = {f["id"]: f["status"] for f in json.loads((state / "findings.json").read_text())}
+    assert before["paper-4500000001-PART-A"] == "open"
+    stock = root / "soony/erp/stock_snapshot.csv"
+    stock.write_text(stock.read_text().replace("quantity", "qty_on_hand", 1))
+    papercheck.run(write=True)
+    after = {f["id"]: f["status"] for f in json.loads((state / "findings.json").read_text())}
+    assert after == before

@@ -55,3 +55,15 @@ def test_dispatches_erp_and_news_changes_to_their_roles(tmp_path):
     assert payload["predictor"] == [{"changed": "soony/news/port_strike.txt"}]
     assert "cards" not in payload
     assert "decisions" in payload
+
+
+def test_failing_predictor_does_not_stop_the_verifier(tmp_path):
+    class Broken(PredictorRecorder):
+        def run(self, events, force):
+            raise TypeError("model down")
+
+    root = make_portal(tmp_path / "portal")
+    write(root, "soony/news/port_strike.txt", "Port strike.")
+    out = tmp_path / "state" / "dispatch.json"
+    routed = refresh(["soony/news/port_strike.txt"], root, tmp_path / "r", out, Broken())
+    assert routed.predictor and out.is_file()
