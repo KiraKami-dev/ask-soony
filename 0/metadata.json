@@ -1,0 +1,196 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M81DQ2Z6TQMM2PY7AQ8MH479",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T10:44:56.690295Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "d43a2355a8c1",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 28,
+    "cache_creation_tokens": 13866,
+    "cache_read_tokens": 4649116,
+    "output_tokens": 8300,
+    "api_call_count": 12
+  },
+  "session_token_usage": {
+    "input_tokens": 3796,
+    "cache_creation_tokens": 3518747,
+    "cache_read_tokens": 793700554,
+    "output_tokens": 1447203,
+    "api_call_count": 1656,
+    "subagent_tokens": {
+      "input_tokens": 3280,
+      "cache_creation_tokens": 7006960,
+      "cache_read_tokens": 240487983,
+      "output_tokens": 1893026,
+      "api_call_count": 1569
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 2550,
+    "layers": {
+      "betterleaks": 40,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 108,
+      "credentialed_uri": 0,
+      "entropy": 906,
+      "goredact": 8,
+      "key_context": 0,
+      "pii": 1502,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1365,
+      "IP": 72,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-22T09:30:29.207868Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "6e096d3ead7c",
+      "timestamp": "2026-11-22T09:30:29.207868Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 310
+  },
+  "summary": {
+    "intent": "Take part in the Lio 'Keep the Line Running' hackathon challenge: analyze Soony's confidential launch data, find where the plan hides a Collector's Edition shortfall, and build a product (now called Lighthouse) that rechecks the plan on every portal drop and acts on it, with a UI suited to procurement roles.",
+    "outcome": "Found the hidden gaps (art book overbooking, failed statue lot, game card offload, sleeve revision conflict, false magnet alarm) and built a polling, versioned, agent-based pipeline with approver and buyer UI. Many commits sit on `main`, with a case-flow branch and a parked chat branch. As of the last turn the hand-in at 12:00 was close and some work was not yet pushed or restarted live.",
+    "learnings": {
+      "repo": [
+        "Confidential portal data lives in the gitignored `data/` folder; `.env` is gitignored and `.env.example` is committed. Neither should carry real values into code or commits.",
+        "The portal API has only three endpoints (`GET /api/v1/files`, `/files/{path}`, `/archive.zip`) and no webhooks. Files change without notice and are replaced under the same name, so change detection must compare SHA-256 checksums by polling.",
+        "The team workflow is in `CLAUDE.md` and `PROGRESS.md`. Tasks are claimed with a 'Now' line in `PROGRESS.md`, and Entire hooks checkpoint on commit and push.",
+        "Main already runs an escalation loop and a phone bridge (`card_alerts.py`). The `new-approach` branch's second escalation loop and `pulse-console` app would duplicate them and bypass the duplicate-send guard and record-only mode.",
+        "The routine editor only accepts steps the trigger kind supports: 'Chase once if no answer' needs a watcher on waiting messages, 'Ask for a status' needs a watcher on shipments, and the server rejects them on 'open decisions'. The Add step menu now greys these out with the reason.",
+        "The API does not load `.env` on import, so settings such as the buyer title must be read through a helper that loads `.env` first, or they are missing after a restart.",
+        "The case flow reuses the routine diagram's connector and node components, exported from `FlowGraph.tsx`, so the two views share drawing code and cannot drift apart.",
+        "The web build is served by live and demo directly after a rebuild, but new backend endpoints need a server restart. The suite has 360 tests, and ESLint is not configured in the web app.",
+        "The role title for the approver comes from the data ('Head of Procurement'); the data has no buyer title, so it is set through a buyer title setting."
+      ],
+      "code": [
+        {
+          "path": "web/src/components/CaseFlow.tsx",
+          "finding": "New 'How we got here' component showing a case's agent steps (Portal, Reader, Verifier, Prediction, Approval rule, Decision, Then). It is built only from the case's own data and omits steps the data lacks. It now runs as a single top-to-bottom column because Pulse's two-per-row snake read right-to-left and confused users."
+        },
+        {
+          "path": "web/src/components/routines/Describe.tsx",
+          "finding": "Pulse-style 'Describe it' chat on branch `jonas/pulse-ui`, backed by `POST /api/routines/describe`. It was merged then reverted because it duplicated the per-routine 'change in your words' box, clashed in colour and ignored predictions. It stays parked."
+        }
+      ],
+      "workflow": [
+        "Check what a repo already does before adding features. The 'Covered' green line and the Describe chat both duplicated existing UI and were dropped or reverted.",
+        "Use separate git worktree folders per branch (`../ask-soony-pulse`, `../ask-soony-flow`) with preview servers on a copy of demo state (background off, email record-only) so live data is never touched.",
+        "Verify UI changes with headless-browser screenshots at desktop and phone size before committing.",
+        "Interviews with Soony staff should drive design. Sophia preferred the decision view over a chat pipeline, and Maren wanted decisions first, which exposed the chat misreading.",
+        "Keep untrusted or confidential material local. Findings notes and extracted data stay in gitignored `data/`, and credentials seen in chat are left out of shared docs.",
+        "Rebase onto origin before pushing when teammates have pushed, then re-run tests and the build."
+      ]
+    },
+    "friction": [
+      "Misread the team's liking for Pulse and built a chat that duplicated existing UI, which cost a merge and a revert.",
+      "The first role change replaced names with roles, which the user did not want, and it made Maren's button read 'Ask Maren to approve' for her own cases.",
+      "The first two-column case flow ran right to left and confused readers.",
+      "Adding 'Chase once if no answer' looked broken because the step menu offered it on every routine, while the server rejected it on decision routines.",
+      "The first 'Fixed today' version read supplier reply fields and wrongly listed Boise's cards as a win.",
+      "Several results were not verified in a real browser: the Describe chat, the History link and the demo load.",
+      "The Routines page becomes a long wall when many routines exist.",
+      "The user interrupted several tool runs when direction needed correcting."
+    ],
+    "open_items": [
+      "Push `main` (about 7 commits ahead of origin) and restart live so the sign-in choice, Maren's 'Waiting for your OK' and the heartbeat show there.",
+      "Merge `jonas/case-flow` (`4000003`) into `main` if wanted; `jonas/pulse-ui` stays parked.",
+      "Port Lucas's 'read new documents before verifying' step into `runner.run_pipeline`, keeping the skip-without-model path and the try/except, after the hand-in.",
+      "Redesign Routines as a compact list with a ⋯ menu and a duplicate-routine warning.",
+      "Support 'send email, then chase once if no answer' on decision routines through a reply-watching follow-up.",
+      "Prepare the pitch deck and video for the 12:00 hand-in.",
+      "Decide on the logo (offered a beam variant) and the Karton Nowak art book order, plus other supplier emails sent from a registered sender.",
+      "Open question: whether portal data and supplier replies differ per team, to ask the Lio engineers.",
+      "Tell Lucas about the decision on his `new-approach` branch.",
+      "Change the portal login password, since it appeared in Discord history."
+    ]
+  }
+}
