@@ -1,0 +1,205 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M81B2Y918CGP1RSM86NM814T",
+  "session_id": "3021cc1a-f777-4712-b18b-d31b6ece5ff1",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T09:58:55.495813Z",
+  "branch": "main",
+  "checkpoints_count": 3,
+  "save_step_count": 1,
+  "files_touched": [
+    "web/src/components/History.tsx"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "68f619755b69",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 2,
+    "cache_creation_tokens": 1127,
+    "cache_read_tokens": 152430,
+    "output_tokens": 403,
+    "api_call_count": 1
+  },
+  "session_token_usage": {
+    "input_tokens": 3369,
+    "cache_creation_tokens": 3276286,
+    "cache_read_tokens": 741924596,
+    "output_tokens": 1332368,
+    "api_call_count": 1463,
+    "subagent_tokens": {
+      "input_tokens": 3280,
+      "cache_creation_tokens": 7006960,
+      "cache_read_tokens": 240487983,
+      "output_tokens": 1893026,
+      "api_call_count": 1569
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 2388,
+    "layers": {
+      "betterleaks": 34,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 94,
+      "credentialed_uri": 0,
+      "entropy": 858,
+      "goredact": 8,
+      "key_context": 0,
+      "pii": 1408,
+      "provider_token": 0,
+      "shell_stdin": 0
+    },
+    "pii": {
+      "EMAIL": 1271,
+      "IP": 72,
+      "PHONE": 65
+    }
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01KETkZrpukb6NZ6NkXMEn1U",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "1d86fed25be5",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 969,
+        "end": 970,
+        "entry_ids": [
+          "3bfe892e-c060-425b-a918-56eaee3cf42f"
+        ],
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01KETkZrpukb6NZ6NkXMEn1U"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-21T23:13:16.480865Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "f2c10462d8fb",
+      "timestamp": "2026-11-21T23:13:16.480865Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    },
+    {
+      "id": "prompt-skill-claude-code-flush-2026-11-22T09:30:29.207868Z",
+      "event_type": "prompt_invocation",
+      "skill": {
+        "name": "flush"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "prompt_slash_command",
+        "confidence": "explicit"
+      },
+      "turn_id": "6e096d3ead7c",
+      "timestamp": "2026-11-22T09:30:29.207868Z",
+      "native": {
+        "command": "/flush"
+      },
+      "collapse": {
+        "target": "user_message",
+        "label": "/flush",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 290
+  },
+  "summary": {
+    "intent": "Build, during the START Hack Munich 'Keep the Line Running' challenge, an agent product that rechecks Soony's launch plan against messy supplier documents, acts on gaps (emails, phone calls, approvals), and is demo-ready for the Sunday 12:00 hand-in. Latest asks: merge the teammate's llm-task-update branch via PR, and split the UI into Senior Buyer and Head of Procurement roles with separate inboxes and a History view.",
+    "outcome": "Found that Soony's launch plan hides Collector's Edition shortfalls (art books overbooked 80,000 vs 8,000, failed statues, rev B/C sleeves), and built a deployed notice/show/act/learn product with a poller, versioned store, approvals, routines, phone bridge and role-based views. PR #7 and PR #8 (llm-task-update) were merged, though #8 brought 335 confidential portal files into main; the two-person sign-in, Maren's filtered inbox and History page were built, tested and committed.",
+    "learnings": {
+      "repo": [
+        "Portal API has only GET /files, /files/{path} and /archive.zip, with no webhooks; changes must be detected by polling the list and comparing SHA-256, since files are replaced under the same name.",
+        "Portal data is confidential and must stay in gitignored data/; AGENTS.md says not to commit it, yet merging llm-task-update (PR #8) put 335 data/portal files into main history.",
+        "Approving cards on live data sends real supplier emails, so tests must use state copies or the dry-run mode (ASK_MAIL_DRY=on writes dry_outbox.json).",
+        "Live (:8000) and demo (:8001) servers run from the main folder, so branches should be checked out in a separate git worktree (../ask-soony-llm-task-update) to avoid swapping code under them.",
+        "Entire hooks only write a checkpoint when repo files change; read-only turns log 'no files modified, skipping checkpoint'.",
+        "Source data is messy: SAP exports can be cp1252 with ';' delimiters and German dates/decimal commas, so read_csv falls back from utf-8-sig to cp1252 and a column-mapping module normalises names.",
+        "Team workflow lives in CLAUDE.md, AGENTS.md and PROGRESS.md; Entire checks (entire status, entire brain status) are required before pushing."
+      ],
+      "code": [
+        {
+          "path": "src/ask_soony/outbox.py",
+          "finding": "Sync previously overwrote actions written meanwhile (lost an approval twice); the final append must happen under api._lock."
+        },
+        {
+          "path": "src/ask_soony/routines.py",
+          "finding": "pick() compared the literal 'make po,rev'; it now splits comma words and treats 'supplier' as an email option; stale proposals needed expire_stale."
+        },
+        {
+          "path": "src/ask_soony/openai_calls.py",
+          "finding": "Realtime calls dropped from noise, concurrent responses and sideband ConnectionClosed; fixed with semantic VAD default, active/pending response flags and two sideband reconnects."
+        },
+        {
+          "path": "src/ask_soony/api.py",
+          "finding": "read_csv decodes utf-8-sig then cp1252 and sniffs ';' vs ','; approve has a 409 duplicate-send guard; activity items now record who decided."
+        },
+        {
+          "path": "web/src/components/History.tsx",
+          "finding": "New History page showing who decided what, added for the Senior Buyer / Head of Procurement split; Maren's menu omits Routines."
+        }
+      ],
+      "workflow": [
+        "Use a git worktree for reviewing or pulling another branch while servers run from the main folder.",
+        "Subagents are effective for bulk cross-checking (200 order confirmations and 59 scans against SAP) in one pass.",
+        "Verify a pull changed nothing by comparing local files with the portal's checksums instead of trusting the git diff.",
+        "Ask before every push; open PRs only when asked; no attribution trailers; no em dashes.",
+        "Persist session state to the project's running memory status file before context compaction."
+      ]
+    },
+    "friction": [
+      "Demo background loop does not auto-raise call alerts, so test calls had to be started by hand.",
+      "Realtime phone calls were cut off by background noise and double-response errors before the fixes; one residual error from OpenAI's own voice detection remains.",
+      "The Cloudflare demo hostname first pointed at the wrong tunnel (Error 1033) and had to be re-routed.",
+      "PR #8 conflicted in test_shortfall.py and branched from an older main (936 changed files), requiring a merge of main first.",
+      "The user asked about pulling llm-task-update repeatedly because the branch was data-only at first, which delayed the PR.",
+      "Paper check crashed on the cp1252 German PO export dropped Sunday 09:20.",
+      "Scanned delivery notes and PDFs needed rendering to images to be read."
+    ],
+    "open_items": [
+      "Portal data (335 files under data/portal) is now tracked on main; decide whether to run git rm -r --cached data/portal (history would still keep it).",
+      "Live and demo servers still run pre-pull code and need a restart to pick up Farhan's reading baseline.",
+      "Video and deck for the 12:00 hand-in are not done.",
+      "Demo background loop does not auto-trigger call alerts.",
+      "After the demo, switch the OpenAI webhook back to https://ask-soony.stenglein.dev/hooks/openai.",
+      "Delete the duplicate live routine 'Ask Hamburg to count book stock'; optionally send notes to Hwaseong and Lucas about the Pulse emails.",
+      "Add Maren's top bar and a 'What still saves it' section to Launch.",
+      "Role split commit is local and not pushed; a push needs the user's OK.",
+      "Whether Karton Nowak's 24 h art-book offer and the Boise EXW reply were actually acted on by the agent remains to be confirmed."
+    ]
+  }
+}
