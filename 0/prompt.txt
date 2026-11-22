@@ -1,0 +1,9 @@
+how to test this now?
+
+---
+
+But I feel like the button should not be hidden first but directly show? and also can you (afer changing the ui) put that card back to test again?
+
+---
+
+and maybe teh "amber" is not the best part to describe it?
