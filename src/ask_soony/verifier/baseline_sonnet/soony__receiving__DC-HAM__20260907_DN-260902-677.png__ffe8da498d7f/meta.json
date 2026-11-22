@@ -1,0 +1,15 @@
+{
+  "path": "soony/receiving/DC-HAM/20260907_DN-260902-677.png",
+  "sha256": "ffe8da498d7fa700fbf80a08485674f0f95990c07c878731702b68b6a95a57f2",
+  "model": "claude-sonnet-5-5",
+  "effort": "high",
+  "fingerprint": "ef7ff7aae87f85e3",
+  "status": "error",
+  "error": "CLIJSONDecodeError: Failed to decode JSON: JSON message exceeded maximum buffer size of 1048576 bytes...",
+  "attempts": 3,
+  "finished_at": "2026-11-21T21:18:57+00:00",
+  "seconds": 258.8,
+  "num_turns": null,
+  "cost_usd": null,
+  "usage": null
+}

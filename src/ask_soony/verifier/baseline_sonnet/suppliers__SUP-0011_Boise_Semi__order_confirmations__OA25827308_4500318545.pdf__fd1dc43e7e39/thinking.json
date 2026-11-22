@@ -1,0 +1,6 @@
+[
+  {
+    "turn": 41,
+    "thinking": "The document looks clean overall, but the terms section contradicts itself: it says EXW while also saying the seller prepays freight, insurance and duties, which doesn't fit with EXW. I'll flag that. The quantity is 9,500 units at 6.11 USD, with a confirmed date of 2025-10-13, and no total is given.\n\nThe order date is 2025-09-05, and the document doesn't state its own date, so that field gets left empty.\n\n"
+  }
+]

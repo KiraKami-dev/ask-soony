@@ -1,0 +1,6 @@
+[
+  {
+    "turn": 24,
+    "thinking": "The document's data is in view: a quantity of 110,000 at 0.06 EUR per unit, with the confirmed date and order date set out. The quantity is labeled \"Qty\" on the order confirmation, so I'll record it as quantity_confirmed.\n\n"
+  }
+]

@@ -1,0 +1,6 @@
+[
+  {
+    "turn": 46,
+    "thinking": "I'm checking the document for consistency: it lists EXW Boise, yet also says freight, insurance and duties are prepaid by the seller and added to the invoice, which doesn't quite fit EXW terms, so I'll flag that. I'm also normalizing the quantity 8,500 to 8500, noting that no total prices are given, and that both lines reference CMP-GAM-002.\n\nI'm marking the dates as confirmed and recording the order date as 2026-01-27 on a line, with the quantity having no unit since none is given and the price in USD. The document date isn't stated, so I'll leave it as null.\n\n"
+  }
+]

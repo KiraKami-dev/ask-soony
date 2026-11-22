@@ -1,0 +1,6 @@
+[
+  {
+    "turn": 50,
+    "thinking": "I'm going to flag a contradiction in the terms: the quote says EXW Boise, which puts freight on the buyer, yet it also says the seller prepays freight, insurance and duties and adds them to the invoice. I'll note that as an inconsistency. The quantity is 9,500 and the unit price is 6.11 USD, with no total given, and the date is confirmed.\n\nI'm mapping the order and confirmation dates into fields: the confirmation date goes in as confirmed, and the order date may belong as a line value. The quantity is taken from the order confirmation, and the item is the game card description.\n\n"
+  }
+]

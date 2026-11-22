@@ -1,0 +1,135 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Boise Semiconductor Inc.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26715702",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318717"
+    },
+    {
+      "type": "contract",
+      "value": "PC-0011-2023"
+    },
+    {
+      "type": "other",
+      "value": "Incoterms EXW Boise"
+    },
+    {
+      "type": "other",
+      "value": "Payment NET30"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "10,000",
+          "number": 10000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "6.11",
+          "number": 6.11,
+          "unit": "USD",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-09-22",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "00020",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "5,000",
+          "number": 5000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "6.11",
+          "number": 6.11,
+          "unit": "USD",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-09-30",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Terms of delivery are EXW Boise, ID per Sales Agreement PC-0011-2023, section 4.1. DDP is not agreed. Freight, insurance and duties are prepaid by Seller and added to the invoice.",
+      "quote": "Terms of delivery: EXW Boise, ID per Sales Agreement PC-0011-2023, section 4.1. DDP is not agreed. Freight, insurance and duties are prepaid by Seller and added to the invoice."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Order dated 2026-08-24; Incoterms EXW Boise; payment terms NET30.",
+      "quote": "Your order 4500318717 of 2026-08-24 · Incoterms EXW Boise · Payment NET30"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Boise Semiconductor order acknowledgement OA26715702 for Soony Interactive GmbH PO 4500318717 (dated 2026-08-24). It confirms two lines of CMP-GAM-002 (Game Card 64 GB – Grand Heist 5) at 6.11 USD each. Line 00010 is 10,000 pcs confirmed for 2026-09-22. Line 00020 is 5,000 pcs confirmed for 2026-09-30. Terms are EXW Boise, NET30. The document has no handwritten corrections or stamps.",
+    "red_flags": [
+      "Delivery terms are internally inconsistent: the document says EXW Boise and that DDP is not agreed, but also says freight, insurance and duties are prepaid by Seller and added to the invoice. Under EXW the buyer normally arranges and pays freight, so the invoiced charges need clarification.",
+      "The delivery is split into two schedule lines on different dates (10,000 on 2026-09-22 and 5,000 on 2026-09-30), 15,000 in total. The original PO quantity is not shown, so it cannot be checked against this document.",
+      "No unit of measure is stated for the quantities. The document has no date of its own."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Clean typed PDF, single page, no handwriting, stamps or signatures.",
+      "Quantities use comma thousands separators (10,000 = ten thousand).",
+      "No document issue date is printed; 2026-08-24 is the customer's PO date."
+    ]
+  }
+}

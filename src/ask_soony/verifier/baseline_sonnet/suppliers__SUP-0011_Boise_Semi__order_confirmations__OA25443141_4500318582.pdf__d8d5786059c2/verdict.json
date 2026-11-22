@@ -1,0 +1,99 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Boise Semiconductor Inc.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA25443141",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318582"
+    },
+    {
+      "type": "contract",
+      "value": "PC-0011-2023"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "8,000",
+          "number": 8000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "6.11",
+          "number": 6.11,
+          "unit": "USD",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2025-12-23",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2025-11-19",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Terms of delivery: EXW Boise, ID per Sales Agreement PC-0011-2023, section 4.1. DDP is not agreed. Freight, insurance and duties are prepaid by Seller and added to the invoice.",
+      "quote": "Terms of delivery: EXW Boise, ID per Sales Agreement PC-0011-2023, section 4.1. DDP is not agreed. Freight, insurance and duties are prepaid by Seller and added to the invoice."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Incoterms EXW Boise; payment terms NET30.",
+      "quote": "Incoterms EXW Boise · Payment NET30"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Order acknowledgement OA25443141 from Boise Semiconductor Inc. to Soony Interactive GmbH for PO 4500318582 (dated 2025-11-19). One line: item 00010, CMP-GAM-002 Game Card 64 GB – Grand Heist 5, 8,000 units at 6.11 USD, confirmed delivery 2025-12-23. Terms are EXW Boise with payment NET30. The document has no handwritten corrections or stamps.",
+    "red_flags": [
+      "Delivery terms are ambiguous: the document says EXW Boise and 'DDP is not agreed', but also says freight, insurance and duties are prepaid by Seller and added to the invoice. This means the buyer will pay these costs through the invoice, and they are not in the unit price. Under pure EXW the buyer would arrange and pay for freight itself.",
+      "The document has no issue date of its own. Only the PO date (2025-11-19) is shown.",
+      "The unit price has no per-unit basis, such as per piece, and no total line value is given."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Clean typed PDF with no handwriting, stamps, strike-throughs or signatures.",
+      "Single page, single line item; all text is clearly legible.",
+      "The column header 'Qty' is not labelled as ordered or confirmed. It was recorded as quantity confirmed because this is an order acknowledgement."
+    ]
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Polish",
+    "English"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o., Poznań, PL",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "WZ-261014-800",
+  "document_date": "2026-10-14",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318740"
+    },
+    {
+      "type": "delivery_note",
+      "value": "WZ-261014-800"
+    },
+    {
+      "type": "other",
+      "value": "Przewoźnik (carrier): PO 14993"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-004",
+      "supplier_part_no": null,
+      "description": "Cover Sleeve Grand Heist 6 (USK/PE",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "65.000",
+          "number": 65000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "32",
+          "number": 32,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "480 kg",
+          "number": 480,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_shipped",
+          "field_label": null,
+          "value": "14.10.2026",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "other",
+      "text_en": "Remarks field (Uwagi) is blank.",
+      "quote": "Uwagi:"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Received by: Meyer K. (handwritten signature/name in the 'Odebrał' field).",
+      "quote": "Odebrał: Meyer K."
+    }
+  ],
+  "decisions": [],
+  "corrections": [
+    {
+      "what": "Handwritten receiver name/signature in 'Odebrał' (received by) field; not a correction of a printed value",
+      "original": null,
+      "replacement": "Meyer K.",
+      "where": "Odebrał: field, below Uwagi"
+    }
+  ],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Polish WZ delivery note WZ-261014-800 dated 14.10.2026 from Karton Nowak (Poznań) to Soony Distribution Center Hamburg, against order 4500318740. It covers one line: CMP-GAM-004 Cover Sleeve Grand Heist 6, 65.000 PCS (65,000), 32 packages, gross weight 480 kg, carrier PO 14993. It is signed as received by 'Meyer K.' by hand. There are no corrections, no remarks and no receiving date stamp.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Product description is cut off at '(USK/PE' with no closing parenthesis, so the full name is not visible.",
+      "Quantity '65.000' uses the Polish thousands separator, so it means 65000 pieces.",
+      "Handwritten 'Meyer K.' under 'Odebrał' is the only handwriting; it is clear. There is no handwritten date and no receiving stamp.",
+      "The Uwagi (remarks) field is empty.",
+      "The file name suggests a 16 Oct 2026 receipt, but the document itself shows no receiving date.",
+      "No ordered quantity is shown, so the delivered quantity cannot be compared against the order."
+    ]
+  }
+}

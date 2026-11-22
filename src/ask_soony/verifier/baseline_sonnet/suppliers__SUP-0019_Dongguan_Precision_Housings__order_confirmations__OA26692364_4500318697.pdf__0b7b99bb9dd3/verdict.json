@@ -1,0 +1,139 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English",
+    "Chinese"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26692364",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318697"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-003",
+      "supplier_part_no": null,
+      "description": "Game Card Case (clear)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "122,000",
+          "number": 122000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "1.57",
+          "number": 1.57,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-10-05",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "00020",
+      "material_id": "CMP-GAM-006",
+      "supplier_part_no": null,
+      "description": "Steel Case Grand Heist 6",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "19,000",
+          "number": 19000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "21.64",
+          "number": 21.64,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-10-19",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": null,
+      "material_id": null,
+      "supplier_part_no": null,
+      "description": "Header: order date of referenced PO",
+      "values": [
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2026-07-20",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Incoterms FOB Yantian; payment terms NET30.",
+      "quote": "Incoterms FOB Yantian · Payment NET30"
+    },
+    {
+      "topic": "other",
+      "text_en": "Order confirmation for customer Soony Interactive GmbH, referencing their order 4500318697 of 2026-07-20.",
+      "quote": "Customer: Soony Interactive GmbH · Your order 4500318697 of 2026-07-20"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA26692364 from Dongguan Precision Housings to Soony Interactive GmbH for PO 4500318697 (dated 2026-07-20). Confirms two lines: 122,000 Game Card Case (clear) at 1.57 CNY for 2026-10-05, and 19,000 Steel Case Grand Heist 6 at 21.64 CNY for 2026-10-19. Terms FOB Yantian, NET30. No handwriting, stamps or corrections.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Single page, fully printed, no handwriting, stamps or signatures.",
+      "The document has no issue date of its own; only the PO date 2026-07-20 appears.",
+      "The Qty column is not labelled as ordered or confirmed; it is recorded as quantity_confirmed since this is an order confirmation. The unit of measure is not stated.",
+      "The Chinese title 订单确认书 is the only Chinese text."
+    ]
+  }
+}

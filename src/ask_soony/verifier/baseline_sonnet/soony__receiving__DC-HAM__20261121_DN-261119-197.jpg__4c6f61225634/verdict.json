@@ -1,0 +1,143 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Boise Semiconductor Inc., Boise, US (+1 208 362 0144)",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "DN-261119-197",
+  "document_date": "2026-11-19",
+  "references": [
+    {
+      "type": "delivery_note",
+      "value": "DN-261119-197"
+    },
+    {
+      "type": "po_number",
+      "value": "4500318766"
+    },
+    {
+      "type": "po_number",
+      "value": "4500318769"
+    }
+  ],
+  "lines": [
+    {
+      "item": "Line 1",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "5.000",
+          "number": 5000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "10",
+          "number": 10,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "Line 2",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "5.500",
+          "number": 5500,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "2",
+          "number": 2,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "Shipment total",
+      "material_id": null,
+      "supplier_part_no": null,
+      "description": "Footer totals (gross weight and packages)",
+      "values": [
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "228 kg",
+          "number": 228,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "12",
+          "number": 12,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Alpen Air Cargo GmbH",
+      "quote": "Carrier: Alpen Air Cargo GmbH"
+    },
+    {
+      "topic": "other",
+      "text_en": "The Remarks field is empty.",
+      "quote": "Remarks:"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Delivery note DN-261119-197 dated 11/19/2026 from Boise Semiconductor Inc. to Soony Distribution Center Hamburg. It lists CMP-GAM-002 Game Card 64 GB – Grand Heist 5 on two lines: 5.000 PCS in 10 packages and 5.500 PCS in 2 packages. That is 10,500 PCS in 12 packages, 228 kg gross, carried by Alpen Air Cargo GmbH. It references two POs (4500318766, 4500318769) but does not say which line belongs to which PO. The Remarks field is blank. A handwritten 'Schulz P.' appears on the 'Received by' line, with no receiving date or stamp. There are no corrections or strike-throughs.",
+    "red_flags": [
+      "The same part CMP-GAM-002 appears on two lines, and the note does not assign either line to a PO. Two POs are listed in the header.",
+      "Quantities per package are very uneven: 5.000 PCS in 10 packages is about 500 per package, and 5.500 PCS in 2 packages is about 2,750 per package. This may be worth checking.",
+      "Quantities are printed as '5.000' and '5.500'. I read them as 5000 and 5500 because PCS is a whole-piece unit and the note has no decimal quantities. The document is in English and the US-style date suggests a US issuer, so the separator convention is ambiguous. Check against the POs.",
+      "The 'Received by' line has a handwritten name but no date, and there is no receiving stamp. No received quantity is recorded, so there is no evidence of a goods-receipt check against the delivered quantity."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Clean printed layout. All printed values are clearly legible.",
+      "The handwritten 'Schulz P.' on the 'Received by' line is the only handwriting. It is a signature or name, not a correction.",
+      "No stamps, strike-throughs or overwrites are visible.",
+      "The Remarks field is blank.",
+      "The 'Packages' column header slightly overflows the table border, which is cosmetic only.",
+      "The document date is printed in US format (MM/DD/YYYY): 11/19/2026."
+    ]
+  }
+}

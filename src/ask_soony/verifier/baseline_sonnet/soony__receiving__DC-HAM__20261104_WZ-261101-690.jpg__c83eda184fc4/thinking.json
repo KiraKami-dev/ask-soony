@@ -1,0 +1,6 @@
+[
+  {
+    "turn": 50,
+    "thinking": "I've already read the image, so now I need to put the structured output together. It's a Polish WZ delivery document from Karton Nowak in Poznań, addressed to Soony Distribution Center in Hamburg, with the number, date, and purchase order recorded, and the first line item is a cover sleeve for Grand Heist 6.\n\nI'm pulling the remaining line details together: the quantity of 75,000 pieces, 37 packages, and a gross weight of 333 kg. The carrier reference and the handwritten receipt signature from Schulz P. are noted, along with the 04.11.2026 receipt stamp, and the remarks field is empty.\n\n"
+  }
+]

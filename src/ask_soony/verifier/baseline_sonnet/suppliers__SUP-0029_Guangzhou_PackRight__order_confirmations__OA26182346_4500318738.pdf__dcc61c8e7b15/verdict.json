@@ -1,0 +1,134 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English",
+    "Chinese"
+  ],
+  "issuer": "Guangzhou PackRight Packaging Co., Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26182346",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318738"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00020",
+      "material_id": "PR-CC-0312",
+      "supplier_part_no": null,
+      "description": "Game Card Case (clear)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "350,000",
+          "number": 350000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "1.44",
+          "number": 1.44,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-11-21",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "00010",
+      "material_id": "PR-SL-0604",
+      "supplier_part_no": null,
+      "description": "Cover Sleeve Grand Heist 6 (USK/PEGI)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "64,000",
+          "number": 64000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.4143",
+          "number": 0.4143,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-11-16",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "revision",
+          "field_label": null,
+          "value": "rev. B",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "revision",
+      "text_en": "Artwork for PR-SL-0604: rev. B (GH6_sleeve_revB.pdf), per Soony drawing on file.",
+      "quote": "Artwork PR-SL-0604: rev. B (GH6_sleeve_revB.pdf), per Soony drawing on file."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Customer Soony Interactive GmbH; order 4500318738 of 2026-09-16; Incoterms FOB Yantian; payment NET30.",
+      "quote": "Customer: Soony Interactive GmbH · Your order 4500318738 of 2026-09-16 · Incoterms FOB Yantian · Payment NET30"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA26182346 from Guangzhou PackRight to Soony Interactive GmbH for PO 4500318738 (dated 2026-09-16). It confirms two lines: 350,000 Game Card Cases (PR-CC-0312) at 1.44 CNY, confirmed for 2026-11-21, and 64,000 Cover Sleeves Grand Heist 6 (PR-SL-0604) at 0.4143 CNY, confirmed for 2026-11-16, artwork rev. B. Terms are FOB Yantian and NET30. The document has no handwritten changes or stamps.",
+    "red_flags": [
+      "Line items are listed in the order 00020 then 00010, not in numerical order.",
+      "The document has no issue date of its own; only the customer order date (2026-09-16) is given.",
+      "The order quantities on the original PO are not shown, so they cannot be compared with the confirmed quantities."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Typed PDF with no handwriting, stamps or signatures.",
+      "Header contains Chinese text (订单确认书) alongside English.",
+      "Unit of measure is not stated for the quantities."
+    ]
+  }
+}

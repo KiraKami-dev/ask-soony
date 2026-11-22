@@ -1,0 +1,150 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English",
+    "Korean"
+  ],
+  "issuer": "Hwaseong Memory Co., Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26860304",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318705"
+    },
+    {
+      "type": "other",
+      "value": "Order confirmation OA26860304"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "13,000",
+          "number": 13000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "5.4",
+          "number": 5.4,
+          "unit": "USD",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-09-29",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2026-07-28",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "00020",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "12,000",
+          "number": 12000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "5.56",
+          "number": 5.56,
+          "unit": "USD",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-10-05",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2026-07-28",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Incoterms FOB Busan; payment terms NET45.",
+      "quote": "Incoterms FOB Busan · Payment NET45"
+    },
+    {
+      "topic": "other",
+      "text_en": "Order confirmation OA26860304 for customer Soony Interactive GmbH, referencing order 4500318705 of 2026-07-28.",
+      "quote": "Customer: Soony Interactive GmbH · Your order 4500318705 of 2026-07-28"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Order confirmation OA26860304 from Hwaseong Memory for PO 4500318705 (dated 2026-07-28), FOB Busan, NET45. It confirms two lines for the same material CMP-GAM-002 (Game Card 64 GB – Grand Heist 5): 13,000 pcs at 5.4 USD confirmed for 2026-09-29, and 12,000 pcs at 5.56 USD confirmed for 2026-10-05. Total 25,000 pcs. The document is clean, with no handwriting or corrections.",
+    "red_flags": [
+      "The same material CMP-GAM-002 appears on two lines at different unit prices (5.4 USD vs 5.56 USD). The buyer should check both against the PO.",
+      "The two lines have different confirmed dates (2026-09-29 and 2026-10-05), so delivery is split.",
+      "The document carries no issue date of its own; only the PO date 2026-07-28 is shown.",
+      "The quantity column has no unit of measure stated, and the confirmation does not say whether the quantities match the original PO."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Clean printed single-page document with no handwriting, stamps, signatures or visible damage.",
+      "The heading is bilingual (Korean/English); the rest is in English.",
+      "Quantities use comma thousands separators (13,000 = 13000).",
+      "The Qty column is read as the confirmed quantity because this is an order confirmation. The original ordered quantity is not shown."
+    ]
+  }
+}

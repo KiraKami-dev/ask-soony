@@ -1,0 +1,1269 @@
+[
+  {
+    "_type": "SystemMessage",
+    "subtype": "init",
+    "data": {
+      "type": "system",
+      "subtype": "init",
+      "cwd": "/Users/farhanhassan/ask-soony/data/portal",
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "tools": [
+        "Read",
+        "StructuredOutput"
+      ],
+      "mcp_servers": [],
+      "model": "claude-sonnet-5-5",
+      "permissionMode": "dontAsk",
+      "slash_commands": [
+        "deep-research",
+        "design",
+        "design-sync",
+        "dataviz",
+        "update-config",
+        "verify",
+        "debug",
+        "code-review",
+        "simplify",
+        "batch",
+        "fewer-permission-prompts",
+        "doctor",
+        "loop",
+        "schedule",
+        "claude-api",
+        "workflow-authoring",
+        "run",
+        "run-skill-generator",
+        "plugin-authoring",
+        "advisor",
+        "agents",
+        "auto-mode-setup",
+        "autocompact",
+        "clear",
+        "color",
+        "compact",
+        "config",
+        "output-style",
+        "context",
+        "effort",
+        "fast",
+        "focus",
+        "heapdump",
+        "init",
+        "mcp",
+        "import",
+        "model",
+        "__remote-workflow",
+        "workflow-launch-exec",
+        "reload-plugins",
+        "reload-skills",
+        "rename",
+        "ultrareview",
+        "security-review",
+        "usage-credits",
+        "extra-usage",
+        "usage",
+        "insights",
+        "recap",
+        "skill-doctor",
+        "goal",
+        "design-consent",
+        "design-revoke",
+        "list-agents",
+        "team-onboarding"
+      ],
+      "terminal_slash_commands": [
+        "doctor",
+        "color",
+        "focus",
+        "reload-plugins"
+      ],
+      "apiKeySource": "none",
+      "claude_code_version": "2.1.330",
+      "output_style": "default",
+      "agents": [
+        "claude",
+        "Explore",
+        "general-purpose",
+        "Plan",
+        "statusline-setup",
+        "web-fetch"
+      ],
+      "skills": [
+        "deep-research",
+        "design",
+        "design-sync",
+        "dataviz",
+        "update-config",
+        "verify",
+        "debug",
+        "code-review",
+        "simplify",
+        "batch",
+        "fewer-permission-prompts",
+        "doctor",
+        "loop",
+        "schedule",
+        "claude-api",
+        "workflow-authoring",
+        "run",
+        "run-skill-generator",
+        "plugin-authoring"
+      ],
+      "plugins": [
+        {
+          "name": "cc-plugin-sec-default",
+          "path": "builtin",
+          "source": "cc-plugin-sec-default@builtin"
+        },
+        {
+          "name": "cc-plugin-agents-md",
+          "path": "builtin",
+          "source": "cc-plugin-agents-md@builtin"
+        },
+        {
+          "name": "cc-plugin-telemetry",
+          "path": "builtin",
+          "source": "cc-plugin-telemetry@builtin"
+        },
+        {
+          "name": "cc-plugin-privacy",
+          "path": "builtin",
+          "source": "cc-plugin-privacy@builtin"
+        },
+        {
+          "name": "cc-plugin-plugin-authoring",
+          "path": "builtin",
+          "source": "cc-plugin-plugin-authoring@builtin"
+        }
+      ],
+      "capabilities": [
+        "interrupt_receipt_v1",
+        "interrupt_cancel_queued_v1",
+        "interrupt_send_now_v1",
+        "interrupt_requeue_taken_v1",
+        "msg_lifecycle_v1",
+        "request_marker_lists_v1",
+        "ask_user_question_unanswered_v1",
+        "lifecycle_wakeup_source_v1",
+        "sdk_mcp_tools_list_changed",
+        "sdk_mcp_manifests",
+        "mcp_read_resource_v1",
+        "mcp_tool_ui_meta_v1",
+        "ui_surface_v1",
+        "mcp_call_result_not_for_model_v1",
+        "mcp_call_check_permissions_v1",
+        "voice_call_talk_line_v1",
+        "withdrawn_files_note_v2",
+        "withdrawn_tools_v1",
+        "ui_pane_widget_v1",
+        "reload_plugins_refuse_if_busy_v1",
+        "get_usage_detached_v1",
+        "silent_resend_files_v1"
+      ],
+      "analytics_disabled": false,
+      "product_feedback_disabled": false,
+      "served_by_anthropic": true,
+      "uuid": "aeea24e6-2bdc-4c2e-a1dd-df339a16738a",
+      "memory_paths": {
+        "auto": "/Users/farhanhassan/.claude/projects/-Users-farhanhassan-ask-soony/memory/"
+      },
+      "original_cwd": "/Users/farhanhassan/ask-soony/data/portal",
+      "additional_directories": [],
+      "messaging_socket_path": "/tmp/cc-socks/56515.sock",
+      "fast_mode_state": "off",
+      "fast_mode_disabled_reason": "sdk_opt_in_required",
+      "per_turn_effort_active": true,
+      "ultrathink_available": false,
+      "ultrathink_typed_raises": false,
+      "view_mode": "default"
+    }
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ToolUseBlock",
+        "id": "toolu_01LcrZAPfweT8TdJ7M53L4CB",
+        "name": "Read",
+        "input": {
+          "file_path": "/Users/farhanhassan/ask-soony/data/portal/suppliers/SUP-0028_Karton_Nowak/order_confirmations/OA26162273_4500318698.pdf"
+        }
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 881,
+      "cache_read_input_tokens": 3786,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 881
+      },
+      "output_tokens": 16,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGmMsqxpLa5zcFkELx9a",
+    "stop_reason": null,
+    "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+    "uuid": "0ac3bdca-fc18-4133-a08f-bd7133ba9a99",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "UserMessage",
+    "content": [
+      {
+        "_type": "ToolResultBlock",
+        "tool_use_id": "toolu_01LcrZAPfweT8TdJ7M53L4CB",
+        "content": [
+          {
+            "type": "text",
+            "text": "PDF file read: /Users/farhanhassan/ask-soony/data/portal/suppliers/SUP-0028_Karton_Nowak/order_confirmations/OA26162273_4500318698.pdf (2.2KB)"
+          },
+          {
+            "type": "document",
+            "source": {
+              "type": "base64",
+              "media_type": "application/pdf",
+              "data": "<2996 chars of encoded data left out>"
+            }
+          }
+        ],
+        "is_error": null
+      }
+    ],
+    "uuid": "178ab123-8383-4024-aa46-98e0a8999f90",
+    "parent_tool_use_id": null,
+    "tool_use_result": {
+      "type": "pdf",
+      "file": {
+        "filePath": "/Users/farhanhassan/ask-soony/data/portal/suppliers/SUP-0028_Karton_Nowak/order_confirmations/OA26162273_4500318698.pdf",
+        "base64": "JVBERi0xLjQKJeLjz9MgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiAzIDAgUgo+PgplbmRvYmoKMiAwIG9iago8PAovQmFzZUZvbnQgL0hlbHZldGljYSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjEgL1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iagozIDAgb2JqCjw8Ci9CYXNlRm9udCAvSGVsdmV0aWNhLUJvbGQgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgL05hbWUgL0YyIC9TdWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKNCAwIG9iago8PAovQ29udGVudHMgOCAwIFIgL01lZGlhQm94IFsgMCAwIDU5NS4yNzU2IDg0MS44ODk4IF0gL1BhcmVudCA3IDAgUiAvUmVzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERiAvVGV4dCAvSW1hZ2VCIC9JbWFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKCj4+IAogIC9UeXBlIC9QYWdlCj4+CmVuZG9iago1IDAgb2JqCjw8Ci9QYWdlTW9kZSAvVXNlTm9uZSAvUGFnZXMgNyAwIFIgL1R5cGUgL0NhdGFsb2cKPj4KZW5kb2JqCjYgMCBvYmoKPDwKL0F1dGhvciAoQWduaWVzemthIE5vd2FrKSAvQ3JlYXRpb25EYXRlIChEOjIwMjYwNzIzMDczMjEyKzAwJzAwJykgL0NyZWF0b3IgKFNBUCBOZXRXZWF2ZXIgNy41MCkgL0tleXdvcmRzICgpIC9Nb2REYXRlIChEOjIwMjYwNzIzMDczMjEyKzAwJzAwJykgL1Byb2R1Y2VyIChTQVAgTmV0V2VhdmVyIEFwcGxpY2F0aW9uIFNlcnZlciA3LjUwIC8gQUJBUCkgCiAgL1N1YmplY3QgKCkgL1RpdGxlIChLYXJ0b24gTm93YWsgU3AuIHogby5vLikgL1RyYXBwZWQgL0ZhbHNlCj4+CmVuZG9iago3IDAgb2JqCjw8Ci9Db3VudCAxIC9LaWRzIFsgNCAwIFIgXSAvVHlwZSAvUGFnZXMKPj4KZW5kb2JqCjggMCBvYmoKPDwKL0ZpbHRlciBbIC9BU0NJSTg1RGVjb2RlIC9GbGF0ZURlY29kZSBdIC9MZW5ndGggODI3Cj4+CnN0cmVhbQpHYXQ9aTlpS2UjJjtLWlEnbWtURCZSKjs+U19jXStKWDI/ImJiNmknTGRbcEBDbyohayIyRFJVJzNvNTIzMj1rSHJmSGklPS47XSEiUjYxbGhpZUssLiJUOVMjZm4tViFKVmtRajtecFhpLTBfO1BwLkU6RVFLPlwoX0wjKzAkWzI/Qz4uTUw6JyMtLShTM1dRaytqS0NcPFBiRlRrbi5YXDI1bCgmVDZfNmhTOVtpcCoiXjNqQGEyR0VhdDwwT0tGZ3JBVm5kOSoqTUFfMXJXK2ZtSVgtOVdKMz9zTk9lLTw5cUVnb0tJXS43KEFdQU1WKUQ3QGw+ak4lMG87J3VNIXBFP0RfRDZOOWtqOWVNbycjWUlZQV9ObmxJZm8kWjRGaTg9cWFKWkZhJFAxRSIjKVphPSw/KigqIkBhJm1McDBKZCskYVVYOmtOMzNxZmpWLVlXWjM7NkJMMmEvdV07PDJKOWIjV2dWWHJlcTFPR0g5JCldayQlMFs9cFAzKDdRL3MlVytHSDFuPnBLaDhycykuTkQ2a1o1PT5JaUJKMl9ibzAiPi1nW0BWOkQ/KVVqXjVRUmxkbj04WUNxbEQ8ZEZkL18oRzhHImkjZXIsQVprOVhQcipYaydGT3NXdGM7PVdBQSpAJFtqTmRTNlFvPGElWTlkZE8iSmRZMSlgaWNMNklxYkFrNiY3N1BXJ0c6a2VJZ0VeN0wnNTRoO1dUdHIoaWhcTVRuWWtCJSd1IUlrZzl1SDVAVFpmRkZqXGRDKnIyTGhPKllRMGgoaTcrQEs9V283M2Bmb24mQlxiNGYlRWRIWiRmTThYTTpJSmw7NUhpMyVROVZwbkRGYDtfSUZbYEYlWWUzT2plNG9QQ141OiJva1NrZmdlS05bcT9QP1VeaFg8OzE/UGkyR0A0RTdLaT1OcCRCWHI4blFvOzZyMUpOPFY8aTs1VCFdVS1cK0F1bSFpLScxKFZJRWooaHJDSDI7Ui1TNDQzR2ZIVVcuZlpnaVFwR0ZzWXVpcTRFOiZtZzFGaCslTiUjW1E3J01nPi1qIj8tPm4nWT4iOmhlTytOZjdFUigqM0koSWVVWlFnVTA7LCl+PmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDkKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDYxIDAwMDAwIG4gCjAwMDAwMDAxMDIgMDAwMDAgbiAKMDAwMDAwMDIwOSAwMDAwMCBuIAowMDAwMDAwMzIxIDAwMDAwIG4gCjAwMDAwMDA1MjQgMDAwMDAgbiAKMDAwMDAwMDU5MiAwMDAwMCBuIAowMDAwMDAwODc4IDAwMDAwIG4gCjAwMDAwMDA5MzcgMDAwMDAgbiAKdHJhaWxlcgo8PAovSUQgCls8OWQ2YmUwZWI4YTk3ZWEyODRjYzE3ZTFkNmY0NTMwNWQ+PDlkNmJlMGViOGE5N2VhMjg0Y2MxN2UxZDZmNDUzMDVkPl0KJSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCgovSW5mbyA2IDAgUgovUm9vdCA1IDAgUgovU2l6ZSA5Cj4+CnN0YXJ0eHJlZgoxODU0CiUlRU9GCg==",
+        "originalSize": 2245
+      }
+    },
+    "origin": null
+  },
+  {
+    "_type": "RateLimitEvent",
+    "rate_limit_info": {
+      "_type": "RateLimitInfo",
+      "status": "allowed",
+      "resets_at": 1795313400,
+      "rate_limit_type": "five_hour",
+      "utilization": null,
+      "overage_status": "rejected",
+      "overage_resets_at": 1796083200,
+      "overage_disabled_reason": "org_level_disabled_until",
+      "raw": {
+        "status": "allowed",
+        "resetsAt": 1795313400,
+        "rateLimitType": "five_hour",
+        "overageStatus": "rejected",
+        "overageResetsAt": 1796083200,
+        "overageDisabledReason": "org_level_disabled_until",
+        "memberSpendLimit": {},
+        "isUsingOverage": false,
+        "unifiedWindows": {
+          "five_hour": {
+            "utilization": 0.04,
+            "resetsAt": 1795313400,
+            "status": "allowed"
+          },
+          "seven_day": {
+            "utilization": 0,
+            "resetsAt": 1795554000,
+            "status": "allowed"
+          }
+        }
+      }
+    },
+    "uuid": "77279902-ad64-473b-876e-34502602fb20",
+    "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb"
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 5,
+      "estimated_tokens_delta": 5,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "a49ce003-95b2-400e-9703-b6dad5759ad6"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 10,
+      "estimated_tokens_delta": 5,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "04f51fa3-ee50-48b2-8415-3d5d848ca8ee"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 14,
+      "estimated_tokens_delta": 4,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "f065c787-f46f-4a5d-8788-89860cb05cc1"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 18,
+      "estimated_tokens_delta": 4,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "6ca3020a-4b1d-4da8-b82f-61dd10e2c8b7"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 19,
+      "estimated_tokens_delta": 1,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "648ff0c7-7f15-4aea-9b65-f8af6f0a3722"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 25,
+      "estimated_tokens_delta": 6,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "7b78a2f1-1b58-407a-8871-99730d325af1"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 30,
+      "estimated_tokens_delta": 5,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "4438aeac-6ec2-4a0b-9c34-844b89eda9da"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 36,
+      "estimated_tokens_delta": 6,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "a84487a1-2774-443a-ac08-2377045f8304"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 38,
+      "estimated_tokens_delta": 2,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "7d89056f-8ce9-44bd-af8b-dee12ec56090"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 46,
+      "estimated_tokens_delta": 8,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "1a04ee8b-27d4-482a-bdaa-96d74e2ba755"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 48,
+      "estimated_tokens_delta": 2,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "1b76585f-baf1-4439-a214-b9f56363d257"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 51,
+      "estimated_tokens_delta": 3,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "6146658d-c39f-41a1-be9d-a20454197388"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 55,
+      "estimated_tokens_delta": 4,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "c2d32a1b-dac5-43c4-a0cb-4b93311c0a64"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 57,
+      "estimated_tokens_delta": 2,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "68f2cf09-14b0-491a-b4d9-29e20f16b28e"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 58,
+      "estimated_tokens_delta": 1,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "f1d5d07c-41a0-4d3c-9d61-cc1d6646d740"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 61,
+      "estimated_tokens_delta": 3,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "3e3719a8-5edf-447e-875d-a2befb9bc4b4"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 63,
+      "estimated_tokens_delta": 2,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "7f0bd2e3-16e7-461b-8c75-a89e15b11b0c"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 64,
+      "estimated_tokens_delta": 1,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "e7ac9340-ad99-46a1-b288-a58d6415978c"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 70,
+      "estimated_tokens_delta": 6,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "31b8cc7d-432f-487b-8e15-147e2a6c649f"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 74,
+      "estimated_tokens_delta": 4,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "04a7512e-fa50-4952-9b0b-0b0d284a1e15"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 76,
+      "estimated_tokens_delta": 2,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "43c574bf-843e-459e-be4f-eb9d8bca7db1"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 77,
+      "estimated_tokens_delta": 1,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "5ee8c247-2d31-4d46-bfd0-f963b1dc5845"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 81,
+      "estimated_tokens_delta": 4,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "86c91614-6678-4679-8800-2b24fc8780bb"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 85,
+      "estimated_tokens_delta": 4,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "ab3961ff-f877-403b-87ba-0ee879b9de2d"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 86,
+      "estimated_tokens_delta": 1,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "57bf3595-ac72-4007-a65c-efd9dd276100"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 93,
+      "estimated_tokens_delta": 7,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "4ee403e7-4348-4cc1-83a6-dba360c1fcc6"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 96,
+      "estimated_tokens_delta": 3,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "c1989bd1-e983-4130-a1a3-65d5bc5c3d3d"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 99,
+      "estimated_tokens_delta": 3,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "30d01a90-772c-4c80-84c5-2358e4b6215b"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 104,
+      "estimated_tokens_delta": 5,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "8e69ff1f-0594-46ea-aca6-6c1e0d3bc032"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 106,
+      "estimated_tokens_delta": 2,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "56e2669e-38e6-4291-b1b4-4c705f4aaff3"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 108,
+      "estimated_tokens_delta": 2,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "a51aaa33-0bd1-4629-8f40-3a04621e47e1"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 112,
+      "estimated_tokens_delta": 4,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "9af95d49-14f6-43e0-b50d-c3ade8ef9f1c"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 118,
+      "estimated_tokens_delta": 6,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "9d23fcc6-97b3-47b3-9cb7-1b305f6e655d"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 123,
+      "estimated_tokens_delta": 5,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "073c3e5a-6260-4081-a3b1-1470fb9d3e73"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 124,
+      "estimated_tokens_delta": 1,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "fb58d830-25b9-4b62-a42c-29300676e63c"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 130,
+      "estimated_tokens_delta": 6,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "5f39fd29-beb3-4f65-a455-dc72262b0c35"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 132,
+      "estimated_tokens_delta": 2,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "25553dd7-6e5b-4f05-a207-802f214da36f"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 134,
+      "estimated_tokens_delta": 2,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "4821a935-996d-4f63-aa0c-c179e74f7074"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 139,
+      "estimated_tokens_delta": 5,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "5a098444-06b2-4920-a08e-5bde8a9d7ef5"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 140,
+      "estimated_tokens_delta": 1,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "2267ae5b-e1f2-4632-aa3a-0bb7203e6a50"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 321,
+      "estimated_tokens_delta": 181,
+      "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+      "uuid": "e9180581-fcc5-4e5a-9c4a-22ff1f62bc1a"
+    }
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ThinkingBlock",
+        "thinking": "I'm reading the quantities as English-style numbers: 130,000 and 10,500, since the unit price 0.03 uses a dot for decimals, so the commas must be thousands separators. The total isn't stated, so I'll record the quantities under quantity_ordered and leave the total out.\n\nThe order date is 2026-07-20, so I'll record it as date_ordered, and the \"Confirmed\" date goes in date_confirmed. For the quantity I'll use quantity_confirmed. The unit isn't stated, but the unit price is in EUR.\n\n",
+        "signature": "CAQS/AkKEAgUGAI4AUIIdGhpbmtpbmcSDOzOs3r06CJMLdV0jhoMkmdo/E+hxQtIci1fIjB7Lf0k2EeSWJI1G92D5LF9vxRM/n/xFIbm/U5RTP2iHDDcFysROo/LGMuUVlEVxsgqmQl0VJvgt74QLKzBsf5qnYKYn9zFlLdp/QRtmG1Yody2zDBc/9xGBWzLy8ezfHIw/yWpug0HXupxkAxBNsHGcSMg9Gpiwc/TsaytThijuSHbluI45G3pXMn9Zgd4cSC46E/LLVYW+MVRS7K9yOZ9kZfh1vo6CfS5tB4lphOKx6ElexhponxUYokPAAQX6WqPkJFl8XnNyHaX4EVTIyGkAfwV7oT/qHaLZjVuB4JV8ta7GlbQfrbyehkrOJQGt57paOoOdHmDj00Lw/36avqkagtJ/5LSybb3ou3mCHJF4a0IKT0eStiNTYI2iqPKpvLzLPIGiRz+W4nWsbpDTJky9jKYtcJbNQrgcL6u5CJfuerYgj2/JLg94CIdtNlICwBXJiGmi0DgBjNlNbmBIQdanOLORVNMrHn+Gm94Bc6oNxiczO17iIL4Im210Gjbg5kqYviS6b/Te0uY3A4BMQBomB1PytYaB/9sRAI7NOtlvdUqDPkLIzLImUx+0QrPrNTUEvgJIq/QyJfstexW5sgMqkVaAyqQ9TJdmgs3Ar3yXnXWutT6R5uG46lM2iqe+V2eOi14ExhytqBLlI8Y9xa3SHIggFmL8BYhrlZgHd6XXkvH67vnSxgfATwQsUoacILnnt5aMsbw8NAT8bE+bKD9lBBLXKWWdaJ7AZDQjWlmZEF3QSSkbnQGcDpFTpZjo6B0g7gLx6Rb/rauZTGQuD3tC1YVzAG9bjHu4B8FnmYSJ0Wsw7nIG2PNfEaDpK7icquGyJqLRZJt2wdv+PWf729i74cAmeCkXkRA4NR2ry0nsU6vqW5E5x1e4uMOKjzU6An/XV5DUxbuC0xvw4Tg9Bl9uBhh1VmGR18n6pcuVlH/ERDtWm+fSv3KTfyPNBy2/9g32GOO8HGfci+hTSQwDY0YO4HGybr0isK8zkOX5HYC9WlgE8qGCXg2VyZmiD8Jh55XXpoWAFqYT4De3npqs99yABkjr1GAESkioMV76ufFAllmzpBcsXE/BXiIZ1w3xitlao48TOD/cuz+r8GGIh65OND06vBBYHLLKpYcwdq9fLn7umxEbSaoQElesj/z6b+SRj8rnjAUos1p6gDVhZaTAjiQUzPDzEiWpLlJLPXN1eNlcDoL4CFAZQdVaEexYXbt8f364Il4SkCIo2XRnfoIKmWeJ/srWTGnk1vusEYZxjpAvadF/X8EcsLkXNrlrwD+W5M62AVT3iSrgp4oFZs++G3P7A3TX4Q0QcJ7Z2/pUDJ+/uaabYANolJoh1gG/1CRy5ugDYaZEnMvtoRYfg8vQ7w0S4/4Tk0J1wGa/ML2YDyLVhT7RQA5B86QICTTJFfhUiKAXQBpjagooZoCoCjj/O49ZUmMdWTjo3XFPW8F6XuqX8w67Ms0kxkOtM2BOXQDvTGVJIaAgHvnkjb8OZtCb6ICyLgUsMqQFK8xMg5sIaF8pZolBOiJx5PiktbL5kcEzHnTgl7MwpCMNE5u8JQrc8atXTQpwdARKHvjdT/m5OyKss+no5Kh1/ARN5ce0HolvNhZuwlOyt+/scLs3ZfB64CuNG58ATGzxL8FGAE="
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 20035,
+      "cache_read_input_tokens": 3786,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 20035
+      },
+      "output_tokens": 9,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGmN4Kkb6ZHJacCZnvrA",
+    "stop_reason": null,
+    "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+    "uuid": "10c55857-60c5-4c7a-8abc-f34d469062c1",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ToolUseBlock",
+        "id": "toolu_019wTCgcbP8eUJV76YPy6QGk",
+        "name": "StructuredOutput",
+        "input": {
+          "document_type": "order_confirmation",
+          "languages": [
+            "Polish",
+            "English"
+          ],
+          "issuer": "Karton Nowak Sp. z o.o.",
+          "recipient": "Soony Interactive GmbH",
+          "document_number": "OA26162273",
+          "document_date": null,
+          "references": [
+            {
+              "type": "po_number",
+              "value": "4500318698"
+            }
+          ],
+          "lines": [
+            {
+              "item": "00010",
+              "material_id": "CMP-GAM-011",
+              "supplier_part_no": null,
+              "description": "Activation Code Leaflet",
+              "values": [
+                {
+                  "field": "quantity_confirmed",
+                  "field_label": null,
+                  "value": "130,000",
+                  "number": 130000,
+                  "unit": null,
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "unit_price",
+                  "field_label": null,
+                  "value": "0.03",
+                  "number": 0.03,
+                  "unit": "EUR",
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "date_confirmed",
+                  "field_label": null,
+                  "value": "2026-08-14",
+                  "number": null,
+                  "unit": null,
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "date_ordered",
+                  "field_label": null,
+                  "value": "2026-07-20",
+                  "number": null,
+                  "unit": null,
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                }
+              ]
+            },
+            {
+              "item": "00020",
+              "material_id": "CMP-GAM-008",
+              "supplier_part_no": null,
+              "description": "Art Book Grand Heist 6 (96 p, hardcover)",
+              "values": [
+                {
+                  "field": "quantity_confirmed",
+                  "field_label": null,
+                  "value": "10,500",
+                  "number": 10500,
+                  "unit": null,
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "unit_price",
+                  "field_label": null,
+                  "value": "2.1",
+                  "number": 2.1,
+                  "unit": "EUR",
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "date_confirmed",
+                  "field_label": null,
+                  "value": "2026-09-03",
+                  "number": null,
+                  "unit": null,
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "date_ordered",
+                  "field_label": null,
+                  "value": "2026-07-20",
+                  "number": null,
+                  "unit": null,
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                }
+              ]
+            }
+          ],
+          "statements": [
+            {
+              "topic": "terms",
+              "text_en": "Incoterms DAP Hamburg; payment NET30.",
+              "quote": "Incoterms DAP Hamburg · Payment NET30"
+            },
+            {
+              "topic": "other",
+              "text_en": "Order confirmation OA26162273 for customer Soony Interactive GmbH, referring to order 4500318698 of 2026-07-20.",
+              "quote": "Customer: Soony Interactive GmbH · Your order 4500318698 of 2026-07-20"
+            }
+          ],
+          "decisions": [],
+          "corrections": [],
+          "verdict": {
+            "status": "clean",
+            "summary_en": "Karton Nowak order confirmation OA26162273 for PO 4500318698 (dated 2026-07-20) to Soony Interactive GmbH. Item 00010 CMP-GAM-011 Activation Code Leaflet, 130,000 at 0.03 EUR, confirmed 2026-08-14. Item 00020 CMP-GAM-008 Art Book Grand Heist 6, 10,500 at 2.1 EUR, confirmed 2026-09-03. Terms are DAP Hamburg, NET30. There are no corrections or handwriting.",
+            "red_flags": [],
+            "confidence": "high",
+            "observations": [
+              "Typed PDF with no handwriting, stamps or signatures.",
+              "The document has no issue date of its own. The only date besides the confirmed dates is the order date of 2026-07-20.",
+              "No unit of measure is given for the quantities.",
+              "No line totals or order total are shown.",
+              "The comma in the quantities (130,000 and 10,500) is read as a thousands separator, because prices use a decimal point."
+            ]
+          }
+        }
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 20035,
+      "cache_read_input_tokens": 3786,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 20035
+      },
+      "output_tokens": 9,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGmN4Kkb6ZHJacCZnvrA",
+    "stop_reason": null,
+    "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+    "uuid": "6ca105be-ed07-43c1-a154-ef9beef05f32",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "RateLimitEvent",
+    "rate_limit_info": {
+      "_type": "RateLimitInfo",
+      "status": "allowed",
+      "resets_at": 1795313400,
+      "rate_limit_type": "five_hour",
+      "utilization": null,
+      "overage_status": "rejected",
+      "overage_resets_at": 1796083200,
+      "overage_disabled_reason": "org_level_disabled_until",
+      "raw": {
+        "status": "allowed",
+        "resetsAt": 1795313400,
+        "rateLimitType": "five_hour",
+        "overageStatus": "rejected",
+        "overageResetsAt": 1796083200,
+        "overageDisabledReason": "org_level_disabled_until",
+        "memberSpendLimit": {},
+        "isUsingOverage": false,
+        "unifiedWindows": {
+          "five_hour": {
+            "utilization": 0.05,
+            "resetsAt": 1795313400,
+            "status": "allowed"
+          },
+          "seven_day": {
+            "utilization": 0.01,
+            "resetsAt": 1795554000,
+            "status": "allowed"
+          }
+        }
+      }
+    },
+    "uuid": "b0b6f65e-e2ed-4426-a352-5c33cbbef028",
+    "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb"
+  },
+  {
+    "_type": "UserMessage",
+    "content": [
+      {
+        "_type": "ToolResultBlock",
+        "tool_use_id": "toolu_019wTCgcbP8eUJV76YPy6QGk",
+        "content": "Structured output provided successfully",
+        "is_error": null
+      }
+    ],
+    "uuid": "4363cada-e581-4450-a1cc-8438757e987a",
+    "parent_tool_use_id": null,
+    "tool_use_result": "Structured output provided successfully",
+    "origin": null
+  },
+  {
+    "_type": "ResultMessage",
+    "subtype": "success",
+    "duration_ms": 12813,
+    "duration_api_ms": 13148,
+    "is_error": false,
+    "num_turns": 3,
+    "session_id": "5c0b5996-221c-4961-98d5-2a380deb1ceb",
+    "stop_reason": "tool_use",
+    "total_cost_usd": 0.1030768,
+    "usage": {
+      "input_tokens": 4,
+      "cache_creation_input_tokens": 20916,
+      "cache_read_input_tokens": 7572,
+      "output_tokens": 1851,
+      "output_tokens_details": {
+        "thinking_tokens": 245
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 20916,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "global",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 1740,
+          "cache_read_input_tokens": 3786,
+          "cache_creation_input_tokens": 20035,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 20035
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "result": "{\"document_type\":\"order_confirmation\",\"languages\":[\"Polish\",\"English\"],\"issuer\":\"Karton Nowak Sp. z o.o.\",\"recipient\":\"Soony Interactive GmbH\",\"document_number\":\"OA26162273\",\"document_date\":null,\"references\":[{\"type\":\"po_number\",\"value\":\"4500318698\"}],\"lines\":[{\"item\":\"00010\",\"material_id\":\"CMP-GAM-011\",\"supplier_part_no\":null,\"description\":\"Activation Code Leaflet\",\"values\":[{\"field\":\"quantity_confirmed\",\"field_label\":null,\"value\":\"130,000\",\"number\":130000,\"unit\":null,\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"unit_price\",\"field_label\":null,\"value\":\"0.03\",\"number\":0.03,\"unit\":\"EUR\",\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"date_confirmed\",\"field_label\":null,\"value\":\"2026-08-14\",\"number\":null,\"unit\":null,\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"date_ordered\",\"field_label\":null,\"value\":\"2026-07-20\",\"number\":null,\"unit\":null,\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"}]},{\"item\":\"00020\",\"material_id\":\"CMP-GAM-008\",\"supplier_part_no\":null,\"description\":\"Art Book Grand Heist 6 (96 p, hardcover)\",\"values\":[{\"field\":\"quantity_confirmed\",\"field_label\":null,\"value\":\"10,500\",\"number\":10500,\"unit\":null,\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"unit_price\",\"field_label\":null,\"value\":\"2.1\",\"number\":2.1,\"unit\":\"EUR\",\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"date_confirmed\",\"field_label\":null,\"value\":\"2026-09-03\",\"number\":null,\"unit\":null,\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"date_ordered\",\"field_label\":null,\"value\":\"2026-07-20\",\"number\":null,\"unit\":null,\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"}]}],\"statements\":[{\"topic\":\"terms\",\"text_en\":\"Incoterms DAP Hamburg; payment NET30.\",\"quote\":\"Incoterms DAP Hamburg · Payment NET30\"},{\"topic\":\"other\",\"text_en\":\"Order confirmation OA26162273 for customer Soony Interactive GmbH, referring to order 4500318698 of 2026-07-20.\",\"quote\":\"Customer: Soony Interactive GmbH · Your order 4500318698 of 2026-07-20\"}],\"decisions\":[],\"corrections\":[],\"verdict\":{\"status\":\"clean\",\"summary_en\":\"Karton Nowak order confirmation OA26162273 for PO 4500318698 (dated 2026-07-20) to Soony Interactive GmbH. Item 00010 CMP-GAM-011 Activation Code Leaflet, 130,000 at 0.03 EUR, confirmed 2026-08-14. Item 00020 CMP-GAM-008 Art Book Grand Heist 6, 10,500 at 2.1 EUR, confirmed 2026-09-03. Terms are DAP Hamburg, NET30. There are no corrections or handwriting.\",\"red_flags\":[],\"confidence\":\"high\",\"observations\":[\"Typed PDF with no handwriting, stamps or signatures.\",\"The document has no issue date of its own. The only date besides the confirmed dates is the order date of 2026-07-20.\",\"No unit of measure is given for the quantities.\",\"No line totals or order total are shown.\",\"The comma in the quantities (130,000 and 10,500) is read as a thousands separator, because prices use a decimal point.\"]}}",
+    "structured_output": {
+      "document_type": "order_confirmation",
+      "languages": [
+        "Polish",
+        "English"
+      ],
+      "issuer": "Karton Nowak Sp. z o.o.",
+      "recipient": "Soony Interactive GmbH",
+      "document_number": "OA26162273",
+      "document_date": null,
+      "references": [
+        {
+          "type": "po_number",
+          "value": "4500318698"
+        }
+      ],
+      "lines": [
+        {
+          "item": "00010",
+          "material_id": "CMP-GAM-011",
+          "supplier_part_no": null,
+          "description": "Activation Code Leaflet",
+          "values": [
+            {
+              "field": "quantity_confirmed",
+              "field_label": null,
+              "value": "130,000",
+              "number": 130000,
+              "unit": null,
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "unit_price",
+              "field_label": null,
+              "value": "0.03",
+              "number": 0.03,
+              "unit": "EUR",
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "date_confirmed",
+              "field_label": null,
+              "value": "2026-08-14",
+              "number": null,
+              "unit": null,
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "date_ordered",
+              "field_label": null,
+              "value": "2026-07-20",
+              "number": null,
+              "unit": null,
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            }
+          ]
+        },
+        {
+          "item": "00020",
+          "material_id": "CMP-GAM-008",
+          "supplier_part_no": null,
+          "description": "Art Book Grand Heist 6 (96 p, hardcover)",
+          "values": [
+            {
+              "field": "quantity_confirmed",
+              "field_label": null,
+              "value": "10,500",
+              "number": 10500,
+              "unit": null,
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "unit_price",
+              "field_label": null,
+              "value": "2.1",
+              "number": 2.1,
+              "unit": "EUR",
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "date_confirmed",
+              "field_label": null,
+              "value": "2026-09-03",
+              "number": null,
+              "unit": null,
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "date_ordered",
+              "field_label": null,
+              "value": "2026-07-20",
+              "number": null,
+              "unit": null,
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            }
+          ]
+        }
+      ],
+      "statements": [
+        {
+          "topic": "terms",
+          "text_en": "Incoterms DAP Hamburg; payment NET30.",
+          "quote": "Incoterms DAP Hamburg · Payment NET30"
+        },
+        {
+          "topic": "other",
+          "text_en": "Order confirmation OA26162273 for customer Soony Interactive GmbH, referring to order 4500318698 of 2026-07-20.",
+          "quote": "Customer: Soony Interactive GmbH · Your order 4500318698 of 2026-07-20"
+        }
+      ],
+      "decisions": [],
+      "corrections": [],
+      "verdict": {
+        "status": "clean",
+        "summary_en": "Karton Nowak order confirmation OA26162273 for PO 4500318698 (dated 2026-07-20) to Soony Interactive GmbH. Item 00010 CMP-GAM-011 Activation Code Leaflet, 130,000 at 0.03 EUR, confirmed 2026-08-14. Item 00020 CMP-GAM-008 Art Book Grand Heist 6, 10,500 at 2.1 EUR, confirmed 2026-09-03. Terms are DAP Hamburg, NET30. There are no corrections or handwriting.",
+        "red_flags": [],
+        "confidence": "high",
+        "observations": [
+          "Typed PDF with no handwriting, stamps or signatures.",
+          "The document has no issue date of its own. The only date besides the confirmed dates is the order date of 2026-07-20.",
+          "No unit of measure is given for the quantities.",
+          "No line totals or order total are shown.",
+          "The comma in the quantities (130,000 and 10,500) is read as a thousands separator, because prices use a decimal point."
+        ]
+      }
+    },
+    "model_usage": {
+      "claude-haiku-5-5": {
+        "inputTokens": 1261,
+        "outputTokens": 23,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.0001376,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 0,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 0,
+        "canonicalModel": "claude-haiku-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      },
+      "claude-sonnet-5-5": {
+        "inputTokens": 4,
+        "outputTokens": 1851,
+        "cacheReadInputTokens": 7572,
+        "cacheCreationInputTokens": 20916,
+        "webSearchRequests": 0,
+        "costUSD": 0.1029392,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 245,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 20916,
+        "canonicalModel": "claude-sonnet-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "permission_denials": [],
+    "deferred_tool_use": null,
+    "errors": null,
+    "api_error_status": null,
+    "uuid": "a16a4de5-42fa-4fd0-9e6a-fb8bc47e826c",
+    "terminal_reason": "completed",
+    "origin": null,
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  }
+]

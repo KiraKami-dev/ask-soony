@@ -1,0 +1,992 @@
+[
+  {
+    "_type": "SystemMessage",
+    "subtype": "init",
+    "data": {
+      "type": "system",
+      "subtype": "init",
+      "cwd": "/Users/farhanhassan/ask-soony/data/portal",
+      "session_id": "f150e4f2-8318-4126-8824-43716dd87018",
+      "tools": [
+        "Read",
+        "StructuredOutput"
+      ],
+      "mcp_servers": [],
+      "model": "claude-sonnet-5-5",
+      "permissionMode": "dontAsk",
+      "slash_commands": [
+        "deep-research",
+        "design",
+        "design-sync",
+        "dataviz",
+        "update-config",
+        "verify",
+        "debug",
+        "code-review",
+        "simplify",
+        "batch",
+        "fewer-permission-prompts",
+        "doctor",
+        "loop",
+        "schedule",
+        "claude-api",
+        "workflow-authoring",
+        "run",
+        "run-skill-generator",
+        "plugin-authoring",
+        "advisor",
+        "agents",
+        "auto-mode-setup",
+        "autocompact",
+        "clear",
+        "color",
+        "compact",
+        "config",
+        "output-style",
+        "context",
+        "effort",
+        "fast",
+        "focus",
+        "heapdump",
+        "init",
+        "mcp",
+        "import",
+        "model",
+        "__remote-workflow",
+        "workflow-launch-exec",
+        "reload-plugins",
+        "reload-skills",
+        "rename",
+        "ultrareview",
+        "security-review",
+        "usage-credits",
+        "extra-usage",
+        "usage",
+        "insights",
+        "recap",
+        "skill-doctor",
+        "goal",
+        "design-consent",
+        "design-revoke",
+        "list-agents",
+        "team-onboarding"
+      ],
+      "terminal_slash_commands": [
+        "doctor",
+        "color",
+        "focus",
+        "reload-plugins"
+      ],
+      "apiKeySource": "none",
+      "claude_code_version": "2.1.330",
+      "output_style": "default",
+      "agents": [
+        "claude",
+        "Explore",
+        "general-purpose",
+        "Plan",
+        "statusline-setup",
+        "web-fetch"
+      ],
+      "skills": [
+        "deep-research",
+        "design",
+        "design-sync",
+        "dataviz",
+        "update-config",
+        "verify",
+        "debug",
+        "code-review",
+        "simplify",
+        "batch",
+        "fewer-permission-prompts",
+        "doctor",
+        "loop",
+        "schedule",
+        "claude-api",
+        "workflow-authoring",
+        "run",
+        "run-skill-generator",
+        "plugin-authoring"
+      ],
+      "plugins": [
+        {
+          "name": "cc-plugin-sec-default",
+          "path": "builtin",
+          "source": "cc-plugin-sec-default@builtin"
+        },
+        {
+          "name": "cc-plugin-agents-md",
+          "path": "builtin",
+          "source": "cc-plugin-agents-md@builtin"
+        },
+        {
+          "name": "cc-plugin-telemetry",
+          "path": "builtin",
+          "source": "cc-plugin-telemetry@builtin"
+        },
+        {
+          "name": "cc-plugin-privacy",
+          "path": "builtin",
+          "source": "cc-plugin-privacy@builtin"
+        },
+        {
+          "name": "cc-plugin-plugin-authoring",
+          "path": "builtin",
+          "source": "cc-plugin-plugin-authoring@builtin"
+        }
+      ],
+      "capabilities": [
+        "interrupt_receipt_v1",
+        "interrupt_cancel_queued_v1",
+        "interrupt_send_now_v1",
+        "interrupt_requeue_taken_v1",
+        "msg_lifecycle_v1",
+        "request_marker_lists_v1",
+        "ask_user_question_unanswered_v1",
+        "lifecycle_wakeup_source_v1",
+        "sdk_mcp_tools_list_changed",
+        "sdk_mcp_manifests",
+        "mcp_read_resource_v1",
+        "mcp_tool_ui_meta_v1",
+        "ui_surface_v1",
+        "mcp_call_result_not_for_model_v1",
+        "mcp_call_check_permissions_v1",
+        "voice_call_talk_line_v1",
+        "withdrawn_files_note_v2",
+        "withdrawn_tools_v1",
+        "ui_pane_widget_v1",
+        "reload_plugins_refuse_if_busy_v1",
+        "get_usage_detached_v1",
+        "silent_resend_files_v1"
+      ],
+      "analytics_disabled": false,
+      "product_feedback_disabled": false,
+      "served_by_anthropic": true,
+      "uuid": "cb53b6a2-d67b-4eaf-855a-4de98e035390",
+      "memory_paths": {
+        "auto": "/Users/farhanhassan/.claude/projects/-Users-farhanhassan-ask-soony/memory/"
+      },
+      "original_cwd": "/Users/farhanhassan/ask-soony/data/portal",
+      "additional_directories": [],
+      "messaging_socket_path": "/tmp/cc-socks/49490.sock",
+      "fast_mode_state": "off",
+      "fast_mode_disabled_reason": "sdk_opt_in_required",
+      "per_turn_effort_active": true,
+      "ultrathink_available": false,
+      "ultrathink_typed_raises": false,
+      "view_mode": "default"
+    }
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ToolUseBlock",
+        "id": "toolu_01JvzhrbNW9mwnFjmi6uHnyF",
+        "name": "Read",
+        "input": {
+          "file_path": "/Users/farhanhassan/ask-soony/data/portal/suppliers/SUP-0011_Boise_Semi/contracts/SUP-0011_Sales_Agreement_2023.pdf",
+          "pages": "1-10"
+        }
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 885,
+      "cache_read_input_tokens": 3786,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 885
+      },
+      "output_tokens": 16,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGk7PinCxszZ1JYd6MtC",
+    "stop_reason": null,
+    "session_id": "f150e4f2-8318-4126-8824-43716dd87018",
+    "uuid": "10abbf66-5482-40b7-94e8-8125c507d2ca",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "RateLimitEvent",
+    "rate_limit_info": {
+      "_type": "RateLimitInfo",
+      "status": "rejected",
+      "resets_at": 1795300800,
+      "rate_limit_type": "five_hour",
+      "utilization": null,
+      "overage_status": "allowed",
+      "overage_resets_at": 1796083200,
+      "overage_disabled_reason": null,
+      "raw": {
+        "status": "rejected",
+        "resetsAt": 1795300800,
+        "rateLimitType": "five_hour",
+        "overageStatus": "allowed",
+        "overageResetsAt": 1796083200,
+        "isUsingOverage": true,
+        "overageInUse": true,
+        "unifiedWindows": {
+          "five_hour": {
+            "utilization": 1,
+            "resetsAt": 1795300800,
+            "status": "rejected",
+            "surpassedThreshold": 1
+          },
+          "seven_day": {
+            "utilization": 0.3,
+            "resetsAt": 1795554000,
+            "status": "allowed"
+          }
+        }
+      }
+    },
+    "uuid": "7bb7304e-abfc-4b57-9be9-c8b9a2f497da",
+    "session_id": "f150e4f2-8318-4126-8824-43716dd87018"
+  },
+  {
+    "_type": "UserMessage",
+    "content": [
+      {
+        "_type": "ToolResultBlock",
+        "tool_use_id": "toolu_01JvzhrbNW9mwnFjmi6uHnyF",
+        "content": "pdftoppm is not installed. Install poppler-utils (e.g. `brew install poppler` or `apt-get install poppler-utils`) to enable PDF page rendering.",
+        "is_error": true
+      }
+    ],
+    "uuid": "9b7d3ed3-225d-4e27-bd99-9f2d19797b0a",
+    "parent_tool_use_id": null,
+    "tool_use_result": "Error: pdftoppm is not installed. Install poppler-utils (e.g. `brew install poppler` or `apt-get install poppler-utils`) to enable PDF page rendering.",
+    "origin": null
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 7,
+      "estimated_tokens_delta": 7,
+      "session_id": "f150e4f2-8318-4126-8824-43716dd87018",
+      "uuid": "a5be08c8-b880-4d05-934d-efca972647ea"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 11,
+      "estimated_tokens_delta": 4,
+      "session_id": "f150e4f2-8318-4126-8824-43716dd87018",
+      "uuid": "2cbe56b0-08be-4172-b42f-59678a08084b"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 17,
+      "estimated_tokens_delta": 6,
+      "session_id": "f150e4f2-8318-4126-8824-43716dd87018",
+      "uuid": "2fb01f93-7dce-4de3-b921-6fea6bb12308"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 18,
+      "estimated_tokens_delta": 1,
+      "session_id": "f150e4f2-8318-4126-8824-43716dd87018",
+      "uuid": "a53261ba-e109-4106-9ccc-e067696969ff"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 26,
+      "estimated_tokens_delta": 8,
+      "session_id": "f150e4f2-8318-4126-8824-43716dd87018",
+      "uuid": "c948bd97-2b63-4618-8e5c-a734cff3f719"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 27,
+      "estimated_tokens_delta": 1,
+      "session_id": "f150e4f2-8318-4126-8824-43716dd87018",
+      "uuid": "2d294de7-a192-4182-8a23-5d2db36d0a3c"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 28,
+      "estimated_tokens_delta": 1,
+      "session_id": "f150e4f2-8318-4126-8824-43716dd87018",
+      "uuid": "d6abc3b6-9b41-48fc-b755-b60c53de7836"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 204,
+      "estimated_tokens_delta": 176,
+      "session_id": "f150e4f2-8318-4126-8824-43716dd87018",
+      "uuid": "a83b9da1-f366-4663-a4fb-10348b999f5f"
+    }
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ThinkingBlock",
+        "thinking": "The PDF read failed because pdftoppm isn't installed, so I'll retry without the pages parameter.\n\n",
+        "signature": "CAQSqQYKEAgUGAI4AUIIdGhpbmtpbmcSDKO0w40gttDsDRPIQRoMnOsMRQ7s4JBp0OsBIjAT8qZzAecwMx7h10fxrgggFydsl9OzvafDeMIjbd5skbhjj7bBV51QvfadtfjyvE4qxgUsLWUeKmofengReuAfQ+BqHQudIBAVdDezSEfQ0Svrd/r1bltyIrX+L/hzrrTaClUY2E7VKGWYItfno0ve4bSeX0jo5Tb8lbJvfYvy662MIqeUcoA32TCaNBsesE/siyxccxKEzDSEKGViYbViXJ6AL7pablgs+A9L4CC6uhqnS/QgfUEzIhL09DJ10xZxEnTPTdW0UhPveI9HIxr3aVWx6LTKmLTR7vg7YLDFzKxUTC5QFPBGc0DSotOBbRyhhBV6IXvvDF+Tvf86j6KMO656B2e9/Q/olK8hTHtnc+lxfbUZbvAlzIgpkc0fHVlVAhF+pFekzOuCMw3BLNFSeh77YOGlfdBxzFdfgoelcrTX/0EB2jVVi6rWvPInknIdoAWMTup0r9FnWVbB+HL7UX/+nSgKT25Xtmvt1MtQncmgOue3ov8RHdF7g/ZUQuLMIUOYUuSD/CaPv1INFfgWyKZ6nwEX/xDUzVn2qIes2I+JqJxfEiZPa8+dJiWaCvL5UlqPLuq9oCv3G0fzBxx+9M9LMCtqjwns0++0S7GpqRQBlVL9tKHdE86njlAZsgUmssTFtVt9/R0Oi5yLUOnebiHSu0fsAXqMyx1V3oaAcnSHTzqkT8DcS5GD1sMvu/8Ko60WnezKhxowe/knVBlYFWGXzSms9DOtjoxu6+J3ddET8tZ8ioKG+/9sSG2FaBfwKP7ziLMgsgvn9+E4nKvqxbNlpm/JARRNwI3nP/CvLB2Neb2VGBxJhYexGMTP5DVYG5srOTJqM28nILMjWYE2Vcw3tmYqS7co4soCJORebiPWJPeK0Ox80ozd3OE2kEzgQsv7rBMPKzrNGsWSi3jBsYnjT/ksRbVwW//6+pgGrJaHO/+v9kqrDIxM+u/pXOQjzZXkTCe/YOv2XaDgx+TvLPOhsz/mgEVHZeo9656Q+VeTnZvnLnznChgB"
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 18214,
+      "cache_read_input_tokens": 3786,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 18214,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 7,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGk7YojVCq2gGWpBNUiA",
+    "stop_reason": null,
+    "session_id": "f150e4f2-8318-4126-8824-43716dd87018",
+    "uuid": "6f6a75e8-6274-4fbf-a968-5e70c4f59a60",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "TextBlock",
+        "text": "The page render failed because `pdftoppm` isn't installed. I'll try reading the file without the `pages` parameter."
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 18214,
+      "cache_read_input_tokens": 3786,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 18214,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 7,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGk7YojVCq2gGWpBNUiA",
+    "stop_reason": null,
+    "session_id": "f150e4f2-8318-4126-8824-43716dd87018",
+    "uuid": "b63ee7e1-c882-439c-8da9-1a11080c670c",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ToolUseBlock",
+        "id": "toolu_013FjWm7z8NZrQD4ZHGbAMqG",
+        "name": "Read",
+        "input": {
+          "file_path": "/Users/farhanhassan/ask-soony/data/portal/suppliers/SUP-0011_Boise_Semi/contracts/SUP-0011_Sales_Agreement_2023.pdf"
+        }
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 18214,
+      "cache_read_input_tokens": 3786,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 18214,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 7,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGk7YojVCq2gGWpBNUiA",
+    "stop_reason": null,
+    "session_id": "f150e4f2-8318-4126-8824-43716dd87018",
+    "uuid": "b3431097-a8ab-4a43-97a2-f8650dac221c",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "UserMessage",
+    "content": [
+      {
+        "_type": "ToolResultBlock",
+        "tool_use_id": "toolu_013FjWm7z8NZrQD4ZHGbAMqG",
+        "content": [
+          {
+            "type": "text",
+            "text": "PDF file read: /Users/farhanhassan/ask-soony/data/portal/suppliers/SUP-0011_Boise_Semi/contracts/SUP-0011_Sales_Agreement_2023.pdf (63.9KB)"
+          },
+          {
+            "type": "document",
+            "source": {
+              "type": "base64",
+              "media_type": "application/pdf",
+              "data": "<87192 chars of encoded data left out>"
+            }
+          }
+        ],
+        "is_error": null
+      }
+    ],
+    "uuid": "f46a3461-bdc3-43d6-bfb1-4e8f307c3718",
+    "parent_tool_use_id": null,
+    "tool_use_result": {
+      "type": "pdf",
+      "file": {
+        "filePath": "/Users/farhanhassan/ask-soony/data/portal/suppliers/SUP-0011_Boise_Semi/contracts/SUP-0011_Sales_Agreement_2023.pdf",
+        "base64": "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… <67192 more chars>",
+        "originalSize": 65393
+      }
+    },
+    "origin": null
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ToolUseBlock",
+        "id": "toolu_01K1ARSyu99d29JpQYcU1vVa",
+        "name": "StructuredOutput",
+        "input": {
+          "document_type": "contract",
+          "languages": [
+            "English"
+          ],
+          "issuer": "Boise Semiconductor Inc. (Supplier) / Soony Interactive GmbH (Buyer) — Sales Agreement",
+          "recipient": "Soony Interactive GmbH, Leopoldstraße 180, 80804 Munich, Germany",
+          "document_number": "PC-0011-2023",
+          "document_date": "2023-05-01",
+          "references": [
+            {
+              "type": "contract",
+              "value": "PC-0011-2023"
+            }
+          ],
+          "lines": [
+            {
+              "item": "Annex A row 1",
+              "material_id": "CMP-GAM-001",
+              "supplier_part_no": null,
+              "description": "Game Card 128 GB – Grand Heist 6",
+              "values": [
+                {
+                  "field": "unit_price",
+                  "field_label": null,
+                  "value": "10.2",
+                  "number": 10.2,
+                  "unit": "USD",
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "minimum_order_quantity",
+                  "field_label": null,
+                  "value": "20,000",
+                  "number": 20000,
+                  "unit": null,
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "lead_time",
+                  "field_label": null,
+                  "value": "28",
+                  "number": 28,
+                  "unit": "days",
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                }
+              ]
+            },
+            {
+              "item": "Annex A row 2",
+              "material_id": "CMP-GAM-002",
+              "supplier_part_no": null,
+              "description": "Game Card 64 GB – Grand Heist 5",
+              "values": [
+                {
+                  "field": "unit_price",
+                  "field_label": null,
+                  "value": "5.7",
+                  "number": 5.7,
+                  "unit": "USD",
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "minimum_order_quantity",
+                  "field_label": null,
+                  "value": "5,000",
+                  "number": 5000,
+                  "unit": null,
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "lead_time",
+                  "field_label": null,
+                  "value": "28",
+                  "number": 28,
+                  "unit": "days",
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                }
+              ]
+            }
+          ],
+          "statements": [
+            {
+              "topic": "terms",
+              "text_en": "Contract no. PC-0011-2023, effective 2023-05-01, expires 2028-04-30 (unless extended in writing).",
+              "quote": "Contract no. PC-0011-2023 · Effective 2023-05-01 · Expires 2028-04-30"
+            },
+            {
+              "topic": "terms",
+              "text_en": "Buyer provides a non-binding 12-month rolling forecast monthly. Orders are binding upon Seller's written acceptance.",
+              "quote": "Buyer provides a non-binding 12-month rolling forecast monthly. Orders are binding upon Seller's written acceptance."
+            },
+            {
+              "topic": "price",
+              "text_en": "Prices are set out in Annex A in USD and may be revised by Seller with 60 days' written notice.",
+              "quote": "Prices are set out in Annex A in USD and may be revised by Seller with 60 days' written notice."
+            },
+            {
+              "topic": "shipment",
+              "text_en": "Delivery terms EXW Boise, ID (Incoterms 2020). Shipping dates are estimates. Freight, insurance, export and import duties are for Buyer's account.",
+              "quote": "Delivery terms: EXW Boise, ID (Incoterms 2020). Shipping dates are estimates. 4.1 Delivery. Prices in Annex A are EXW Seller's plant in Boise, Idaho. Freight, insurance, export and import duties are for Buyer's account."
+            },
+            {
+              "topic": "terms",
+              "text_en": "Payment terms NET30. Late payments bear interest at 1% per month.",
+              "quote": "Payment terms: NET30. Late payments bear interest at 1 % per month."
+            },
+            {
+              "topic": "quality",
+              "text_en": "Seller warrants that products conform to the agreed specifications for 12 months from delivery.",
+              "quote": "Seller warrants that products conform to the agreed specifications for 12 months from delivery."
+            },
+            {
+              "topic": "delay",
+              "text_en": "Seller will notify Buyer of anticipated delays. Seller's liability for delay is limited to the price of the delayed products.",
+              "quote": "Seller will notify Buyer of anticipated delays. Seller's liability for delay is limited to the price of the delayed products."
+            },
+            {
+              "topic": "delay",
+              "text_en": "Force majeure: Seller is not liable for delay or failure to deliver caused by acts of God, fire, flood, labor disputes, shortages of materials, carrier delays or any other cause beyond its reasonable control.",
+              "quote": "Seller shall not be liable for any delay or failure to deliver caused by acts of God, fire, flood, labor disputes, shortages of materials, carrier delays or any other cause beyond Seller's reasonable control."
+            },
+            {
+              "topic": "terms",
+              "text_en": "Seller is not liable for indirect, incidental or consequential damages.",
+              "quote": "In no event shall Seller be liable for indirect, incidental or consequential damages."
+            },
+            {
+              "topic": "terms",
+              "text_en": "Each party keeps the other's information confidential for 5 years after termination.",
+              "quote": "Each party keeps the other party's information confidential for 5 years after termination."
+            },
+            {
+              "topic": "terms",
+              "text_en": "Agreement is governed by the laws of the State of Idaho.",
+              "quote": "This Agreement is governed by the laws of the State of Idaho."
+            },
+            {
+              "topic": "terms",
+              "text_en": "Signed at Munich, 2023-05-01, for Soony by Jonas Lindqvist, CPO, and for Supplier by Megan Ortiz.",
+              "quote": "Munich, 2023-05-01 · for Soony: Jonas Lindqvist, CPO · for Supplier: Megan Ortiz"
+            }
+          ],
+          "decisions": [],
+          "corrections": [],
+          "verdict": {
+            "status": "has_warnings",
+            "summary_en": "Two-page Sales Agreement PC-0011-2023 between Soony Interactive GmbH (Buyer) and Boise Semiconductor Inc. (Supplier), effective 2023-05-01 to 2028-04-30. Terms are EXW Boise (Incoterms 2020) and NET30. Annex A lists two game card parts with USD unit prices, MOQs and 28-day lead times. No handwritten corrections or stamps are visible.",
+            "red_flags": [
+              "Seller may revise Annex A prices with only 60 days' written notice (§3).",
+              "Shipping dates are estimates only; delay liability is capped at the price of the delayed products (§4, §7).",
+              "Broad force majeure clause covers labor disputes, shortages of materials and carrier delays (§8).",
+              "EXW terms: freight, insurance, export and import duties are for the Buyer's account (§4.1).",
+              "Late payments bear 1% interest per month (§5).",
+              "The text uses 'Seller' and 'Buyer' while the parties are defined as 'Soony' and 'Supplier'. The terms are inconsistent.",
+              "Signature block lists names only; no visible handwritten signatures. Party legal entity named as 'Boise Semiconductor Inc.' while header says 'Boise Semi'.",
+              "MOQs are high: 20,000 units for CMP-GAM-001 and 5,000 for CMP-GAM-002."
+            ],
+            "confidence": "high",
+            "observations": [
+              "Typed PDF text, fully legible; no handwriting, stamps or strike-throughs.",
+              "Page 1 holds the clauses and page 2 holds Annex A only.",
+              "Signature line is typed text, with no visible signature image.",
+              "The first Read attempt with a page range failed because pdftoppm is missing. Re-reading without a page range worked and the text was extracted."
+            ]
+          }
+        }
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 4415,
+      "cache_read_input_tokens": 22000,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 4415,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 25,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGk7he3M5UqVFDT8XJtp",
+    "stop_reason": null,
+    "session_id": "f150e4f2-8318-4126-8824-43716dd87018",
+    "uuid": "60d32d96-f57f-434e-af2e-de61715b277d",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "UserMessage",
+    "content": [
+      {
+        "_type": "ToolResultBlock",
+        "tool_use_id": "toolu_01K1ARSyu99d29JpQYcU1vVa",
+        "content": "Structured output provided successfully",
+        "is_error": null
+      }
+    ],
+    "uuid": "cf901a9b-8fe7-453a-8f0e-9c0076548cd2",
+    "parent_tool_use_id": null,
+    "tool_use_result": "Structured output provided successfully",
+    "origin": null
+  },
+  {
+    "_type": "ResultMessage",
+    "subtype": "success",
+    "duration_ms": 19068,
+    "duration_api_ms": 19357,
+    "is_error": false,
+    "num_turns": 4,
+    "session_id": "f150e4f2-8318-4126-8824-43716dd87018",
+    "stop_reason": "tool_use",
+    "total_cost_usd": 0.0936512,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 23514,
+      "cache_read_input_tokens": 29572,
+      "output_tokens": 3043,
+      "output_tokens_details": {
+        "thinking_tokens": 43
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 885,
+        "ephemeral_5m_input_tokens": 22629
+      },
+      "inference_geo": "global",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 2707,
+          "cache_read_input_tokens": 22000,
+          "cache_creation_input_tokens": 4415,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 4415,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "result": "{\"document_type\":\"contract\",\"languages\":[\"English\"],\"issuer\":\"Boise Semiconductor Inc. (Supplier) / Soony Interactive GmbH (Buyer) — Sales Agreement\",\"recipient\":\"Soony Interactive GmbH, Leopoldstraße 180, 80804 Munich, Germany\",\"document_number\":\"PC-0011-2023\",\"document_date\":\"2023-05-01\",\"references\":[{\"type\":\"contract\",\"value\":\"PC-0011-2023\"}],\"lines\":[{\"item\":\"Annex A row 1\",\"material_id\":\"CMP-GAM-001\",\"supplier_part_no\":null,\"description\":\"Game Card 128 GB – Grand Heist 6\",\"values\":[{\"field\":\"unit_price\",\"field_label\":null,\"value\":\"10.2\",\"number\":10.2,\"unit\":\"USD\",\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"minimum_order_quantity\",\"field_label\":null,\"value\":\"20,000\",\"number\":20000,\"unit\":null,\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"lead_time\",\"field_label\":null,\"value\":\"28\",\"number\":28,\"unit\":\"days\",\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"}]},{\"item\":\"Annex A row 2\",\"material_id\":\"CMP-GAM-002\",\"supplier_part_no\":null,\"description\":\"Game Card 64 GB – Grand Heist 5\",\"values\":[{\"field\":\"unit_price\",\"field_label\":null,\"value\":\"5.7\",\"number\":5.7,\"unit\":\"USD\",\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"minimum_order_quantity\",\"field_label\":null,\"value\":\"5,000\",\"number\":5000,\"unit\":null,\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"lead_time\",\"field_label\":null,\"value\":\"28\",\"number\":28,\"unit\":\"days\",\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"}]}],\"statements\":[{\"topic\":\"terms\",\"text_en\":\"Contract no. PC-0011-2023, effective 2023-05-01, expires 2028-04-30 (unless extended in writing).\",\"quote\":\"Contract no. PC-0011-2023 · Effective 2023-05-01 · Expires 2028-04-30\"},{\"topic\":\"terms\",\"text_en\":\"Buyer provides a non-binding 12-month rolling forecast monthly. Orders are binding upon Seller's written acceptance.\",\"quote\":\"Buyer provides a non-binding 12-month rolling forecast monthly. Orders are binding upon Seller's written acceptance.\"},{\"topic\":\"price\",\"text_en\":\"Prices are set out in Annex A in USD and may be revised by Seller with 60 days' written notice.\",\"quote\":\"Prices are set out in Annex A in USD and may be revised by Seller with 60 days' written notice.\"},{\"topic\":\"shipment\",\"text_en\":\"Delivery terms EXW Boise, ID (Incoterms 2020). Shipping dates are estimates. Freight, insurance, export and import duties are for Buyer's account.\",\"quote\":\"Delivery terms: EXW Boise, ID (Incoterms 2020). Shipping dates are estimates. 4.1 Delivery. Prices in Annex A are EXW Seller's plant in Boise, Idaho. Freight, insurance, export and import duties are for Buyer's account.\"},{\"topic\":\"terms\",\"text_en\":\"Payment terms NET30. Late payments bear interest at 1% per month.\",\"quote\":\"Payment terms: NET30. Late payments bear interest at 1 % per month.\"},{\"topic\":\"quality\",\"text_en\":\"Seller warrants that products conform to the agreed specifications for 12 months from delivery.\",\"quote\":\"Seller warrants that products conform to the agreed specifications for 12 months from delivery.\"},{\"topic\":\"delay\",\"text_en\":\"Seller will notify Buyer of anticipated delays. Seller's liability for delay is limited to the price of the delayed products.\",\"quote\":\"Seller will notify Buyer of anticipated delays. Seller's liability for delay is limited to the price of the delayed products.\"},{\"topic\":\"delay\",\"text_en\":\"Force majeure: Seller is not liable for delay or failure to deliver caused by acts of God, fire, flood, labor disputes, shortages of materials, carrier delays or any other cause beyond its reasonable control.\",\"quote\":\"Seller shall not be liable for any delay or failure to deliver caused by acts of God, fire, flood, labor disputes, shortages of materials, carrier delays or any other cause beyond Seller's reasonable control.\"},{\"topic\":\"terms\",\"text_en\":\"Seller is not liable for indirect, incidental or consequential damages.\",\"quote\":\"In no event shall Seller be liable for indirect, incidental or consequential damages.\"},{\"topic\":\"terms\",\"text_en\":\"Each party keeps the other's information confidential for 5 years after termination.\",\"quote\":\"Each party keeps the other party's information confidential for 5 years after termination.\"},{\"topic\":\"terms\",\"text_en\":\"Agreement is governed by the laws of the State of Idaho.\",\"quote\":\"This Agreement is governed by the laws of the State of Idaho.\"},{\"topic\":\"terms\",\"text_en\":\"Signed at Munich, 2023-05-01, for Soony by Jonas Lindqvist, CPO, and for Supplier by Megan Ortiz.\",\"quote\":\"Munich, 2023-05-01 · for Soony: Jonas Lindqvist, CPO · for Supplier: Megan Ortiz\"}],\"decisions\":[],\"corrections\":[],\"verdict\":{\"status\":\"has_warnings\",\"summary_en\":\"Two-page Sales Agreement PC-0011-2023 between Soony Interactive GmbH (Buyer) and Boise Semiconductor Inc. (Supplier), effective 2023-05-01 to 2028-04-30. Terms are EXW Boise (Incoterms 2020) and NET30. Annex A lists two game card parts with USD unit prices, MOQs and 28-day lead times. No handwritten corrections or stamps are visible.\",\"red_flags\":[\"Seller may revise Annex A prices with only 60 days' written notice (§3).\",\"Shipping dates are estimates only; delay liability is capped at the price of the delayed products (§4, §7).\",\"Broad force majeure clause covers labor disputes, shortages of materials and carrier delays (§8).\",\"EXW terms: freight, insurance, export and import duties are for the Buyer's account (§4.1).\",\"Late payments bear 1% interest per month (§5).\",\"The text uses 'Seller' and 'Buyer' while the parties are defined as 'Soony' and 'Supplier'. The terms are inconsistent.\",\"Signature block lists names only; no visible handwritten signatures. Party legal entity named as 'Boise Semiconductor Inc.' while header says 'Boise Semi'.\",\"MOQs are high: 20,000 units for CMP-GAM-001 and 5,000 for CMP-GAM-002.\"],\"confidence\":\"high\",\"observations\":[\"Typed PDF text, fully legible; no handwriting, stamps or strike-throughs.\",\"Page 1 holds the clauses and page 2 holds Annex A only.\",\"Signature line is typed text, with no visible signature image.\",\"The first Read attempt with a page range failed because pdftoppm is missing. Re-reading without a page range worked and the text was extracted.\"]}}",
+    "structured_output": {
+      "document_type": "contract",
+      "languages": [
+        "English"
+      ],
+      "issuer": "Boise Semiconductor Inc. (Supplier) / Soony Interactive GmbH (Buyer) — Sales Agreement",
+      "recipient": "Soony Interactive GmbH, Leopoldstraße 180, 80804 Munich, Germany",
+      "document_number": "PC-0011-2023",
+      "document_date": "2023-05-01",
+      "references": [
+        {
+          "type": "contract",
+          "value": "PC-0011-2023"
+        }
+      ],
+      "lines": [
+        {
+          "item": "Annex A row 1",
+          "material_id": "CMP-GAM-001",
+          "supplier_part_no": null,
+          "description": "Game Card 128 GB – Grand Heist 6",
+          "values": [
+            {
+              "field": "unit_price",
+              "field_label": null,
+              "value": "10.2",
+              "number": 10.2,
+              "unit": "USD",
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "minimum_order_quantity",
+              "field_label": null,
+              "value": "20,000",
+              "number": 20000,
+              "unit": null,
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "lead_time",
+              "field_label": null,
+              "value": "28",
+              "number": 28,
+              "unit": "days",
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            }
+          ]
+        },
+        {
+          "item": "Annex A row 2",
+          "material_id": "CMP-GAM-002",
+          "supplier_part_no": null,
+          "description": "Game Card 64 GB – Grand Heist 5",
+          "values": [
+            {
+              "field": "unit_price",
+              "field_label": null,
+              "value": "5.7",
+              "number": 5.7,
+              "unit": "USD",
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "minimum_order_quantity",
+              "field_label": null,
+              "value": "5,000",
+              "number": 5000,
+              "unit": null,
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "lead_time",
+              "field_label": null,
+              "value": "28",
+              "number": 28,
+              "unit": "days",
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            }
+          ]
+        }
+      ],
+      "statements": [
+        {
+          "topic": "terms",
+          "text_en": "Contract no. PC-0011-2023, effective 2023-05-01, expires 2028-04-30 (unless extended in writing).",
+          "quote": "Contract no. PC-0011-2023 · Effective 2023-05-01 · Expires 2028-04-30"
+        },
+        {
+          "topic": "terms",
+          "text_en": "Buyer provides a non-binding 12-month rolling forecast monthly. Orders are binding upon Seller's written acceptance.",
+          "quote": "Buyer provides a non-binding 12-month rolling forecast monthly. Orders are binding upon Seller's written acceptance."
+        },
+        {
+          "topic": "price",
+          "text_en": "Prices are set out in Annex A in USD and may be revised by Seller with 60 days' written notice.",
+          "quote": "Prices are set out in Annex A in USD and may be revised by Seller with 60 days' written notice."
+        },
+        {
+          "topic": "shipment",
+          "text_en": "Delivery terms EXW Boise, ID (Incoterms 2020). Shipping dates are estimates. Freight, insurance, export and import duties are for Buyer's account.",
+          "quote": "Delivery terms: EXW Boise, ID (Incoterms 2020). Shipping dates are estimates. 4.1 Delivery. Prices in Annex A are EXW Seller's plant in Boise, Idaho. Freight, insurance, export and import duties are for Buyer's account."
+        },
+        {
+          "topic": "terms",
+          "text_en": "Payment terms NET30. Late payments bear interest at 1% per month.",
+          "quote": "Payment terms: NET30. Late payments bear interest at 1 % per month."
+        },
+        {
+          "topic": "quality",
+          "text_en": "Seller warrants that products conform to the agreed specifications for 12 months from delivery.",
+          "quote": "Seller warrants that products conform to the agreed specifications for 12 months from delivery."
+        },
+        {
+          "topic": "delay",
+          "text_en": "Seller will notify Buyer of anticipated delays. Seller's liability for delay is limited to the price of the delayed products.",
+          "quote": "Seller will notify Buyer of anticipated delays. Seller's liability for delay is limited to the price of the delayed products."
+        },
+        {
+          "topic": "delay",
+          "text_en": "Force majeure: Seller is not liable for delay or failure to deliver caused by acts of God, fire, flood, labor disputes, shortages of materials, carrier delays or any other cause beyond its reasonable control.",
+          "quote": "Seller shall not be liable for any delay or failure to deliver caused by acts of God, fire, flood, labor disputes, shortages of materials, carrier delays or any other cause beyond Seller's reasonable control."
+        },
+        {
+          "topic": "terms",
+          "text_en": "Seller is not liable for indirect, incidental or consequential damages.",
+          "quote": "In no event shall Seller be liable for indirect, incidental or consequential damages."
+        },
+        {
+          "topic": "terms",
+          "text_en": "Each party keeps the other's information confidential for 5 years after termination.",
+          "quote": "Each party keeps the other party's information confidential for 5 years after termination."
+        },
+        {
+          "topic": "terms",
+          "text_en": "Agreement is governed by the laws of the State of Idaho.",
+          "quote": "This Agreement is governed by the laws of the State of Idaho."
+        },
+        {
+          "topic": "terms",
+          "text_en": "Signed at Munich, 2023-05-01, for Soony by Jonas Lindqvist, CPO, and for Supplier by Megan Ortiz.",
+          "quote": "Munich, 2023-05-01 · for Soony: Jonas Lindqvist, CPO · for Supplier: Megan Ortiz"
+        }
+      ],
+      "decisions": [],
+      "corrections": [],
+      "verdict": {
+        "status": "has_warnings",
+        "summary_en": "Two-page Sales Agreement PC-0011-2023 between Soony Interactive GmbH (Buyer) and Boise Semiconductor Inc. (Supplier), effective 2023-05-01 to 2028-04-30. Terms are EXW Boise (Incoterms 2020) and NET30. Annex A lists two game card parts with USD unit prices, MOQs and 28-day lead times. No handwritten corrections or stamps are visible.",
+        "red_flags": [
+          "Seller may revise Annex A prices with only 60 days' written notice (§3).",
+          "Shipping dates are estimates only; delay liability is capped at the price of the delayed products (§4, §7).",
+          "Broad force majeure clause covers labor disputes, shortages of materials and carrier delays (§8).",
+          "EXW terms: freight, insurance, export and import duties are for the Buyer's account (§4.1).",
+          "Late payments bear 1% interest per month (§5).",
+          "The text uses 'Seller' and 'Buyer' while the parties are defined as 'Soony' and 'Supplier'. The terms are inconsistent.",
+          "Signature block lists names only; no visible handwritten signatures. Party legal entity named as 'Boise Semiconductor Inc.' while header says 'Boise Semi'.",
+          "MOQs are high: 20,000 units for CMP-GAM-001 and 5,000 for CMP-GAM-002."
+        ],
+        "confidence": "high",
+        "observations": [
+          "Typed PDF text, fully legible; no handwriting, stamps or strike-throughs.",
+          "Page 1 holds the clauses and page 2 holds Annex A only.",
+          "Signature line is typed text, with no visible signature image.",
+          "The first Read attempt with a page range failed because pdftoppm is missing. Re-reading without a page range worked and the text was extracted."
+        ]
+      }
+    },
+    "model_usage": {
+      "claude-haiku-5-5": {
+        "inputTokens": 1265,
+        "outputTokens": 26,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.0001395,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 0,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 0,
+        "canonicalModel": "claude-haiku-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      },
+      "claude-sonnet-5-5": {
+        "inputTokens": 6,
+        "outputTokens": 3043,
+        "cacheReadInputTokens": 29572,
+        "cacheCreationInputTokens": 23514,
+        "webSearchRequests": 0,
+        "costUSD": 0.0935117,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 43,
+        "cacheCreationEphemeral5mInputTokens": 22629,
+        "cacheCreationEphemeral1hInputTokens": 885,
+        "canonicalModel": "claude-sonnet-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "permission_denials": [],
+    "deferred_tool_use": null,
+    "errors": null,
+    "api_error_status": null,
+    "uuid": "5a8a3e0a-2f3e-4300-b602-b14409dc5541",
+    "terminal_reason": "completed",
+    "origin": null,
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  }
+]

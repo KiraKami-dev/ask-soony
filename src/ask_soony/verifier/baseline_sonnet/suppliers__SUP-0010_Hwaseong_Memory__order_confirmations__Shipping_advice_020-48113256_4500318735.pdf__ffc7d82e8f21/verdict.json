@@ -1,0 +1,144 @@
+{
+  "document_type": "shipping_advice",
+  "languages": [
+    "English",
+    "Korean"
+  ],
+  "issuer": "Hwaseong Memory Co., Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": null,
+  "document_date": "2026-11-21",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318735"
+    },
+    {
+      "type": "air_waybill",
+      "value": "020-48113256"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-001",
+      "supplier_part_no": null,
+      "description": "Game Card 128 GB – Grand Heist 6",
+      "values": [
+        {
+          "field": "quantity_ordered",
+          "field_label": null,
+          "value": "48,000",
+          "number": 48000,
+          "unit": "pcs",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "quantity_shipped",
+          "field_label": null,
+          "value": "28,000",
+          "number": 28000,
+          "unit": "pcs",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "quantity_balance",
+          "field_label": null,
+          "value": "20,000",
+          "number": 20000,
+          "unit": "pcs",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_shipped",
+          "field_label": null,
+          "value": "today (document dated 2026-11-21)",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "5 of 7 ULDs",
+          "number": 5,
+          "unit": "ULD",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_expected",
+          "field_label": "balance_next_flight_ICN_FRA",
+          "value": "2026-11-23",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_expected",
+          "field_label": "balance_delivery_to_Hamburg",
+          "value": "2026-11-24",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Two ULDs could not be loaded due to the airline's circumstances.",
+      "quote": "항공사 사정으로 ULD 2대가 선적되지 못했습니다."
+    },
+    {
+      "topic": "shipment",
+      "text_en": "AWB 020-48113256: 28,000 pcs flown ICN–FRA today, 5 of 7 ULDs.",
+      "quote": "AWB 020-48113256: 28,000 pcs flown ICN–FRA today, 5 of 7 ULDs."
+    },
+    {
+      "topic": "capacity",
+      "text_en": "Two ULDs were offloaded by the carrier (capacity).",
+      "quote": "Two ULDs were offloaded by the carrier (capacity)."
+    },
+    {
+      "topic": "delay",
+      "text_en": "Balance of 20,000 pcs: next available flight ICN–FRA 2026-11-23, delivery to Hamburg 2026-11-24.",
+      "quote": "Balance 20,000 pcs: next available flight ICN–FRA 2026-11-23, delivery to Hamburg 2026-11-24."
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Hwaseong Memory advises a short shipment on PO 4500318735 for CMP-GAM-001 (Game Card 128 GB – Grand Heist 6). Of 48,000 pcs ordered, 28,000 pcs (5 of 7 ULDs) were flown ICN–FRA on AWB 020-48113256. The carrier offloaded 2 ULDs for capacity reasons. The balance of 20,000 pcs is planned for the 2026-11-23 flight, with delivery to Hamburg on 2026-11-24.",
+    "red_flags": [
+      "Short shipment: 28,000 of 48,000 pcs shipped; 20,000 pcs balance outstanding.",
+      "Balance delivery to Hamburg is only planned (next available flight 2026-11-23, delivery 2026-11-24) and is not confirmed.",
+      "Cause given is carrier offloading (capacity), 2 of 7 ULDs.",
+      "ULD counts do not match the quantities if the ULDs were loaded evenly. 28,000 pcs on 5 ULDs is 5,600 per ULD, which would make 7 ULDs about 39,200 pcs, not 48,000. The 2 offloaded ULDs would hold 11,200 pcs, not 20,000. Loads may be uneven, so this needs checking with the supplier.",
+      "The document gives no document number, and the delivery date for the shipped 28,000 pcs is not stated."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Clean typed PDF with no handwriting, stamps, signatures or corrections.",
+      "The page mixes Korean and English. The Korean column headers are 발주수량 (ordered), 출하수량 (shipped) and 잔량 (balance).",
+      "Numbers use English comma thousands separators (48,000 = 48000).",
+      "The shipping date is given only as 'today', and the document header is dated 2026-11-21.",
+      "Contact named: Seo-yeon Kim, +82 31 200 3300."
+    ]
+  }
+}

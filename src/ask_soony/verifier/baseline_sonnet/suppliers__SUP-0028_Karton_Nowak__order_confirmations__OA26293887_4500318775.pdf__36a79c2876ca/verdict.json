@@ -1,0 +1,131 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "Polish",
+    "English"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26293887",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318775"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00020",
+      "material_id": "CMP-GAM-004",
+      "supplier_part_no": null,
+      "description": "Cover Sleeve Grand Heist 6 (USK/PEGI)",
+      "values": [
+        {
+          "field": "quantity_ordered",
+          "field_label": null,
+          "value": "20,000",
+          "number": 20000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.06",
+          "number": 0.06,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-11-21",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2026-10-26",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "revision",
+          "field_label": null,
+          "value": "rev. C",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_shipped",
+          "field_label": null,
+          "value": "21.11.2026",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "other",
+          "field_label": "artwork_received_date",
+          "value": "2026-08-07",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "revision",
+      "text_en": "CMP-GAM-004: printed to artwork rev. C (GH6_sleeve_revC_USK2026.pdf), as received from Soony Marketing on 2026-08-07.",
+      "quote": "CMP-GAM-004: druk wg pliku rev. C (GH6_sleeve_revC_USK2026.pdf), otrzymanego od Soony Marketing 2026-08-07. / Printed to artwork rev. C as received from Soony Marketing on 2026-08-07."
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Dispatch 2026-11-21 via Warta Trans, delivery to DC Hamburg the same evening.",
+      "quote": "Wysyłka: 21.11.2026, Warta Trans, dostawa DC Hamburg tego samego dnia wieczorem. / Dispatch 2026-11-21, delivery to DC Hamburg the same evening."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Incoterms DAP Hamburg; payment NET30.",
+      "quote": "Incoterms DAP Hamburg · Payment NET30"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA26293887 from Karton Nowak to Soony Interactive GmbH for PO 4500318775 (2026-10-26). One line: item 00020, CMP-GAM-004 Cover Sleeve Grand Heist 6 (USK/PEGI), 20,000 pcs at 0.06 EUR, confirmed for 2026-11-21. Printed to artwork rev. C. Dispatch 2026-11-21 via Warta Trans, delivery to DC Hamburg the same evening. DAP Hamburg, NET30.",
+    "red_flags": [
+      "Confirmed delivery date is 2026-11-21, with dispatch and delivery to Hamburg both on the same day, so there is no transit buffer.",
+      "Supplier states printing is to artwork rev. C received 2026-08-07; the buyer should check that rev. C is the currently approved artwork revision.",
+      "No document date is shown on the confirmation."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Typed PDF, single page, no handwriting, stamps or signatures.",
+      "Quantity unit is not stated; the unit price basis (per piece or per 1,000) is not stated.",
+      "Order confirmation has no document date; only the PO date 2026-10-26 is given."
+    ]
+  }
+}

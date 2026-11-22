@@ -1,0 +1,637 @@
+[
+  {
+    "_type": "SystemMessage",
+    "subtype": "init",
+    "data": {
+      "type": "system",
+      "subtype": "init",
+      "cwd": "/Users/farhanhassan/ask-soony/data/portal",
+      "session_id": "c1935d74-0aec-46a5-b297-1f24eba4ef5a",
+      "tools": [
+        "Read",
+        "StructuredOutput"
+      ],
+      "mcp_servers": [],
+      "model": "claude-sonnet-5-5",
+      "permissionMode": "dontAsk",
+      "slash_commands": [
+        "deep-research",
+        "design",
+        "design-sync",
+        "dataviz",
+        "update-config",
+        "verify",
+        "debug",
+        "code-review",
+        "simplify",
+        "batch",
+        "fewer-permission-prompts",
+        "doctor",
+        "loop",
+        "schedule",
+        "claude-api",
+        "workflow-authoring",
+        "run",
+        "run-skill-generator",
+        "plugin-authoring",
+        "advisor",
+        "agents",
+        "auto-mode-setup",
+        "autocompact",
+        "clear",
+        "color",
+        "compact",
+        "config",
+        "output-style",
+        "context",
+        "effort",
+        "fast",
+        "focus",
+        "heapdump",
+        "init",
+        "mcp",
+        "import",
+        "model",
+        "__remote-workflow",
+        "workflow-launch-exec",
+        "reload-plugins",
+        "reload-skills",
+        "rename",
+        "ultrareview",
+        "security-review",
+        "usage-credits",
+        "extra-usage",
+        "usage",
+        "insights",
+        "recap",
+        "skill-doctor",
+        "goal",
+        "design-consent",
+        "design-revoke",
+        "list-agents",
+        "team-onboarding"
+      ],
+      "terminal_slash_commands": [
+        "doctor",
+        "color",
+        "focus",
+        "reload-plugins"
+      ],
+      "apiKeySource": "none",
+      "claude_code_version": "2.1.330",
+      "output_style": "default",
+      "agents": [
+        "claude",
+        "Explore",
+        "general-purpose",
+        "Plan",
+        "statusline-setup",
+        "web-fetch"
+      ],
+      "skills": [
+        "deep-research",
+        "design",
+        "design-sync",
+        "dataviz",
+        "update-config",
+        "verify",
+        "debug",
+        "code-review",
+        "simplify",
+        "batch",
+        "fewer-permission-prompts",
+        "doctor",
+        "loop",
+        "schedule",
+        "claude-api",
+        "workflow-authoring",
+        "run",
+        "run-skill-generator",
+        "plugin-authoring"
+      ],
+      "plugins": [
+        {
+          "name": "cc-plugin-sec-default",
+          "path": "builtin",
+          "source": "cc-plugin-sec-default@builtin"
+        },
+        {
+          "name": "cc-plugin-agents-md",
+          "path": "builtin",
+          "source": "cc-plugin-agents-md@builtin"
+        },
+        {
+          "name": "cc-plugin-telemetry",
+          "path": "builtin",
+          "source": "cc-plugin-telemetry@builtin"
+        },
+        {
+          "name": "cc-plugin-privacy",
+          "path": "builtin",
+          "source": "cc-plugin-privacy@builtin"
+        },
+        {
+          "name": "cc-plugin-plugin-authoring",
+          "path": "builtin",
+          "source": "cc-plugin-plugin-authoring@builtin"
+        }
+      ],
+      "capabilities": [
+        "interrupt_receipt_v1",
+        "interrupt_cancel_queued_v1",
+        "interrupt_send_now_v1",
+        "interrupt_requeue_taken_v1",
+        "msg_lifecycle_v1",
+        "request_marker_lists_v1",
+        "ask_user_question_unanswered_v1",
+        "lifecycle_wakeup_source_v1",
+        "sdk_mcp_tools_list_changed",
+        "sdk_mcp_manifests",
+        "mcp_read_resource_v1",
+        "mcp_tool_ui_meta_v1",
+        "ui_surface_v1",
+        "mcp_call_result_not_for_model_v1",
+        "mcp_call_check_permissions_v1",
+        "voice_call_talk_line_v1",
+        "withdrawn_files_note_v2",
+        "withdrawn_tools_v1",
+        "ui_pane_widget_v1",
+        "reload_plugins_refuse_if_busy_v1",
+        "get_usage_detached_v1",
+        "silent_resend_files_v1"
+      ],
+      "analytics_disabled": false,
+      "product_feedback_disabled": false,
+      "served_by_anthropic": true,
+      "uuid": "3cf24658-8e41-4543-afb2-89150c237194",
+      "memory_paths": {
+        "auto": "/Users/farhanhassan/.claude/projects/-Users-farhanhassan-ask-soony/memory/"
+      },
+      "original_cwd": "/Users/farhanhassan/ask-soony/data/portal",
+      "additional_directories": [],
+      "messaging_socket_path": "/tmp/cc-socks/56876.sock",
+      "fast_mode_state": "off",
+      "fast_mode_disabled_reason": "sdk_opt_in_required",
+      "per_turn_effort_active": true,
+      "ultrathink_available": false,
+      "ultrathink_typed_raises": false,
+      "view_mode": "default"
+    }
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ToolUseBlock",
+        "id": "toolu_01FEKMwKbMUwd3xuN7psCNiT",
+        "name": "Read",
+        "input": {
+          "file_path": "/Users/farhanhassan/ask-soony/data/portal/suppliers/SUP-0028_Karton_Nowak/order_confirmations/OA26633658_4500318665.pdf"
+        }
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 881,
+      "cache_read_input_tokens": 3786,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 881
+      },
+      "output_tokens": 16,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGmQcZ434oZxrJrm1Guj",
+    "stop_reason": null,
+    "session_id": "c1935d74-0aec-46a5-b297-1f24eba4ef5a",
+    "uuid": "9d8afb12-59c1-4f6a-99ea-ddf58bc42a67",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "RateLimitEvent",
+    "rate_limit_info": {
+      "_type": "RateLimitInfo",
+      "status": "allowed",
+      "resets_at": 1795313400,
+      "rate_limit_type": "five_hour",
+      "utilization": null,
+      "overage_status": "rejected",
+      "overage_resets_at": 1796083200,
+      "overage_disabled_reason": "org_level_disabled_until",
+      "raw": {
+        "status": "allowed",
+        "resetsAt": 1795313400,
+        "rateLimitType": "five_hour",
+        "overageStatus": "rejected",
+        "overageResetsAt": 1796083200,
+        "overageDisabledReason": "org_level_disabled_until",
+        "memberSpendLimit": {},
+        "isUsingOverage": false,
+        "unifiedWindows": {
+          "five_hour": {
+            "utilization": 0.11,
+            "resetsAt": 1795313400,
+            "status": "allowed"
+          },
+          "seven_day": {
+            "utilization": 0.01,
+            "resetsAt": 1795554000,
+            "status": "allowed"
+          }
+        }
+      }
+    },
+    "uuid": "ecf1c7a7-a873-4ef1-a02e-6bb69680cba1",
+    "session_id": "c1935d74-0aec-46a5-b297-1f24eba4ef5a"
+  },
+  {
+    "_type": "UserMessage",
+    "content": [
+      {
+        "_type": "ToolResultBlock",
+        "tool_use_id": "toolu_01FEKMwKbMUwd3xuN7psCNiT",
+        "content": [
+          {
+            "type": "text",
+            "text": "PDF file read: /Users/farhanhassan/ask-soony/data/portal/suppliers/SUP-0028_Karton_Nowak/order_confirmations/OA26633658_4500318665.pdf (2.1KB)"
+          },
+          {
+            "type": "document",
+            "source": {
+              "type": "base64",
+              "media_type": "application/pdf",
+              "data": "<2872 chars of encoded data left out>"
+            }
+          }
+        ],
+        "is_error": null
+      }
+    ],
+    "uuid": "867119f4-441f-4377-b99e-0a9669f771d5",
+    "parent_tool_use_id": null,
+    "tool_use_result": {
+      "type": "pdf",
+      "file": {
+        "filePath": "/Users/farhanhassan/ask-soony/data/portal/suppliers/SUP-0028_Karton_Nowak/order_confirmations/OA26633658_4500318665.pdf",
+        "base64": "JVBERi0xLjQKJeLjz9MgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiAzIDAgUgo+PgplbmRvYmoKMiAwIG9iago8PAovQmFzZUZvbnQgL0hlbHZldGljYSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjEgL1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iagozIDAgb2JqCjw8Ci9CYXNlRm9udCAvSGVsdmV0aWNhLUJvbGQgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgL05hbWUgL0YyIC9TdWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKNCAwIG9iago8PAovQ29udGVudHMgOCAwIFIgL01lZGlhQm94IFsgMCAwIDU5NS4yNzU2IDg0MS44ODk4IF0gL1BhcmVudCA3IDAgUiAvUmVzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERiAvVGV4dCAvSW1hZ2VCIC9JbWFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKCj4+IAogIC9UeXBlIC9QYWdlCj4+CmVuZG9iago1IDAgb2JqCjw8Ci9QYWdlTW9kZSAvVXNlTm9uZSAvUGFnZXMgNyAwIFIgL1R5cGUgL0NhdGFsb2cKPj4KZW5kb2JqCjYgMCBvYmoKPDwKL0F1dGhvciAoQWduaWVzemthIE5vd2FrKSAvQ3JlYXRpb25EYXRlIChEOjIwMjYwNTI1MDgwNDQ2KzAwJzAwJykgL0NyZWF0b3IgKFNBUCBOZXRXZWF2ZXIgNy41MCkgL0tleXdvcmRzICgpIC9Nb2REYXRlIChEOjIwMjYwNTI1MDgwNDQ2KzAwJzAwJykgL1Byb2R1Y2VyIChTQVAgTmV0V2VhdmVyIEFwcGxpY2F0aW9uIFNlcnZlciA3LjUwIC8gQUJBUCkgCiAgL1N1YmplY3QgKCkgL1RpdGxlIChLYXJ0b24gTm93YWsgU3AuIHogby5vLikgL1RyYXBwZWQgL0ZhbHNlCj4+CmVuZG9iago3IDAgb2JqCjw8Ci9Db3VudCAxIC9LaWRzIFsgNCAwIFIgXSAvVHlwZSAvUGFnZXMKPj4KZW5kb2JqCjggMCBvYmoKPDwKL0ZpbHRlciBbIC9BU0NJSTg1RGVjb2RlIC9GbGF0ZURlY29kZSBdIC9MZW5ndGggNzM1Cj4+CnN0cmVhbQpHYXRVcTlsbyNCJjtLWlEnbWgzcywuKkxaUyksUWU1a0BFcjNIVSI2IiFaYj4+PnVILG5FVlVaNWFyMUIxWDlbTCI1ODBxaD1XOTtKX0doUnBGSE9EKl5LI3IhXHQjc0oxYmdiXDsiPkpyLE0zOy42S3A3UU9IITsmXScwOm9CXEJbXCc6K0goJTxKYGRwam9MWEFnaDlCNichNGQlaV5SPkoxRG9fZyJVWCYiNzBQIVBwUHA/U15FTT8wQDs5PFspZz82dGthT1E0bGJMaCpvSzFwRjsiNm0pKyhqLStFbiI7JFxiYDFOUi0jWC01dF9pXDZALkQwSSFJLTBKMiQrL2smdSVnJ19cWkZaTkpXYWZWU18tJCRhImJvVUs5SzVcP1hiKSQiMy5OSEEqck9HKiIkM1g1J3BOYjJWJWZSPV5hUENALltnZCheZ1QiSTxaa19kQVMyLXUwUmhmRVZkYUVVXjtNS21PM0tNIUhOQyNkQkZQK1diYGMxRkIqNHNKO28lX1VFdVdNVmMrWXJxIklCYmtoU0BkazNQTEtyNydjVChCI0BUZVYxajkhWGJKVzQ/aURDWic5J2U+LjA8ZUE4R2luVTtRWFJZPiVLbEpWKGdzNTFKY1B1Z251Z2VsOTVockQ2TFxNLGAsRSRSOnJIaSteQGlxNS45Y0VcZjRUSTppT2YwKlluR1ZxO1QyakdwdSleSGhVTEdqLlVvUDllIidQailvQlY6JWRyIVc3Z1hwMWFzMGkyV2FCT0dVWiF1bUlPciY8LC1ja2BKcVM8UDtzJU5acWZTNURHMiI1blBzQVNsT1RtMGVWOjZbMUV1ZDRWY21zJVxwJyowPWAqOGhpazxIJFs/Iyo8KEc+Z0I2cC0rc0JnOW9LYEo7L3Asal8kSEhWJk5BM3NPOkhOQTclQV5SJFd0TG5OQ2QjXUhuTDEtWyY1cyJlQVxHK1VGLHJXOVptZEA6fj5lbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCA5CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDA2MSAwMDAwMCBuIAowMDAwMDAwMTAyIDAwMDAwIG4gCjAwMDAwMDAyMDkgMDAwMDAgbiAKMDAwMDAwMDMyMSAwMDAwMCBuIAowMDAwMDAwNTI0IDAwMDAwIG4gCjAwMDAwMDA1OTIgMDAwMDAgbiAKMDAwMDAwMDg3OCAwMDAwMCBuIAowMDAwMDAwOTM3IDAwMDAwIG4gCnRyYWlsZXIKPDwKL0lEIApbPGVhZjVmMzhhMjg3ZmQ4ZDZjN2RiOTk3NzRmYzY2NWRmPjxlYWY1ZjM4YTI4N2ZkOGQ2YzdkYjk5Nzc0ZmM2NjVkZj5dCiUgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAoKL0luZm8gNiAwIFIKL1Jvb3QgNSAwIFIKL1NpemUgOQo+PgpzdGFydHhyZWYKMTc2MgolJUVPRgo=",
+        "originalSize": 2153
+      }
+    },
+    "origin": null
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ToolUseBlock",
+        "id": "toolu_01FVy24M3481gvp74R6r7Lnt",
+        "name": "StructuredOutput",
+        "input": {
+          "document_type": "order_confirmation",
+          "languages": [
+            "Polish",
+            "English"
+          ],
+          "issuer": "Karton Nowak Sp. z o.o.",
+          "recipient": "Soony Interactive GmbH",
+          "document_number": "OA26633658",
+          "document_date": null,
+          "references": [
+            {
+              "type": "po_number",
+              "value": "4500318665"
+            }
+          ],
+          "lines": [
+            {
+              "item": "00010",
+              "material_id": "CMP-GAM-005",
+              "supplier_part_no": null,
+              "description": "Cover Sleeve Grand Heist 5 (USK/PEGI)",
+              "values": [
+                {
+                  "field": "quantity_ordered",
+                  "field_label": null,
+                  "value": "110,000",
+                  "number": 110000,
+                  "unit": null,
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "unit_price",
+                  "field_label": null,
+                  "value": "0.06",
+                  "number": 0.06,
+                  "unit": "EUR",
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "date_confirmed",
+                  "field_label": null,
+                  "value": "2026-06-11",
+                  "number": null,
+                  "unit": null,
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "date_ordered",
+                  "field_label": null,
+                  "value": "2026-05-21",
+                  "number": null,
+                  "unit": null,
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                }
+              ]
+            }
+          ],
+          "statements": [
+            {
+              "topic": "terms",
+              "text_en": "Incoterms DAP Hamburg; payment NET30.",
+              "quote": "Incoterms DAP Hamburg · Payment NET30"
+            }
+          ],
+          "decisions": [],
+          "corrections": [],
+          "verdict": {
+            "status": "clean",
+            "summary_en": "Order confirmation OA26633658 from Karton Nowak to Soony Interactive GmbH for PO 4500318665 dated 2026-05-21. One line: item 00010, CMP-GAM-005 Cover Sleeve Grand Heist 5 (USK/PEGI), 110,000 at 0.06 EUR, confirmed for 2026-06-11. Terms DAP Hamburg, NET30.",
+            "red_flags": [],
+            "confidence": "high",
+            "observations": [
+              "Clean printed single-page document with no handwriting, stamps or signatures.",
+              "The document has no issue date of its own. The only other date is the PO date, 2026-05-21.",
+              "The quantity is printed without a unit of measure. The 110,000 uses a comma thousands separator, as in English notation.",
+              "The unit price is printed as 0.06 EUR. No line total is shown."
+            ]
+          }
+        }
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 19993,
+      "cache_read_input_tokens": 3786,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 19993
+      },
+      "output_tokens": 25,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGmQjJquHLiH44btaavq",
+    "stop_reason": null,
+    "session_id": "c1935d74-0aec-46a5-b297-1f24eba4ef5a",
+    "uuid": "1cfe04a7-3249-4810-b904-e5518eefe872",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "UserMessage",
+    "content": [
+      {
+        "_type": "ToolResultBlock",
+        "tool_use_id": "toolu_01FVy24M3481gvp74R6r7Lnt",
+        "content": "Structured output provided successfully",
+        "is_error": null
+      }
+    ],
+    "uuid": "78028049-8822-4cc4-b960-6f23380b5224",
+    "parent_tool_use_id": null,
+    "tool_use_result": "Structured output provided successfully",
+    "origin": null
+  },
+  {
+    "_type": "RateLimitEvent",
+    "rate_limit_info": {
+      "_type": "RateLimitInfo",
+      "status": "allowed",
+      "resets_at": 1795313400,
+      "rate_limit_type": "five_hour",
+      "utilization": null,
+      "overage_status": "rejected",
+      "overage_resets_at": 1796083200,
+      "overage_disabled_reason": "org_level_disabled_until",
+      "raw": {
+        "status": "allowed",
+        "resetsAt": 1795313400,
+        "rateLimitType": "five_hour",
+        "overageStatus": "rejected",
+        "overageResetsAt": 1796083200,
+        "overageDisabledReason": "org_level_disabled_until",
+        "memberSpendLimit": {},
+        "isUsingOverage": false,
+        "unifiedWindows": {
+          "five_hour": {
+            "utilization": 0.1,
+            "resetsAt": 1795313400,
+            "status": "allowed"
+          },
+          "seven_day": {
+            "utilization": 0.01,
+            "resetsAt": 1795554000,
+            "status": "allowed"
+          }
+        }
+      }
+    },
+    "uuid": "dc321d40-9e44-49e5-bbf6-5a3422a87c08",
+    "session_id": "c1935d74-0aec-46a5-b297-1f24eba4ef5a"
+  },
+  {
+    "_type": "ResultMessage",
+    "subtype": "success",
+    "duration_ms": 9425,
+    "duration_api_ms": 10081,
+    "is_error": false,
+    "num_turns": 3,
+    "session_id": "c1935d74-0aec-46a5-b297-1f24eba4ef5a",
+    "stop_reason": "tool_use",
+    "total_cost_usd": 0.09595530000000001,
+    "usage": {
+      "input_tokens": 4,
+      "cache_creation_input_tokens": 20874,
+      "cache_read_input_tokens": 7572,
+      "output_tokens": 1147,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 20874,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "global",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 1036,
+          "cache_read_input_tokens": 3786,
+          "cache_creation_input_tokens": 19993,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 19993
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "result": "{\"document_type\":\"order_confirmation\",\"languages\":[\"Polish\",\"English\"],\"issuer\":\"Karton Nowak Sp. z o.o.\",\"recipient\":\"Soony Interactive GmbH\",\"document_number\":\"OA26633658\",\"document_date\":null,\"references\":[{\"type\":\"po_number\",\"value\":\"4500318665\"}],\"lines\":[{\"item\":\"00010\",\"material_id\":\"CMP-GAM-005\",\"supplier_part_no\":null,\"description\":\"Cover Sleeve Grand Heist 5 (USK/PEGI)\",\"values\":[{\"field\":\"quantity_ordered\",\"field_label\":null,\"value\":\"110,000\",\"number\":110000,\"unit\":null,\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"unit_price\",\"field_label\":null,\"value\":\"0.06\",\"number\":0.06,\"unit\":\"EUR\",\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"date_confirmed\",\"field_label\":null,\"value\":\"2026-06-11\",\"number\":null,\"unit\":null,\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"date_ordered\",\"field_label\":null,\"value\":\"2026-05-21\",\"number\":null,\"unit\":null,\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"}]}],\"statements\":[{\"topic\":\"terms\",\"text_en\":\"Incoterms DAP Hamburg; payment NET30.\",\"quote\":\"Incoterms DAP Hamburg · Payment NET30\"}],\"decisions\":[],\"corrections\":[],\"verdict\":{\"status\":\"clean\",\"summary_en\":\"Order confirmation OA26633658 from Karton Nowak to Soony Interactive GmbH for PO 4500318665 dated 2026-05-21. One line: item 00010, CMP-GAM-005 Cover Sleeve Grand Heist 5 (USK/PEGI), 110,000 at 0.06 EUR, confirmed for 2026-06-11. Terms DAP Hamburg, NET30.\",\"red_flags\":[],\"confidence\":\"high\",\"observations\":[\"Clean printed single-page document with no handwriting, stamps or signatures.\",\"The document has no issue date of its own. The only other date is the PO date, 2026-05-21.\",\"The quantity is printed without a unit of measure. The 110,000 uses a comma thousands separator, as in English notation.\",\"The unit price is printed as 0.06 EUR. No line total is shown.\"]}}",
+    "structured_output": {
+      "document_type": "order_confirmation",
+      "languages": [
+        "Polish",
+        "English"
+      ],
+      "issuer": "Karton Nowak Sp. z o.o.",
+      "recipient": "Soony Interactive GmbH",
+      "document_number": "OA26633658",
+      "document_date": null,
+      "references": [
+        {
+          "type": "po_number",
+          "value": "4500318665"
+        }
+      ],
+      "lines": [
+        {
+          "item": "00010",
+          "material_id": "CMP-GAM-005",
+          "supplier_part_no": null,
+          "description": "Cover Sleeve Grand Heist 5 (USK/PEGI)",
+          "values": [
+            {
+              "field": "quantity_ordered",
+              "field_label": null,
+              "value": "110,000",
+              "number": 110000,
+              "unit": null,
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "unit_price",
+              "field_label": null,
+              "value": "0.06",
+              "number": 0.06,
+              "unit": "EUR",
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "date_confirmed",
+              "field_label": null,
+              "value": "2026-06-11",
+              "number": null,
+              "unit": null,
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "date_ordered",
+              "field_label": null,
+              "value": "2026-05-21",
+              "number": null,
+              "unit": null,
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            }
+          ]
+        }
+      ],
+      "statements": [
+        {
+          "topic": "terms",
+          "text_en": "Incoterms DAP Hamburg; payment NET30.",
+          "quote": "Incoterms DAP Hamburg · Payment NET30"
+        }
+      ],
+      "decisions": [],
+      "corrections": [],
+      "verdict": {
+        "status": "clean",
+        "summary_en": "Order confirmation OA26633658 from Karton Nowak to Soony Interactive GmbH for PO 4500318665 dated 2026-05-21. One line: item 00010, CMP-GAM-005 Cover Sleeve Grand Heist 5 (USK/PEGI), 110,000 at 0.06 EUR, confirmed for 2026-06-11. Terms DAP Hamburg, NET30.",
+        "red_flags": [],
+        "confidence": "high",
+        "observations": [
+          "Clean printed single-page document with no handwriting, stamps or signatures.",
+          "The document has no issue date of its own. The only other date is the PO date, 2026-05-21.",
+          "The quantity is printed without a unit of measure. The 110,000 uses a comma thousands separator, as in English notation.",
+          "The unit price is printed as 0.06 EUR. No line total is shown."
+        ]
+      }
+    },
+    "model_usage": {
+      "claude-haiku-5-5": {
+        "inputTokens": 1261,
+        "outputTokens": 196,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.0002241,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 173,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 0,
+        "canonicalModel": "claude-haiku-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      },
+      "claude-sonnet-5-5": {
+        "inputTokens": 4,
+        "outputTokens": 1147,
+        "cacheReadInputTokens": 7572,
+        "cacheCreationInputTokens": 20874,
+        "webSearchRequests": 0,
+        "costUSD": 0.0957312,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 0,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 20874,
+        "canonicalModel": "claude-sonnet-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "permission_denials": [],
+    "deferred_tool_use": null,
+    "errors": null,
+    "api_error_status": null,
+    "uuid": "b0282b90-c9f5-4229-aaaf-438634c6a350",
+    "terminal_reason": "completed",
+    "origin": null,
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  }
+]

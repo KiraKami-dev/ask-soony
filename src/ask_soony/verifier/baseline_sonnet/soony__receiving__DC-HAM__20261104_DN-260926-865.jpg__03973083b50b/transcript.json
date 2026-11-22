@@ -1,0 +1,646 @@
+[
+  {
+    "_type": "SystemMessage",
+    "subtype": "init",
+    "data": {
+      "type": "system",
+      "subtype": "init",
+      "cwd": "/Users/farhanhassan/ask-soony/data/portal",
+      "session_id": "3c9f2355-c078-453a-b563-2486b1171da1",
+      "tools": [
+        "Read",
+        "StructuredOutput"
+      ],
+      "mcp_servers": [],
+      "model": "claude-sonnet-5-5",
+      "permissionMode": "dontAsk",
+      "slash_commands": [
+        "deep-research",
+        "design",
+        "design-sync",
+        "dataviz",
+        "update-config",
+        "verify",
+        "debug",
+        "code-review",
+        "simplify",
+        "batch",
+        "fewer-permission-prompts",
+        "doctor",
+        "loop",
+        "schedule",
+        "claude-api",
+        "workflow-authoring",
+        "run",
+        "run-skill-generator",
+        "plugin-authoring",
+        "advisor",
+        "agents",
+        "auto-mode-setup",
+        "autocompact",
+        "clear",
+        "color",
+        "compact",
+        "config",
+        "output-style",
+        "context",
+        "effort",
+        "fast",
+        "focus",
+        "heapdump",
+        "init",
+        "mcp",
+        "import",
+        "model",
+        "__remote-workflow",
+        "workflow-launch-exec",
+        "reload-plugins",
+        "reload-skills",
+        "rename",
+        "ultrareview",
+        "security-review",
+        "usage-credits",
+        "extra-usage",
+        "usage",
+        "insights",
+        "recap",
+        "skill-doctor",
+        "goal",
+        "design-consent",
+        "design-revoke",
+        "list-agents",
+        "team-onboarding"
+      ],
+      "terminal_slash_commands": [
+        "doctor",
+        "color",
+        "focus",
+        "reload-plugins"
+      ],
+      "apiKeySource": "none",
+      "claude_code_version": "2.1.330",
+      "output_style": "default",
+      "agents": [
+        "claude",
+        "Explore",
+        "general-purpose",
+        "Plan",
+        "statusline-setup",
+        "web-fetch"
+      ],
+      "skills": [
+        "deep-research",
+        "design",
+        "design-sync",
+        "dataviz",
+        "update-config",
+        "verify",
+        "debug",
+        "code-review",
+        "simplify",
+        "batch",
+        "fewer-permission-prompts",
+        "doctor",
+        "loop",
+        "schedule",
+        "claude-api",
+        "workflow-authoring",
+        "run",
+        "run-skill-generator",
+        "plugin-authoring"
+      ],
+      "plugins": [
+        {
+          "name": "cc-plugin-sec-default",
+          "path": "builtin",
+          "source": "cc-plugin-sec-default@builtin"
+        },
+        {
+          "name": "cc-plugin-agents-md",
+          "path": "builtin",
+          "source": "cc-plugin-agents-md@builtin"
+        },
+        {
+          "name": "cc-plugin-telemetry",
+          "path": "builtin",
+          "source": "cc-plugin-telemetry@builtin"
+        },
+        {
+          "name": "cc-plugin-privacy",
+          "path": "builtin",
+          "source": "cc-plugin-privacy@builtin"
+        },
+        {
+          "name": "cc-plugin-plugin-authoring",
+          "path": "builtin",
+          "source": "cc-plugin-plugin-authoring@builtin"
+        }
+      ],
+      "capabilities": [
+        "interrupt_receipt_v1",
+        "interrupt_cancel_queued_v1",
+        "interrupt_send_now_v1",
+        "interrupt_requeue_taken_v1",
+        "msg_lifecycle_v1",
+        "request_marker_lists_v1",
+        "ask_user_question_unanswered_v1",
+        "lifecycle_wakeup_source_v1",
+        "sdk_mcp_tools_list_changed",
+        "sdk_mcp_manifests",
+        "mcp_read_resource_v1",
+        "mcp_tool_ui_meta_v1",
+        "ui_surface_v1",
+        "mcp_call_result_not_for_model_v1",
+        "mcp_call_check_permissions_v1",
+        "voice_call_talk_line_v1",
+        "withdrawn_files_note_v2",
+        "withdrawn_tools_v1",
+        "ui_pane_widget_v1",
+        "reload_plugins_refuse_if_busy_v1",
+        "get_usage_detached_v1",
+        "silent_resend_files_v1"
+      ],
+      "analytics_disabled": false,
+      "product_feedback_disabled": false,
+      "served_by_anthropic": true,
+      "uuid": "9142f02b-2366-4b42-95d0-a56148e0670d",
+      "memory_paths": {
+        "auto": "/Users/farhanhassan/.claude/projects/-Users-farhanhassan-ask-soony/memory/"
+      },
+      "original_cwd": "/Users/farhanhassan/ask-soony/data/portal",
+      "additional_directories": [],
+      "messaging_socket_path": "/tmp/cc-socks/47369.sock",
+      "fast_mode_state": "off",
+      "fast_mode_disabled_reason": "sdk_opt_in_required",
+      "per_turn_effort_active": true,
+      "ultrathink_available": false,
+      "ultrathink_typed_raises": false,
+      "view_mode": "default"
+    }
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ToolUseBlock",
+        "id": "toolu_01S2QMjQhmGLf3sA49YYRMzY",
+        "name": "Read",
+        "input": {
+          "file_path": "/Users/farhanhassan/ask-soony/data/portal/soony/receiving/DC-HAM/20261104_DN-260926-865.jpg"
+        }
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 868,
+      "cache_read_input_tokens": 3786,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 868
+      },
+      "output_tokens": 16,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGjjtxL9V8iqX29k2fVW",
+    "stop_reason": null,
+    "session_id": "3c9f2355-c078-453a-b563-2486b1171da1",
+    "uuid": "e51d7f2f-5b3c-412d-a9d4-15118d27ba66",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "RateLimitEvent",
+    "rate_limit_info": {
+      "_type": "RateLimitInfo",
+      "status": "allowed",
+      "resets_at": 1795300800,
+      "rate_limit_type": "five_hour",
+      "utilization": null,
+      "overage_status": "allowed",
+      "overage_resets_at": 1796083200,
+      "overage_disabled_reason": null,
+      "raw": {
+        "status": "allowed",
+        "resetsAt": 1795300800,
+        "rateLimitType": "five_hour",
+        "overageStatus": "allowed",
+        "overageResetsAt": 1796083200,
+        "isUsingOverage": false,
+        "unifiedWindows": {
+          "five_hour": {
+            "utilization": 0.81,
+            "resetsAt": 1795300800,
+            "status": "allowed"
+          },
+          "seven_day": {
+            "utilization": 0.28,
+            "resetsAt": 1795554000,
+            "status": "allowed"
+          }
+        }
+      }
+    },
+    "uuid": "3c5d0ad8-b909-49be-a320-8d3132cecd67",
+    "session_id": "3c9f2355-c078-453a-b563-2486b1171da1"
+  },
+  {
+    "_type": "UserMessage",
+    "content": [
+      {
+        "_type": "ToolResultBlock",
+        "tool_use_id": "toolu_01S2QMjQhmGLf3sA49YYRMzY",
+        "content": [
+          {
+            "type": "image",
+            "source": {
+              "type": "base64",
+              "data": "<178380 chars of encoded data left out>",
+              "media_type": "image/jpeg"
+            }
+          }
+        ],
+        "is_error": null
+      }
+    ],
+    "uuid": "3bff1beb-dde2-44b0-bfff-e9957779cade",
+    "parent_tool_use_id": null,
+    "tool_use_result": {
+      "type": "image",
+      "file": {
+        "base64": "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… <158380 more chars>",
+        "type": "image/jpeg",
+        "originalSize": 157942,
+        "dimensions": {
+          "originalWidth": 1654,
+          "originalHeight": 2339,
+          "displayWidth": 1414,
+          "displayHeight": 2000
+        }
+      }
+    },
+    "origin": null
+  },
+  {
+    "_type": "UserMessage",
+    "content": [
+      {
+        "_type": "TextBlock",
+        "text": "[Image: original 1654x2339, displayed at 1414x2000. Multiply coordinates by 1.17 to map to original image.]"
+      }
+    ],
+    "uuid": "fa2f2101-b292-48f7-87a8-117cdf7f52c0",
+    "parent_tool_use_id": null,
+    "tool_use_result": null,
+    "origin": null
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ToolUseBlock",
+        "id": "toolu_018jmRdnXUkK8LEscGvX6uAK",
+        "name": "StructuredOutput",
+        "input": {
+          "document_type": "delivery_note",
+          "languages": [
+            "Korean",
+            "English"
+          ],
+          "issuer": "Hwaseong Memory Co., Ltd.",
+          "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+          "document_number": "DN-260926-865",
+          "document_date": "2026-09-26",
+          "references": [
+            {
+              "type": "po_number",
+              "value": "4500318718"
+            },
+            {
+              "type": "delivery_note",
+              "value": "DN-260926-865"
+            }
+          ],
+          "lines": [
+            {
+              "item": "1",
+              "material_id": "CMP-GAM-002",
+              "supplier_part_no": null,
+              "description": "Game Card 64 GB – Grand Heist 5",
+              "values": [
+                {
+                  "field": "quantity_delivered",
+                  "field_label": null,
+                  "value": "10 000",
+                  "number": 10000,
+                  "unit": "PCS",
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "packages",
+                  "field_label": null,
+                  "value": "5",
+                  "number": 5,
+                  "unit": "boxes",
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "weight",
+                  "field_label": null,
+                  "value": "65 kg",
+                  "number": 65,
+                  "unit": "kg",
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                }
+              ]
+            }
+          ],
+          "statements": [
+            {
+              "topic": "shipment",
+              "text_en": "Carrier: Nordhav Shipping A/S",
+              "quote": "운송: Nordhav Shipping A/S"
+            },
+            {
+              "topic": "shipment",
+              "text_en": "Total weight 65 kg, 5 boxes",
+              "quote": "총중량: 65 kg 박스: 5"
+            }
+          ],
+          "decisions": [],
+          "corrections": [],
+          "verdict": {
+            "status": "clean",
+            "summary_en": "Korean/English delivery note DN-260926-865 dated 2026.09.26 from Hwaseong Memory Co., Ltd. to Soony Distribution Center Hamburg, PO 4500318718. One line: CMP-GAM-002 Game Card 64 GB – Grand Heist 5, 10 000 PCS in 5 boxes, 65 kg, carrier Nordhav Shipping A/S. The remarks field is empty. There are no corrections.",
+            "red_flags": [],
+            "confidence": "high",
+            "observations": [
+              "Red round company stamp 'HWASEONG MEMORY CO LTD' with a star overlaps the unit and box columns of the table. It contains no date or number. The PCS and box digits are slightly overlapped but still readable.",
+              "Handwritten name 'Meyer K.' on the receiver (인수자) signature line. No receiving date is written.",
+              "Remarks (비고) field is blank.",
+              "No prices shown."
+            ]
+          }
+        }
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 20957,
+      "cache_read_input_tokens": 4654,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 20957
+      },
+      "output_tokens": 25,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGjk5FwM3wvHFtAfsHNy",
+    "stop_reason": null,
+    "session_id": "3c9f2355-c078-453a-b563-2486b1171da1",
+    "uuid": "85993935-53cd-4e1b-9690-61b13f7f8fa6",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "RateLimitEvent",
+    "rate_limit_info": {
+      "_type": "RateLimitInfo",
+      "status": "allowed",
+      "resets_at": 1795300800,
+      "rate_limit_type": "five_hour",
+      "utilization": null,
+      "overage_status": "allowed",
+      "overage_resets_at": 1796083200,
+      "overage_disabled_reason": null,
+      "raw": {
+        "status": "allowed",
+        "resetsAt": 1795300800,
+        "rateLimitType": "five_hour",
+        "overageStatus": "allowed",
+        "overageResetsAt": 1796083200,
+        "isUsingOverage": false,
+        "unifiedWindows": {
+          "five_hour": {
+            "utilization": 0.82,
+            "resetsAt": 1795300800,
+            "status": "allowed"
+          },
+          "seven_day": {
+            "utilization": 0.28,
+            "resetsAt": 1795554000,
+            "status": "allowed"
+          }
+        }
+      }
+    },
+    "uuid": "f0fbb6cb-33cf-4be4-af26-2c0b9f1f3da5",
+    "session_id": "3c9f2355-c078-453a-b563-2486b1171da1"
+  },
+  {
+    "_type": "UserMessage",
+    "content": [
+      {
+        "_type": "ToolResultBlock",
+        "tool_use_id": "toolu_018jmRdnXUkK8LEscGvX6uAK",
+        "content": "Structured output provided successfully",
+        "is_error": null
+      }
+    ],
+    "uuid": "fd69db1d-1257-40a5-945d-9d01715ebd28",
+    "parent_tool_use_id": null,
+    "tool_use_result": "Structured output provided successfully",
+    "origin": null
+  },
+  {
+    "_type": "ResultMessage",
+    "subtype": "success",
+    "duration_ms": 10336,
+    "duration_api_ms": 10943,
+    "is_error": false,
+    "num_turns": 4,
+    "session_id": "3c9f2355-c078-453a-b563-2486b1171da1",
+    "stop_reason": "tool_use",
+    "total_cost_usd": 0.10019679999999999,
+    "usage": {
+      "input_tokens": 4,
+      "cache_creation_input_tokens": 21825,
+      "cache_read_input_tokens": 8440,
+      "output_tokens": 1183,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 21825,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "global",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 1085,
+          "cache_read_input_tokens": 4654,
+          "cache_creation_input_tokens": 20957,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 20957
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "result": "{\"document_type\":\"delivery_note\",\"languages\":[\"Korean\",\"English\"],\"issuer\":\"Hwaseong Memory Co., Ltd.\",\"recipient\":\"Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE\",\"document_number\":\"DN-260926-865\",\"document_date\":\"2026-09-26\",\"references\":[{\"type\":\"po_number\",\"value\":\"4500318718\"},{\"type\":\"delivery_note\",\"value\":\"DN-260926-865\"}],\"lines\":[{\"item\":\"1\",\"material_id\":\"CMP-GAM-002\",\"supplier_part_no\":null,\"description\":\"Game Card 64 GB – Grand Heist 5\",\"values\":[{\"field\":\"quantity_delivered\",\"field_label\":null,\"value\":\"10 000\",\"number\":10000,\"unit\":\"PCS\",\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"packages\",\"field_label\":null,\"value\":\"5\",\"number\":5,\"unit\":\"boxes\",\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"weight\",\"field_label\":null,\"value\":\"65 kg\",\"number\":65,\"unit\":\"kg\",\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"}]}],\"statements\":[{\"topic\":\"shipment\",\"text_en\":\"Carrier: Nordhav Shipping A/S\",\"quote\":\"운송: Nordhav Shipping A/S\"},{\"topic\":\"shipment\",\"text_en\":\"Total weight 65 kg, 5 boxes\",\"quote\":\"총중량: 65 kg 박스: 5\"}],\"decisions\":[],\"corrections\":[],\"verdict\":{\"status\":\"clean\",\"summary_en\":\"Korean/English delivery note DN-260926-865 dated 2026.09.26 from Hwaseong Memory Co., Ltd. to Soony Distribution Center Hamburg, PO 4500318718. One line: CMP-GAM-002 Game Card 64 GB – Grand Heist 5, 10 000 PCS in 5 boxes, 65 kg, carrier Nordhav Shipping A/S. The remarks field is empty. There are no corrections.\",\"red_flags\":[],\"confidence\":\"high\",\"observations\":[\"Red round company stamp 'HWASEONG MEMORY CO LTD' with a star overlaps the unit and box columns of the table. It contains no date or number. The PCS and box digits are slightly overlapped but still readable.\",\"Handwritten name 'Meyer K.' on the receiver (인수자) signature line. No receiving date is written.\",\"Remarks (비고) field is blank.\",\"No prices shown.\"]}}",
+    "structured_output": {
+      "document_type": "delivery_note",
+      "languages": [
+        "Korean",
+        "English"
+      ],
+      "issuer": "Hwaseong Memory Co., Ltd.",
+      "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+      "document_number": "DN-260926-865",
+      "document_date": "2026-09-26",
+      "references": [
+        {
+          "type": "po_number",
+          "value": "4500318718"
+        },
+        {
+          "type": "delivery_note",
+          "value": "DN-260926-865"
+        }
+      ],
+      "lines": [
+        {
+          "item": "1",
+          "material_id": "CMP-GAM-002",
+          "supplier_part_no": null,
+          "description": "Game Card 64 GB – Grand Heist 5",
+          "values": [
+            {
+              "field": "quantity_delivered",
+              "field_label": null,
+              "value": "10 000",
+              "number": 10000,
+              "unit": "PCS",
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "packages",
+              "field_label": null,
+              "value": "5",
+              "number": 5,
+              "unit": "boxes",
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "weight",
+              "field_label": null,
+              "value": "65 kg",
+              "number": 65,
+              "unit": "kg",
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            }
+          ]
+        }
+      ],
+      "statements": [
+        {
+          "topic": "shipment",
+          "text_en": "Carrier: Nordhav Shipping A/S",
+          "quote": "운송: Nordhav Shipping A/S"
+        },
+        {
+          "topic": "shipment",
+          "text_en": "Total weight 65 kg, 5 boxes",
+          "quote": "총중량: 65 kg 박스: 5"
+        }
+      ],
+      "decisions": [],
+      "corrections": [],
+      "verdict": {
+        "status": "clean",
+        "summary_en": "Korean/English delivery note DN-260926-865 dated 2026.09.26 from Hwaseong Memory Co., Ltd. to Soony Distribution Center Hamburg, PO 4500318718. One line: CMP-GAM-002 Game Card 64 GB – Grand Heist 5, 10 000 PCS in 5 boxes, 65 kg, carrier Nordhav Shipping A/S. The remarks field is empty. There are no corrections.",
+        "red_flags": [],
+        "confidence": "high",
+        "observations": [
+          "Red round company stamp 'HWASEONG MEMORY CO LTD' with a star overlaps the unit and box columns of the table. It contains no date or number. The PCS and box digits are slightly overlapped but still readable.",
+          "Handwritten name 'Meyer K.' on the receiver (인수자) signature line. No receiving date is written.",
+          "Remarks (비고) field is blank.",
+          "No prices shown."
+        ]
+      }
+    },
+    "model_usage": {
+      "claude-haiku-5-5": {
+        "inputTokens": 1248,
+        "outputTokens": 180,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.00021480000000000002,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 159,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 0,
+        "canonicalModel": "claude-haiku-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      },
+      "claude-sonnet-5-5": {
+        "inputTokens": 4,
+        "outputTokens": 1183,
+        "cacheReadInputTokens": 8440,
+        "cacheCreationInputTokens": 21825,
+        "webSearchRequests": 0,
+        "costUSD": 0.09998199999999999,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 0,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 21825,
+        "canonicalModel": "claude-sonnet-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "permission_denials": [],
+    "deferred_tool_use": null,
+    "errors": null,
+    "api_error_status": null,
+    "uuid": "3ced2d5b-8a8d-43d9-aeb0-f0b2ac794908",
+    "terminal_reason": "completed",
+    "origin": null,
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  }
+]

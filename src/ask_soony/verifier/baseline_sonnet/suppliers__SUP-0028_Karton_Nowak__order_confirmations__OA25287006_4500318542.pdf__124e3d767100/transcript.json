@@ -1,0 +1,1182 @@
+[
+  {
+    "_type": "SystemMessage",
+    "subtype": "init",
+    "data": {
+      "type": "system",
+      "subtype": "init",
+      "cwd": "/Users/farhanhassan/ask-soony/data/portal",
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "tools": [
+        "Read",
+        "StructuredOutput"
+      ],
+      "mcp_servers": [],
+      "model": "claude-sonnet-5-5",
+      "permissionMode": "dontAsk",
+      "slash_commands": [
+        "deep-research",
+        "design",
+        "design-sync",
+        "dataviz",
+        "update-config",
+        "verify",
+        "debug",
+        "code-review",
+        "simplify",
+        "batch",
+        "fewer-permission-prompts",
+        "doctor",
+        "loop",
+        "schedule",
+        "claude-api",
+        "workflow-authoring",
+        "run",
+        "run-skill-generator",
+        "plugin-authoring",
+        "advisor",
+        "agents",
+        "auto-mode-setup",
+        "autocompact",
+        "clear",
+        "color",
+        "compact",
+        "config",
+        "output-style",
+        "context",
+        "effort",
+        "fast",
+        "focus",
+        "heapdump",
+        "init",
+        "mcp",
+        "import",
+        "model",
+        "__remote-workflow",
+        "workflow-launch-exec",
+        "reload-plugins",
+        "reload-skills",
+        "rename",
+        "ultrareview",
+        "security-review",
+        "usage-credits",
+        "extra-usage",
+        "usage",
+        "insights",
+        "recap",
+        "skill-doctor",
+        "goal",
+        "design-consent",
+        "design-revoke",
+        "list-agents",
+        "team-onboarding"
+      ],
+      "terminal_slash_commands": [
+        "doctor",
+        "color",
+        "focus",
+        "reload-plugins"
+      ],
+      "apiKeySource": "none",
+      "claude_code_version": "2.1.330",
+      "output_style": "default",
+      "agents": [
+        "claude",
+        "Explore",
+        "general-purpose",
+        "Plan",
+        "statusline-setup",
+        "web-fetch"
+      ],
+      "skills": [
+        "deep-research",
+        "design",
+        "design-sync",
+        "dataviz",
+        "update-config",
+        "verify",
+        "debug",
+        "code-review",
+        "simplify",
+        "batch",
+        "fewer-permission-prompts",
+        "doctor",
+        "loop",
+        "schedule",
+        "claude-api",
+        "workflow-authoring",
+        "run",
+        "run-skill-generator",
+        "plugin-authoring"
+      ],
+      "plugins": [
+        {
+          "name": "cc-plugin-sec-default",
+          "path": "builtin",
+          "source": "cc-plugin-sec-default@builtin"
+        },
+        {
+          "name": "cc-plugin-agents-md",
+          "path": "builtin",
+          "source": "cc-plugin-agents-md@builtin"
+        },
+        {
+          "name": "cc-plugin-telemetry",
+          "path": "builtin",
+          "source": "cc-plugin-telemetry@builtin"
+        },
+        {
+          "name": "cc-plugin-privacy",
+          "path": "builtin",
+          "source": "cc-plugin-privacy@builtin"
+        },
+        {
+          "name": "cc-plugin-plugin-authoring",
+          "path": "builtin",
+          "source": "cc-plugin-plugin-authoring@builtin"
+        }
+      ],
+      "capabilities": [
+        "interrupt_receipt_v1",
+        "interrupt_cancel_queued_v1",
+        "interrupt_send_now_v1",
+        "interrupt_requeue_taken_v1",
+        "msg_lifecycle_v1",
+        "request_marker_lists_v1",
+        "ask_user_question_unanswered_v1",
+        "lifecycle_wakeup_source_v1",
+        "sdk_mcp_tools_list_changed",
+        "sdk_mcp_manifests",
+        "mcp_read_resource_v1",
+        "mcp_tool_ui_meta_v1",
+        "ui_surface_v1",
+        "mcp_call_result_not_for_model_v1",
+        "mcp_call_check_permissions_v1",
+        "voice_call_talk_line_v1",
+        "withdrawn_files_note_v2",
+        "withdrawn_tools_v1",
+        "ui_pane_widget_v1",
+        "reload_plugins_refuse_if_busy_v1",
+        "get_usage_detached_v1",
+        "silent_resend_files_v1"
+      ],
+      "analytics_disabled": false,
+      "product_feedback_disabled": false,
+      "served_by_anthropic": true,
+      "uuid": "ca9fe065-1d6f-4180-b98f-83f34935e020",
+      "memory_paths": {
+        "auto": "/Users/farhanhassan/.claude/projects/-Users-farhanhassan-ask-soony/memory/"
+      },
+      "original_cwd": "/Users/farhanhassan/ask-soony/data/portal",
+      "additional_directories": [],
+      "messaging_socket_path": "/tmp/cc-socks/51815.sock",
+      "fast_mode_state": "off",
+      "fast_mode_disabled_reason": "sdk_opt_in_required",
+      "per_turn_effort_active": true,
+      "ultrathink_available": false,
+      "ultrathink_typed_raises": false,
+      "view_mode": "default"
+    }
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ToolUseBlock",
+        "id": "toolu_01LXyMBh2erawxjQZVpRtT6t",
+        "name": "Read",
+        "input": {
+          "file_path": "/Users/farhanhassan/ask-soony/data/portal/suppliers/SUP-0028_Karton_Nowak/order_confirmations/OA25287006_4500318542.pdf"
+        }
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 881,
+      "cache_read_input_tokens": 3786,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 881
+      },
+      "output_tokens": 16,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGkWMKK8QVLEQvpzjKFQ",
+    "stop_reason": null,
+    "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+    "uuid": "4c42fd2c-49b7-45af-8c0d-a7e3764e0d6d",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "RateLimitEvent",
+    "rate_limit_info": {
+      "_type": "RateLimitInfo",
+      "status": "rejected",
+      "resets_at": 1795300800,
+      "rate_limit_type": "five_hour",
+      "utilization": null,
+      "overage_status": "allowed_warning",
+      "overage_resets_at": 1796083200,
+      "overage_disabled_reason": null,
+      "raw": {
+        "status": "rejected",
+        "resetsAt": 1795300800,
+        "rateLimitType": "five_hour",
+        "overageStatus": "allowed_warning",
+        "overageResetsAt": 1796083200,
+        "isUsingOverage": true,
+        "overageInUse": true,
+        "unifiedWindows": {
+          "five_hour": {
+            "utilization": 1,
+            "resetsAt": 1795300800,
+            "status": "rejected",
+            "surpassedThreshold": 1
+          },
+          "seven_day": {
+            "utilization": 0.3,
+            "resetsAt": 1795554000,
+            "status": "allowed"
+          }
+        }
+      }
+    },
+    "uuid": "b65ee48a-9721-4a5f-b9a1-05701f4e9490",
+    "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac"
+  },
+  {
+    "_type": "UserMessage",
+    "content": [
+      {
+        "_type": "ToolResultBlock",
+        "tool_use_id": "toolu_01LXyMBh2erawxjQZVpRtT6t",
+        "content": [
+          {
+            "type": "text",
+            "text": "PDF file read: /Users/farhanhassan/ask-soony/data/portal/suppliers/SUP-0028_Karton_Nowak/order_confirmations/OA25287006_4500318542.pdf (2.2KB)"
+          },
+          {
+            "type": "document",
+            "source": {
+              "type": "base64",
+              "media_type": "application/pdf",
+              "data": "<2988 chars of encoded data left out>"
+            }
+          }
+        ],
+        "is_error": null
+      }
+    ],
+    "uuid": "16452e19-9a9f-4ef8-a395-316714c26d82",
+    "parent_tool_use_id": null,
+    "tool_use_result": {
+      "type": "pdf",
+      "file": {
+        "filePath": "/Users/farhanhassan/ask-soony/data/portal/suppliers/SUP-0028_Karton_Nowak/order_confirmations/OA25287006_4500318542.pdf",
+        "base64": "JVBERi0xLjQKJeLjz9MgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiAzIDAgUgo+PgplbmRvYmoKMiAwIG9iago8PAovQmFzZUZvbnQgL0hlbHZldGljYSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjEgL1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iagozIDAgb2JqCjw8Ci9CYXNlRm9udCAvSGVsdmV0aWNhLUJvbGQgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgL05hbWUgL0YyIC9TdWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKNCAwIG9iago8PAovQ29udGVudHMgOCAwIFIgL01lZGlhQm94IFsgMCAwIDU5NS4yNzU2IDg0MS44ODk4IF0gL1BhcmVudCA3IDAgUiAvUmVzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERiAvVGV4dCAvSW1hZ2VCIC9JbWFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKCj4+IAogIC9UeXBlIC9QYWdlCj4+CmVuZG9iago1IDAgb2JqCjw8Ci9QYWdlTW9kZSAvVXNlTm9uZSAvUGFnZXMgNyAwIFIgL1R5cGUgL0NhdGFsb2cKPj4KZW5kb2JqCjYgMCBvYmoKPDwKL0F1dGhvciAoQWduaWVzemthIE5vd2FrKSAvQ3JlYXRpb25EYXRlIChEOjIwMjUwODE4MTExMTQxKzAwJzAwJykgL0NyZWF0b3IgKFNBUCBOZXRXZWF2ZXIgNy41MCkgL0tleXdvcmRzICgpIC9Nb2REYXRlIChEOjIwMjUwODE4MTExMTQxKzAwJzAwJykgL1Byb2R1Y2VyIChTQVAgTmV0V2VhdmVyIEFwcGxpY2F0aW9uIFNlcnZlciA3LjUwIC8gQUJBUCkgCiAgL1N1YmplY3QgKCkgL1RpdGxlIChLYXJ0b24gTm93YWsgU3AuIHogby5vLikgL1RyYXBwZWQgL0ZhbHNlCj4+CmVuZG9iago3IDAgb2JqCjw8Ci9Db3VudCAxIC9LaWRzIFsgNCAwIFIgXSAvVHlwZSAvUGFnZXMKPj4KZW5kb2JqCjggMCBvYmoKPDwKL0ZpbHRlciBbIC9BU0NJSTg1RGVjb2RlIC9GbGF0ZURlY29kZSBdIC9MZW5ndGggODIxCj4+CnN0cmVhbQpHYXRVcjlsbyNCJjtLWlEnbWgzc1UxYmlHMlNEc1MkLWE3bWNDbSUhKiJYIWNmTGdpaC1NZD1zOiNbS09bTWBXWihiRyhPbV1JWVQrQWIvKHIxJ1liaF1rLFlKVWUwJy0obiVdTGVfQHFIJS5yKD5xI2hBKTQoYmBKLl1WT0RyXjFAL1o2anFCLC5XYFtHZSkiQTYsXUUkaydWazhTaUY8Xzc+I1JKJkNvTV5iXVl1YVQ0ZVImOkgibzAoJTsmLjpmSipoY181cjhrMm9DOjM/SyYuJ24vIT1lYWg3OjFtZ1BIUjtCcDMucVtHOl4uK2I+OihcVm8+S2Q3ZDpcJmIhTXNndFhFXSg6OyFeZWlZWl4tTTxUWTVvW0ViQE9TRTdvM28vcTpwME02OERARSlnWF5cI05yL3AkWGdWJlZrXTFYSmQmUF9oIiVdPyVHaGE0WF4lSlRNPmtyPFhJYWwtNzYnRFBuaU87bFsvJFhkSUUwMF1JMjhkU0xMayFhMWJyRitORCRbR1lRXix0QE5GWW9iKk8rOU5nVilUTFhUJDE1O2pLR0kpNFpaMy5yZztKVWYpcFhoX3IpbWh0UilIJS8kaFNpa25NOnFOQy09TXRJREsnZyRVW1tuQCo3MGExNFE8KiYhOUJwIzRDZC49ZCRcOThgbSYoS0Y6QytgMUZUXz90OElcIldwKUU6az43I2hxbWo7OzxvQ0FsRjBGSEonc1FaPGUjSHJQV0dmVGM2aEBFcy9caipnRy9BOEYqaXVcOy5uQjNbXEVPW1c0JENKImZFaFZZI083UVlARS0+b1cpaDs0MjdxYkxKWmpRWGVZW1xxUGtRPjgrI10oaG05S2pBbSsvWFcvNFs0SzM6XztNSE1GX1JIOUREXVtmRzdmT3M4ZVY6N2w/L1RqTjBjNShCI1AnJTgiRl9COjlTdDZvc0w4NDsqVEguT19SVmhEPyhxWCovZGRbIixfVXFfNTA4cHBaLnVcXFduQywsPz81OVk1Kmcsc1VBYk5hQyJAPEkwRCZRbi1odTZydWUwQlFTOkVvXmAvOyFcNTBSWSQ3YkhUMDFKRzAqb0MxMnV+PmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDkKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDYxIDAwMDAwIG4gCjAwMDAwMDAxMDIgMDAwMDAgbiAKMDAwMDAwMDIwOSAwMDAwMCBuIAowMDAwMDAwMzIxIDAwMDAwIG4gCjAwMDAwMDA1MjQgMDAwMDAgbiAKMDAwMDAwMDU5MiAwMDAwMCBuIAowMDAwMDAwODc4IDAwMDAwIG4gCjAwMDAwMDA5MzcgMDAwMDAgbiAKdHJhaWxlcgo8PAovSUQgCls8NzYzZTM5MWNkNmU5NTA3MDJhNGUwNGNmZjc1OWJiNGU+PDc2M2UzOTFjZDZlOTUwNzAyYTRlMDRjZmY3NTliYjRlPl0KJSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCgovSW5mbyA2IDAgUgovUm9vdCA1IDAgUgovU2l6ZSA5Cj4+CnN0YXJ0eHJlZgoxODQ4CiUlRU9GCg==",
+        "originalSize": 2239
+      }
+    },
+    "origin": null
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 1,
+      "estimated_tokens_delta": 1,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "8aa22660-1fe4-402c-b679-0bd731a3fc33"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 10,
+      "estimated_tokens_delta": 9,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "d85c17d8-539a-43eb-9072-d59311cb36e3"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 13,
+      "estimated_tokens_delta": 3,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "dd85effa-818a-44a3-8219-b7e09cef0aff"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 15,
+      "estimated_tokens_delta": 2,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "b981a54f-4a4b-4186-86a0-c10132fcc4a1"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 22,
+      "estimated_tokens_delta": 7,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "5568afaa-f546-4745-b945-c7f0003eb057"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 27,
+      "estimated_tokens_delta": 5,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "360e33f4-d1a7-4481-b393-0a5230fbca27"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 29,
+      "estimated_tokens_delta": 2,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "22c9c674-cfb3-4f2d-8906-22bbdab49ac3"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 33,
+      "estimated_tokens_delta": 4,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "96fe9242-7604-4631-a82e-00a6809293ff"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 38,
+      "estimated_tokens_delta": 5,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "f36f7f73-9e72-4f85-9ed4-6067375f7669"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 43,
+      "estimated_tokens_delta": 5,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "6c26407d-d9ba-4934-ad37-6eac70eac806"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 46,
+      "estimated_tokens_delta": 3,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "8d8999a5-3728-40ea-8963-bfa8ca910c67"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 52,
+      "estimated_tokens_delta": 6,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "362db18c-80db-4f34-b00a-e3728383721f"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 57,
+      "estimated_tokens_delta": 5,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "0cc1d91a-d850-49d9-a89a-e8efe26ca57d"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 61,
+      "estimated_tokens_delta": 4,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "2c0209e9-9a84-443a-b046-ec8e56f00302"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 67,
+      "estimated_tokens_delta": 6,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "c5af26c9-3d4a-425c-9c9b-a7ad55b86c2c"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 68,
+      "estimated_tokens_delta": 1,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "b9cf21fe-e8cb-4b6b-b7f0-3bebeff79d21"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 70,
+      "estimated_tokens_delta": 2,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "fbe8640b-5791-400d-a939-538655f086dc"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 75,
+      "estimated_tokens_delta": 5,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "dca5a173-d7e2-4733-9dae-3eb1b6c24510"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 78,
+      "estimated_tokens_delta": 3,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "0b22fd36-24a2-4e01-884d-36f1313600f9"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 81,
+      "estimated_tokens_delta": 3,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "533e91a3-be38-4952-8d0c-15f20cdf556e"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 89,
+      "estimated_tokens_delta": 8,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "3189034a-f3d0-4422-9c74-13ab8c097d38"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 91,
+      "estimated_tokens_delta": 2,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "d47840be-0c3b-4245-a2fc-d00e97e57ed5"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 94,
+      "estimated_tokens_delta": 3,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "c0b295ee-a828-489a-9c41-c4dbce0b1056"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 96,
+      "estimated_tokens_delta": 2,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "113030ec-4e6a-48ac-8c9d-54d4716dfade"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 97,
+      "estimated_tokens_delta": 1,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "b2b2e790-ac4f-4685-81bd-5eb631e2dea5"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 98,
+      "estimated_tokens_delta": 1,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "59da6999-0372-4a79-9868-7f12649ea7d7"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 99,
+      "estimated_tokens_delta": 1,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "bc70895b-05f2-421c-9c67-3c9c25470d73"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 100,
+      "estimated_tokens_delta": 1,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "c33c0e2b-c6ad-4fb3-871c-6beca2811e90"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 108,
+      "estimated_tokens_delta": 8,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "0012504d-6c36-48a8-a144-35f6b5ccc382"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 116,
+      "estimated_tokens_delta": 8,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "0b915446-6571-4f2f-8293-bf49f9691404"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 121,
+      "estimated_tokens_delta": 5,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "8690ef83-d8b7-4eb5-b362-59c6a6f80325"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 123,
+      "estimated_tokens_delta": 2,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "9c5b4428-6fab-4f33-94b6-019705c28cff"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 125,
+      "estimated_tokens_delta": 2,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "a5ed4cba-82c6-41e3-83a1-a9217f468bb3"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 127,
+      "estimated_tokens_delta": 2,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "08b34229-0435-4511-8a6b-5eee8898014a"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 131,
+      "estimated_tokens_delta": 4,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "34f1698b-3f1b-4c13-b93a-c58f1232e806"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 134,
+      "estimated_tokens_delta": 3,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "e9371809-e914-4e85-aa79-946f1d6516b9"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 139,
+      "estimated_tokens_delta": 5,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "315b2335-7691-4c7c-a116-16d8dd773aab"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 144,
+      "estimated_tokens_delta": 5,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "40b94eb7-b4db-4d0c-9238-f07fdd694ca1"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 145,
+      "estimated_tokens_delta": 1,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "478e3741-2ca9-4508-b172-6aada71e0bfb"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 146,
+      "estimated_tokens_delta": 1,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "3fe1902b-cb6a-4531-8789-7e8faef81f49"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 314,
+      "estimated_tokens_delta": 168,
+      "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+      "uuid": "5c80729e-d05a-41ad-b277-8cb923ba8306"
+    }
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ThinkingBlock",
+        "thinking": "I've finished reading the document, so now I'm turning it into structured output. The quantity \"110,000\" is in English number format, so it becomes 110000, and the document mixes Polish and English. I'm treating the \"Qty\" column as the confirmed quantity, with the unit price at 0.03 EUR, and since there's no document date given, I'll leave that field empty.\n\nI'm noting that the document lists lines out of order, since 00020 comes before 00010. I also see two unit prices, 0.03 and 0.06, and no unit given for the quantities.\n\n",
+        "signature": "CAQS3gkKEAgUGAI4AUIIdGhpbmtpbmcSDMYIDRmnhqBEipqrMBoMD9wwhEzGlQLu/rCGIjBiht57nAg2N6tYKfYIm82e1VinuUfS1zwPK8JLhK6Mz5kkMlBYOF/QCuQiqrv/xc4q+wgfL2wUGNGdW3c66AZ0p2RZxbEQXdLVSyczNfpy+TwBhnOkOIMNL0zt44gqp1HJ8bK+PY648/CTzyWYIzv0Yb4vBFq9kcB9UTE91nlf0suWCIcG5OgfP9PY6e1mlWdzn3Kr2+jMSn61qj0C/du2WHru3rxfqZGN5f+ZF/ve8tMMNiaR08wm1oi4VscXjtIIWPqBCiRyO2IIoEzEw/emYhwq38ImgxX2MIoj92lpPTDdO9sNtcTzw+Zc//UmXsmodfa0qDbwotLCHCTU7LVt76gcPISVPyga01xzNMttMa39MWguInw0xWxI52E9fvx2u9+QPEqu2IC+04xMqgd0dDz6cgLUWPlEF8AlATknHWqAaVROmOEpBcv7CO4JRTsBZgGpGEPPpc7vzsoV+itJyR7DESVpZKwPy7W0pCp3ZMFdjIiektAVf/cxdxSSVVnt+hPRAdcQmfHq6In81juMxmrZVYqqVzWdYfwnUZXeiJ86DLSgrKl4kAtPPPqBhSrG7z+pKQRS1eG5Fu98R1t38Vm+AxlR07pB+DhqBmq1rkB8vCXoicNk8npmYHPaCgAMMIuuq0Vay+D2z6ECPTwLaEmQI/2/AQroLRl602ToYy5YIO8N+XJAAhpoEebGEZLOkT5fKx3Fx/DFplxwi4nABIR/ZE2MXBCeVmbdfMQNrf/vVS0jKY8QDN+iAUrXJe0rTNWeRMxvgSW6/Otf/0+oMg5mjWDQiVl1Qwm+UvIVrg8eOVAYQmeN2K9ZvwB+iPIcEF8J8B3vtrqLE0i3bCzd9q3WE7dNVlLk2G5sKIYVsGsaWbreYkrt2grNx/unRufww3dNnoK/UtbvnheIRYHvncMPAEgXD9y9OKhUivTUYg7R68IXt0C4Qo+HtB7oSTlzptO2kqPoSYD/aqcy9ivO7ZCeUnURZw+hovpnfRySRxCx15Ykt4shrtj5R5ipXr2IeP/WhhnnQ0XleFoAuSFWFMoONe7SxU4cRYA578bUASwtcv79oNggWHEG+LoFNXBB/H+dLpX2pYPKZDV8Vvl08OdQ90H9VVDoU0LI7Eb0I4e9VIcKDgl2Hxr6NivWzgFp1VHAnk/zr2zAWUv3xH7P749SJx5Kshm0OA2mC2undefohRSTfslPN8meE42T/5mpsfwQSNEvJY4nipE0KXu6ZziYdQnT3bIDIT5FHLbzSq6Iux6xQ9Khdkm8KMJgY3QTeBVxmiKTyUnDpwAT0sm8CpilS2lc8JZ2Wy1SIiTs2KFSyLX3ksR5R3u7M2T8gsJtgIjQxnLsZQgwPhi1WCDplDBbwJAY3z65V2maQWPCZgSTFXxpsZ9504XsSB5XmedTjc7CeTyWSA/J8tNw5ir9S7UWEGWDrf+JmSWESBEbbLuPgqSHR97pcJK/0ZcSuGgk2p396X+VonO0sCmV+encmZ7L4OcYb/6HK0r9vrlj4njHdEaeeDWCbzyhyNDJXkEjuT3AVZu/4TLRVEm8HWZaV87yj/5CAGGEmFb2TDxdfWi9G/KNYfBavrTC3EDDGAE="
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 20037,
+      "cache_read_input_tokens": 3786,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 20037,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 5,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGkWVsWRpDvR2Wx1VzAy",
+    "stop_reason": null,
+    "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+    "uuid": "43da4cac-4561-436d-b757-84e88d34f6bb",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ToolUseBlock",
+        "id": "toolu_01KLpVrewFnsReXmJbQR2riy",
+        "name": "StructuredOutput",
+        "input": {
+          "document_type": "order_confirmation",
+          "languages": [
+            "Polish",
+            "English"
+          ],
+          "issuer": "Karton Nowak Sp. z o.o.",
+          "recipient": "Soony Interactive GmbH",
+          "document_number": "OA25287006",
+          "document_date": null,
+          "references": [
+            {
+              "type": "po_number",
+              "value": "4500318542"
+            }
+          ],
+          "lines": [
+            {
+              "item": "00020",
+              "material_id": "CMP-GAM-011",
+              "supplier_part_no": null,
+              "description": "Activation Code Leaflet",
+              "values": [
+                {
+                  "field": "quantity_confirmed",
+                  "field_label": null,
+                  "value": "110,000",
+                  "number": 110000,
+                  "unit": null,
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "unit_price",
+                  "field_label": null,
+                  "value": "0.03",
+                  "number": 0.03,
+                  "unit": "EUR",
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "date_confirmed",
+                  "field_label": null,
+                  "value": "2025-09-09",
+                  "number": null,
+                  "unit": null,
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                }
+              ]
+            },
+            {
+              "item": "00010",
+              "material_id": "CMP-GAM-005",
+              "supplier_part_no": null,
+              "description": "Cover Sleeve Grand Heist 5 (USK/PEGI)",
+              "values": [
+                {
+                  "field": "quantity_confirmed",
+                  "field_label": null,
+                  "value": "135,000",
+                  "number": 135000,
+                  "unit": null,
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "unit_price",
+                  "field_label": null,
+                  "value": "0.06",
+                  "number": 0.06,
+                  "unit": "EUR",
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "date_confirmed",
+                  "field_label": null,
+                  "value": "2025-09-05",
+                  "number": null,
+                  "unit": null,
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                }
+              ]
+            }
+          ],
+          "statements": [
+            {
+              "topic": "terms",
+              "text_en": "Customer: Soony Interactive GmbH; your order 4500318542 of 2025-08-13; Incoterms DAP Hamburg; Payment NET30.",
+              "quote": "Customer: Soony Interactive GmbH · Your order 4500318542 of 2025-08-13 · Incoterms DAP Hamburg · Payment NET30"
+            }
+          ],
+          "decisions": [],
+          "corrections": [],
+          "verdict": {
+            "status": "clean",
+            "summary_en": "Order confirmation OA25287006 from Karton Nowak to Soony Interactive GmbH for PO 4500318542 (dated 2025-08-13), DAP Hamburg, NET30. Two lines: item 00020 CMP-GAM-011 Activation Code Leaflet, 110,000 at 0.03 EUR, confirmed 2025-09-09; item 00010 CMP-GAM-005 Cover Sleeve Grand Heist 5 (USK/PEGI), 135,000 at 0.06 EUR, confirmed 2025-09-05. No handwriting, stamps or corrections.",
+            "red_flags": [],
+            "confidence": "high",
+            "observations": [
+              "Typed PDF with no handwriting, stamps or signatures.",
+              "Document has no issue date of its own; only the PO date 2025-08-13 is shown.",
+              "Line items are listed out of order (00020 before 00010).",
+              "The quantity unit (e.g. pcs) is not stated; the Qty column is recorded as quantity_confirmed.",
+              "Confirmed dates differ per line (2025-09-09 and 2025-09-05)."
+            ]
+          }
+        }
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 20037,
+      "cache_read_input_tokens": 3786,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 20037,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 5,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGkWVsWRpDvR2Wx1VzAy",
+    "stop_reason": null,
+    "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+    "uuid": "4cf34684-6345-439a-ae17-8cc291ed6756",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "UserMessage",
+    "content": [
+      {
+        "_type": "ToolResultBlock",
+        "tool_use_id": "toolu_01KLpVrewFnsReXmJbQR2riy",
+        "content": "Structured output provided successfully",
+        "is_error": null
+      }
+    ],
+    "uuid": "169da33f-952c-4963-b176-59ee16ca8bbc",
+    "parent_tool_use_id": null,
+    "tool_use_result": "Structured output provided successfully",
+    "origin": null
+  },
+  {
+    "_type": "ResultMessage",
+    "subtype": "success",
+    "duration_ms": 12211,
+    "duration_api_ms": 12457,
+    "is_error": false,
+    "num_turns": 3,
+    "session_id": "6582f793-e256-4b6f-aa99-e166d88b35ac",
+    "stop_reason": "tool_use",
+    "total_cost_usd": 0.07137929999999999,
+    "usage": {
+      "input_tokens": 4,
+      "cache_creation_input_tokens": 20918,
+      "cache_read_input_tokens": 7572,
+      "output_tokens": 1686,
+      "output_tokens_details": {
+        "thinking_tokens": 202
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 881,
+        "ephemeral_5m_input_tokens": 20037
+      },
+      "inference_geo": "global",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 1575,
+          "cache_read_input_tokens": 3786,
+          "cache_creation_input_tokens": 20037,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 20037,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "result": "{\"document_type\":\"order_confirmation\",\"languages\":[\"Polish\",\"English\"],\"issuer\":\"Karton Nowak Sp. z o.o.\",\"recipient\":\"Soony Interactive GmbH\",\"document_number\":\"OA25287006\",\"document_date\":null,\"references\":[{\"type\":\"po_number\",\"value\":\"4500318542\"}],\"lines\":[{\"item\":\"00020\",\"material_id\":\"CMP-GAM-011\",\"supplier_part_no\":null,\"description\":\"Activation Code Leaflet\",\"values\":[{\"field\":\"quantity_confirmed\",\"field_label\":null,\"value\":\"110,000\",\"number\":110000,\"unit\":null,\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"unit_price\",\"field_label\":null,\"value\":\"0.03\",\"number\":0.03,\"unit\":\"EUR\",\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"date_confirmed\",\"field_label\":null,\"value\":\"2025-09-09\",\"number\":null,\"unit\":null,\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"}]},{\"item\":\"00010\",\"material_id\":\"CMP-GAM-005\",\"supplier_part_no\":null,\"description\":\"Cover Sleeve Grand Heist 5 (USK/PEGI)\",\"values\":[{\"field\":\"quantity_confirmed\",\"field_label\":null,\"value\":\"135,000\",\"number\":135000,\"unit\":null,\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"unit_price\",\"field_label\":null,\"value\":\"0.06\",\"number\":0.06,\"unit\":\"EUR\",\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"date_confirmed\",\"field_label\":null,\"value\":\"2025-09-05\",\"number\":null,\"unit\":null,\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"}]}],\"statements\":[{\"topic\":\"terms\",\"text_en\":\"Customer: Soony Interactive GmbH; your order 4500318542 of 2025-08-13; Incoterms DAP Hamburg; Payment NET30.\",\"quote\":\"Customer: Soony Interactive GmbH · Your order 4500318542 of 2025-08-13 · Incoterms DAP Hamburg · Payment NET30\"}],\"decisions\":[],\"corrections\":[],\"verdict\":{\"status\":\"clean\",\"summary_en\":\"Order confirmation OA25287006 from Karton Nowak to Soony Interactive GmbH for PO 4500318542 (dated 2025-08-13), DAP Hamburg, NET30. Two lines: item 00020 CMP-GAM-011 Activation Code Leaflet, 110,000 at 0.03 EUR, confirmed 2025-09-09; item 00010 CMP-GAM-005 Cover Sleeve Grand Heist 5 (USK/PEGI), 135,000 at 0.06 EUR, confirmed 2025-09-05. No handwriting, stamps or corrections.\",\"red_flags\":[],\"confidence\":\"high\",\"observations\":[\"Typed PDF with no handwriting, stamps or signatures.\",\"Document has no issue date of its own; only the PO date 2025-08-13 is shown.\",\"Line items are listed out of order (00020 before 00010).\",\"The quantity unit (e.g. pcs) is not stated; the Qty column is recorded as quantity_confirmed.\",\"Confirmed dates differ per line (2025-09-09 and 2025-09-05).\"]}}",
+    "structured_output": {
+      "document_type": "order_confirmation",
+      "languages": [
+        "Polish",
+        "English"
+      ],
+      "issuer": "Karton Nowak Sp. z o.o.",
+      "recipient": "Soony Interactive GmbH",
+      "document_number": "OA25287006",
+      "document_date": null,
+      "references": [
+        {
+          "type": "po_number",
+          "value": "4500318542"
+        }
+      ],
+      "lines": [
+        {
+          "item": "00020",
+          "material_id": "CMP-GAM-011",
+          "supplier_part_no": null,
+          "description": "Activation Code Leaflet",
+          "values": [
+            {
+              "field": "quantity_confirmed",
+              "field_label": null,
+              "value": "110,000",
+              "number": 110000,
+              "unit": null,
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "unit_price",
+              "field_label": null,
+              "value": "0.03",
+              "number": 0.03,
+              "unit": "EUR",
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "date_confirmed",
+              "field_label": null,
+              "value": "2025-09-09",
+              "number": null,
+              "unit": null,
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            }
+          ]
+        },
+        {
+          "item": "00010",
+          "material_id": "CMP-GAM-005",
+          "supplier_part_no": null,
+          "description": "Cover Sleeve Grand Heist 5 (USK/PEGI)",
+          "values": [
+            {
+              "field": "quantity_confirmed",
+              "field_label": null,
+              "value": "135,000",
+              "number": 135000,
+              "unit": null,
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "unit_price",
+              "field_label": null,
+              "value": "0.06",
+              "number": 0.06,
+              "unit": "EUR",
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "date_confirmed",
+              "field_label": null,
+              "value": "2025-09-05",
+              "number": null,
+              "unit": null,
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            }
+          ]
+        }
+      ],
+      "statements": [
+        {
+          "topic": "terms",
+          "text_en": "Customer: Soony Interactive GmbH; your order 4500318542 of 2025-08-13; Incoterms DAP Hamburg; Payment NET30.",
+          "quote": "Customer: Soony Interactive GmbH · Your order 4500318542 of 2025-08-13 · Incoterms DAP Hamburg · Payment NET30"
+        }
+      ],
+      "decisions": [],
+      "corrections": [],
+      "verdict": {
+        "status": "clean",
+        "summary_en": "Order confirmation OA25287006 from Karton Nowak to Soony Interactive GmbH for PO 4500318542 (dated 2025-08-13), DAP Hamburg, NET30. Two lines: item 00020 CMP-GAM-011 Activation Code Leaflet, 110,000 at 0.03 EUR, confirmed 2025-09-09; item 00010 CMP-GAM-005 Cover Sleeve Grand Heist 5 (USK/PEGI), 135,000 at 0.06 EUR, confirmed 2025-09-05. No handwriting, stamps or corrections.",
+        "red_flags": [],
+        "confidence": "high",
+        "observations": [
+          "Typed PDF with no handwriting, stamps or signatures.",
+          "Document has no issue date of its own; only the PO date 2025-08-13 is shown.",
+          "Line items are listed out of order (00020 before 00010).",
+          "The quantity unit (e.g. pcs) is not stated; the Qty column is recorded as quantity_confirmed.",
+          "Confirmed dates differ per line (2025-09-09 and 2025-09-05)."
+        ]
+      }
+    },
+    "model_usage": {
+      "claude-haiku-5-5": {
+        "inputTokens": 1261,
+        "outputTokens": 23,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.0001376,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 0,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 0,
+        "canonicalModel": "claude-haiku-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      },
+      "claude-sonnet-5-5": {
+        "inputTokens": 4,
+        "outputTokens": 1686,
+        "cacheReadInputTokens": 7572,
+        "cacheCreationInputTokens": 20918,
+        "webSearchRequests": 0,
+        "costUSD": 0.07124169999999999,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 202,
+        "cacheCreationEphemeral5mInputTokens": 20037,
+        "cacheCreationEphemeral1hInputTokens": 881,
+        "canonicalModel": "claude-sonnet-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "permission_denials": [],
+    "deferred_tool_use": null,
+    "errors": null,
+    "api_error_status": null,
+    "uuid": "980d4b4e-e1a3-4ab3-8922-35b36912d054",
+    "terminal_reason": "completed",
+    "origin": null,
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  }
+]

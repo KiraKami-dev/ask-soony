@@ -1,0 +1,119 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Polish",
+    "English"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o., Poznań, PL",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "WZ-261120-732",
+  "document_date": "2026-11-20",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318775"
+    },
+    {
+      "type": "delivery_note",
+      "value": "WZ-261120-732"
+    },
+    {
+      "type": "other",
+      "value": "Przewoźnik (carrier): PO 58342"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-004",
+      "supplier_part_no": null,
+      "description": "Cover Sleeve Grand Heist 6 (USK/PE  (text cut off, no closing parenthesis)",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "20.000",
+          "number": 20000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "10",
+          "number": 10,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "180 kg",
+          "number": 180,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "21.11.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "quality",
+      "text_en": "Handwritten remark: 1 pallet = GH5 Sleeves! (GH5 may refer to a different product than the ordered 'Grand Heist 6' sleeve)",
+      "quote": "1 Pal. = GH5 Sleeves!"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Received stamp: RECEIVED 21.11.2026, DC-HAM",
+      "quote": "RECEIVED 21.11.2026 DC-HAM"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Received by (Odebrał): Yilmaz D. (handwritten signature)",
+      "quote": "Odebrał: Yilmaz D."
+    }
+  ],
+  "decisions": [],
+  "corrections": [
+    {
+      "what": "handwritten remark in the Uwagi (remarks) field",
+      "original": null,
+      "replacement": "1 Pal. = GH5 Sleeves!",
+      "where": "Uwagi (Remarks) section below the item table"
+    }
+  ],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Polish WZ (goods issue) delivery note WZ-261120-732 dated 20.11.2026 from Karton Nowak, Poznań to Soony DC Hamburg against order 4500318775. It covers 20.000 (20,000) PCS of CMP-GAM-004 Cover Sleeve Grand Heist 6, in 10 packages, gross weight 180 kg. It was stamped RECEIVED 21.11.2026 DC-HAM and signed by Yilmaz D. A handwritten remark says '1 Pal. = GH5 Sleeves!', which conflicts with the printed 'Grand Heist 6' item.",
+    "red_flags": [
+      "Handwritten remark '1 Pal. = GH5 Sleeves!' suggests one pallet holds GH5 sleeves, not the ordered Grand Heist 6 (CMP-GAM-004). This is a possible product mix-up or wrong item, and the quantity of GH5 versus GH6 is not stated.",
+      "The received stamp and signature do not note any discrepancy, shortage or damage, and the remark is not tied to a quantity, so the actual GH6 quantity received may be less than 20.000.",
+      "The item description is cut off ('(USK/PE') so the full product name is not readable.",
+      "The carrier field reads 'PO 58342', which is not the order number 4500318775. It is recorded as the carrier reference."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Quantity is written in Polish thousands notation: 20.000 means 20000.",
+      "Description text is truncated at '(USK/PE' with no closing parenthesis.",
+      "Blue handwritten remark in the Uwagi field and a handwritten signature 'Yilmaz D.' on the Odebrał line.",
+      "Blue rectangular stamp 'RECEIVED 21.11.2026 / DC-HAM'.",
+      "Document carries a barcode at the top right; the lower half of the page is blank."
+    ]
+  }
+}

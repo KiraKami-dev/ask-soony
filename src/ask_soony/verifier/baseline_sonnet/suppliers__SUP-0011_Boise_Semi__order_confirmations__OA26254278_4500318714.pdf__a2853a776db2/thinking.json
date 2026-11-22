@@ -1,0 +1,6 @@
+[
+  {
+    "turn": 50,
+    "thinking": "I've finished reading the document and am moving on to the structured output. There's a conflict in the terms: the text says EXW Boise but also says freight, insurance and duties are prepaid by the seller and added to the invoice, which doesn't fit EXW, so I'll flag it. I'm also noting the figures: quantity 8500, unit price 6.11 USD, and a confirmed date of 2026-09-16.\n\nI'm mapping the order date of 2026-08-14 as a possible date_ordered value, since it's the buyer's order date and could sit on the line. No document date is stated, so that field stays null. The total price isn't given either.\n\n"
+  }
+]

@@ -1,0 +1,6 @@
+[
+  {
+    "turn": 60,
+    "thinking": "I'm checking the order confirmation OA26811412, which has two lines for the same material at 130,000 units each but with different dates, and it ties back to customer order 4500318748 from 2026-09-29. The duplicate lines might be a split delivery, and there's no PO quantity visible to compare against. I'm settling on quantity_confirmed for the \"Qty\" field, since it appears on a confirmation.\n\nI'm settling on date_confirmed for the confirmed dates, with unit price 9.8 and the two dates 2026-12-04 and 2026-12-14 as line values. The order date 2026-09-29 belongs at document level, so I'll leave it off the lines, and since no document date is stated, I'm marking that as null.\n\n"
+  }
+]

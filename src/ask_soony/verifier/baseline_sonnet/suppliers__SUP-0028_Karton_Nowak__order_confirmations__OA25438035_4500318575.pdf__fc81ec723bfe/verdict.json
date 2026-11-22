@@ -1,0 +1,88 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "Polish",
+    "English"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA25438035",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318575"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-011",
+      "supplier_part_no": null,
+      "description": "Activation Code Leaflet",
+      "values": [
+        {
+          "field": "quantity_ordered",
+          "field_label": null,
+          "value": "120,000",
+          "number": 120000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.03",
+          "number": 0.03,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2025-12-03",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2025-11-07",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Incoterms DAP Hamburg; payment NET30.",
+      "quote": "Incoterms DAP Hamburg · Payment NET30"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA25438035 from Karton Nowak to Soony Interactive GmbH for order 4500318575 dated 2025-11-07. One line: item 00010, CMP-GAM-011 Activation Code Leaflet, 120,000 at 0.03 EUR, confirmed delivery date 2025-12-03. Terms are DAP Hamburg and NET30.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Typed PDF, no handwriting, stamps or signatures.",
+      "The document has no issue date of its own. The only date besides the confirmed date is the customer order date, 2025-11-07.",
+      "The quantity column has no unit, and the 'Qty' value is read as the quantity ordered/confirmed.",
+      "Unit price basis (per piece or per thousand) is not stated."
+    ]
+  }
+}

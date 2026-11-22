@@ -1,0 +1,6 @@
+[
+  {
+    "turn": 87,
+    "thinking": "I'm going through the shipping document first: it's a Polish WZ delivery note from Karton Nowak in Poznań to Soony Distribution Center in Hamburg, dated 20.11.2026 under order 4500318775. Now I'm looking at the line item for the cover sleeve CMP-GAM-004.\n\nI'm checking the line details now: the quantity of 20.000 pieces works out to 20000, and the 180 kg gross weight looks plausible for that count across 10 packages. There's a handwritten note saying \"1 Pal. = GH5 Sleeves!\", which conflicts with the Grand Heist 6 description, so I'll flag it as a possible wrong product mix. The carrier reference \"PO 58342\" belongs in the carrier field, not as an order number, so I'll record it as another reference.\n\nI'm working out the remaining line details: the packages count at 10 and the 180 kg weight, which I'll attach to the line itself. The received stamp dated 21.11.2026 goes on the line too, and the document date of 20.11.2026 stays as the document date. The description looks cut off partway through, and the document is bilingual in Polish and English.\n\n"
+  }
+]

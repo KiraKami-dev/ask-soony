@@ -1,0 +1,6 @@
+[
+  {
+    "turn": 54,
+    "thinking": "I've finished reading the document and am moving on to structuring the output. The line items are out of order (00010, 00030, 00020), and 00010 and 00020 are both CMP-GAM-002 for 5,000 units, each with a different confirmed date. The terms conflict: the header says EXW Boise, yet the text says the seller prepays freight, insurance, and duties, which doesn't fit EXW. I'll write the quantities as 5000.\n\nI'm settling on quantity_confirmed for the Qty column and date_confirmed for Confirmed, with the unit price at 6.11 USD. The document date isn't stated, so I'll leave it null and treat 2026-10-13 as the buyer's order date.\n\n"
+  }
+]

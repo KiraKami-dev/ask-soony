@@ -1,0 +1,112 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Polish",
+    "English"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o., Poznań, PL",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "WZ-261104-571",
+  "document_date": "2026-11-04",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318761"
+    },
+    {
+      "type": "delivery_note",
+      "value": "WZ-261104-571"
+    },
+    {
+      "type": "other",
+      "value": "Przewoźnik: PO 32778 (carrier field)"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-009",
+      "supplier_part_no": null,
+      "description": "City Map Poster Grand Heist 6 (fol  [text cut off in the Nazwa column]",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "24.800",
+          "number": 24800,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "49",
+          "number": 49,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "588 kg",
+          "number": 588,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "06.11.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "other",
+      "text_en": "Remarks: Protect from moisture.",
+      "quote": "Uwagi: Chronić przed wilgocią"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Gross weight 588 kg, 49 packages, carrier reference PO 32778.",
+      "quote": "Waga brutto: 588 kg   Opak.: 49   Przewoźnik: PO 32778"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Receiving stamp: RECEIVED 06.11.2026, DC-HAM.",
+      "quote": "RECEIVED 06.11.2026 DC-HAM"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Polish WZ delivery note WZ-261104-571 dated 04.11.2026 from Karton Nowak (Poznań) to Soony DC Hamburg against PO 4500318761. One line: CMP-GAM-009 City Map Poster Grand Heist 6, 24.800 PCS (read as 24,800), 49 packages, gross weight 588 kg. Stamped RECEIVED 06.11.2026 DC-HAM. No handwritten corrections. The 'Odebrał' (received by) signature line is blank, and the item description is cut off.",
+    "red_flags": [
+      "The 'Odebrał' (received by) signature line is empty, so no receiver signature is on the note.",
+      "The item description is cut off ('Grand Heist 6 (fol'), so the full product spec cannot be confirmed.",
+      "The note shows no ordered quantity, so shortage or overage against PO 4500318761 cannot be checked from this document.",
+      "Quantity '24.800' uses a Polish thousands separator and is read as 24,800 PCS."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Blue receiving stamp 'RECEIVED 06.11.2026 DC-HAM' is clear, slightly rotated.",
+      "The 'Odebrał:' signature line is blank.",
+      "The Nazwa column text is truncated at '(fol'.",
+      "No handwriting, strike-throughs or overwrites are visible.",
+      "A barcode is printed at the top right."
+    ]
+  }
+}

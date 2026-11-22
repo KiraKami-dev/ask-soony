@@ -1,0 +1,87 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English",
+    "Chinese"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26751816",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318684"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-006",
+      "supplier_part_no": null,
+      "description": "Steel Case Grand Heist 6",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "23,000",
+          "number": 23000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "21.01",
+          "number": 21.01,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-09-04",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2026-06-22",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Incoterms FOB Yantian, payment NET30.",
+      "quote": "Incoterms FOB Yantian · Payment NET30"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA26751816 from Dongguan Precision Housings to Soony Interactive GmbH for PO 4500318684 (dated 2026-06-22). One line: item 00010, CMP-GAM-006 Steel Case Grand Heist 6, qty 23,000 at 21.01 CNY, confirmed date 2026-09-04. Terms: FOB Yantian, NET30. No corrections or handwritten notes.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Single-page, fully printed document; no handwriting, stamps or signatures.",
+      "The document has no issue date of its own; only the order date 2026-06-22 is shown.",
+      "Quantity unit is not stated; the unit price is per unit in CNY (no total price given)."
+    ]
+  }
+}

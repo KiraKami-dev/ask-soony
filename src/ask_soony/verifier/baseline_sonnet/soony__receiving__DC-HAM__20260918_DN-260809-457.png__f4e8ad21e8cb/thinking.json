@@ -1,0 +1,6 @@
+[
+  {
+    "turn": 65,
+    "thinking": "I already have the image, so I'm turning straight to producing the structured output. The document is a Korean delivery note from Hwaseong Memory Co., Ltd., DN-260809-457, dated 2026.08.09, under PO 4500318688. I'm noting the line item for CMP-GAM-002, a 64 GB Game Card, Grand Heist 5, with 20,000 pieces in 40 boxes, and then the shipment details, 520 kg total, carrier Nordhav Shipping A/S.\n\nI'm checking the receiver signature and the stamp, which overlaps the quantity, unit and boxes cells but leaves them readable. The quantity reads 20000 once the space is taken as a thousands separator, so I'll mark that field clear and note the overlap. Everything else is printed and clear, so I'm leaning toward a clean status with high confidence.\n\n"
+  }
+]

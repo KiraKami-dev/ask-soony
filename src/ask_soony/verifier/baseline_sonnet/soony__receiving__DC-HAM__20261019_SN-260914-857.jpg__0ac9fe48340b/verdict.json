@@ -1,0 +1,101 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Chinese",
+    "English"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd.",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "SN-260914-857",
+  "document_date": "2026-09-14",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318697"
+    },
+    {
+      "type": "delivery_note",
+      "value": "SN-260914-857"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-006",
+      "supplier_part_no": null,
+      "description": "Steel Case Grand Heist 6",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "19.000",
+          "number": 19,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "19",
+          "number": 19,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "418 kg",
+          "number": 418,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "19.10.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S",
+      "quote": "承运: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Receiving stamp: RECEIVED 19.10.2026, DC-HAM",
+      "quote": "RECEIVED 19.10.2026 DC-HAM"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Delivery note SN-260914-857 dated 2026-09-14 from Dongguan Precision Housings to Soony DC Hamburg against PO 4500318697. It lists 19.000 PCS (19) of CMP-GAM-006 Steel Case Grand Heist 6 in 19 packages, gross weight 418 kg, carrier Nordhav Shipping A/S. It carries a blue DC-HAM receiving stamp dated 19.10.2026 and a red supplier shipping seal. There are no handwritten corrections.",
+    "red_flags": [
+      "The receiver signature line (收货签字) is blank, so no named person confirms receipt.",
+      "The remarks field (备注) is empty, and the stamp records no received quantity or condition, so the note does not show whether 19 pieces were actually counted."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Red round supplier seal (Dongguan Precision Housings Co. Ltd, 出货专用章) overlaps the PCS unit cell and the edge of the packages cell. The values underneath are still readable.",
+      "Blue rectangular stamp 'RECEIVED 19.10.2026 DC-HAM' is clear.",
+      "Quantity is printed as '19.000', read here as 19 using the Chinese/English decimal-point convention. This matches the 19 packages.",
+      "No handwriting, strike-throughs or overwrites are visible.",
+      "The lower half of the page is blank."
+    ]
+  }
+}

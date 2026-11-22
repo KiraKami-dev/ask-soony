@@ -1,0 +1,6 @@
+[
+  {
+    "turn": 59,
+    "thinking": "I'm looking at this order acknowledgement and noticing that it says EXW Boise but also that the seller prepays freight, insurance and duties and adds them to the invoice, which conflicts with EXW terms, so I'll flag that. I'm also recording the quantity as 9,500 in the standard form and checking whether the order confirmation actually marks the quantity as confirmed.\n\nI'm picking quantity_confirmed for the 9,500 since the Qty column on an order confirmation most likely shows the confirmed figure, and I'm recording the unit price as 6.11 USD along with the confirmed date of 2026-08-28 and the order date of 2026-07-27 from the header. The document gives no explicit date, so that stays empty, and no total price is stated. Supplier is Boise Semiconductor Inc. and the recipient is Soony Interactive GmbH.\n\n"
+  }
+]

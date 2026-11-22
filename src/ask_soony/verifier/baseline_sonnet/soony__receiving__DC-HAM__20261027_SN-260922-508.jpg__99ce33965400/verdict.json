@@ -1,0 +1,126 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Chinese",
+    "English"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd., Dongguan, CN",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "SN-260922-508",
+  "document_date": "2026-09-22",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318706"
+    },
+    {
+      "type": "delivery_note",
+      "value": "SN-260922-508"
+    }
+  ],
+  "lines": [
+    {
+      "item": "Statue \"The Getaway\" (die-cast, 18",
+      "material_id": "CMP-GAM-010",
+      "supplier_part_no": null,
+      "description": "Statue \"The Getaway\" (die-cast, 18 — description is cut off at the cell edge",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "11.500",
+          "number": 11500,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "11",
+          "number": 11,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": "gross_weight",
+          "value": "198 kg",
+          "number": 198,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "27.10.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Remark: moisture-proof, do not turn upside down.",
+      "quote": "备注: 防潮，请勿倒置"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S.",
+      "quote": "承运: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "other",
+      "text_en": "Receiving stamp: received at DC-HAM on 27.10.2026.",
+      "quote": "RECEIVED 27.10.2026 DC-HAM"
+    },
+    {
+      "topic": "other",
+      "text_en": "Red round supplier seal reading 'Dongguan Precision Housings Co Ltd' and 'shipping-only seal'.",
+      "quote": "出货专用章"
+    }
+  ],
+  "decisions": [],
+  "corrections": [
+    {
+      "what": "Receiving stamp with date (blue, not a correction)",
+      "original": null,
+      "replacement": "RECEIVED 27.10.2026 DC-HAM",
+      "where": "Lower middle of page, below the supplier seal"
+    },
+    {
+      "what": "Handwritten receiver signature (not a correction)",
+      "original": null,
+      "replacement": "Yilmaz D.",
+      "where": "Above the 收货签字 (receiver signature) line, lower left"
+    }
+  ],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Chinese-language delivery note SN-260922-508 dated 2026-09-22 from Dongguan Precision Housings to Soony DC Hamburg, for PO 4500318706. It lists one line, CMP-GAM-010 Statue \"The Getaway\", quantity 11.500 PCS in 11 packages, gross weight 198 kg, carried by Nordhav Shipping A/S. It carries a receiving stamp \"RECEIVED 27.10.2026 DC-HAM\" and a handwritten signature \"Yilmaz D.\". There are no strike-throughs or handwritten changes to values. No shortage or damage is noted.",
+    "red_flags": [
+      "Quantity \"11.500\" is read as 11,500 PCS, assuming the dot is a thousands separator. That is about 17 g per piece for 198 kg. This looks implausible for die-cast statues, so the quantity should be checked against the PO and the physical count.",
+      "The part description is cut off at \"(die-cast, 18\", so the size or specification is not fully visible.",
+      "The receiving stamp and signature carry no quantity check, no condition note and no acceptance statement. The stamp shows only a date."
+    ],
+    "confidence": "medium",
+    "observations": [
+      "The red round supplier seal overlaps the table headers (单位, 件数) and the edge of the PCS and packages cells. The packages value \"11\" is partly covered, but it is readable and matches the \"件数: 11\" below the table.",
+      "The item description is truncated at the cell edge.",
+      "The blue rectangular stamp is tilted but legible: \"RECEIVED 27.10.2026\" with \"DC-HAM\" below it.",
+      "The receiver signature \"Yilmaz D.\" is handwritten in blue ink.",
+      "A barcode is printed at the top right. The lower half of the page is blank.",
+      "The decimal convention for \"11.500\" is ambiguous on a Chinese-language document with a German consignee."
+    ]
+  }
+}

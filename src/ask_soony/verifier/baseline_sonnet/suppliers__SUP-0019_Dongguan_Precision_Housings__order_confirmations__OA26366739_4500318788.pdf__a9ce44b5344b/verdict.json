@@ -1,0 +1,121 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English",
+    "Chinese"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26366739",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318788"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-006",
+      "supplier_part_no": null,
+      "description": "Steel Case Grand Heist 6",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "25,000",
+          "number": 25000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "22.29",
+          "number": 22.29,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2027-02-03",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "00020",
+      "material_id": "CMP-GAM-010",
+      "supplier_part_no": null,
+      "description": "Statue \"The Getaway\" (die-cast, 18 cm)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "10,500",
+          "number": 10500,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "88.38",
+          "number": 88.38,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2027-02-02",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Incoterms FOB Yantian; payment NET30.",
+      "quote": "Incoterms FOB Yantian · Payment NET30"
+    },
+    {
+      "topic": "other",
+      "text_en": "Customer order 4500318788 dated 2026-11-10.",
+      "quote": "Your order 4500318788 of 2026-11-10"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA26366739 from Dongguan Precision Housings to Soony Interactive GmbH for PO 4500318788 (2026-11-10). Two lines confirmed: 25,000 pcs CMP-GAM-006 at 22.29 CNY for 2027-02-03, and 10,500 pcs CMP-GAM-010 at 88.38 CNY for 2027-02-02. FOB Yantian, NET30.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Printed document, no handwriting, stamps or corrections.",
+      "No document date other than the referenced order date; the confirmation itself is undated.",
+      "Quantity unit is not stated; currency is CNY.",
+      "Order quantities are not shown separately, so confirmed quantities cannot be compared with the PO."
+    ]
+  }
+}

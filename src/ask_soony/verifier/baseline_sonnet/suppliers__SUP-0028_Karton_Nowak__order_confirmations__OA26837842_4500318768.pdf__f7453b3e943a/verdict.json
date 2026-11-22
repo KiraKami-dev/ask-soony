@@ -1,0 +1,183 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "Polish",
+    "English"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26837842",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318768"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00020",
+      "material_id": "CMP-GAM-004",
+      "supplier_part_no": null,
+      "description": "Cover Sleeve Grand Heist 6 (USK/PEGI)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "74,000",
+          "number": 74000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.06 EUR",
+          "number": 0.06,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-11-12",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "revision",
+          "field_label": null,
+          "value": "rev. C",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-004",
+      "supplier_part_no": null,
+      "description": "Cover Sleeve Grand Heist 6 (USK/PEGI)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "75,000",
+          "number": 75000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.06 EUR",
+          "number": 0.06,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-11-04",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "revision",
+          "field_label": null,
+          "value": "rev. C",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "00030",
+      "material_id": "CMP-GAM-008",
+      "supplier_part_no": null,
+      "description": "Art Book Grand Heist 6 (96 p, hardcover)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "8,000",
+          "number": 8000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "2.1 EUR",
+          "number": 2.1,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-11-20",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "revision",
+      "text_en": "CMP-GAM-004: printed to artwork rev. C (GH6_sleeve_revC_USK2026.pdf), as received from Soony Marketing on 2026-08-07.",
+      "quote": "CMP-GAM-004: druk wg pliku rev. C (GH6_sleeve_revC_USK2026.pdf), otrzymanego od Soony Marketing 2026-08-07. / Printed to artwork rev. C as received from Soony Marketing on 2026-08-07."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Customer Soony Interactive GmbH; order 4500318768 of 2026-10-13; Incoterms DAP Hamburg; payment NET30.",
+      "quote": "Customer: Soony Interactive GmbH · Your order 4500318768 of 2026-10-13 · Incoterms DAP Hamburg · Payment NET30"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Order confirmation OA26837842 from Karton Nowak for Soony PO 4500318768 (dated 2026-10-13), DAP Hamburg, NET30. Confirms three lines: CMP-GAM-004 cover sleeve 75,000 pcs (item 00010) for 2026-11-04 and 74,000 pcs (item 00020) for 2026-11-12, both at 0.06 EUR; CMP-GAM-008 art book 8,000 pcs at 2.1 EUR for 2026-11-20. The note says the sleeves are printed to artwork rev. C, received from Soony Marketing 2026-08-07.",
+    "red_flags": [
+      "CMP-GAM-004 is split into two lines (00010: 75,000 on 2026-11-04; 00020: 74,000 on 2026-11-12), and the lines are listed out of order (00020 before 00010). The original ordered quantities are not shown, so the split cannot be checked against the PO.",
+      "Supplier states CMP-GAM-004 is printed to artwork rev. C received 2026-08-07. The buyer should check that rev. C is the currently approved artwork revision.",
+      "The document does not state ordered quantities or a document date. The unit of measure is not given.",
+      "No line totals are shown."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Clean typed PDF with no handwriting, stamps, or signatures.",
+      "Document date is not shown; only the referenced order date 2026-10-13 appears.",
+      "The Qty column has no unit of measure."
+    ]
+  }
+}

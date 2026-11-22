@@ -1,0 +1,6 @@
+[
+  {
+    "turn": 53,
+    "thinking": "I'm settling on the result now: this is a Polish WZ delivery note, with the quantity read as 24,800 pieces and 49 packages totaling 588 kg gross. The carrier field names PO 32778, and the receipt stamp is dated 06.11.2026. The \"Odebrał\" signature line is blank, so it's unsigned, and the item description cuts off partway through.\n\nI'm checking that the quantity holds up against the package count and weight, and it does. I'm also mapping the document date and the references: the PO number and delivery note number go in their fields, and the carrier PO 32778 goes under other.\n\n"
+  }
+]

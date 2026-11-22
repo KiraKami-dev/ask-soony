@@ -1,0 +1,103 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Chinese",
+    "English"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd., Dongguan, CN (+86 769 2200 8800)",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "SN-260805-706",
+  "document_date": "2026-08-05",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318682"
+    },
+    {
+      "type": "delivery_note",
+      "value": "SN-260805-706"
+    }
+  ],
+  "lines": [
+    {
+      "item": null,
+      "material_id": "CMP-GAM-010",
+      "supplier_part_no": null,
+      "description": "Statue \"The Getaway\" (die-cast, 18 — text cut off at the cell edge",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "13.500",
+          "number": 13500,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "6",
+          "number": 6,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "件数: 6",
+          "number": 6,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "132 kg",
+          "number": 132,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S.",
+      "quote": "承运: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "other",
+      "text_en": "Remarks field is empty.",
+      "quote": "备注:"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Chinese-language delivery note SN-260805-706 dated 2026-08-05 from Dongguan Precision Housings to Soony Distribution Center Hamburg, against PO 4500318682. It lists one line, CMP-GAM-010 Statue \"The Getaway\", quantity 13.500 PCS, in 6 packages with 132 kg gross weight, shipped by Nordhav Shipping A/S. It carries a red supplier shipping seal and a handwritten receiver signature \"Yilmaz D.\". There are no corrections, no remarks and no inspection or acceptance outcome.",
+    "red_flags": [
+      "Quantity \"13.500\" PCS uses a dot separator. I read it as 13,500 pieces because a piece count is whole, but it could be misread. Check it against the PO.",
+      "The receiver signature has no receiving date, and the note records no inspection or acceptance result.",
+      "The item description is cut off at \"(die-cast, 18\", so the full specification is not visible.",
+      "The note has no ordered quantity, so it cannot be checked for a short or over delivery here."
+    ],
+    "confidence": "medium",
+    "observations": [
+      "Red round seal reads \"DONGGUAN PRECISION HOUSINGS CO LTD\" with the Chinese text 出货专用章 (shipping seal). It has no date and partly overlaps the unit column header, the \"PCS\" cell and the package count \"6\". All three are still legible.",
+      "The handwritten signature \"Yilmaz D.\" in blue ink sits on the 收货签字 (receiver signature) line. The signer's name is clear, but no date is written beside it.",
+      "The item description text is truncated at the right edge of its cell.",
+      "The remarks field (备注) is blank. There are no strike-throughs or overwrites, and the lower half of the page is empty.",
+      "A barcode is printed at the top right."
+    ]
+  }
+}

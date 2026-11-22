@@ -1,0 +1,104 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Chinese",
+    "English"
+  ],
+  "issuer": "Guangzhou PackRight Packaging Co., Ltd.",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "SN-260810-719",
+  "document_date": "2026-08-10",
+  "references": [
+    {
+      "type": "delivery_note",
+      "value": "SN-260810-719"
+    },
+    {
+      "type": "po_number",
+      "value": "4500318692"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "PR-CC-0312",
+      "supplier_part_no": null,
+      "description": "Game Card Case (clear)",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "195,000",
+          "number": 195000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "195",
+          "number": 195,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "2925 kg",
+          "number": 2925,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "14.09.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Remarks: moisture-proof, do not turn upside down.",
+      "quote": "备注: 防潮，请勿倒置"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S.",
+      "quote": "承运: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Receiving stamp: RECEIVED 14.09.2026, DC-HAM.",
+      "quote": "RECEIVED 14.09.2026 DC-HAM"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Chinese/English delivery note SN-260810-719 dated 2026/08/10 from Guangzhou PackRight Packaging to Soony DC Hamburg, against PO 4500318692. It covers one line: PR-CC-0312 Game Card Case (clear), 195,000 PCS in 195 packages, gross weight 2925 kg, carrier Nordhav Shipping A/S. It carries a blue DC-HAM receiving stamp dated 14.09.2026 and a handwritten receiving signature, 'Yilmaz D.'. The note has no corrections, no ordered or confirmed quantity to compare against, and no recorded discrepancy.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Red round supplier seal (出货专用章, 'GUANGZHOU PACKRIGHT PACKAGING CO LTD') overlaps the unit and packages columns and the edge of the quantity. The values 195,000, PCS and 195 are still legible.",
+      "Blue rectangular stamp 'RECEIVED 14.09.2026 / DC-HAM' is clear.",
+      "Handwritten blue-ink signature 'Yilmaz D.' sits on the receiving signature line (收货签字).",
+      "No handwritten quantity changes or strike-throughs are visible.",
+      "The receiving stamp does not record a received quantity, so the note does not show whether the quantity was checked on receipt.",
+      "Package count (195) matches the printed total; weight 2925 kg is consistent with 15 kg per package."
+    ]
+  }
+}

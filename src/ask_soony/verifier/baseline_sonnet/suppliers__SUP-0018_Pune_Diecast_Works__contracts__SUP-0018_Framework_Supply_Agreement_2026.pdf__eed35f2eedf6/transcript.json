@@ -1,0 +1,1034 @@
+[
+  {
+    "_type": "SystemMessage",
+    "subtype": "init",
+    "data": {
+      "type": "system",
+      "subtype": "init",
+      "cwd": "/Users/farhanhassan/ask-soony/data/portal",
+      "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+      "tools": [
+        "Read",
+        "StructuredOutput"
+      ],
+      "mcp_servers": [],
+      "model": "claude-sonnet-5-5",
+      "permissionMode": "dontAsk",
+      "slash_commands": [
+        "deep-research",
+        "design",
+        "design-sync",
+        "dataviz",
+        "update-config",
+        "verify",
+        "debug",
+        "code-review",
+        "simplify",
+        "batch",
+        "fewer-permission-prompts",
+        "doctor",
+        "loop",
+        "schedule",
+        "claude-api",
+        "workflow-authoring",
+        "run",
+        "run-skill-generator",
+        "plugin-authoring",
+        "advisor",
+        "agents",
+        "auto-mode-setup",
+        "autocompact",
+        "clear",
+        "color",
+        "compact",
+        "config",
+        "output-style",
+        "context",
+        "effort",
+        "fast",
+        "focus",
+        "heapdump",
+        "init",
+        "mcp",
+        "import",
+        "model",
+        "__remote-workflow",
+        "workflow-launch-exec",
+        "reload-plugins",
+        "reload-skills",
+        "rename",
+        "ultrareview",
+        "security-review",
+        "usage-credits",
+        "extra-usage",
+        "usage",
+        "insights",
+        "recap",
+        "skill-doctor",
+        "goal",
+        "design-consent",
+        "design-revoke",
+        "list-agents",
+        "team-onboarding"
+      ],
+      "terminal_slash_commands": [
+        "doctor",
+        "color",
+        "focus",
+        "reload-plugins"
+      ],
+      "apiKeySource": "none",
+      "claude_code_version": "2.1.330",
+      "output_style": "default",
+      "agents": [
+        "claude",
+        "Explore",
+        "general-purpose",
+        "Plan",
+        "statusline-setup",
+        "web-fetch"
+      ],
+      "skills": [
+        "deep-research",
+        "design",
+        "design-sync",
+        "dataviz",
+        "update-config",
+        "verify",
+        "debug",
+        "code-review",
+        "simplify",
+        "batch",
+        "fewer-permission-prompts",
+        "doctor",
+        "loop",
+        "schedule",
+        "claude-api",
+        "workflow-authoring",
+        "run",
+        "run-skill-generator",
+        "plugin-authoring"
+      ],
+      "plugins": [
+        {
+          "name": "cc-plugin-sec-default",
+          "path": "builtin",
+          "source": "cc-plugin-sec-default@builtin"
+        },
+        {
+          "name": "cc-plugin-agents-md",
+          "path": "builtin",
+          "source": "cc-plugin-agents-md@builtin"
+        },
+        {
+          "name": "cc-plugin-telemetry",
+          "path": "builtin",
+          "source": "cc-plugin-telemetry@builtin"
+        },
+        {
+          "name": "cc-plugin-privacy",
+          "path": "builtin",
+          "source": "cc-plugin-privacy@builtin"
+        },
+        {
+          "name": "cc-plugin-plugin-authoring",
+          "path": "builtin",
+          "source": "cc-plugin-plugin-authoring@builtin"
+        }
+      ],
+      "capabilities": [
+        "interrupt_receipt_v1",
+        "interrupt_cancel_queued_v1",
+        "interrupt_send_now_v1",
+        "interrupt_requeue_taken_v1",
+        "msg_lifecycle_v1",
+        "request_marker_lists_v1",
+        "ask_user_question_unanswered_v1",
+        "lifecycle_wakeup_source_v1",
+        "sdk_mcp_tools_list_changed",
+        "sdk_mcp_manifests",
+        "mcp_read_resource_v1",
+        "mcp_tool_ui_meta_v1",
+        "ui_surface_v1",
+        "mcp_call_result_not_for_model_v1",
+        "mcp_call_check_permissions_v1",
+        "voice_call_talk_line_v1",
+        "withdrawn_files_note_v2",
+        "withdrawn_tools_v1",
+        "ui_pane_widget_v1",
+        "reload_plugins_refuse_if_busy_v1",
+        "get_usage_detached_v1",
+        "silent_resend_files_v1"
+      ],
+      "analytics_disabled": false,
+      "product_feedback_disabled": false,
+      "served_by_anthropic": true,
+      "uuid": "5506f6be-9e16-41ce-b24c-f060aac917f1",
+      "memory_paths": {
+        "auto": "/Users/farhanhassan/.claude/projects/-Users-farhanhassan-ask-soony/memory/"
+      },
+      "original_cwd": "/Users/farhanhassan/ask-soony/data/portal",
+      "additional_directories": [],
+      "messaging_socket_path": "/tmp/cc-socks/50787.sock",
+      "fast_mode_state": "off",
+      "fast_mode_disabled_reason": "sdk_opt_in_required",
+      "per_turn_effort_active": true,
+      "ultrathink_available": false,
+      "ultrathink_typed_raises": false,
+      "view_mode": "default"
+    }
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ToolUseBlock",
+        "id": "toolu_01CQRXTrmtndpHNuCVtoN87a",
+        "name": "Read",
+        "input": {
+          "file_path": "/Users/farhanhassan/ask-soony/data/portal/suppliers/SUP-0018_Pune_Diecast_Works/contracts/SUP-0018_Framework_Supply_Agreement_2026.pdf",
+          "pages": "1-10"
+        }
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 893,
+      "cache_read_input_tokens": 3786,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 893
+      },
+      "output_tokens": 16,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGkMP11RaFZvfB78v9J3",
+    "stop_reason": null,
+    "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+    "uuid": "f3927c2b-42e0-4479-ade2-0d3d72e8bec5",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "RateLimitEvent",
+    "rate_limit_info": {
+      "_type": "RateLimitInfo",
+      "status": "rejected",
+      "resets_at": 1795300800,
+      "rate_limit_type": "five_hour",
+      "utilization": null,
+      "overage_status": "allowed",
+      "overage_resets_at": 1796083200,
+      "overage_disabled_reason": null,
+      "raw": {
+        "status": "rejected",
+        "resetsAt": 1795300800,
+        "rateLimitType": "five_hour",
+        "overageStatus": "allowed",
+        "overageResetsAt": 1796083200,
+        "isUsingOverage": true,
+        "overageInUse": true,
+        "unifiedWindows": {
+          "five_hour": {
+            "utilization": 1,
+            "resetsAt": 1795300800,
+            "status": "rejected",
+            "surpassedThreshold": 1
+          },
+          "seven_day": {
+            "utilization": 0.3,
+            "resetsAt": 1795554000,
+            "status": "allowed"
+          }
+        }
+      }
+    },
+    "uuid": "726edbb4-0cfc-4913-9127-fb2e152e2605",
+    "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391"
+  },
+  {
+    "_type": "UserMessage",
+    "content": [
+      {
+        "_type": "ToolResultBlock",
+        "tool_use_id": "toolu_01CQRXTrmtndpHNuCVtoN87a",
+        "content": "pdftoppm is not installed. Install poppler-utils (e.g. `brew install poppler` or `apt-get install poppler-utils`) to enable PDF page rendering.",
+        "is_error": true
+      }
+    ],
+    "uuid": "011c8a67-ada9-45dc-b277-9194d8721937",
+    "parent_tool_use_id": null,
+    "tool_use_result": "Error: pdftoppm is not installed. Install poppler-utils (e.g. `brew install poppler` or `apt-get install poppler-utils`) to enable PDF page rendering.",
+    "origin": null
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 7,
+      "estimated_tokens_delta": 7,
+      "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+      "uuid": "cf62cb81-ac1c-4777-a70a-844ccc2a9f6e"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 11,
+      "estimated_tokens_delta": 4,
+      "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+      "uuid": "2564eb9c-5097-4d23-9653-c552e94fc943"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 15,
+      "estimated_tokens_delta": 4,
+      "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+      "uuid": "f6cb3a3c-06e2-4a58-90dd-6a0338b11e88"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 18,
+      "estimated_tokens_delta": 3,
+      "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+      "uuid": "dc398bee-0add-4ef7-8c0d-e1da51a58db6"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 20,
+      "estimated_tokens_delta": 2,
+      "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+      "uuid": "1870a5d4-d9fd-4cb6-aefb-2cb3a3da96a4"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 27,
+      "estimated_tokens_delta": 7,
+      "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+      "uuid": "c1950ee3-2822-418c-9268-7b1a3cfca6c6"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 35,
+      "estimated_tokens_delta": 8,
+      "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+      "uuid": "9a655996-066c-466d-b022-c34e57c36c73"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 37,
+      "estimated_tokens_delta": 2,
+      "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+      "uuid": "6a373549-f76f-4c90-a589-3507f21091d4"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 38,
+      "estimated_tokens_delta": 1,
+      "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+      "uuid": "8f1b64c2-e9d5-47b6-af5a-5e481f5a0abd"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 42,
+      "estimated_tokens_delta": 4,
+      "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+      "uuid": "ac011714-b82c-4b95-a1ea-a1af17ecff9b"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 43,
+      "estimated_tokens_delta": 1,
+      "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+      "uuid": "30e799ad-c422-4178-b608-ce977fc8a3f0"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 46,
+      "estimated_tokens_delta": 3,
+      "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+      "uuid": "aefe23a0-84c8-4a43-bc09-c947f092493c"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 48,
+      "estimated_tokens_delta": 2,
+      "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+      "uuid": "d66d4648-5abb-46a8-83b2-714ffc5da7da"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 49,
+      "estimated_tokens_delta": 1,
+      "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+      "uuid": "ff75eddb-75f5-4649-9147-694cb2617fbc"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 50,
+      "estimated_tokens_delta": 1,
+      "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+      "uuid": "10fe4614-3332-4ba5-9517-68777d08ec00"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 223,
+      "estimated_tokens_delta": 173,
+      "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+      "uuid": "9bea3608-7a82-4e27-b677-d4bc71871ac2"
+    }
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ThinkingBlock",
+        "thinking": "The PDF read failed because pdftoppm isn't installed on this system. I'll try reading the file again without the pages parameter, since I'm not sure it's required here.\n\n",
+        "signature": "CAQS8wYKEAgUGAI4AUIIdGhpbmtpbmcSDBJZRIQNBrtlWTQJ4RoMrpQ1k1E4oBqhm4JBIjDPMWdc4tB5oY41jHm9+sagNwMgxL1PShUW47Sg7qaqtf4kXj7/CLyfLEUqFKWVfAIqkAbkUSTG3kDAQOVT6jnLEU2JHZ2SqH9ZaR5EytJ4RYsgTwUStNHwkweYL+8AClXgMgFaT6Epiehc96thkH/ZHuKHig1ENwJrUGq/GAEQLGChDkyIRjmFl7fBhMWswtLFRkpjTvTgHdXGV/yCizl9D7nMAJenBHgHvvrmxE7DCXHWUe4jC5GtKuOXVRcOAOFELYcyLjy4Q0G57W6nmCLtfdKLo7MIWs8+XDAZX9QICyCjlvJyXrlSB4Dz1JddNscz3NKdmIG1qAr10h6/gpi2wfC0UDUIlVhvmFjav+uMqYOUb1kB4fzeeTMzXuKlE2rgf8ztTYDQG0TwswCUpkoh4nSg3DZJ6zim3NHrYJvwubZPeBQi3l81aGdkU1JWo4WLOVOMn7NSZrT+fBy4aP3xPH6JB6bU+I8nqAC3mRXbXr+EYpCXoUFtMTEkmum17voVECCR5gcZeqFiBH7mW0y+4NU7zU7ZLnpwdfc2DGzmLjfH9ssR4kbUhI6GwpvI4piFS6jhy/OIYQDEcaAiPzA1hWSMfj4iF+Ofz0crM76tNCezjb/DWNOVLaby7vLj67EvE5GVcQG9l/uJiOx3vkUbJMY3GoPbJl4I+dmqmUlVSuO22wYZIVON7EPKhO5SjgBpxBu+eFoV+tTq4nMxoNKA401XOgzyHmGCuDzZeN9dUFHkUpIlAOBXV2okvsVbz0uNoKYqGXvvtEizcOol+ZABkyqVUXBATvbMoiIpHUlvyhfr4VLILd3g7mndavOlKPND0TixGM0C2rHT719wGJn1firNoCW2JgUpnYLINm5A1P7HfsCrVaRmhLv+QwRG2WYZALg7hUFPnnqcM2lxJ/XyeNTGhrz8V9DhPOMCg85/7N+G3L5VD0SKk7bn/RYIh6j+4J33Rl2hfJC9Rptuim+9Ahg+hDWBYOZDdOSPT6efEWDPPj6ENVTlN3GMn2IIXdtio39YDnzOxBlzzjxHuLV0Kvj6W/vHdFWyx/Ntz4el2AMZBLcMRuGUbOpWrJt1cARFRsfRXnLL1Q3JjZKNQ8+sbHOnGAE="
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 18230,
+      "cache_read_input_tokens": 3786,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 18230,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 8,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGkMaEw9nSKZnd6vf61j",
+    "stop_reason": null,
+    "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+    "uuid": "dda2e361-d54b-4125-bd59-147b0d3ca0ef",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "TextBlock",
+        "text": "The page render failed because `pdftoppm` isn't installed. I'll try reading the file without the `pages` parameter."
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 18230,
+      "cache_read_input_tokens": 3786,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 18230,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 8,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGkMaEw9nSKZnd6vf61j",
+    "stop_reason": null,
+    "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+    "uuid": "faa8bec6-bbb3-41b8-befe-c829a26e83b3",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ToolUseBlock",
+        "id": "toolu_01DMXhXVsGT6phuib7J4Pf4W",
+        "name": "Read",
+        "input": {
+          "file_path": "/Users/farhanhassan/ask-soony/data/portal/suppliers/SUP-0018_Pune_Diecast_Works/contracts/SUP-0018_Framework_Supply_Agreement_2026.pdf"
+        }
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 18230,
+      "cache_read_input_tokens": 3786,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 18230,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 8,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGkMaEw9nSKZnd6vf61j",
+    "stop_reason": null,
+    "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+    "uuid": "768bb032-26d3-4392-bcec-2eb75ccaf777",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "UserMessage",
+    "content": [
+      {
+        "_type": "ToolResultBlock",
+        "tool_use_id": "toolu_01DMXhXVsGT6phuib7J4Pf4W",
+        "content": [
+          {
+            "type": "text",
+            "text": "PDF file read: /Users/farhanhassan/ask-soony/data/portal/suppliers/SUP-0018_Pune_Diecast_Works/contracts/SUP-0018_Framework_Supply_Agreement_2026.pdf (64.8KB)"
+          },
+          {
+            "type": "document",
+            "source": {
+              "type": "base64",
+              "media_type": "application/pdf",
+              "data": "<88516 chars of encoded data left out>"
+            }
+          }
+        ],
+        "is_error": null
+      }
+    ],
+    "uuid": "c11e126a-e730-4ef3-94bc-2b7bace6110f",
+    "parent_tool_use_id": null,
+    "tool_use_result": {
+      "type": "pdf",
+      "file": {
+        "filePath": "/Users/farhanhassan/ask-soony/data/portal/suppliers/SUP-0018_Pune_Diecast_Works/contracts/SUP-0018_Framework_Supply_Agreement_2026.pdf",
+        "base64": "JVBERi0xLjQKJeLjz9MgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiswIDkgMCBSIC9GMyswIDEzIDAgUgo+PgplbmRvYmoKMiAwIG9iago8PAovQmFzZUZvbnQgL0hlbHZldGljYSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjEgL1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iagozIDAgb2JqCjw8Ci9Db250ZW50cyAxNyAwIFIgL01lZGlhQm94IFsgMCAwIDU5NS4yNzU2IDg0MS44ODk4IF0gL1BhcmVudCAxNiAwIFIgL1Jlc291cmNlcyA8PAovRm9udCAxIDAgUiAvUHJvY1NldCBbIC9QREYgL1RleHQgL0ltYWdlQiAvSW1hZ2VDIC9JbWFnZUkgXQo+PiAvUm90YXRlIDAgL1RyYW5zIDw8Cgo+PiAKICAvVHlwZSAvUGFnZQo+PgplbmRvYmoKNCAwIG9iago8PAovQ29udGVudHMgMTggMCBSIC9NZWRpYUJveCBbIDAgMCA1OTUuMjc1NiA4NDEuODg5OCBdIC9QYXJlbnQgMTYgMCBSIC9SZXNvdXJjZXMgPDwKL0ZvbnQgMSAwIFIgL1Byb2NTZXQgWyAvUERGIC9UZXh0IC9JbWFnZUIgL0ltYWdlQyAvSW1hZ2VJIF0KPj4gL1JvdGF0ZSAwIC9UcmFucyA8PAoKPj4gCiAgL1R5cGUgL1BhZ2UKPj4KZW5kb2JqCjUgMCBvYmoKPDwKL0NvbnRlbnRzIDE5IDAgUiAvTWVkaWFCb3ggWyAwIDAgNTk1LjI3NTYgODQxLjg4OTggXSAvUGFyZW50IDE2IDAgUiAvUmVzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERiAvVGV4dCAvSW1hZ2VCIC9JbWFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKCj4+IAogIC9UeXBlIC9QYWdlCj4+CmVuZG9iago2IDAgb2JqCjw8Ci9GaWx0ZXIgWyAvRmxhdGVEZWNvZGUgXSAvTGVuZ3RoIDY4Mgo+PgpzdHJlYW0KeJx1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… <68516 more chars>",
+        "originalSize": 66387
+      }
+    },
+    "origin": null
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ToolUseBlock",
+        "id": "toolu_017itGg19f9sM1oGvASC59n4",
+        "name": "StructuredOutput",
+        "input": {
+          "document_type": "contract",
+          "languages": [
+            "English"
+          ],
+          "issuer": "Soony Interactive GmbH",
+          "recipient": "Pune Diecast Works Pvt. Ltd.",
+          "document_number": "PC-0018-2026",
+          "document_date": "2026-08-01",
+          "references": [
+            {
+              "type": "contract",
+              "value": "PC-0018-2026"
+            }
+          ],
+          "lines": [
+            {
+              "item": "Annex A line 1",
+              "material_id": "CMP-GAM-010",
+              "supplier_part_no": null,
+              "description": "Statue \"The Getaway\" (die-cast, 18 cm)",
+              "values": [
+                {
+                  "field": "unit_price",
+                  "field_label": null,
+                  "value": "1037 INR",
+                  "number": 1037,
+                  "unit": "INR",
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "minimum_order_quantity",
+                  "field_label": null,
+                  "value": "2,000",
+                  "number": 2000,
+                  "unit": null,
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "lead_time",
+                  "field_label": null,
+                  "value": "70",
+                  "number": 70,
+                  "unit": "days",
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                }
+              ]
+            }
+          ],
+          "statements": [
+            {
+              "topic": "terms",
+              "text_en": "Agreement between Soony Interactive GmbH and Pune Diecast Works Pvt. Ltd. Effective 2026-08-01, expires 2029-07-31 unless extended in writing.",
+              "quote": "Contract no. PC-0018-2026 · Effective 2026-08-01 · Expires 2029-07-31"
+            },
+            {
+              "topic": "approval_status",
+              "text_en": "Deliveries are made under Soony's conditional release of 1 August 2026. Serial supply requires a completed PPAP and the written release by Soony Supplier Quality and the responsible Category Lead.",
+              "quote": "Deliveries under this Agreement are made under Soony's conditional release of 1 August 2026. Serial supply requires a completed PPAP and the written release by Soony Supplier Quality and the responsible Category Lead."
+            },
+            {
+              "topic": "terms",
+              "text_en": "Lead times per Annex A are counted from PO acknowledgement. Supplier acknowledges POs within 3 working days.",
+              "quote": "Lead times per Annex A, counted from PO acknowledgement. Supplier acknowledges POs within 3 working days."
+            },
+            {
+              "topic": "shipment",
+              "text_en": "Deliveries are FOB Nhava Sheva (Incoterms 2020). Risk passes according to the agreed Incoterm.",
+              "quote": "Deliveries are made FOB Nhava Sheva (Incoterms 2020). Risk passes in accordance with the agreed Incoterm."
+            },
+            {
+              "topic": "price",
+              "text_en": "Prices per Annex A, in INR, are fixed for the calendar year. Invoices quote the Soony PO number and item. Payment NET30.",
+              "quote": "Prices per Annex A, in INR, are fixed for the calendar year. Invoices quote the Soony PO number and item. Payment NET30."
+            },
+            {
+              "topic": "quality",
+              "text_en": "PPAP level 3 for new part numbers. Changes to process, site or sub-supplier require Soony's written approval (PCN, 90 days). Supplier maintains IATF 16949 or ISO 9001 certification.",
+              "quote": "PPAP level 3 for new part numbers. Changes to process, site or sub-supplier require Soony's written approval (PCN, 90 days). Supplier maintains IATF 16949 or ISO 9001 certification."
+            },
+            {
+              "topic": "delay",
+              "text_en": "Late delivery penalty: 0.5% of the delayed order value per commenced week, capped at 5%.",
+              "quote": "Late delivery: 0.5 % of the delayed order value per commenced week, capped at 5 %."
+            },
+            {
+              "topic": "terms",
+              "text_en": "Force majeure excuses performance only to the extent prevented. Shortages of materials or labour at the Supplier or sub-suppliers are not force majeure unless themselves caused by force majeure. Notice within 48 hours; if the event lasts more than 60 days either party may terminate affected orders.",
+              "quote": "Shortages of materials or labour at the Supplier or its sub-suppliers are not force majeure unless they are themselves caused by force majeure. Notice within 48 hours; if the event lasts more than 60 days, either party may terminate the affected orders."
+            },
+            {
+              "topic": "terms",
+              "text_en": "Supplier discloses sub-suppliers of critical materials on request.",
+              "quote": "Supplier discloses sub-suppliers of critical materials on request."
+            },
+            {
+              "topic": "terms",
+              "text_en": "Supplier complies with Soony's Supplier Code of Conduct, REACH, RoHS and conflict-minerals reporting (CMRT annually).",
+              "quote": "Supplier complies with Soony's Supplier Code of Conduct, REACH, RoHS and conflict-minerals reporting (CMRT annually)."
+            },
+            {
+              "topic": "terms",
+              "text_en": "Confidentiality for 5 years after termination.",
+              "quote": "Each party keeps the other party's information confidential for 5 years after termination."
+            },
+            {
+              "topic": "terms",
+              "text_en": "German law applies, excluding the CISG. Place of jurisdiction is Munich.",
+              "quote": "German law applies, excluding the CISG. Place of jurisdiction is Munich."
+            },
+            {
+              "topic": "terms",
+              "text_en": "Signature block: Munich, 2026-08-01, for Soony Jonas Lindqvist, CPO; for Supplier Rohan Deshmukh (names typed, no visible handwritten signatures).",
+              "quote": "Munich, 2026-08-01 · for Soony: Jonas Lindqvist, CPO · for Supplier: Rohan Deshmukh"
+            }
+          ],
+          "decisions": [
+            {
+              "subject": "Supply status under the agreement",
+              "outcome": "conditional",
+              "decided_by": "Soony",
+              "conditions": "Serial supply requires a completed PPAP and written release by Soony Supplier Quality and the responsible Category Lead.",
+              "quote": "Deliveries under this Agreement are made under Soony's conditional release of 1 August 2026."
+            }
+          ],
+          "corrections": [],
+          "verdict": {
+            "status": "has_warnings",
+            "summary_en": "Three-page framework supply agreement PC-0018-2026 between Soony Interactive GmbH and Pune Diecast Works Pvt. Ltd., effective 2026-08-01 to 2029-07-31. It covers one part, CMP-GAM-010 (die-cast statue 'The Getaway'), at 1037 INR per unit, MOQ 2,000 and 70 days lead time. Terms: FOB Nhava Sheva, NET30, late-delivery penalty of 0.5% per week capped at 5%, German law, Munich jurisdiction. Supply is under a conditional release only.",
+            "red_flags": [
+              "Supply is conditional: deliveries are made under Soony's conditional release of 1 August 2026. Serial supply needs a completed PPAP and written release by Soony Supplier Quality and the Category Lead.",
+              "Prices are fixed per calendar year only, so the 1037 INR price may change after the 2026 calendar year; the contract does not state the price for later years.",
+              "Shortages of materials or labour at the Supplier or its sub-suppliers are not force majeure unless themselves caused by force majeure.",
+              "The signature block shows typed names only; no handwritten signatures or stamps are visible.",
+              "Annex A lists only one part number."
+            ],
+            "confidence": "high",
+            "observations": [
+              "The PDF was read as text and page images; all text is clear and printed.",
+              "No handwriting, stamps, strike-throughs or overwrites are visible.",
+              "The signature block is typed text only; no visible signature marks.",
+              "Page 2 holds only § 13 and the signature line; page 3 holds only Annex A.",
+              "The unit price is printed as '1037' with the currency in a separate column (INR)."
+            ]
+          }
+        }
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 6245,
+      "cache_read_input_tokens": 22016,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 6245,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 25,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGkMnh3AKLS2t2dQMAgG",
+    "stop_reason": null,
+    "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+    "uuid": "69081efe-cee8-4430-b705-ee0b820e5ca6",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "UserMessage",
+    "content": [
+      {
+        "_type": "ToolResultBlock",
+        "tool_use_id": "toolu_017itGg19f9sM1oGvASC59n4",
+        "content": "Structured output provided successfully",
+        "is_error": null
+      }
+    ],
+    "uuid": "b84393a5-dc7c-4e7b-9c3a-7a4981f3e078",
+    "parent_tool_use_id": null,
+    "tool_use_result": "Structured output provided successfully",
+    "origin": null
+  },
+  {
+    "_type": "ResultMessage",
+    "subtype": "success",
+    "duration_ms": 20817,
+    "duration_api_ms": 20995,
+    "is_error": false,
+    "num_turns": 4,
+    "session_id": "b5c85979-1ada-4e76-8d3d-a5b434454391",
+    "stop_reason": "tool_use",
+    "total_cost_usd": 0.0997921,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 25368,
+      "cache_read_input_tokens": 29588,
+      "output_tokens": 3192,
+      "output_tokens_details": {
+        "thinking_tokens": 70
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 893,
+        "ephemeral_5m_input_tokens": 24475
+      },
+      "inference_geo": "global",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 2813,
+          "cache_read_input_tokens": 22016,
+          "cache_creation_input_tokens": 6245,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 6245,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "result": "{\"document_type\":\"contract\",\"languages\":[\"English\"],\"issuer\":\"Soony Interactive GmbH\",\"recipient\":\"Pune Diecast Works Pvt. Ltd.\",\"document_number\":\"PC-0018-2026\",\"document_date\":\"2026-08-01\",\"references\":[{\"type\":\"contract\",\"value\":\"PC-0018-2026\"}],\"lines\":[{\"item\":\"Annex A line 1\",\"material_id\":\"CMP-GAM-010\",\"supplier_part_no\":null,\"description\":\"Statue \\\"The Getaway\\\" (die-cast, 18 cm)\",\"values\":[{\"field\":\"unit_price\",\"field_label\":null,\"value\":\"1037 INR\",\"number\":1037,\"unit\":\"INR\",\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"minimum_order_quantity\",\"field_label\":null,\"value\":\"2,000\",\"number\":2000,\"unit\":null,\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"lead_time\",\"field_label\":null,\"value\":\"70\",\"number\":70,\"unit\":\"days\",\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"}]}],\"statements\":[{\"topic\":\"terms\",\"text_en\":\"Agreement between Soony Interactive GmbH and Pune Diecast Works Pvt. Ltd. Effective 2026-08-01, expires 2029-07-31 unless extended in writing.\",\"quote\":\"Contract no. PC-0018-2026 · Effective 2026-08-01 · Expires 2029-07-31\"},{\"topic\":\"approval_status\",\"text_en\":\"Deliveries are made under Soony's conditional release of 1 August 2026. Serial supply requires a completed PPAP and the written release by Soony Supplier Quality and the responsible Category Lead.\",\"quote\":\"Deliveries under this Agreement are made under Soony's conditional release of 1 August 2026. Serial supply requires a completed PPAP and the written release by Soony Supplier Quality and the responsible Category Lead.\"},{\"topic\":\"terms\",\"text_en\":\"Lead times per Annex A are counted from PO acknowledgement. Supplier acknowledges POs within 3 working days.\",\"quote\":\"Lead times per Annex A, counted from PO acknowledgement. Supplier acknowledges POs within 3 working days.\"},{\"topic\":\"shipment\",\"text_en\":\"Deliveries are FOB Nhava Sheva (Incoterms 2020). Risk passes according to the agreed Incoterm.\",\"quote\":\"Deliveries are made FOB Nhava Sheva (Incoterms 2020). Risk passes in accordance with the agreed Incoterm.\"},{\"topic\":\"price\",\"text_en\":\"Prices per Annex A, in INR, are fixed for the calendar year. Invoices quote the Soony PO number and item. Payment NET30.\",\"quote\":\"Prices per Annex A, in INR, are fixed for the calendar year. Invoices quote the Soony PO number and item. Payment NET30.\"},{\"topic\":\"quality\",\"text_en\":\"PPAP level 3 for new part numbers. Changes to process, site or sub-supplier require Soony's written approval (PCN, 90 days). Supplier maintains IATF 16949 or ISO 9001 certification.\",\"quote\":\"PPAP level 3 for new part numbers. Changes to process, site or sub-supplier require Soony's written approval (PCN, 90 days). Supplier maintains IATF 16949 or ISO 9001 certification.\"},{\"topic\":\"delay\",\"text_en\":\"Late delivery penalty: 0.5% of the delayed order value per commenced week, capped at 5%.\",\"quote\":\"Late delivery: 0.5 % of the delayed order value per commenced week, capped at 5 %.\"},{\"topic\":\"terms\",\"text_en\":\"Force majeure excuses performance only to the extent prevented. Shortages of materials or labour at the Supplier or sub-suppliers are not force majeure unless themselves caused by force majeure. Notice within 48 hours; if the event lasts more than 60 days either party may terminate affected orders.\",\"quote\":\"Shortages of materials or labour at the Supplier or its sub-suppliers are not force majeure unless they are themselves caused by force majeure. Notice within 48 hours; if the event lasts more than 60 days, either party may terminate the affected orders.\"},{\"topic\":\"terms\",\"text_en\":\"Supplier discloses sub-suppliers of critical materials on request.\",\"quote\":\"Supplier discloses sub-suppliers of critical materials on request.\"},{\"topic\":\"terms\",\"text_en\":\"Supplier complies with Soony's Supplier Code of Conduct, REACH, RoHS and conflict-minerals reporting (CMRT annually).\",\"quote\":\"Supplier complies with Soony's Supplier Code of Conduct, REACH, RoHS and conflict-minerals reporting (CMRT annually).\"},{\"topic\":\"terms\",\"text_en\":\"Confidentiality for 5 years after termination.\",\"quote\":\"Each party keeps the other party's information confidential for 5 years after termination.\"},{\"topic\":\"terms\",\"text_en\":\"German law applies, excluding the CISG. Place of jurisdiction is Munich.\",\"quote\":\"German law applies, excluding the CISG. Place of jurisdiction is Munich.\"},{\"topic\":\"terms\",\"text_en\":\"Signature block: Munich, 2026-08-01, for Soony Jonas Lindqvist, CPO; for Supplier Rohan Deshmukh (names typed, no visible handwritten signatures).\",\"quote\":\"Munich, 2026-08-01 · for Soony: Jonas Lindqvist, CPO · for Supplier: Rohan Deshmukh\"}],\"decisions\":[{\"subject\":\"Supply status under the agreement\",\"outcome\":\"conditional\",\"decided_by\":\"Soony\",\"conditions\":\"Serial supply requires a completed PPAP and written release by Soony Supplier Quality and the responsible Category Lead.\",\"quote\":\"Deliveries under this Agreement are made under Soony's conditional release of 1 August 2026.\"}],\"corrections\":[],\"verdict\":{\"status\":\"has_warnings\",\"summary_en\":\"Three-page framework supply agreement PC-0018-2026 between Soony Interactive GmbH and Pune Diecast Works Pvt. Ltd., effective 2026-08-01 to 2029-07-31. It covers one part, CMP-GAM-010 (die-cast statue 'The Getaway'), at 1037 INR per unit, MOQ 2,000 and 70 days lead time. Terms: FOB Nhava Sheva, NET30, late-delivery penalty of 0.5% per week capped at 5%, German law, Munich jurisdiction. Supply is under a conditional release only.\",\"red_flags\":[\"Supply is conditional: deliveries are made under Soony's conditional release of 1 August 2026. Serial supply needs a completed PPAP and written release by Soony Supplier Quality and the Category Lead.\",\"Prices are fixed per calendar year only, so the 1037 INR price may change after the 2026 calendar year; the contract does not state the price for later years.\",\"Shortages of materials or labour at the Supplier or its sub-suppliers are not force majeure unless themselves caused by force majeure.\",\"The signature block shows typed names only; no handwritten signatures or stamps are visible.\",\"Annex A lists only one part number.\"],\"confidence\":\"high\",\"observations\":[\"The PDF was read as text and page images; all text is clear and printed.\",\"No handwriting, stamps, strike-throughs or overwrites are visible.\",\"The signature block is typed text only; no visible signature marks.\",\"Page 2 holds only § 13 and the signature line; page 3 holds only Annex A.\",\"The unit price is printed as '1037' with the currency in a separate column (INR).\"]}}",
+    "structured_output": {
+      "document_type": "contract",
+      "languages": [
+        "English"
+      ],
+      "issuer": "Soony Interactive GmbH",
+      "recipient": "Pune Diecast Works Pvt. Ltd.",
+      "document_number": "PC-0018-2026",
+      "document_date": "2026-08-01",
+      "references": [
+        {
+          "type": "contract",
+          "value": "PC-0018-2026"
+        }
+      ],
+      "lines": [
+        {
+          "item": "Annex A line 1",
+          "material_id": "CMP-GAM-010",
+          "supplier_part_no": null,
+          "description": "Statue \"The Getaway\" (die-cast, 18 cm)",
+          "values": [
+            {
+              "field": "unit_price",
+              "field_label": null,
+              "value": "1037 INR",
+              "number": 1037,
+              "unit": "INR",
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "minimum_order_quantity",
+              "field_label": null,
+              "value": "2,000",
+              "number": 2000,
+              "unit": null,
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "lead_time",
+              "field_label": null,
+              "value": "70",
+              "number": 70,
+              "unit": "days",
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            }
+          ]
+        }
+      ],
+      "statements": [
+        {
+          "topic": "terms",
+          "text_en": "Agreement between Soony Interactive GmbH and Pune Diecast Works Pvt. Ltd. Effective 2026-08-01, expires 2029-07-31 unless extended in writing.",
+          "quote": "Contract no. PC-0018-2026 · Effective 2026-08-01 · Expires 2029-07-31"
+        },
+        {
+          "topic": "approval_status",
+          "text_en": "Deliveries are made under Soony's conditional release of 1 August 2026. Serial supply requires a completed PPAP and the written release by Soony Supplier Quality and the responsible Category Lead.",
+          "quote": "Deliveries under this Agreement are made under Soony's conditional release of 1 August 2026. Serial supply requires a completed PPAP and the written release by Soony Supplier Quality and the responsible Category Lead."
+        },
+        {
+          "topic": "terms",
+          "text_en": "Lead times per Annex A are counted from PO acknowledgement. Supplier acknowledges POs within 3 working days.",
+          "quote": "Lead times per Annex A, counted from PO acknowledgement. Supplier acknowledges POs within 3 working days."
+        },
+        {
+          "topic": "shipment",
+          "text_en": "Deliveries are FOB Nhava Sheva (Incoterms 2020). Risk passes according to the agreed Incoterm.",
+          "quote": "Deliveries are made FOB Nhava Sheva (Incoterms 2020). Risk passes in accordance with the agreed Incoterm."
+        },
+        {
+          "topic": "price",
+          "text_en": "Prices per Annex A, in INR, are fixed for the calendar year. Invoices quote the Soony PO number and item. Payment NET30.",
+          "quote": "Prices per Annex A, in INR, are fixed for the calendar year. Invoices quote the Soony PO number and item. Payment NET30."
+        },
+        {
+          "topic": "quality",
+          "text_en": "PPAP level 3 for new part numbers. Changes to process, site or sub-supplier require Soony's written approval (PCN, 90 days). Supplier maintains IATF 16949 or ISO 9001 certification.",
+          "quote": "PPAP level 3 for new part numbers. Changes to process, site or sub-supplier require Soony's written approval (PCN, 90 days). Supplier maintains IATF 16949 or ISO 9001 certification."
+        },
+        {
+          "topic": "delay",
+          "text_en": "Late delivery penalty: 0.5% of the delayed order value per commenced week, capped at 5%.",
+          "quote": "Late delivery: 0.5 % of the delayed order value per commenced week, capped at 5 %."
+        },
+        {
+          "topic": "terms",
+          "text_en": "Force majeure excuses performance only to the extent prevented. Shortages of materials or labour at the Supplier or sub-suppliers are not force majeure unless themselves caused by force majeure. Notice within 48 hours; if the event lasts more than 60 days either party may terminate affected orders.",
+          "quote": "Shortages of materials or labour at the Supplier or its sub-suppliers are not force majeure unless they are themselves caused by force majeure. Notice within 48 hours; if the event lasts more than 60 days, either party may terminate the affected orders."
+        },
+        {
+          "topic": "terms",
+          "text_en": "Supplier discloses sub-suppliers of critical materials on request.",
+          "quote": "Supplier discloses sub-suppliers of critical materials on request."
+        },
+        {
+          "topic": "terms",
+          "text_en": "Supplier complies with Soony's Supplier Code of Conduct, REACH, RoHS and conflict-minerals reporting (CMRT annually).",
+          "quote": "Supplier complies with Soony's Supplier Code of Conduct, REACH, RoHS and conflict-minerals reporting (CMRT annually)."
+        },
+        {
+          "topic": "terms",
+          "text_en": "Confidentiality for 5 years after termination.",
+          "quote": "Each party keeps the other party's information confidential for 5 years after termination."
+        },
+        {
+          "topic": "terms",
+          "text_en": "German law applies, excluding the CISG. Place of jurisdiction is Munich.",
+          "quote": "German law applies, excluding the CISG. Place of jurisdiction is Munich."
+        },
+        {
+          "topic": "terms",
+          "text_en": "Signature block: Munich, 2026-08-01, for Soony Jonas Lindqvist, CPO; for Supplier Rohan Deshmukh (names typed, no visible handwritten signatures).",
+          "quote": "Munich, 2026-08-01 · for Soony: Jonas Lindqvist, CPO · for Supplier: Rohan Deshmukh"
+        }
+      ],
+      "decisions": [
+        {
+          "subject": "Supply status under the agreement",
+          "outcome": "conditional",
+          "decided_by": "Soony",
+          "conditions": "Serial supply requires a completed PPAP and written release by Soony Supplier Quality and the responsible Category Lead.",
+          "quote": "Deliveries under this Agreement are made under Soony's conditional release of 1 August 2026."
+        }
+      ],
+      "corrections": [],
+      "verdict": {
+        "status": "has_warnings",
+        "summary_en": "Three-page framework supply agreement PC-0018-2026 between Soony Interactive GmbH and Pune Diecast Works Pvt. Ltd., effective 2026-08-01 to 2029-07-31. It covers one part, CMP-GAM-010 (die-cast statue 'The Getaway'), at 1037 INR per unit, MOQ 2,000 and 70 days lead time. Terms: FOB Nhava Sheva, NET30, late-delivery penalty of 0.5% per week capped at 5%, German law, Munich jurisdiction. Supply is under a conditional release only.",
+        "red_flags": [
+          "Supply is conditional: deliveries are made under Soony's conditional release of 1 August 2026. Serial supply needs a completed PPAP and written release by Soony Supplier Quality and the Category Lead.",
+          "Prices are fixed per calendar year only, so the 1037 INR price may change after the 2026 calendar year; the contract does not state the price for later years.",
+          "Shortages of materials or labour at the Supplier or its sub-suppliers are not force majeure unless themselves caused by force majeure.",
+          "The signature block shows typed names only; no handwritten signatures or stamps are visible.",
+          "Annex A lists only one part number."
+        ],
+        "confidence": "high",
+        "observations": [
+          "The PDF was read as text and page images; all text is clear and printed.",
+          "No handwriting, stamps, strike-throughs or overwrites are visible.",
+          "The signature block is typed text only; no visible signature marks.",
+          "Page 2 holds only § 13 and the signature line; page 3 holds only Annex A.",
+          "The unit price is printed as '1037' with the currency in a separate column (INR)."
+        ]
+      }
+    },
+    "model_usage": {
+      "claude-haiku-5-5": {
+        "inputTokens": 1273,
+        "outputTokens": 29,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.0001418,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 0,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 0,
+        "canonicalModel": "claude-haiku-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      },
+      "claude-sonnet-5-5": {
+        "inputTokens": 6,
+        "outputTokens": 3192,
+        "cacheReadInputTokens": 29588,
+        "cacheCreationInputTokens": 25368,
+        "webSearchRequests": 0,
+        "costUSD": 0.0996503,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 70,
+        "cacheCreationEphemeral5mInputTokens": 24475,
+        "cacheCreationEphemeral1hInputTokens": 893,
+        "canonicalModel": "claude-sonnet-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "permission_denials": [],
+    "deferred_tool_use": null,
+    "errors": null,
+    "api_error_status": null,
+    "uuid": "49471811-4404-472e-b243-5d427f1639f7",
+    "terminal_reason": "completed",
+    "origin": null,
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  }
+]

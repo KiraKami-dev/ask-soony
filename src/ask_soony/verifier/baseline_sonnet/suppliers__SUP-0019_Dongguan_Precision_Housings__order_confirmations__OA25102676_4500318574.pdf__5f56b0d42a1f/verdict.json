@@ -1,0 +1,88 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English",
+    "Chinese"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA25102676",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318574"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-003",
+      "supplier_part_no": null,
+      "description": "Game Card Case (clear)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "44,000",
+          "number": 44000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "1.52",
+          "number": 1.52,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-01-21",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2025-11-05",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Incoterms FOB Yantian; Payment NET30",
+      "quote": "Incoterms FOB Yantian · Payment NET30"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA25102676 from Dongguan Precision Housings to Soony Interactive GmbH for PO 4500318574 (dated 2025-11-05). One line: item 00010, CMP-GAM-003 Game Card Case (clear), 44,000 pcs at 1.52 CNY, confirmed delivery 2026-01-21. Incoterms FOB Yantian, payment NET30.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Single-page printed document with one line item; no handwriting, stamps or signatures.",
+      "No document date is printed; only the PO date 2025-11-05 appears.",
+      "Quantity unit is not stated on the document.",
+      "Quantity column is labelled 'Qty' and the date column 'Confirmed'; they are recorded as quantity_confirmed and date_confirmed."
+    ]
+  }
+}

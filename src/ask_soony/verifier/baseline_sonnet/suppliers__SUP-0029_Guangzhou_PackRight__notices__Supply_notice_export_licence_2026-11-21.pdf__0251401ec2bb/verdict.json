@@ -1,0 +1,121 @@
+{
+  "document_type": "notice",
+  "languages": [
+    "English",
+    "Chinese"
+  ],
+  "issuer": "Guangzhou PackRight Packaging Co., Ltd. (Lin Hui)",
+  "recipient": "Soony Interactive GmbH, Procurement",
+  "document_number": null,
+  "document_date": "2026-11-21",
+  "references": [
+    {
+      "type": "other",
+      "value": "PR-RB-2207"
+    },
+    {
+      "type": "other",
+      "value": "RM-N42-D0401 (magnet part number)"
+    }
+  ],
+  "lines": [
+    {
+      "item": "PR-RB-2207",
+      "material_id": null,
+      "supplier_part_no": "PR-RB-2207",
+      "description": "Boxes with magnet closure; production from December affected. Confirmed dates with delivery after 2026-12-01 move out by 6 weeks.",
+      "values": [
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "delivery after 2026-12-01",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "lead_time",
+          "field_label": "delay",
+          "value": "6 weeks",
+          "number": 6,
+          "unit": "weeks",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "RM-N42-D0401",
+      "material_id": null,
+      "supplier_part_no": "RM-N42-D0401",
+      "description": "Magnet from Jiangxi RareMag Materials Co., Ltd.; shipments suspended until a licence is granted.",
+      "values": [
+        {
+          "field": "other",
+          "field_label": "sample_lead_time_alternative_closures",
+          "value": "within 10 days",
+          "number": 10,
+          "unit": "days",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Magnet supplier Jiangxi RareMag Materials Co., Ltd. (Ganzhou, CN) has informed PackRight that under the new licensing rules for rare-earth products its shipments of RM-N42-D0401 are suspended until a licence is granted.",
+      "quote": "Our magnet supplier Jiangxi RareMag Materials Co., Ltd. (Ganzhou, CN) has informed us that under the new licensing rules for rare-earth products its shipments of RM-N42-D0401 are suspended until a licence is granted."
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Chinese paragraph: the magnet supplier notified that, due to the new rare-earth export licence rules, its magnet shipments must reapply for a licence.",
+      "quote": "尊敬的客户：我司磁铁供应商 Jiangxi RareMag Materials Co., Ltd.（Ganzhou, CN）通知，受稀土出口许可新规影响，其磁铁出货须重新申请许可。"
+    },
+    {
+      "topic": "capacity",
+      "text_en": "PackRight holds magnets for the boxes already confirmed for November.",
+      "quote": "We hold magnets for the boxes already confirmed for November."
+    },
+    {
+      "topic": "delay",
+      "text_en": "PR-RB-2207 production from December is affected. Confirmed dates for PR-RB-2207 with delivery after 2026-12-01 move out by 6 weeks.",
+      "quote": "Affected: PR-RB-2207 production from December. Our confirmed dates for PR-RB-2207 with delivery after 2026-12-01 move out by 6 weeks."
+    },
+    {
+      "topic": "other",
+      "text_en": "Printed parts without magnets are not affected.",
+      "quote": "Printed parts without magnets are not affected."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Supplier asks for understanding and will update when the licence status changes. Alternative closures (ferrite magnet, ribbon) can be sampled within 10 days on request.",
+      "quote": "We ask for your understanding and will update you when the licence status changes. Alternative closures (ferrite magnet, ribbon) can be sampled within 10 days on request."
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Supply notice from Guangzhou PackRight dated 2026-11-21. Its magnet supplier's shipments of RM-N42-D0401 are suspended pending a rare-earth export licence. Confirmed PR-RB-2207 dates with delivery after 2026-12-01 move out by 6 weeks. November boxes are covered by magnet stock, and printed parts without magnets are unaffected. Ferrite magnet or ribbon closures can be sampled within 10 days on request.",
+    "red_flags": [
+      "Confirmed delivery dates for PR-RB-2207 after 2026-12-01 are delayed by 6 weeks.",
+      "Magnet supply (RM-N42-D0401) is suspended with no licence date given; the end of the delay is open-ended.",
+      "Only boxes already confirmed for November are covered by held magnet stock.",
+      "No new specific dates or quantities are given; the buyer must work out the revised dates itself.",
+      "Alternative closures (ferrite magnet, ribbon) would need sampling and approval."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Clean digital PDF, no handwriting, stamps or signatures.",
+      "No document number, PO number or quantities given.",
+      "Contact named: Lin Hui, +86 20 8200 1100.",
+      "Opening paragraph is in Chinese and repeats part of the English text; the English text adds the part number, the November stock and the PR-RB-2207 impact."
+    ]
+  }
+}

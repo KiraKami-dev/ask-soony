@@ -1,0 +1,15 @@
+{
+  "path": "suppliers/SUP-0019_Dongguan_Precision_Housings/contracts/SUP-0019_Supply_Agreement_2018.pdf",
+  "sha256": "8c9cc633b50d3fa1ba0079ddfbb430cb6c763b8eb2edd12647447f170ae57314",
+  "model": "claude-sonnet-5-5",
+  "effort": "high",
+  "fingerprint": "ef7ff7aae87f85e3",
+  "status": "error",
+  "error": "CLIJSONDecodeError: Failed to decode JSON: JSON message exceeded maximum buffer size of 1048576 bytes...",
+  "attempts": 3,
+  "finished_at": "2026-11-21T21:19:12+00:00",
+  "seconds": 273.8,
+  "num_turns": null,
+  "cost_usd": null,
+  "usage": null
+}

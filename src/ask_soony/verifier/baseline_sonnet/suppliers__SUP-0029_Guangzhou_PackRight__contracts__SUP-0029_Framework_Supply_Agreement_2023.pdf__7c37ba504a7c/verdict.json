@@ -1,0 +1,271 @@
+{
+  "document_type": "contract",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Soony Interactive GmbH",
+  "recipient": "Guangzhou PackRight Packaging Co., Ltd.",
+  "document_number": "PC-0029-2023",
+  "document_date": "2023-09-01",
+  "references": [
+    {
+      "type": "contract",
+      "value": "PC-0029-2023"
+    }
+  ],
+  "lines": [
+    {
+      "item": "Annex A",
+      "material_id": "CMP-GAM-003",
+      "supplier_part_no": "PR-CC-0312",
+      "description": "Game Card Case (clear)",
+      "values": [
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "1.38 CNY",
+          "number": 1.38,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "minimum_order_quantity",
+          "field_label": null,
+          "value": "50,000",
+          "number": 50000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "lead_time",
+          "field_label": null,
+          "value": "56",
+          "number": 56,
+          "unit": "days",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "Annex A",
+      "material_id": "CMP-GAM-004",
+      "supplier_part_no": "PR-SL-0604",
+      "description": "Cover Sleeve Grand Heist 6 (USK/PEGI)",
+      "values": [
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.3984 CNY",
+          "number": 0.3984,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "minimum_order_quantity",
+          "field_label": null,
+          "value": "50,000",
+          "number": 50000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "lead_time",
+          "field_label": null,
+          "value": "56",
+          "number": 56,
+          "unit": "days",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "Annex A",
+      "material_id": "CMP-GAM-007",
+      "supplier_part_no": "PR-RB-2207",
+      "description": "Collector's Box Grand Heist 6 (rigid, magnetic lid)",
+      "values": [
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "24.63 CNY",
+          "number": 24.63,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "minimum_order_quantity",
+          "field_label": null,
+          "value": "5,000",
+          "number": 5000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "lead_time",
+          "field_label": null,
+          "value": "63",
+          "number": 63,
+          "unit": "days",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "Annex A",
+      "material_id": "CMP-MAG-005",
+      "supplier_part_no": "RM-N42-D0401",
+      "description": "NdFeB Disc Magnet 4x1 (lid closure): fitted by Supplier, 4 per CMP-GAM-007",
+      "values": [
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "included in CMP-GAM-007",
+          "number": null,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "minimum_order_quantity",
+          "field_label": null,
+          "value": "n/a",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "lead_time",
+          "field_label": null,
+          "value": "63",
+          "number": 63,
+          "unit": "days",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Terms have the meaning given in Soony's General Purchasing Conditions (edition 2023) unless defined otherwise.",
+      "quote": "Terms used in this Agreement have the meaning given in Soony's General Purchasing Conditions (edition 2023) unless defined otherwise."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Supplier manufactures and supplies the parts listed in Annex A for Soony's products.",
+      "quote": "Supplier manufactures and supplies the parts listed in Annex A for Soony's products."
+    },
+    {
+      "topic": "delay",
+      "text_en": "Lead times per Annex A, counted from PO acknowledgement. Supplier acknowledges POs within 3 working days.",
+      "quote": "Lead times per Annex A, counted from PO acknowledgement. Supplier acknowledges POs within 3 working days."
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Deliveries are made FOB Yantian (Incoterms 2020). Risk passes in accordance with the agreed Incoterm.",
+      "quote": "Deliveries are made FOB Yantian (Incoterms 2020). Risk passes in accordance with the agreed Incoterm."
+    },
+    {
+      "topic": "price",
+      "text_en": "Prices per Annex A, in CNY, are fixed for the calendar year. Invoices quote the Soony PO number and item. Payment NET30.",
+      "quote": "Prices per Annex A, in CNY, are fixed for the calendar year. Invoices quote the Soony PO number and item. Payment NET30."
+    },
+    {
+      "topic": "quality",
+      "text_en": "PPAP level 3 for new part numbers. Changes to process, site or sub-supplier require Soony's written approval (PCN, 90 days). Supplier maintains IATF 16949 or ISO 9001 certification.",
+      "quote": "PPAP level 3 for new part numbers. Changes to process, site or sub-supplier require Soony's written approval (PCN, 90 days). Supplier maintains IATF 16949 or ISO 9001 certification."
+    },
+    {
+      "topic": "revision",
+      "text_en": "Artwork (6.2): Supplier prints to the drawing revision in Soony's component master at the date of the purchase order.",
+      "quote": "6.2 Artwork. Supplier prints to the drawing revision in Soony's component master at the date of the purchase order."
+    },
+    {
+      "topic": "delay",
+      "text_en": "Late delivery penalty: 0.5% of the delayed order value per commenced week, capped at 5%.",
+      "quote": "Late delivery: 0.5 % of the delayed order value per commenced week, capped at 5 %."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Force majeure includes governmental export restrictions on rare-earth materials. Supplier must notify Soony within 48 hours and propose mitigation.",
+      "quote": "Force majeure includes governmental export restrictions on rare-earth materials. Supplier must notify Soony within 48 hours and propose mitigation."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Supplier discloses its sub-suppliers of critical materials in Annex B and informs Soony of any change at least 90 days in advance.",
+      "quote": "Supplier discloses its sub-suppliers of critical materials in Annex B and informs Soony of any change at least 90 days in advance."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Supplier complies with Soony's Supplier Code of Conduct, REACH, RoHS and conflict-minerals reporting (CMRT annually).",
+      "quote": "Supplier complies with Soony's Supplier Code of Conduct, REACH, RoHS and conflict-minerals reporting (CMRT annually)."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Each party keeps the other party's information confidential for 5 years after termination.",
+      "quote": "Each party keeps the other party's information confidential for 5 years after termination."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Agreement effective from 2023-09-01 and expires on 2027-08-31 unless extended in writing.",
+      "quote": "This Agreement is effective from 2023-09-01 and expires on 2027-08-31 unless extended in writing."
+    },
+    {
+      "topic": "terms",
+      "text_en": "German law applies, excluding the CISG. Place of jurisdiction is Munich.",
+      "quote": "German law applies, excluding the CISG. Place of jurisdiction is Munich."
+    },
+    {
+      "topic": "other",
+      "text_en": "Annex B: sole listed sub-supplier is Jiangxi RareMag Materials Co., Ltd., Ganzhou, CN, supplying NdFeB disc magnets for lid closures (CMP-MAG-005), fitted by Supplier.",
+      "quote": "Jiangxi RareMag Materials Co., Ltd. | Ganzhou, CN | NdFeB disc magnets for lid closures (Soony part CMP-MAG-005), fitted by Supplier"
+    },
+    {
+      "topic": "other",
+      "text_en": "Annex C: Supplier's documents use Supplier's part numbers (cross-reference: CMP-GAM-003 = PR-CC-0312; CMP-GAM-004 = PR-SL-0604; CMP-GAM-007 = PR-RB-2207; CMP-MAG-005 = RM-N42-D0401).",
+      "quote": "Supplier's documents (order confirmations, delivery notes, correspondence) use Supplier's part numbers."
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Framework Supply Agreement PC-0029-2023 between Soony Interactive GmbH and Guangzhou PackRight Packaging Co., Ltd., effective 2023-09-01, expiring 2027-08-31. It sets FOB Yantian delivery, CNY prices fixed per calendar year, NET30 payment, and a late-delivery penalty of 0.5% per commenced week capped at 5%. Annex A gives prices, MOQs and lead times for four parts. Annex B names one sub-supplier. Annex C maps Soony part numbers to supplier part numbers. The signature line names Jonas Lindqvist (CPO) for Soony and Lin Hui for the Supplier. No handwritten corrections were found.",
+    "red_flags": [
+      "Contract expires 2027-08-31 unless extended in writing.",
+      "CMP-MAG-005 has no separate price: it is included in the CMP-GAM-007 price. The magnets come from a single sub-supplier, Jiangxi RareMag, and rare-earth export restrictions count as force majeure under §8.",
+      "Supplier must notify Soony within 48 hours of force majeure, and a sub-supplier change needs 90 days' notice and Soony's written approval.",
+      "Prices are fixed per calendar year only. The document does not say how prices are set for later years."
+    ],
+    "confidence": "high",
+    "observations": [
+      "PDF is machine-typeset text across 3 pages. No handwriting, stamps or strike-throughs were seen.",
+      "Signature line is printed text only: 'Munich, 2023-09-01 · for Soony: Jonas Lindqvist, CPO · for Supplier: Lin Hui'. No visible handwritten signatures.",
+      "The first attempt to render the PDF pages failed because pdftoppm is not installed. The file was then read without the pages parameter and all 3 pages were returned.",
+      "In Annex A the CMP-MAG-005 price cell wraps across lines ('included in C / MP-GAM-007'). I read it as 'included in CMP-GAM-007'."
+    ]
+  }
+}

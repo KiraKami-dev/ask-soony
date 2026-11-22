@@ -1,0 +1,120 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English",
+    "Chinese"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26790451",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318759"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00020",
+      "material_id": "CMP-GAM-010",
+      "supplier_part_no": null,
+      "description": "Statue \"The Getaway\" (die-cast, 18 cm)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "11,000",
+          "number": 11000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "88.38",
+          "number": 88.38,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2027-01-11",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-010",
+      "supplier_part_no": null,
+      "description": "Statue \"The Getaway\" (die-cast, 18 cm)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "9,000",
+          "number": 9000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "88.38",
+          "number": 88.38,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2027-01-13",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Customer Soony Interactive GmbH, referencing order 4500318759 dated 2026-10-05; Incoterms FOB Yantian; payment NET30.",
+      "quote": "Customer: Soony Interactive GmbH · Your order 4500318759 of 2026-10-05 · Incoterms FOB Yantian · Payment NET30"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA26790451 from Dongguan Precision Housings to Soony Interactive GmbH for PO 4500318759 (dated 2026-10-05). Two lines for CMP-GAM-010 Statue \"The Getaway\" (die-cast, 18 cm): item 00020, 11,000 pcs, confirmed 2027-01-11; item 00010, 9,000 pcs, confirmed 2027-01-13. Both are at 88.38 CNY. Terms: FOB Yantian, NET30. The document has no handwriting, stamps or corrections.",
+    "red_flags": [
+      "The document does not show the original ordered quantities, so confirmed quantities (total 20,000) cannot be checked against the PO from this document alone.",
+      "Items are listed out of order (00020 before 00010), and the higher item number has the earlier confirmed date (2027-01-11 vs 2027-01-13).",
+      "The same material (CMP-GAM-010) appears on two lines with identical unit price but different quantities and dates (split delivery).",
+      "No unit of measure is stated for the quantities, and no document date for the confirmation itself is given (only the PO date)."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Single-page, fully printed document; no handwriting, stamps, signatures or visible damage.",
+      "Header has Chinese title (订单确认书) alongside English.",
+      "Quantities use comma thousands separators (11,000 and 9,000)."
+    ]
+  }
+}

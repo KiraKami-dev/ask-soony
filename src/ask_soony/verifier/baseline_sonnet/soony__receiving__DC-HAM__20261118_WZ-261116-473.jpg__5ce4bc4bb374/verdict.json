@@ -1,0 +1,130 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Polish",
+    "English"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o., Poznań, PL",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "WZ-261116-473",
+  "document_date": "2026-11-16",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318768"
+    },
+    {
+      "type": "delivery_note",
+      "value": "WZ-261116-473"
+    },
+    {
+      "type": "other",
+      "value": "Przewoźnik (carrier): PO 33338"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-008",
+      "supplier_part_no": null,
+      "description": "Art Book Grand Heist 6 (96 p, hard — text cut off at cell edge)",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "80.000",
+          "number": 80000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": true,
+          "legible": "clear"
+        },
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "8 000",
+          "number": 8000,
+          "unit": "PCS",
+          "written": "handwritten",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "40",
+          "number": 40,
+          "unit": "Opak.",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "360 kg",
+          "number": 360,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "18.11.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "other",
+      "text_en": "Received by: Meyer K. (handwritten signature on the 'Odebrał' line).",
+      "quote": "Odebrał: Meyer K."
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Receiving stamp: received 18.11.2026 at DC-HAM.",
+      "quote": "RECEIVED 18.11.2026 DC-HAM"
+    },
+    {
+      "topic": "other",
+      "text_en": "Remarks field ('Uwagi') is empty.",
+      "quote": "Uwagi:"
+    }
+  ],
+  "decisions": [],
+  "corrections": [
+    {
+      "what": "printed quantity struck through and replaced by handwritten quantity",
+      "original": "80.000",
+      "replacement": "8 000",
+      "where": "Ilość column, line CMP-GAM-008 (replacement written below the row)"
+    }
+  ],
+  "verdict": {
+    "status": "has_corrections",
+    "summary_en": "Polish WZ delivery note WZ-261116-473 dated 16.11.2026 from Karton Nowak (Poznań) to Soony DC Hamburg for PO 4500318768, one line CMP-GAM-008 Art Book Grand Heist 6. The printed quantity 80.000 PCS (80,000) is crossed out and replaced by a handwritten 8 000 (8,000). Stamped received 18.11.2026 at DC-HAM and signed Meyer K.",
+    "red_flags": [
+      "Quantity corrected by hand: printed 80.000 (80,000 PCS) struck through, handwritten 8 000 (8,000 PCS) — a tenfold difference.",
+      "The correction has no initials, explanation or remark; the 'Uwagi' (remarks) field is empty.",
+      "Header shows 40 packages and 360 kg gross, which do not state which quantity they match. They are not changed by the correction.",
+      "Product description is cut off ('96 p, hard'), so the full description is not readable.",
+      "The receiving stamp and signature do not state whether the received quantity is the corrected 8,000 or the printed 80,000."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Printed 80.000 is struck through with a diagonal line; the handwritten '8 000' sits just below the row, outside the table.",
+      "Blue receiving stamp 'RECEIVED 18.11.2026 / DC-HAM' is clear.",
+      "Handwritten signature 'Meyer K.' on the Odebrał line.",
+      "Description text is truncated at the cell edge.",
+      "Barcode at the top right; the lower half of the page is blank."
+    ]
+  }
+}

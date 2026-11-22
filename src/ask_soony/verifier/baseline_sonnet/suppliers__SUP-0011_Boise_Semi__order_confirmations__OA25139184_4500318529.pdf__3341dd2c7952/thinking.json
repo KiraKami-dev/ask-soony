@@ -1,0 +1,6 @@
+[
+  {
+    "turn": 37,
+    "thinking": "I'm treating this as an order acknowledgement. The terms line looks contradictory: it says EXW Boise but then has the seller prepaying freight, insurance and duties, so I'll flag that. The quantities are 9000 and 10000 at 6.11 USD per unit, and the dates check out.\n\nI'm filling in the order date as 2025-07-09 and leaving the document date as null since it isn't stated. Both line items carry the same part number, CMP-GAM-002.\n\n"
+  }
+]

@@ -1,0 +1,109 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Chinese",
+    "English"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd.",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "SN-260818-893",
+  "document_date": "2026-08-18",
+  "references": [
+    {
+      "type": "delivery_note",
+      "value": "SN-260818-893"
+    },
+    {
+      "type": "po_number",
+      "value": "—"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": null,
+      "supplier_part_no": "PRM-GH6-PIN",
+      "description": "Pre-order Pin \"GH6\" (enamel)",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "24.000",
+          "number": 24000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "12",
+          "number": 12,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "unclear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "228 kg",
+          "number": 228,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "21.09.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S. Gross weight 228 kg, 12 packages.",
+      "quote": "毛重: 228 kg 件数: 12 承运: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "approval_status",
+      "text_en": "Blue receiving stamp: RECEIVED 21.09.2026, DC-HAM.",
+      "quote": "RECEIVED 21.09.2026 DC-HAM"
+    },
+    {
+      "topic": "other",
+      "text_en": "Red round company seal reading 'Dongguan Precision Housings Co. Ltd.' with the Chinese text 'shipping special seal'.",
+      "quote": "出货专用章"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Chinese/English delivery note SN-260818-893 dated 2026-08-18 from Dongguan Precision Housings to Soony DC Hamburg. It lists one line, PRM-GH6-PIN, Pre-order Pin \"GH6\" (enamel), 24.000 PCS in 12 packages, gross weight 228 kg, carrier Nordhav Shipping A/S. A blue stamp reads RECEIVED 21.09.2026 DC-HAM. The purchase order field is blank (\"—\"). The consignee signature line and the remarks are empty. There are no handwritten corrections.",
+    "red_flags": [
+      "Purchase order field (采购订单) shows only a dash, so the note carries no PO reference.",
+      "Consignee signature line (收货签字) is blank, although the note carries a RECEIVED stamp.",
+      "No received quantity is recorded, only the stamp date, so there is no check of received against delivered quantity.",
+      "The quantity 24.000 PCS is read as 24,000 pieces, which fits 12 packages and 228 kg. The notation is ambiguous, so confirm it."
+    ],
+    "confidence": "high",
+    "observations": [
+      "The red company seal overlaps the table's unit column header and the packages cell. The packages value '12' is partly covered but still reads as 12, and it matches 件数: 12 below the table.",
+      "The seal text is partly covered, but the legible part reads as Dongguan Precision Housings Co. Ltd. with 出货专用章.",
+      "The blue RECEIVED stamp is slightly tilted and clearly legible.",
+      "The remarks field (备注) is empty.",
+      "There is a barcode at the top right.",
+      "There is no handwriting on the document."
+    ]
+  }
+}

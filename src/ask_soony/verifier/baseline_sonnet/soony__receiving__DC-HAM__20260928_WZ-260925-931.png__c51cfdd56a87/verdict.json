@@ -1,0 +1,105 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Polish",
+    "English"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o., Poznań, PL",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "WZ-260925-931",
+  "document_date": "2026-09-25",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318724"
+    },
+    {
+      "type": "delivery_note",
+      "value": "WZ-260925-931"
+    },
+    {
+      "type": "other",
+      "value": "Przewoźnik (carrier): PO 55734"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-005",
+      "supplier_part_no": null,
+      "description": "Cover Sleeve Grand Heist 5 (USK/PE",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "65.000",
+          "number": 65000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "65",
+          "number": 65,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "1105 kg",
+          "number": 1105,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "other",
+      "text_en": "Remarks field (Uwagi) is empty.",
+      "quote": "Uwagi:"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Gross weight 1105 kg, 65 packages, carrier PO 55734.",
+      "quote": "Waga brutto: 1105 kg   Opak.: 65   Przewoźnik: PO 55734"
+    },
+    {
+      "topic": "other",
+      "text_en": "Received by (Odebrał): handwritten signature/name 'Yilmaz D.'",
+      "quote": "Odebrał: Yilmaz D."
+    }
+  ],
+  "decisions": [],
+  "corrections": [
+    {
+      "what": "handwritten receiver signature/name (not a correction)",
+      "original": null,
+      "replacement": "Yilmaz D.",
+      "where": "Odebrał (received by) line, bottom left"
+    }
+  ],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Polish WZ delivery note WZ-260925-931 dated 25.09.2026 from Karton Nowak (Poznań) to Soony Distribution Center Hamburg, for PO 4500318724. One line: CMP-GAM-005 Cover Sleeve Grand Heist 5, 65.000 PCS in 65 packages, gross weight 1105 kg, carrier PO 55734. Signed 'Yilmaz D.' under Odebrał. No remarks, corrections or strike-throughs.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Product description is cut off and has no closing parenthesis: 'Cover Sleeve Grand Heist 5 (USK/PE'.",
+      "Quantity '65.000' uses the Polish thousands separator, so it means 65000 pieces.",
+      "Receiver name 'Yilmaz D.' is handwritten in blue ink on the signature line.",
+      "No receiving date stamp is visible, and the document shows no received quantity.",
+      "Uwagi (remarks) field is blank.",
+      "Barcode at top right."
+    ]
+  }
+}

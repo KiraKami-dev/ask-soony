@@ -1,0 +1,145 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Korean",
+    "English"
+  ],
+  "issuer": "Hwaseong Memory Co., Ltd., Hwaseong, KR",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "DN-260821-169",
+  "document_date": "2026-08-21",
+  "references": [
+    {
+      "type": "delivery_note",
+      "value": "DN-260821-169"
+    },
+    {
+      "type": "po_number",
+      "value": "4500318694"
+    },
+    {
+      "type": "po_number",
+      "value": "4500318701"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "21 000",
+          "number": 21000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "10",
+          "number": 10,
+          "unit": "boxes",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "2",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "22 000",
+          "number": 22000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "4",
+          "number": 4,
+          "unit": "boxes",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "Totals",
+      "material_id": null,
+      "supplier_part_no": null,
+      "description": "Shipment totals (총중량 / 박스)",
+      "values": [
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "168 kg",
+          "number": 168,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "14",
+          "number": 14,
+          "unit": "boxes",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S",
+      "quote": "운송: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "other",
+      "text_en": "Document title: Delivery note / transaction statement. The remarks field (비고) is empty and the receiver (인수자) signature line is blank.",
+      "quote": "거래명세서 / 비고: / 인수자:"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Korean delivery note DN-260821-169 dated 2026.08.21 from Hwaseong Memory Co., Ltd. to Soony Distribution Center Hamburg. It covers two lines of CMP-GAM-002 (Game Card 64 GB – Grand Heist 5): 21 000 PCS in 10 boxes and 22 000 PCS in 4 boxes. Totals are 14 boxes and 168 kg, shipped by Nordhav Shipping A/S. It references two POs, 4500318694 and 4500318701. There are no handwritten corrections or stamps. The receiver signature line is blank.",
+    "red_flags": [
+      "Two POs (4500318694, 4500318701) are listed but the lines do not say which quantity belongs to which PO.",
+      "The same material CMP-GAM-002 appears on two separate lines (21 000 and 22 000 PCS). The note gives no combined total (43 000 PCS if the lines are added).",
+      "Box density differs sharply between the lines: 21 000 PCS in 10 boxes versus 22 000 PCS in 4 boxes.",
+      "The receiver (인수자) signature line is blank and there is no receiving stamp or date, so receipt is not confirmed on this document.",
+      "The note shows no unit prices and no ordered or confirmed quantities, so it cannot be checked against the POs from this document alone."
+    ],
+    "confidence": "high",
+    "observations": [
+      "The scan is slightly rotated but fully legible.",
+      "No handwriting, stamps or strike-throughs are visible.",
+      "The remarks (비고) field is empty.",
+      "The receiver signature line is empty.",
+      "A barcode is printed at the top right.",
+      "Quantities use a space as the thousands separator (21 000 = 21000)."
+    ]
+  }
+}

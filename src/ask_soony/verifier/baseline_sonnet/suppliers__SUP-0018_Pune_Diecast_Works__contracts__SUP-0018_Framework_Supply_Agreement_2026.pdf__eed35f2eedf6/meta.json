@@ -1,0 +1,48 @@
+{
+  "path": "suppliers/SUP-0018_Pune_Diecast_Works/contracts/SUP-0018_Framework_Supply_Agreement_2026.pdf",
+  "sha256": "eed35f2eedf6917b8846f0a31e799111e00012e1497a836404ff1b94d259c5b4",
+  "model": "claude-sonnet-5-5",
+  "effort": "high",
+  "fingerprint": "ef7ff7aae87f85e3",
+  "status": "ok",
+  "error": null,
+  "attempts": 1,
+  "finished_at": "2026-11-21T21:02:05+00:00",
+  "seconds": 706.4,
+  "num_turns": 4,
+  "cost_usd": 0.0997921,
+  "usage": {
+    "input_tokens": 6,
+    "cache_creation_input_tokens": 25368,
+    "cache_read_input_tokens": 29588,
+    "output_tokens": 3192,
+    "output_tokens_details": {
+      "thinking_tokens": 70
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 893,
+      "ephemeral_5m_input_tokens": 24475
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 2813,
+        "cache_read_input_tokens": 22016,
+        "cache_creation_input_tokens": 6245,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 6245,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  }
+}

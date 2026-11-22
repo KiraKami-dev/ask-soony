@@ -1,0 +1,130 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Polish",
+    "English"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o., Poznań, PL",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "WZ-261007-439",
+  "document_date": "2026-10-07",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318722"
+    },
+    {
+      "type": "po_number",
+      "value": "4500318731"
+    },
+    {
+      "type": "delivery_note",
+      "value": "WZ-261007-439"
+    },
+    {
+      "type": "other",
+      "value": "Przewoźnik (carrier): PO 24687"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-008",
+      "supplier_part_no": null,
+      "description": "Art Book Grand Heist 6 (96 p, hard",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "12.500",
+          "number": 12500,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "25",
+          "number": 25,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "2",
+      "material_id": "CMP-GAM-011",
+      "supplier_part_no": null,
+      "description": "Activation Code Leaflet",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "280.000",
+          "number": 280000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "56",
+          "number": 56,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Goods are on EUR pallets, please return them.",
+      "quote": "Uwagi: Towar na paletach EUR, prosimy o zwrot"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Gross weight 1134 kg; 81 packages in total; carrier: PO 24687.",
+      "quote": "Waga brutto: 1134 kg   Opak.: 81   Przewoźnik: PO 24687"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Received by (handwritten signature): Meyer K.",
+      "quote": "Odebrał: Meyer K."
+    }
+  ],
+  "decisions": [],
+  "corrections": [
+    {
+      "what": "handwritten signature/name in the 'received by' (Odebrał) field; no date or quantity note beside it",
+      "original": null,
+      "replacement": "Meyer K.",
+      "where": "Bottom left, next to 'Odebrał:'"
+    }
+  ],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Polish WZ delivery note WZ-261007-439 dated 07.10.2026 from Karton Nowak (Poznań) to the Soony DC Hamburg. It covers POs 4500318722 and 4500318731. Line 1 is CMP-GAM-008 Art Book Grand Heist 6, 12.500 PCS (12,500) in 25 packages. Line 2 is CMP-GAM-011 Activation Code Leaflet, 280.000 PCS (280,000) in 56 packages. Gross weight is 1134 kg and total packages are 81 (25+56, which matches). The goods are on EUR pallets and the sender asks for their return. The note is handwritten-signed 'Meyer K.' in the received-by field. There are no corrections, strike-throughs or stamps, and no receiving date.",
+    "red_flags": [
+      "The note lists two POs but does not say which line belongs to which PO.",
+      "The pallets are EUR pallets and the sender asks for them to be returned.",
+      "No receiving date or goods-receipt stamp is present, and the signature is undated. There is no note of any quantity check against the order."
+    ],
+    "confidence": "high",
+    "observations": [
+      "The line 1 description is cut off: '(96 p, hard' has no closing bracket.",
+      "Quantities use the Polish thousands separator (12.500 = 12500, 280.000 = 280000).",
+      "The only handwriting is the signature 'Meyer K.' in blue ink.",
+      "The bottom of the page is blank, and there are no stamps.",
+      "The page has a barcode at the top right."
+    ]
+  }
+}

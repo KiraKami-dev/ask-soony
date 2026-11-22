@@ -1,0 +1,6 @@
+[
+  {
+    "turn": 47,
+    "thinking": "I'm checking the issuer name, which reads Guangzhou PackRight Packaging Co., Ltd. and matches across the header and the image. Next I'm weighing whether the material code PR-CC-0312 belongs in the material_id field, since that field is meant for the buyer's part number.\n\nI'm settling on quantity 80000, unit price 1.44 CNY, and confirmed date 2026-08-12, with the order date 2026-06-15 going into date_ordered. I'm leaning toward quantity_confirmed since the \"Qty\" column is from the order confirmation, and I won't compute a total because none is stated.\n\n"
+  }
+]

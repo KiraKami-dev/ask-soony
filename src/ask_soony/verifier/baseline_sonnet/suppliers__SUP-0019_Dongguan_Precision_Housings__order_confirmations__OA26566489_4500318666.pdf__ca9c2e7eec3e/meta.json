@@ -1,0 +1,48 @@
+{
+  "path": "suppliers/SUP-0019_Dongguan_Precision_Housings/order_confirmations/OA26566489_4500318666.pdf",
+  "sha256": "ca9c2e7eec3e6ccb8073f5c3006160b6bcce6ce9d65a1b88f8cb8ef669ebafe3",
+  "model": "claude-sonnet-5-5",
+  "effort": "high",
+  "fingerprint": "ef7ff7aae87f85e3",
+  "status": "ok",
+  "error": null,
+  "attempts": 1,
+  "finished_at": "2026-11-21T21:03:10+00:00",
+  "seconds": 770.6,
+  "num_turns": 3,
+  "cost_usd": 0.06555230000000001,
+  "usage": {
+    "input_tokens": 4,
+    "cache_creation_input_tokens": 20872,
+    "cache_read_input_tokens": 7572,
+    "output_tokens": 1114,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 886,
+      "ephemeral_5m_input_tokens": 19986
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 998,
+        "cache_read_input_tokens": 3786,
+        "cache_creation_input_tokens": 19986,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 19986,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  }
+}

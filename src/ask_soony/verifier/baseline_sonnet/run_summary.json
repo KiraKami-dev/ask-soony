@@ -1,0 +1,36 @@
+{
+  "documents": 289,
+  "by_status": {
+    "ok": 283,
+    "error": 6
+  },
+  "by_document_type": {
+    "order_confirmation": 202,
+    "delivery_note": 68,
+    "None": 6,
+    "contract": 4,
+    "notice": 2,
+    "org_chart": 2,
+    "shipping_advice": 1,
+    "inspection_report": 1,
+    "policy": 1,
+    "offer": 1,
+    "packing_list": 1
+  },
+  "by_verdict": {
+    "clean": 196,
+    "has_warnings": 86,
+    "None": 6,
+    "has_corrections": 1
+  },
+  "with_red_flags": 139,
+  "total_cost_usd": 24.4692,
+  "errors": {
+    "soony/receiving/DC-HAM/20260907_DN-260902-677.png": "CLIJSONDecodeError: Failed to decode JSON: JSON message exceeded maximum buffer size of 1048576 bytes...",
+    "soony/receiving/DC-HAM/20261001_WZ-260930-528.png": "CLIJSONDecodeError: Failed to decode JSON: JSON message exceeded maximum buffer size of 1048576 bytes...",
+    "soony/receiving/DC-HAM/20261021_DN-261016-359.png": "CLIJSONDecodeError: Failed to decode JSON: JSON message exceeded maximum buffer size of 1048576 bytes...",
+    "soony/receiving/DC-HAM/20261106_SN-261001-815.png": "CLIJSONDecodeError: Failed to decode JSON: JSON message exceeded maximum buffer size of 1048576 bytes...",
+    "suppliers/SUP-0028_Karton_Nowak/contracts/SUP-0028_Supply_Agreement_2021.pdf": "CLIJSONDecodeError: Failed to decode JSON: JSON message exceeded maximum buffer size of 1048576 bytes...",
+    "suppliers/SUP-0019_Dongguan_Precision_Housings/contracts/SUP-0019_Supply_Agreement_2018.pdf": "CLIJSONDecodeError: Failed to decode JSON: JSON message exceeded maximum buffer size of 1048576 bytes..."
+  }
+}

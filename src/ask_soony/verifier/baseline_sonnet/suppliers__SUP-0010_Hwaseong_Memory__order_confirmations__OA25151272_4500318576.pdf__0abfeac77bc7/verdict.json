@@ -1,0 +1,144 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English",
+    "Korean"
+  ],
+  "issuer": "Hwaseong Memory Co., Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA25151272",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318576"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "21,000",
+          "number": 21000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "5.4",
+          "number": 5.4,
+          "unit": "USD",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-01-19",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2025-11-10",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "00020",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "19,000",
+          "number": 19000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "5.4",
+          "number": 5.4,
+          "unit": "USD",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-01-22",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2025-11-10",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Incoterms FOB Busan; payment NET45.",
+      "quote": "Incoterms FOB Busan · Payment NET45"
+    },
+    {
+      "topic": "other",
+      "text_en": "Order confirmation OA25151272 for customer Soony Interactive GmbH, referencing the customer's order 4500318576 dated 2025-11-10.",
+      "quote": "Customer: Soony Interactive GmbH · Your order 4500318576 of 2025-11-10"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Hwaseong Memory order confirmation OA25151272 for PO 4500318576 (dated 2025-11-10) to Soony Interactive GmbH. Two lines for CMP-GAM-002 Game Card 64 GB – Grand Heist 5 at 5.4 USD each: 21,000 confirmed for 2026-01-19 and 19,000 confirmed for 2026-01-22 (40,000 in total). Terms: FOB Busan, NET45.",
+    "red_flags": [
+      "The same material CMP-GAM-002 is split over two lines with different confirmed dates (2026-01-19 and 2026-01-22).",
+      "The document shows no unit of measure for quantities and no document date. The original ordered quantity is not shown, so it cannot be compared with the confirmed 40,000."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Fully printed, typed document with no handwriting, stamps, signatures or corrections.",
+      "The header is bilingual (Korean/English); the table is in English.",
+      "The description wraps over three lines in the table.",
+      "Quantity and price columns carry no unit of measure; the currency is given as USD."
+    ]
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Polish",
+    "English"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o., Poznań, PL",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "WZ-260908-528",
+  "document_date": "2026-09-09",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318712"
+    },
+    {
+      "type": "delivery_note",
+      "value": "WZ-260908-528"
+    },
+    {
+      "type": "other",
+      "value": "Przewoźnik: PO 11003"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-004",
+      "supplier_part_no": null,
+      "description": "Cover Sleeve Grand Heist 6 (USK/PE (text cut off in the description column)",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "65.000",
+          "number": 65000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "32",
+          "number": 32,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "2",
+      "material_id": "CMP-GAM-009",
+      "supplier_part_no": null,
+      "description": "City Map Poster Grand Heist 6 (fol (text cut off in the description column)",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "28.000",
+          "number": 28000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "5",
+          "number": 5,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Total gross weight 481 kg; 37 packages; carrier: PO 11003.",
+      "quote": "Waga brutto: 481 kg   Opak.: 37   Przewoźnik: PO 11003"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Polish goods issue note (Dokument WZ) WZ-260908-528 dated 09.09.2026 from Karton Nowak, Poznań, to Soony Distribution Center Hamburg against order 4500318712. It lists 65,000 PCS of CMP-GAM-004 in 32 packages and 28,000 PCS of CMP-GAM-009 in 5 packages. The totals are 37 packages and 481 kg gross. The document has no handwritten corrections, stamps or remarks.",
+    "red_flags": [
+      "The receiver's signature line (Odebrał) is blank, so there is no signed confirmation of receipt and no receiving stamp or date.",
+      "The Uwagi (remarks) field is empty.",
+      "Both item descriptions are cut off in the printed table (\"(USK/PE\" and \"(fol\")."
+    ],
+    "confidence": "high",
+    "observations": [
+      "The document is a clean printed scan with no handwriting, stamps or crossed-out values.",
+      "The quantities use the Polish thousands separator (65.000 = 65000, 28.000 = 28000).",
+      "The package counts are consistent: 32 + 5 = 37, which matches the stated total.",
+      "The carrier is given as 'PO 11003'. It is unclear whether this is a carrier name or an order-type code.",
+      "A barcode is printed at the top right.",
+      "The lower half of the page is blank."
+    ]
+  }
+}

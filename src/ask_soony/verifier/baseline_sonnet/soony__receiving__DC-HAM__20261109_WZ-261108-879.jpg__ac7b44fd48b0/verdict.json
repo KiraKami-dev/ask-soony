@@ -1,0 +1,110 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Polish",
+    "English"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o., Poznań, PL",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "WZ-261108-879",
+  "document_date": "2026-11-08",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318761"
+    },
+    {
+      "type": "delivery_note",
+      "value": "WZ-261108-879"
+    },
+    {
+      "type": "other",
+      "value": "Przewoźnik (carrier) field: PO 99724"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-011",
+      "supplier_part_no": null,
+      "description": "Activation Code Leaflet",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "270.000",
+          "number": 270000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "540",
+          "number": 540,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "10800 kg",
+          "number": 10800,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "09.11.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Received by: Schulz P. (handwritten signature on the 'Odebrał' line).",
+      "quote": "Odebrał: Schulz P."
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Receiving stamp: received 09.11.2026 at DC-HAM.",
+      "quote": "RECEIVED 09.11.2026 DC-HAM"
+    },
+    {
+      "topic": "other",
+      "text_en": "Remarks field is empty.",
+      "quote": "Uwagi:"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Polish WZ delivery note WZ-261108-879 dated 08.11.2026 from Karton Nowak (Poznań) to Soony DC Hamburg against order 4500318761. One line: CMP-GAM-011 Activation Code Leaflet, 270.000 PCS (270,000), 540 packages, gross weight 10800 kg. Stamped RECEIVED 09.11.2026 DC-HAM and signed 'Schulz P.'. No corrections, no remarks, no discrepancies noted on the document.",
+    "red_flags": [
+      "No ordered quantity is shown on the note, so the delivered 270,000 PCS cannot be checked against the order from this document alone.",
+      "The carrier field (Przewoźnik) contains 'PO 99724', which looks like a purchase-order style reference rather than a carrier name."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Quantity '270.000' is printed in Polish format, read as 270000.",
+      "Blue 'RECEIVED 09.11.2026 DC-HAM' stamp, slightly rotated, fully legible.",
+      "Handwritten signature 'Schulz P.' on the 'Odebrał' line; it is a signature, not a correction.",
+      "Remarks (Uwagi) field is blank; no strike-throughs or overwrites visible.",
+      "Lower part of the page is blank."
+    ]
+  }
+}

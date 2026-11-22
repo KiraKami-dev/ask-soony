@@ -1,0 +1,6 @@
+[
+  {
+    "turn": 49,
+    "thinking": "I'm reading the document and noticing a conflict in the terms: it says EXW Boise but also that freight, insurance and duties are prepaid by the seller and added to the invoice, which doesn't fit EXW. I'll flag that. Line 00020 comes before 00010, with quantities of 5,500 and 52,000.\n\nI'm settling on quantity_confirmed for the \"Qty\" column and date_confirmed for the \"Confirmed\" dates. The order date of 2026-11-10 could go in as date_ordered, though I'm not sure it belongs in the lines. I also note that the lines are out of sequence, with 00020 ahead of 00010.\n\n"
+  }
+]

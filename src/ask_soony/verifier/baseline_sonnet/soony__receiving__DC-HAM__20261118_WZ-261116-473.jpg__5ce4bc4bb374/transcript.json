@@ -1,0 +1,1328 @@
+[
+  {
+    "_type": "SystemMessage",
+    "subtype": "init",
+    "data": {
+      "type": "system",
+      "subtype": "init",
+      "cwd": "/Users/farhanhassan/ask-soony/data/portal",
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "tools": [
+        "Read",
+        "StructuredOutput"
+      ],
+      "mcp_servers": [],
+      "model": "claude-sonnet-5-5",
+      "permissionMode": "dontAsk",
+      "slash_commands": [
+        "deep-research",
+        "design",
+        "design-sync",
+        "dataviz",
+        "update-config",
+        "verify",
+        "debug",
+        "code-review",
+        "simplify",
+        "batch",
+        "fewer-permission-prompts",
+        "doctor",
+        "loop",
+        "schedule",
+        "claude-api",
+        "workflow-authoring",
+        "run",
+        "run-skill-generator",
+        "plugin-authoring",
+        "advisor",
+        "agents",
+        "auto-mode-setup",
+        "autocompact",
+        "clear",
+        "color",
+        "compact",
+        "config",
+        "output-style",
+        "context",
+        "effort",
+        "fast",
+        "focus",
+        "heapdump",
+        "init",
+        "mcp",
+        "import",
+        "model",
+        "__remote-workflow",
+        "workflow-launch-exec",
+        "reload-plugins",
+        "reload-skills",
+        "rename",
+        "ultrareview",
+        "security-review",
+        "usage-credits",
+        "extra-usage",
+        "usage",
+        "insights",
+        "recap",
+        "skill-doctor",
+        "goal",
+        "design-consent",
+        "design-revoke",
+        "list-agents",
+        "team-onboarding"
+      ],
+      "terminal_slash_commands": [
+        "doctor",
+        "color",
+        "focus",
+        "reload-plugins"
+      ],
+      "apiKeySource": "none",
+      "claude_code_version": "2.1.330",
+      "output_style": "default",
+      "agents": [
+        "claude",
+        "Explore",
+        "general-purpose",
+        "Plan",
+        "statusline-setup",
+        "web-fetch"
+      ],
+      "skills": [
+        "deep-research",
+        "design",
+        "design-sync",
+        "dataviz",
+        "update-config",
+        "verify",
+        "debug",
+        "code-review",
+        "simplify",
+        "batch",
+        "fewer-permission-prompts",
+        "doctor",
+        "loop",
+        "schedule",
+        "claude-api",
+        "workflow-authoring",
+        "run",
+        "run-skill-generator",
+        "plugin-authoring"
+      ],
+      "plugins": [
+        {
+          "name": "cc-plugin-sec-default",
+          "path": "builtin",
+          "source": "cc-plugin-sec-default@builtin"
+        },
+        {
+          "name": "cc-plugin-agents-md",
+          "path": "builtin",
+          "source": "cc-plugin-agents-md@builtin"
+        },
+        {
+          "name": "cc-plugin-telemetry",
+          "path": "builtin",
+          "source": "cc-plugin-telemetry@builtin"
+        },
+        {
+          "name": "cc-plugin-privacy",
+          "path": "builtin",
+          "source": "cc-plugin-privacy@builtin"
+        },
+        {
+          "name": "cc-plugin-plugin-authoring",
+          "path": "builtin",
+          "source": "cc-plugin-plugin-authoring@builtin"
+        }
+      ],
+      "capabilities": [
+        "interrupt_receipt_v1",
+        "interrupt_cancel_queued_v1",
+        "interrupt_send_now_v1",
+        "interrupt_requeue_taken_v1",
+        "msg_lifecycle_v1",
+        "request_marker_lists_v1",
+        "ask_user_question_unanswered_v1",
+        "lifecycle_wakeup_source_v1",
+        "sdk_mcp_tools_list_changed",
+        "sdk_mcp_manifests",
+        "mcp_read_resource_v1",
+        "mcp_tool_ui_meta_v1",
+        "ui_surface_v1",
+        "mcp_call_result_not_for_model_v1",
+        "mcp_call_check_permissions_v1",
+        "voice_call_talk_line_v1",
+        "withdrawn_files_note_v2",
+        "withdrawn_tools_v1",
+        "ui_pane_widget_v1",
+        "reload_plugins_refuse_if_busy_v1",
+        "get_usage_detached_v1",
+        "silent_resend_files_v1"
+      ],
+      "analytics_disabled": false,
+      "product_feedback_disabled": false,
+      "served_by_anthropic": true,
+      "uuid": "cbc2d245-5ddb-4317-ac1a-ae1adb4df89c",
+      "memory_paths": {
+        "auto": "/Users/farhanhassan/.claude/projects/-Users-farhanhassan-ask-soony/memory/"
+      },
+      "original_cwd": "/Users/farhanhassan/ask-soony/data/portal",
+      "additional_directories": [],
+      "messaging_socket_path": "/tmp/cc-socks/45447.sock",
+      "fast_mode_state": "off",
+      "fast_mode_disabled_reason": "sdk_opt_in_required",
+      "per_turn_effort_active": true,
+      "ultrathink_available": false,
+      "ultrathink_typed_raises": false,
+      "view_mode": "default",
+      "startup_timing": {
+        "entrypoint": "sdk-py",
+        "warm_spare_claimed": false,
+        "plugin_full_loads": 0,
+        "user_context_builds": 1,
+        "sdk_mcp_dial_runs": 0,
+        "sdk_mcp_servers_dialed": 0,
+        "flag_fetch_kick": "not_eligible",
+        "flag_fetch_kick_judged_at_ms": 232,
+        "hooks_init_source": "startup",
+        "phases": {
+          "node_boot_ms": 134,
+          "settings_load_ms": 1,
+          "pre_action_mdm_keychain_ms": 3,
+          "pre_action_init_ms": 92,
+          "pre_action_client_data_url_ms": 0,
+          "pre_action_migrations_ms": 0,
+          "pre_action_managed_settings_ms": 3,
+          "pre_action_ms": 103,
+          "permission_context_ms": 35,
+          "setup_import_ms": 0,
+          "skills_load_ms": 31,
+          "setup_uds_dir_ms": 32,
+          "setup_uds_listen_ms": 2,
+          "setup_uds_publish_ms": 0,
+          "setup_uds_messaging_ms": 37,
+          "setup_hooks_snapshot_ms": 0,
+          "setup_file_watcher_ms": 0,
+          "setup_release_notes_ms": 17,
+          "setup_ms": 54,
+          "tools_commands_load_ms": 7,
+          "model_catalog_decision_ms": 17,
+          "mcp_config_wait_ms": 2,
+          "mcp_config_load_ms": 32,
+          "mcp_connect_ms": 0,
+          "print_import_ms": 6,
+          "grove_check_ms": 1,
+          "headless_prologue_ms": 3,
+          "hooks_init_ms": 14,
+          "initial_messages_load_ms": 0,
+          "headless_post_load_ms": 1,
+          "input_ready_ms": 470,
+          "first_message_read_ms": 514,
+          "sdk_mcp_update_ms": 1,
+          "first_message_handle_ms": 1,
+          "first_message_handle_cpu_ms": 1,
+          "first_message_handle_loop_lag_ms": 0,
+          "mcp_prewait_ms": 0,
+          "qe_system_prompt_ms": 0,
+          "prompt_submit_hooks_ms": 2,
+          "qe_plugin_skills_load_ms": 1,
+          "init_emit_ms": 1
+        },
+        "time_origin_ms": 1795293933596.821,
+        "phase_start_ms": {
+          "node_boot_ms": 0,
+          "settings_load_ms": 135,
+          "pre_action_mdm_keychain_ms": 137,
+          "pre_action_init_ms": 140,
+          "pre_action_client_data_url_ms": 232,
+          "pre_action_migrations_ms": 233,
+          "pre_action_managed_settings_ms": 233,
+          "pre_action_ms": 137,
+          "permission_context_ms": 280,
+          "setup_import_ms": 316,
+          "skills_load_ms": 320,
+          "setup_uds_dir_ms": 321,
+          "setup_uds_listen_ms": 354,
+          "setup_uds_publish_ms": 356,
+          "setup_uds_messaging_ms": 319,
+          "setup_hooks_snapshot_ms": 358,
+          "setup_file_watcher_ms": 358,
+          "setup_release_notes_ms": 359,
+          "setup_ms": 321,
+          "tools_commands_load_ms": 384,
+          "model_catalog_decision_ms": 414,
+          "mcp_config_wait_ms": 440,
+          "mcp_connect_ms": 450,
+          "print_import_ms": 452,
+          "grove_check_ms": 459,
+          "headless_prologue_ms": 458,
+          "hooks_init_ms": 447,
+          "initial_messages_load_ms": 461,
+          "headless_post_load_ms": 462,
+          "input_ready_ms": 0,
+          "first_message_read_ms": 0,
+          "sdk_mcp_update_ms": 514,
+          "first_message_handle_ms": 514,
+          "mcp_prewait_ms": 515,
+          "qe_system_prompt_ms": 521,
+          "prompt_submit_hooks_ms": 530,
+          "qe_plugin_skills_load_ms": 546,
+          "init_emit_ms": 548
+        }
+      }
+    }
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ToolUseBlock",
+        "id": "toolu_01F6swz5VfwfEsrStCd8BNAx",
+        "name": "Read",
+        "input": {
+          "file_path": "/Users/farhanhassan/ask-soony/data/portal/soony/receiving/DC-HAM/20261118_WZ-261116-473.jpg"
+        }
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 4655,
+      "cache_read_input_tokens": 0,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 4655
+      },
+      "output_tokens": 16,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGj7tRaVwcBLht3hZS9V",
+    "stop_reason": null,
+    "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+    "uuid": "2a817611-9b9c-481e-a20e-9086d3cc524e",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "RateLimitEvent",
+    "rate_limit_info": {
+      "_type": "RateLimitInfo",
+      "status": "allowed",
+      "resets_at": 1795300800,
+      "rate_limit_type": "five_hour",
+      "utilization": null,
+      "overage_status": "allowed",
+      "overage_resets_at": 1796083200,
+      "overage_disabled_reason": null,
+      "raw": {
+        "status": "allowed",
+        "resetsAt": 1795300800,
+        "rateLimitType": "five_hour",
+        "overageStatus": "allowed",
+        "overageResetsAt": 1796083200,
+        "isUsingOverage": false,
+        "unifiedWindows": {
+          "five_hour": {
+            "utilization": 0.5,
+            "resetsAt": 1795300800,
+            "status": "allowed"
+          },
+          "seven_day": {
+            "utilization": 0.25,
+            "resetsAt": 1795554000,
+            "status": "allowed"
+          }
+        }
+      }
+    },
+    "uuid": "0eadf3ae-9452-4d8c-a736-e9785b2903a2",
+    "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d"
+  },
+  {
+    "_type": "UserMessage",
+    "content": [
+      {
+        "_type": "ToolResultBlock",
+        "tool_use_id": "toolu_01F6swz5VfwfEsrStCd8BNAx",
+        "content": [
+          {
+            "type": "image",
+            "source": {
+              "type": "base64",
+              "data": "<424268 chars of encoded data left out>",
+              "media_type": "image/jpeg"
+            }
+          }
+        ],
+        "is_error": null
+      }
+    ],
+    "uuid": "24953a07-7f58-43dc-af38-8f4bab09dfd9",
+    "parent_tool_use_id": null,
+    "tool_use_result": {
+      "type": "image",
+      "file": {
+        "base64": "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… <404268 more chars>",
+        "type": "image/jpeg",
+        "originalSize": 439693,
+        "dimensions": {
+          "originalWidth": 1654,
+          "originalHeight": 2339,
+          "displayWidth": 1414,
+          "displayHeight": 2000
+        }
+      }
+    },
+    "origin": null
+  },
+  {
+    "_type": "UserMessage",
+    "content": [
+      {
+        "_type": "TextBlock",
+        "text": "[Image: original 1654x2339, displayed at 1414x2000. Multiply coordinates by 1.17 to map to original image.]"
+      }
+    ],
+    "uuid": "3886cb4f-aebc-47b0-9ae1-67d12d0a9ffb",
+    "parent_tool_use_id": null,
+    "tool_use_result": null,
+    "origin": null
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 2,
+      "estimated_tokens_delta": 2,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "48b3ee4d-3972-4130-bc42-29cf04d312f9"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 6,
+      "estimated_tokens_delta": 4,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "b78645c1-d677-4cfa-9638-4fc773a33200"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 10,
+      "estimated_tokens_delta": 4,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "9cacde8f-b8de-461c-9536-34b112962e83"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 12,
+      "estimated_tokens_delta": 2,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "bbb111ca-b91e-4519-9bc3-413682324e77"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 17,
+      "estimated_tokens_delta": 5,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "c866a256-aacc-4b8e-8b93-58a616150bb4"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 18,
+      "estimated_tokens_delta": 1,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "9c555a32-b757-4d1c-bbcc-bfb193548ede"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 22,
+      "estimated_tokens_delta": 4,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "9839eca9-a4f4-4acf-b1df-cb2b65e30b1e"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 25,
+      "estimated_tokens_delta": 3,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "840f76e4-7e30-4337-aab7-ea4699536365"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 27,
+      "estimated_tokens_delta": 2,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "ae574515-bcd0-4c03-adb4-46b4abc57519"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 28,
+      "estimated_tokens_delta": 1,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "28a5f50f-35cb-44ba-96c0-bda098d0698d"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 33,
+      "estimated_tokens_delta": 5,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "0d922479-d3f6-48ba-adce-9bb533cb6216"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 35,
+      "estimated_tokens_delta": 2,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "c7352d10-c16d-4712-8215-4df0677ff66f"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 41,
+      "estimated_tokens_delta": 6,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "4eaa4300-8e6d-47f9-8d13-172f6c2d2723"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 44,
+      "estimated_tokens_delta": 3,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "ee239600-ee7f-4d54-96e4-fdcf2b90bf73"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 45,
+      "estimated_tokens_delta": 1,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "5ef9b31c-cc63-45c9-a5b8-bd26c8588124"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 48,
+      "estimated_tokens_delta": 3,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "3fe609ad-3ad8-4a0b-a887-5cb1f496e31e"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 52,
+      "estimated_tokens_delta": 4,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "c33009dd-4711-44ac-8ee5-b5326f9de41b"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 55,
+      "estimated_tokens_delta": 3,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "40ce84be-a927-498c-a124-34e705746e3b"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 57,
+      "estimated_tokens_delta": 2,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "ca59c7ac-23e6-4a56-aa95-0b12114c6a16"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 60,
+      "estimated_tokens_delta": 3,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "0928ca9c-7099-4990-ad25-01677c82ec2b"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 61,
+      "estimated_tokens_delta": 1,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "d2d8e6e9-fff1-4d08-a945-c3de541d8638"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 63,
+      "estimated_tokens_delta": 2,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "6f60bad7-ac3c-4fd0-9974-0c9c02391012"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 65,
+      "estimated_tokens_delta": 2,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "35ca56d3-0ce0-4be8-beb3-6a59123cbc30"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 71,
+      "estimated_tokens_delta": 6,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "89303392-afcd-4a4d-86b3-1d41d85f7ee7"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 72,
+      "estimated_tokens_delta": 1,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "bd6f0863-436d-40f4-8901-dc736402889d"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 78,
+      "estimated_tokens_delta": 6,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "d0685623-b573-45e5-bd71-e1d6addc612a"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 82,
+      "estimated_tokens_delta": 4,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "0bf7d059-387b-4c46-9c6f-8eaa6bfc2e01"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 83,
+      "estimated_tokens_delta": 1,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "00d4ae2b-42fe-4210-8a64-13680c921c2a"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 89,
+      "estimated_tokens_delta": 6,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "2120361d-fb98-4a95-923d-af9d2dcc0695"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 91,
+      "estimated_tokens_delta": 2,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "84feebf6-b52b-4a74-9f5d-aa38d5b5935e"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 92,
+      "estimated_tokens_delta": 1,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "b782b040-3116-403d-8f22-860201a254bc"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 94,
+      "estimated_tokens_delta": 2,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "e5ce3d51-c460-41d0-9119-c2c41382352d"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 99,
+      "estimated_tokens_delta": 5,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "035cd197-db15-4af4-9237-61b341c81d09"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 101,
+      "estimated_tokens_delta": 2,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "cdd13352-ec11-4ea2-a5d4-9079b153a109"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 103,
+      "estimated_tokens_delta": 2,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "c4697601-1a0f-46ce-8f2b-248fa04261e1"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 107,
+      "estimated_tokens_delta": 4,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "bd2601c2-db04-4df8-90ba-3ab2fded2ac8"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 110,
+      "estimated_tokens_delta": 3,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "235221e9-c5b2-492d-82f6-4619b7713264"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 111,
+      "estimated_tokens_delta": 1,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "75d43ba7-dc2b-42ca-abb1-319734f7a9ac"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 119,
+      "estimated_tokens_delta": 8,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "806673b4-a481-4dff-8b21-92abc821ed28"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 121,
+      "estimated_tokens_delta": 2,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "34872ed6-3525-44a1-8df3-cdfcd2172808"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 122,
+      "estimated_tokens_delta": 1,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "d74ed7ef-eeac-46cf-bd41-1ca829cd2884"
+    }
+  },
+  {
+    "_type": "SystemMessage",
+    "subtype": "thinking_tokens",
+    "data": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 416,
+      "estimated_tokens_delta": 294,
+      "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+      "uuid": "63f01f95-658e-429e-9ac0-9bc8e59e7809"
+    }
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ThinkingBlock",
+        "thinking": "I'm pulling the key details from this Polish WZ document: the line items for CMP-GAM-008 and the Art Book Grand Heist 6, with the quantity corrected by hand from 80,000 to 8,000, plus the weight, packaging, carrier, and the receiving signature.\n\nI'm checking the quantity correction: 80.000 crossed out and replaced by 8 000 by hand, which doesn't square with 40 packages and 360 kg, and the correction has no initials next to it.\n\n",
+        "signature": "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"
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 20958,
+      "cache_read_input_tokens": 4655,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 20958
+      },
+      "output_tokens": 10,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGj85uNx9w1BdVdor4gG",
+    "stop_reason": null,
+    "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+    "uuid": "cadfeb28-62b4-4cbe-a6a2-10a2f830e854",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "AssistantMessage",
+    "content": [
+      {
+        "_type": "ToolUseBlock",
+        "id": "toolu_01Ri4TtwHqdwJo7ud1zYzU4o",
+        "name": "StructuredOutput",
+        "input": {
+          "document_type": "delivery_note",
+          "languages": [
+            "Polish",
+            "English"
+          ],
+          "issuer": "Karton Nowak Sp. z o.o., Poznań, PL",
+          "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+          "document_number": "WZ-261116-473",
+          "document_date": "2026-11-16",
+          "references": [
+            {
+              "type": "po_number",
+              "value": "4500318768"
+            },
+            {
+              "type": "delivery_note",
+              "value": "WZ-261116-473"
+            },
+            {
+              "type": "other",
+              "value": "Przewoźnik (carrier): PO 33338"
+            }
+          ],
+          "lines": [
+            {
+              "item": "1",
+              "material_id": "CMP-GAM-008",
+              "supplier_part_no": null,
+              "description": "Art Book Grand Heist 6 (96 p, hard — text cut off at cell edge)",
+              "values": [
+                {
+                  "field": "quantity_delivered",
+                  "field_label": null,
+                  "value": "80.000",
+                  "number": 80000,
+                  "unit": "PCS",
+                  "written": "printed",
+                  "crossed_out": true,
+                  "legible": "clear"
+                },
+                {
+                  "field": "quantity_delivered",
+                  "field_label": null,
+                  "value": "8 000",
+                  "number": 8000,
+                  "unit": "PCS",
+                  "written": "handwritten",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "packages",
+                  "field_label": null,
+                  "value": "40",
+                  "number": 40,
+                  "unit": "Opak.",
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "weight",
+                  "field_label": null,
+                  "value": "360 kg",
+                  "number": 360,
+                  "unit": "kg",
+                  "written": "printed",
+                  "crossed_out": false,
+                  "legible": "clear"
+                },
+                {
+                  "field": "date_received",
+                  "field_label": null,
+                  "value": "18.11.2026",
+                  "number": null,
+                  "unit": null,
+                  "written": "stamped",
+                  "crossed_out": false,
+                  "legible": "clear"
+                }
+              ]
+            }
+          ],
+          "statements": [
+            {
+              "topic": "other",
+              "text_en": "Received by: Meyer K. (handwritten signature on the 'Odebrał' line).",
+              "quote": "Odebrał: Meyer K."
+            },
+            {
+              "topic": "shipment",
+              "text_en": "Receiving stamp: received 18.11.2026 at DC-HAM.",
+              "quote": "RECEIVED 18.11.2026 DC-HAM"
+            },
+            {
+              "topic": "other",
+              "text_en": "Remarks field ('Uwagi') is empty.",
+              "quote": "Uwagi:"
+            }
+          ],
+          "decisions": [],
+          "corrections": [
+            {
+              "what": "printed quantity struck through and replaced by handwritten quantity",
+              "original": "80.000",
+              "replacement": "8 000",
+              "where": "Ilość column, line CMP-GAM-008 (replacement written below the row)"
+            }
+          ],
+          "verdict": {
+            "status": "has_corrections",
+            "summary_en": "Polish WZ delivery note WZ-261116-473 dated 16.11.2026 from Karton Nowak (Poznań) to Soony DC Hamburg for PO 4500318768, one line CMP-GAM-008 Art Book Grand Heist 6. The printed quantity 80.000 PCS (80,000) is crossed out and replaced by a handwritten 8 000 (8,000). Stamped received 18.11.2026 at DC-HAM and signed Meyer K.",
+            "red_flags": [
+              "Quantity corrected by hand: printed 80.000 (80,000 PCS) struck through, handwritten 8 000 (8,000 PCS) — a tenfold difference.",
+              "The correction has no initials, explanation or remark; the 'Uwagi' (remarks) field is empty.",
+              "Header shows 40 packages and 360 kg gross, which do not state which quantity they match. They are not changed by the correction.",
+              "Product description is cut off ('96 p, hard'), so the full description is not readable.",
+              "The receiving stamp and signature do not state whether the received quantity is the corrected 8,000 or the printed 80,000."
+            ],
+            "confidence": "high",
+            "observations": [
+              "Printed 80.000 is struck through with a diagonal line; the handwritten '8 000' sits just below the row, outside the table.",
+              "Blue receiving stamp 'RECEIVED 18.11.2026 / DC-HAM' is clear.",
+              "Handwritten signature 'Meyer K.' on the Odebrał line.",
+              "Description text is truncated at the cell edge.",
+              "Barcode at the top right; the lower half of the page is blank."
+            ]
+          }
+        }
+      }
+    ],
+    "model": "claude-sonnet-5-5",
+    "parent_tool_use_id": null,
+    "error": null,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 20958,
+      "cache_read_input_tokens": 4655,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 20958
+      },
+      "output_tokens": 10,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "message_id": "msg_011ChGj85uNx9w1BdVdor4gG",
+    "stop_reason": null,
+    "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+    "uuid": "94e40229-42a1-413b-ab88-1c60326eaf1e",
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  },
+  {
+    "_type": "UserMessage",
+    "content": [
+      {
+        "_type": "ToolResultBlock",
+        "tool_use_id": "toolu_01Ri4TtwHqdwJo7ud1zYzU4o",
+        "content": "Structured output provided successfully",
+        "is_error": null
+      }
+    ],
+    "uuid": "d90418ea-a2d4-4308-b415-6b8a657061c8",
+    "parent_tool_use_id": null,
+    "tool_use_result": "Structured output provided successfully",
+    "origin": null
+  },
+  {
+    "_type": "ResultMessage",
+    "subtype": "success",
+    "duration_ms": 17058,
+    "duration_api_ms": 17069,
+    "is_error": false,
+    "num_turns": 4,
+    "session_id": "67420ed8-fd9a-4a68-88f0-144dae72210d",
+    "stop_reason": "tool_use",
+    "total_cost_usd": 0.1251714,
+    "usage": {
+      "input_tokens": 4,
+      "cache_creation_input_tokens": 25613,
+      "cache_read_input_tokens": 4655,
+      "output_tokens": 2211,
+      "output_tokens_details": {
+        "thinking_tokens": 493
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 25613,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "global",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 2112,
+          "cache_read_input_tokens": 4655,
+          "cache_creation_input_tokens": 20958,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 20958
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "result": "{\"document_type\":\"delivery_note\",\"languages\":[\"Polish\",\"English\"],\"issuer\":\"Karton Nowak Sp. z o.o., Poznań, PL\",\"recipient\":\"Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE\",\"document_number\":\"WZ-261116-473\",\"document_date\":\"2026-11-16\",\"references\":[{\"type\":\"po_number\",\"value\":\"4500318768\"},{\"type\":\"delivery_note\",\"value\":\"WZ-261116-473\"},{\"type\":\"other\",\"value\":\"Przewoźnik (carrier): PO 33338\"}],\"lines\":[{\"item\":\"1\",\"material_id\":\"CMP-GAM-008\",\"supplier_part_no\":null,\"description\":\"Art Book Grand Heist 6 (96 p, hard — text cut off at cell edge)\",\"values\":[{\"field\":\"quantity_delivered\",\"field_label\":null,\"value\":\"80.000\",\"number\":80000,\"unit\":\"PCS\",\"written\":\"printed\",\"crossed_out\":true,\"legible\":\"clear\"},{\"field\":\"quantity_delivered\",\"field_label\":null,\"value\":\"8 000\",\"number\":8000,\"unit\":\"PCS\",\"written\":\"handwritten\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"packages\",\"field_label\":null,\"value\":\"40\",\"number\":40,\"unit\":\"Opak.\",\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"weight\",\"field_label\":null,\"value\":\"360 kg\",\"number\":360,\"unit\":\"kg\",\"written\":\"printed\",\"crossed_out\":false,\"legible\":\"clear\"},{\"field\":\"date_received\",\"field_label\":null,\"value\":\"18.11.2026\",\"number\":null,\"unit\":null,\"written\":\"stamped\",\"crossed_out\":false,\"legible\":\"clear\"}]}],\"statements\":[{\"topic\":\"other\",\"text_en\":\"Received by: Meyer K. (handwritten signature on the 'Odebrał' line).\",\"quote\":\"Odebrał: Meyer K.\"},{\"topic\":\"shipment\",\"text_en\":\"Receiving stamp: received 18.11.2026 at DC-HAM.\",\"quote\":\"RECEIVED 18.11.2026 DC-HAM\"},{\"topic\":\"other\",\"text_en\":\"Remarks field ('Uwagi') is empty.\",\"quote\":\"Uwagi:\"}],\"decisions\":[],\"corrections\":[{\"what\":\"printed quantity struck through and replaced by handwritten quantity\",\"original\":\"80.000\",\"replacement\":\"8 000\",\"where\":\"Ilość column, line CMP-GAM-008 (replacement written below the row)\"}],\"verdict\":{\"status\":\"has_corrections\",\"summary_en\":\"Polish WZ delivery note WZ-261116-473 dated 16.11.2026 from Karton Nowak (Poznań) to Soony DC Hamburg for PO 4500318768, one line CMP-GAM-008 Art Book Grand Heist 6. The printed quantity 80.000 PCS (80,000) is crossed out and replaced by a handwritten 8 000 (8,000). Stamped received 18.11.2026 at DC-HAM and signed Meyer K.\",\"red_flags\":[\"Quantity corrected by hand: printed 80.000 (80,000 PCS) struck through, handwritten 8 000 (8,000 PCS) — a tenfold difference.\",\"The correction has no initials, explanation or remark; the 'Uwagi' (remarks) field is empty.\",\"Header shows 40 packages and 360 kg gross, which do not state which quantity they match. They are not changed by the correction.\",\"Product description is cut off ('96 p, hard'), so the full description is not readable.\",\"The receiving stamp and signature do not state whether the received quantity is the corrected 8,000 or the printed 80,000.\"],\"confidence\":\"high\",\"observations\":[\"Printed 80.000 is struck through with a diagonal line; the handwritten '8 000' sits just below the row, outside the table.\",\"Blue receiving stamp 'RECEIVED 18.11.2026 / DC-HAM' is clear.\",\"Handwritten signature 'Meyer K.' on the Odebrał line.\",\"Description text is truncated at the cell edge.\",\"Barcode at the top right; the lower half of the page is blank.\"]}}",
+    "structured_output": {
+      "document_type": "delivery_note",
+      "languages": [
+        "Polish",
+        "English"
+      ],
+      "issuer": "Karton Nowak Sp. z o.o., Poznań, PL",
+      "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+      "document_number": "WZ-261116-473",
+      "document_date": "2026-11-16",
+      "references": [
+        {
+          "type": "po_number",
+          "value": "4500318768"
+        },
+        {
+          "type": "delivery_note",
+          "value": "WZ-261116-473"
+        },
+        {
+          "type": "other",
+          "value": "Przewoźnik (carrier): PO 33338"
+        }
+      ],
+      "lines": [
+        {
+          "item": "1",
+          "material_id": "CMP-GAM-008",
+          "supplier_part_no": null,
+          "description": "Art Book Grand Heist 6 (96 p, hard — text cut off at cell edge)",
+          "values": [
+            {
+              "field": "quantity_delivered",
+              "field_label": null,
+              "value": "80.000",
+              "number": 80000,
+              "unit": "PCS",
+              "written": "printed",
+              "crossed_out": true,
+              "legible": "clear"
+            },
+            {
+              "field": "quantity_delivered",
+              "field_label": null,
+              "value": "8 000",
+              "number": 8000,
+              "unit": "PCS",
+              "written": "handwritten",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "packages",
+              "field_label": null,
+              "value": "40",
+              "number": 40,
+              "unit": "Opak.",
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "weight",
+              "field_label": null,
+              "value": "360 kg",
+              "number": 360,
+              "unit": "kg",
+              "written": "printed",
+              "crossed_out": false,
+              "legible": "clear"
+            },
+            {
+              "field": "date_received",
+              "field_label": null,
+              "value": "18.11.2026",
+              "number": null,
+              "unit": null,
+              "written": "stamped",
+              "crossed_out": false,
+              "legible": "clear"
+            }
+          ]
+        }
+      ],
+      "statements": [
+        {
+          "topic": "other",
+          "text_en": "Received by: Meyer K. (handwritten signature on the 'Odebrał' line).",
+          "quote": "Odebrał: Meyer K."
+        },
+        {
+          "topic": "shipment",
+          "text_en": "Receiving stamp: received 18.11.2026 at DC-HAM.",
+          "quote": "RECEIVED 18.11.2026 DC-HAM"
+        },
+        {
+          "topic": "other",
+          "text_en": "Remarks field ('Uwagi') is empty.",
+          "quote": "Uwagi:"
+        }
+      ],
+      "decisions": [],
+      "corrections": [
+        {
+          "what": "printed quantity struck through and replaced by handwritten quantity",
+          "original": "80.000",
+          "replacement": "8 000",
+          "where": "Ilość column, line CMP-GAM-008 (replacement written below the row)"
+        }
+      ],
+      "verdict": {
+        "status": "has_corrections",
+        "summary_en": "Polish WZ delivery note WZ-261116-473 dated 16.11.2026 from Karton Nowak (Poznań) to Soony DC Hamburg for PO 4500318768, one line CMP-GAM-008 Art Book Grand Heist 6. The printed quantity 80.000 PCS (80,000) is crossed out and replaced by a handwritten 8 000 (8,000). Stamped received 18.11.2026 at DC-HAM and signed Meyer K.",
+        "red_flags": [
+          "Quantity corrected by hand: printed 80.000 (80,000 PCS) struck through, handwritten 8 000 (8,000 PCS) — a tenfold difference.",
+          "The correction has no initials, explanation or remark; the 'Uwagi' (remarks) field is empty.",
+          "Header shows 40 packages and 360 kg gross, which do not state which quantity they match. They are not changed by the correction.",
+          "Product description is cut off ('96 p, hard'), so the full description is not readable.",
+          "The receiving stamp and signature do not state whether the received quantity is the corrected 8,000 or the printed 80,000."
+        ],
+        "confidence": "high",
+        "observations": [
+          "Printed 80.000 is struck through with a diagonal line; the handwritten '8 000' sits just below the row, outside the table.",
+          "Blue receiving stamp 'RECEIVED 18.11.2026 / DC-HAM' is clear.",
+          "Handwritten signature 'Meyer K.' on the Odebrał line.",
+          "Description text is truncated at the cell edge.",
+          "Barcode at the top right; the lower half of the page is blank."
+        ]
+      }
+    },
+    "model_usage": {
+      "claude-haiku-5-5": {
+        "inputTokens": 1249,
+        "outputTokens": 22,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.0001359,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 0,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 0,
+        "canonicalModel": "claude-haiku-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      },
+      "claude-sonnet-5-5": {
+        "inputTokens": 4,
+        "outputTokens": 2211,
+        "cacheReadInputTokens": 4655,
+        "cacheCreationInputTokens": 25613,
+        "webSearchRequests": 0,
+        "costUSD": 0.1250355,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 493,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 25613,
+        "canonicalModel": "claude-sonnet-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "permission_denials": [],
+    "deferred_tool_use": null,
+    "errors": null,
+    "api_error_status": null,
+    "uuid": "6a57e2d3-85e2-4170-82dc-aacf63959c73",
+    "terminal_reason": "completed",
+    "origin": null,
+    "user_message_uuid": null,
+    "user_message_uuids": null
+  }
+]

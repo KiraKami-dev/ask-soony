@@ -1,0 +1,15 @@
+{
+  "path": "suppliers/SUP-0028_Karton_Nowak/contracts/SUP-0028_Supply_Agreement_2021.pdf",
+  "sha256": "a4e91da8a44d900a372bb325c5131a2d2a712887008a4a52332c2d77a75215ab",
+  "model": "claude-sonnet-5-5",
+  "effort": "high",
+  "fingerprint": "ef7ff7aae87f85e3",
+  "status": "error",
+  "error": "CLIJSONDecodeError: Failed to decode JSON: JSON message exceeded maximum buffer size of 1048576 bytes...",
+  "attempts": 3,
+  "finished_at": "2026-11-21T21:19:05+00:00",
+  "seconds": 267.3,
+  "num_turns": null,
+  "cost_usd": null,
+  "usage": null
+}

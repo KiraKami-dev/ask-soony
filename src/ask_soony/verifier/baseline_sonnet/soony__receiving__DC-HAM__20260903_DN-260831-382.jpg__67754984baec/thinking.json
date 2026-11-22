@@ -1,0 +1,6 @@
+[
+  {
+    "turn": 58,
+    "thinking": "I'm weighing whether the quantity \"8.500\" should read as 8.5 under English conventions or as 8500 units, since this is a PCS card item and the unit makes the reading ambiguous. The document is English with a US shipper and MM/DD/YYYY dates, and I'm noting that the shipment is bound for Hamburg.\n\nI'm settling on 8500 for the quantity, since 8.5 pieces wouldn't fit an 11 kg gross weight for a card shipment, and I'll flag the ambiguity in the observations. The receipt signature reads \"Schulz P.\" with no receipt date on the document, so I'm leaving the date out and noting the signature there instead.\n\n"
+  }
+]

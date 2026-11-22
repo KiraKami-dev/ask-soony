@@ -1,0 +1,137 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Chinese",
+    "English"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd.",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "SN-260820-788",
+  "document_date": "2026-08-20",
+  "references": [
+    {
+      "type": "delivery_note",
+      "value": "SN-260820-788"
+    },
+    {
+      "type": "po_number",
+      "value": "4500318689"
+    },
+    {
+      "type": "po_number",
+      "value": "4500318691"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-010",
+      "supplier_part_no": null,
+      "description": "Statue \"The Getaway\" (die-cast, 18",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "14.000",
+          "number": 14,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "2",
+          "number": 2,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "25.09.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "2",
+      "material_id": "CMP-GAM-006",
+      "supplier_part_no": null,
+      "description": "Steel Case Grand Heist 6",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "16.000",
+          "number": 16,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "16",
+          "number": 16,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "25.09.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Gross weight: 180 kg; total packages: 18; carrier: Nordhav Shipping A/S.",
+      "quote": "毛重: 180 kg 件数: 18 承运: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "other",
+      "text_en": "Remarks field is empty.",
+      "quote": "备注:"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Received stamp at DC-HAM dated 25.09.2026; receiver's signature 'Meyer K.' in the consignee signature field.",
+      "quote": "RECEIVED 25.09.2026 DC-HAM"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Chinese/English delivery note SN-260820-788 dated 2026-08-20 from Dongguan Precision Housings to Soony DC Hamburg, referencing POs 4500318689 and 4500318691. It lists 14 PCS of CMP-GAM-010 (2 packages) and 16 PCS of CMP-GAM-006 (16 packages). The package total of 18 matches the stated 件数 of 18. Gross weight is 180 kg and the carrier is Nordhav Shipping A/S. It carries a DC-HAM RECEIVED stamp dated 25.09.2026 and a handwritten receiver signature 'Meyer K.'. There are no corrections or strike-throughs.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Quantities are printed as '14.000' and '16.000'. They are read as 14 and 16 under the Chinese decimal convention, which fits the 2 and 16 packages and the 180 kg gross weight.",
+      "The description of CMP-GAM-010 is cut off in print after 'die-cast, 18'.",
+      "Both POs are listed in the header, but the lines are not mapped to individual POs.",
+      "The note shows no ordered quantity, so delivered quantities cannot be compared with the orders from this document.",
+      "The blue DC-HAM RECEIVED stamp reads 25.09.2026 and is slightly rotated but clear.",
+      "The receiver signature 'Meyer K.' is handwritten in blue ink on the 收货签字 line.",
+      "The remarks field (备注) is blank."
+    ]
+  }
+}

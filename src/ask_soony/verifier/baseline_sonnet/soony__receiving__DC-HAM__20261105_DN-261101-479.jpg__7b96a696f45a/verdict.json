@@ -1,0 +1,105 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Korean",
+    "English"
+  ],
+  "issuer": "Hwaseong Memory Co., Ltd.",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "DN-261101-479",
+  "document_date": "2026-11-01",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318725"
+    },
+    {
+      "type": "delivery_note",
+      "value": "DN-261101-479"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-001",
+      "supplier_part_no": null,
+      "description": "Game Card 128 GB – Grand Heist 6",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "96 000",
+          "number": 96000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "96",
+          "number": 96,
+          "unit": "boxes",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "1728 kg",
+          "number": 1728,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "05.11.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Nordhav Shipping A/S",
+      "quote": "운송: Nordhav Shipping A/S"
+    },
+    {
+      "topic": "other",
+      "text_en": "Remarks: Handle with care",
+      "quote": "비고: 취급주의"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Receiving stamp: RECEIVED 05.11.2026, DC-HAM",
+      "quote": "RECEIVED 05.11.2026 DC-HAM"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Korean delivery note DN-261101-479 dated 2026.11.01 from Hwaseong Memory to Soony DC Hamburg for PO 4500318725: 96,000 PCS of CMP-GAM-001 Game Card 128 GB – Grand Heist 6 in 96 boxes, total weight 1728 kg, carrier Nordhav Shipping A/S. Stamped RECEIVED 05.11.2026 DC-HAM. No handwritten corrections.",
+    "red_flags": [
+      "The receiver (인수자) signature line is blank, so no signature of the receiving person is present.",
+      "The note records only the delivered quantity; no ordered quantity is on it to compare against."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Blue stamp 'RECEIVED 05.11.2026 DC-HAM' is clear and legible.",
+      "Receiver (인수자) signature line is empty.",
+      "Remarks field says '취급주의' (handle with care).",
+      "No handwriting or strike-throughs visible; the lower part of the page is blank."
+    ]
+  }
+}

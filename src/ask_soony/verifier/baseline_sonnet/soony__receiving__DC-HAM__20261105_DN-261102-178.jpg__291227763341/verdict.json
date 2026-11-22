@@ -1,0 +1,86 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Boise Semiconductor Inc., Boise, US",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "DN-261102-178",
+  "document_date": "2026-11-02",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318751"
+    },
+    {
+      "type": "delivery_note",
+      "value": "DN-261102-178"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-001",
+      "supplier_part_no": null,
+      "description": "Game Card 128 GB – Grand Heist 6",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "56.000",
+          "number": 56000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "11",
+          "number": 11,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "154 kg",
+          "number": 154,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Alpen Air Cargo GmbH. Gross weight 154 kg, 11 packages.",
+      "quote": "Gross weight: 154 kg   Packages: 11   Carrier: Alpen Air Cargo GmbH"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Delivery note DN-261102-178 from Boise Semiconductor Inc. to the Soony Distribution Center in Hamburg, dated 11/02/2026, against PO 4500318751. It lists one line: CMP-GAM-001 Game Card 128 GB – Grand Heist 6, quantity 56.000 PCS, in 11 packages. Gross weight is 154 kg and the carrier is Alpen Air Cargo GmbH. The Remarks field is empty. The 'Received by' line carries a handwritten signature, 'Meyer K.'. There are no corrections or strike-throughs.",
+    "red_flags": [
+      "Quantity '56.000' is ambiguous. It is read as 56,000 PCS because 154 kg over 11 packages fits thousands of small cards, but in English decimal notation it would read as 56. Confirm against the PO.",
+      "The date 11/02/2026 could be MM/DD or DD/MM. It is read as 2 November 2026, which matches the document number DN-261102-178.",
+      "The 'Received by' signature has no receiving date and no quantity check. There is no receiving stamp."
+    ],
+    "confidence": "high",
+    "observations": [
+      "The 'Received by' line has a handwritten, legible signature 'Meyer K.'. It has no date next to it.",
+      "There are no stamps, strike-throughs or overwrites.",
+      "The Remarks field is blank.",
+      "The 'Packages' column header is slightly overrun by the table border.",
+      "A barcode is printed at the top right."
+    ]
+  }
+}

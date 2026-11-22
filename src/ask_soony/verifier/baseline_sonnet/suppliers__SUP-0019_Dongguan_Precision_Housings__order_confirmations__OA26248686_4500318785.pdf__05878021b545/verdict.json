@@ -1,0 +1,116 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "English",
+    "Chinese"
+  ],
+  "issuer": "Dongguan Precision Housings Co., Ltd.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26248686",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318785"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00020",
+      "material_id": "CMP-GAM-010",
+      "supplier_part_no": null,
+      "description": "Statue \"The Getaway\" (die-cast, 18 cm)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "10,500",
+          "number": 10500,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "88.38",
+          "number": 88.38,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2027-02-02",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-003",
+      "supplier_part_no": null,
+      "description": "Game Card Case (clear)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "270,000",
+          "number": 270000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "1.61",
+          "number": 1.61,
+          "unit": "CNY",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2027-01-25",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "terms",
+      "text_en": "Customer: Soony Interactive GmbH; your order 4500318785 of 2026-11-05; Incoterms FOB Yantian; Payment NET30",
+      "quote": "Customer: Soony Interactive GmbH · Your order 4500318785 of 2026-11-05 · Incoterms FOB Yantian · Payment NET30"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Order confirmation OA26248686 from Dongguan Precision Housings to Soony Interactive GmbH for PO 4500318785 (dated 2026-11-05), FOB Yantian, NET30. Two lines confirmed: item 00020 CMP-GAM-010 statue, 10,500 pcs at 88.38 CNY, confirmed 2027-02-02; item 00010 CMP-GAM-003 game card case, 270,000 pcs at 1.61 CNY, confirmed 2027-01-25. No handwriting, stamps or corrections.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Document has no issue date of its own; only the order date 2026-11-05 is printed.",
+      "Line items are listed in the order 00020 then 00010.",
+      "Quantity unit is not stated; unit price currency is CNY.",
+      "No stamps, signatures or handwritten marks."
+    ]
+  }
+}

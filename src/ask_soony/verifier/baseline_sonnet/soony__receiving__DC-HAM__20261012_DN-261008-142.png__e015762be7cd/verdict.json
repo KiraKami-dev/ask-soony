@@ -1,0 +1,117 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Boise Semiconductor Inc., Boise, US",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "DN-261008-142",
+  "document_date": "2026-10-08",
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318730"
+    },
+    {
+      "type": "delivery_note",
+      "value": "DN-261008-142"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "5.500",
+          "number": 5500,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "5",
+          "number": 5,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "75 kg",
+          "number": 75,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_shipped",
+          "field_label": null,
+          "value": "10/08/2026",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "12.10.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "shipment",
+      "text_en": "Carrier: Alpen Air Cargo GmbH",
+      "quote": "Carrier: Alpen Air Cargo GmbH"
+    },
+    {
+      "topic": "terms",
+      "text_en": "Remarks: Pallets returnable",
+      "quote": "Remarks: Pallets returnable"
+    },
+    {
+      "topic": "shipment",
+      "text_en": "Received stamp from DC-HAM dated 12.10.2026",
+      "quote": "RECEIVED 12.10.2026 DC-HAM"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Delivery note DN-261008-142 from Boise Semiconductor Inc. to Soony DC Hamburg against PO 4500318730: 5.500 PCS of CMP-GAM-002 Game Card 64 GB – Grand Heist 5 in 5 packages, gross weight 75 kg, carrier Alpen Air Cargo GmbH. The receiving stamp reads 12.10.2026 DC-HAM. There are no handwritten corrections. The 'Received by' signature line is blank.",
+    "red_flags": [
+      "'Received by' signature line is empty; only the DC-HAM received stamp is present.",
+      "No ordered quantity is on the note, so the delivered quantity cannot be checked against the PO from this document.",
+      "Note date is printed as 10/08/2026 (US-style, read as 8 Oct 2026, which matches the DN number 261008), while the stamp uses DD.MM.YYYY (12.10.2026). The formats differ.",
+      "Quantity '5.500' is read as 5500 pieces because a fractional piece count makes no sense. The separator convention is not stated on the document."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Blue received stamp 'RECEIVED 12.10.2026 / DC-HAM' is slightly tilted but fully legible.",
+      "'Received by:' signature line is blank.",
+      "No handwriting or strike-throughs.",
+      "A barcode is printed at the top right.",
+      "The 'Packages' column header text slightly overflows the table border."
+    ]
+  }
+}

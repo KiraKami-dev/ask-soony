@@ -1,0 +1,209 @@
+{
+  "document_type": "policy",
+  "languages": [
+    "English"
+  ],
+  "issuer": "Soony (Owner: Head of Procurement)",
+  "recipient": null,
+  "document_number": "PP-07",
+  "document_date": "2025-04-01",
+  "references": [
+    {
+      "type": "other",
+      "value": "Procurement Policy PP-07 v3.2"
+    }
+  ],
+  "lines": [
+    {
+      "item": "Buyer",
+      "material_id": null,
+      "supplier_part_no": null,
+      "description": "Approval limit per PO (EUR)",
+      "values": [
+        {
+          "field": "other",
+          "field_label": "approval_limit_per_po",
+          "value": "< 50,000",
+          "number": 50000,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "Category Lead",
+      "material_id": null,
+      "supplier_part_no": null,
+      "description": "Approval limit per PO (EUR)",
+      "values": [
+        {
+          "field": "other",
+          "field_label": "approval_limit_per_po",
+          "value": "< 500,000",
+          "number": 500000,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "Head of Procurement",
+      "material_id": null,
+      "supplier_part_no": null,
+      "description": "Approval limit per PO (EUR)",
+      "values": [
+        {
+          "field": "other",
+          "field_label": "approval_limit_per_po",
+          "value": "< 2,000,000",
+          "number": 2000000,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "Chief Procurement Officer",
+      "material_id": null,
+      "supplier_part_no": null,
+      "description": "Approval limit per PO (EUR)",
+      "values": [
+        {
+          "field": "other",
+          "field_label": "approval_limit_per_po",
+          "value": "< 5,000,000",
+          "number": 5000000,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "CPO and CFO jointly",
+      "material_id": null,
+      "supplier_part_no": null,
+      "description": "Approval limit per PO (EUR)",
+      "values": [
+        {
+          "field": "other",
+          "field_label": "approval_limit_per_po",
+          "value": "≥ 5,000,000",
+          "number": 5000000,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "Air freight",
+      "material_id": null,
+      "supplier_part_no": null,
+      "description": "Unplanned air freight limit per calendar month and category approvable by Category Lead",
+      "values": [
+        {
+          "field": "other",
+          "field_label": "air_freight_category_lead_limit",
+          "value": "EUR 200,000",
+          "number": 200000,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    },
+    {
+      "item": "Conditional release",
+      "material_id": null,
+      "supplier_part_no": null,
+      "description": "Maximum duration of conditional supplier release, and maximum extension",
+      "values": [
+        {
+          "field": "lead_time",
+          "field_label": null,
+          "value": "90 days",
+          "number": 90,
+          "unit": "days",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "other",
+          "field_label": "max_extension",
+          "value": "at most 90 days",
+          "number": 90,
+          "unit": "days",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "approval_status",
+      "text_en": "This policy defines who may approve purchase orders (POs), supplier releases and air-freight spend.",
+      "quote": "This policy defines who may approve purchase orders (POs), supplier releases and air-freight spend."
+    },
+    {
+      "topic": "terms",
+      "text_en": "POs delivered to a Soony site require, in addition to the value approval, a booked dock slot released by the site lead. DC-HAM Hamburg: site lead Katrin Jansen, deputy Raj Patel.",
+      "quote": "POs delivered to a Soony site require, in addition to the value approval, a booked dock slot released by the site lead."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Unplanned air freight up to EUR 200,000 per calendar month and category is approved by the responsible Category Lead. Above that, CPO approval is required before booking.",
+      "quote": "Unplanned air freight up to EUR 200,000 per calendar month and category is approved by the responsible Category Lead. Above that, approval by the CPO is required before booking."
+    },
+    {
+      "topic": "approval_status",
+      "text_en": "A supplier is released for serial deliveries only after a successful PPAP and written release by the Supplier Quality Lead and the responsible Category Lead.",
+      "quote": "A supplier is released for serial deliveries only after a successful PPAP and written release by the Supplier Quality Lead and the responsible Category Lead."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Conditional releases are limited to 90 days from the date of release. POs placed after a conditional release has expired are held in status 'awaiting approval'.",
+      "quote": "Conditional releases are limited to 90 days from the date of release. POs placed after a conditional release has expired are held in status 'awaiting approval'."
+    },
+    {
+      "topic": "terms",
+      "text_en": "A conditional release is extended in writing, once and by at most 90 days, by the responsible Category Lead together with the Supplier Quality Lead.",
+      "quote": "A conditional release is extended in writing, once and by at most 90 days, by the responsible Category Lead together with the Supplier Quality Lead."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Exceptions must be documented and approved by the Head of Procurement.",
+      "quote": "Exceptions must be documented and approved by the Head of Procurement."
+    },
+    {
+      "topic": "other",
+      "text_en": "Version 3.2, effective 2025-04-01, owner Head of Procurement, reviewed annually.",
+      "quote": "Version 3.2 · Effective 2025-04-01 · Owner: Head of Procurement · Review: annually"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Procurement Policy PP-07 v3.2 (effective 2025-04-01) sets PO approval limits by role (Buyer <50k up to CPO+CFO jointly ≥5M EUR), requires a booked dock slot from the site lead for deliveries to Soony sites (DC-HAM Hamburg: Katrin Jansen, deputy Raj Patel), sets air-freight approval thresholds (Category Lead up to EUR 200,000 per month and category, CPO above), limits conditional supplier releases to 90 days with a single extension of at most 90 days, and requires Head of Procurement approval for exceptions.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Single-page, fully printed, typed document; no handwriting, stamps, signatures or corrections.",
+      "Limit table boundaries: Chief Procurement Officer '< 5,000,000' and CPO and CFO jointly '≥ 5,000,000'; all tiers readable.",
+      "Document is a policy and contains no order lines or inspection results; the 'lines' entries record policy thresholds."
+    ]
+  }
+}

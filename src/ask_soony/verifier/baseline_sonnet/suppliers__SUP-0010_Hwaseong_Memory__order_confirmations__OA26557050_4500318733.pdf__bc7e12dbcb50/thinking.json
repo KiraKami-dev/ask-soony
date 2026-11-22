@@ -1,0 +1,6 @@
+[
+  {
+    "turn": 50,
+    "thinking": "I'm laying out the order confirmation in the sequence shown, with lines 00010 through 00040 listed out of order, and I'm noting the totals for the two CMP-GAM items. I'm also pulling out the unit price of 5.4 in USD and starting on the quantity.\n\nI'm reading the quantity as 13000, since the number is in English format, and noting that the document is in English with a Korean header. For the fields, I'll map the quantity to quantity_confirmed and the date to date_confirmed, with unit_price for the price. The document date isn't stated, so I'll leave it null and treat 2026-09-09 as the customer's order date.\n\n"
+  }
+]

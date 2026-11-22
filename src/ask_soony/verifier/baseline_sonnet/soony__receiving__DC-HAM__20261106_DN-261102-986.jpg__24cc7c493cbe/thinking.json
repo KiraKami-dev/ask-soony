@@ -1,0 +1,6 @@
+[
+  {
+    "turn": 50,
+    "thinking": "I already have the image, so I'm turning it into the structured output now. The document is a Korean delivery note from Hwaseong Memory Co., Ltd. to Soony Distribution Center Hamburg, dated 2026.11.02, with the reference numbers I need to capture.\n\nThe stamp sits over part of the table header, covering some of the \"단위\" and \"박스\" text, but the PCS and 44 values underneath are still legible. There is no receiving date, and the receiver's signature is in the 인수자 field. Quantity works out to 2,000 per box and 19 kg per box, which checks out.\n\n"
+  }
+]

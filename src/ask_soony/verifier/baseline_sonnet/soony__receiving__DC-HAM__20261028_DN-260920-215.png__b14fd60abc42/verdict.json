@@ -1,0 +1,89 @@
+{
+  "document_type": "delivery_note",
+  "languages": [
+    "Korean",
+    "English"
+  ],
+  "issuer": "Hwaseong Memory Co., Ltd., Hwaseong, KR",
+  "recipient": "Soony Distribution Center, Dradenaustraße 12, 21129 Hamburg, DE",
+  "document_number": "DN-260920-215",
+  "document_date": "2026-09-20",
+  "references": [
+    {
+      "type": "delivery_note",
+      "value": "DN-260920-215"
+    },
+    {
+      "type": "po_number",
+      "value": "4500318718"
+    }
+  ],
+  "lines": [
+    {
+      "item": "1",
+      "material_id": "CMP-GAM-002",
+      "supplier_part_no": null,
+      "description": "Game Card 64 GB – Grand Heist 5",
+      "values": [
+        {
+          "field": "quantity_delivered",
+          "field_label": null,
+          "value": "12 000",
+          "number": 12000,
+          "unit": "PCS",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "packages",
+          "field_label": null,
+          "value": "2",
+          "number": 2,
+          "unit": "boxes",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "weight",
+          "field_label": null,
+          "value": "42 kg",
+          "number": 42,
+          "unit": "kg",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_received",
+          "field_label": null,
+          "value": "28.10.2026",
+          "number": null,
+          "unit": null,
+          "written": "stamped",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "clean",
+    "summary_en": "Korean/English delivery note DN-260920-215 dated 2026.09.20 from Hwaseong Memory Co., Ltd. to Soony Distribution Center Hamburg, for PO 4500318718. It lists one line: CMP-GAM-002 Game Card 64 GB – Grand Heist 5, 12 000 PCS in 2 boxes, total weight 42 kg, carrier Nordhav Shipping A/S. The blue stamp reads 'RECEIVED 28.10.2026 DC-HAM', and the receiver's handwritten signature reads 'Meyer K.'. The remarks field is empty. There are no corrections or strike-throughs.",
+    "red_flags": [],
+    "confidence": "high",
+    "observations": [
+      "Red round company seal 'HWASEONG MEMORY CO LTD' overlaps the table header (unit column) and the edge of the boxes cell, but the values 'PCS' and '2' are still legible.",
+      "Blue rectangular stamp 'RECEIVED 28.10.2026 / DC-HAM' is slightly tilted and clearly readable.",
+      "Receiver (인수자) signature is handwritten 'Meyer K.' on the signature line.",
+      "Remarks (비고) field is blank.",
+      "Quantity is written '12 000' with a space as the thousands separator, read as 12000.",
+      "The note is dated 2026.09.20 and the receiving stamp is dated 28.10.2026, a gap of about 5 weeks; the document gives no explanation.",
+      "No ordered or confirmed quantity is shown, so a comparison with the PO is not possible from this document."
+    ]
+  }
+}

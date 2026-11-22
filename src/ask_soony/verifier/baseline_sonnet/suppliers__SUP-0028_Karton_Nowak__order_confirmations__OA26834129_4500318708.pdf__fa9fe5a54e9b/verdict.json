@@ -1,0 +1,124 @@
+{
+  "document_type": "order_confirmation",
+  "languages": [
+    "Polish",
+    "English"
+  ],
+  "issuer": "Karton Nowak Sp. z o.o.",
+  "recipient": "Soony Interactive GmbH",
+  "document_number": "OA26834129",
+  "document_date": null,
+  "references": [
+    {
+      "type": "po_number",
+      "value": "4500318708"
+    },
+    {
+      "type": "other",
+      "value": "Order confirmation OA26834129"
+    },
+    {
+      "type": "other",
+      "value": "Artwork file GH6_sleeve_revC_USK2026.pdf"
+    }
+  ],
+  "lines": [
+    {
+      "item": "00010",
+      "material_id": "CMP-GAM-004",
+      "supplier_part_no": null,
+      "description": "Cover Sleeve Grand Heist 6 (USK/PEGI)",
+      "values": [
+        {
+          "field": "quantity_confirmed",
+          "field_label": null,
+          "value": "65,000",
+          "number": 65000,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "unit_price",
+          "field_label": null,
+          "value": "0.06",
+          "number": 0.06,
+          "unit": "EUR",
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_confirmed",
+          "field_label": null,
+          "value": "2026-08-31",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "date_ordered",
+          "field_label": null,
+          "value": "2026-08-04",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "revision",
+          "field_label": null,
+          "value": "rev. C",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        },
+        {
+          "field": "other",
+          "field_label": "artwork_received_date",
+          "value": "2026-08-07",
+          "number": null,
+          "unit": null,
+          "written": "printed",
+          "crossed_out": false,
+          "legible": "clear"
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "topic": "revision",
+      "text_en": "CMP-GAM-004: printed to artwork rev. C (GH6_sleeve_revC_USK2026.pdf), as received from Soony Marketing on 2026-08-07.",
+      "quote": "CMP-GAM-004: druk wg pliku rev. C (GH6_sleeve_revC_USK2026.pdf), otrzymanego od Soony Marketing 2026-08-07. / Printed to artwork rev. C as received from Soony Marketing on 2026-08-07."
+    },
+    {
+      "topic": "terms",
+      "text_en": "Incoterms DAP Hamburg; payment NET30.",
+      "quote": "Incoterms DAP Hamburg · Payment NET30"
+    }
+  ],
+  "decisions": [],
+  "corrections": [],
+  "verdict": {
+    "status": "has_warnings",
+    "summary_en": "Karton Nowak order confirmation OA26834129 for Soony PO 4500318708 (dated 2026-08-04): item 00010, CMP-GAM-004 Cover Sleeve Grand Heist 6 (USK/PEGI), 65,000 at 0.06 EUR, confirmed delivery date 2026-08-31, DAP Hamburg, NET30. The supplier notes printing to artwork rev. C, received from Soony Marketing on 2026-08-07. The document has no handwritten corrections or stamps.",
+    "red_flags": [
+      "The supplier states it is printing to artwork rev. C received from Soony Marketing on 2026-08-07, which is after the PO date of 2026-08-04. The buyer should check that rev. C is the approved revision for this order.",
+      "The quantity of 65,000 has no unit of measure on the document.",
+      "No total value is stated, and the document has no issue date."
+    ],
+    "confidence": "high",
+    "observations": [
+      "Clean typed PDF with a single line item.",
+      "No handwriting, stamps, signatures or strike-throughs.",
+      "The unit price is shown as 0.06 EUR with no price-per-quantity basis stated."
+    ]
+  }
+}
