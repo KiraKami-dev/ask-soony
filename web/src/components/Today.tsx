@@ -1164,8 +1164,29 @@ function AllClear({
   const suggestion = live.suggestions[0] ?? null
   return (
     <section className="rise pt-[16vh] lg:pt-[10vh]">
-      <h1 className="t-big text-ink">Nothing needs you.</h1>
-      <p className="t-body mt-6 text-ink-2">{launchStatus(state, nowMs)}</p>
+      {pending.length > 0 ? (
+        // Prepared by routines in "Ask me" mode: nothing goes out without a look, so this is the
+        // decision now, not a footnote.
+        <>
+          <h1 className="t-big text-ink">
+            {pending.length === 1 ? 'One step is' : `${pending.length} steps are`} ready for your OK.
+          </h1>
+          <p className="t-body mt-6 text-ink-2">
+            Your routines prepared {pending.length === 1 ? 'it' : 'them'}. Nothing goes out before you look. {launchStatus(state, nowMs)}
+          </p>
+          <button
+            onClick={() => onReview(pending)}
+            className="t-body mt-8 inline-flex h-12 cursor-pointer items-center justify-center rounded-xl bg-accent px-7 font-medium text-white hover:bg-[#1d3db5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            Review {pending.length === 1 ? 'it' : `all ${pending.length}`}
+          </button>
+        </>
+      ) : (
+        <>
+          <h1 className="t-big text-ink">Nothing needs you.</h1>
+          <p className="t-body mt-6 text-ink-2">{launchStatus(state, nowMs)}</p>
+        </>
+      )}
       <div className="t-small mt-10 grid gap-3.5 text-ink-2">
         <span>Watching {plural(state.shipments.length, 'shipment')}<button className="uline ml-1.5" onClick={() => go('/suppliers')}>see</button></span>
         {waiting > 0 && <span>{plural(waiting, 'decision')} with others<button className="uline ml-1.5" onClick={() => onReveal('waiting')}>see</button></span>}
@@ -1175,10 +1196,7 @@ function AllClear({
           </RoutineLine>
         )}
         {/* One routine waiting: its own line below names it. Several: one count. */}
-        {pending.length > 0 && new Set(pending.map((x) => x.routine_id)).size > 1 && (
-          <RoutineLine links={[{ label: 'review', onClick: () => onReview(pending) }]}>{pending.length} waiting for your OK</RoutineLine>
-        )}
-        <Automation state={state} onRoutines={onRoutines} onReview={onReview} onChanged={onChanged} className="grid gap-3.5" />
+        {pending.length === 0 && <Automation state={state} onRoutines={onRoutines} onReview={onReview} onChanged={onChanged} className="grid gap-3.5" />}
         {suggestion && (
           <RoutineLine links={[{ label: 'make it a routine', onClick: () => onRoutines({ cardId: suggestion.last_card_id, k: Date.now() }) }]}>
             You did ‘{suggestionLabel(suggestion, state)}’ {suggestion.count} times
