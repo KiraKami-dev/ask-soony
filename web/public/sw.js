@@ -24,7 +24,7 @@ self.addEventListener("push", (event) => {
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   const card = event.notification.data && event.notification.data.card_id;
-  const url = card ? `/?card=${encodeURIComponent(card)}&talk=1` : "/";
+  const url = card ? `/d/${encodeURIComponent(card)}?talk=1` : "/";
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((wins) => {
       for (const w of wins) {

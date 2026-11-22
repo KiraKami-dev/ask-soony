@@ -1,6 +1,6 @@
 {
-  "name": "Decision inbox",
-  "short_name": "Inbox",
+  "name": "Ask Soony",
+  "short_name": "Ask Soony",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

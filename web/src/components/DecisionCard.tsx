@@ -1,6 +1,7 @@
 import { Check, ChevronRight, FileSearch, Phone, Workflow } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { VoiceCall } from '@/components/VoiceCall'
 import { COLORS, fmtDay, fmtNum, fmtTime, post, until, type Card } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
@@ -15,12 +16,16 @@ interface Props {
   onChanged: () => void
   onHover?: (routes: string[]) => void
   onDrawer: (card: Card, tab: 'evidence' | 'trail') => void
+  ringing?: boolean
+  onRingingDone?: () => void
 }
 
 // A person's first name; a role ('Head of Procurement', 'DC site lead') stays whole.
 const first = (s?: string) => (!s ? '' : /\s[a-z]/.test(s) ? s : s.split(' ')[0])
 
-export function DecisionCard({ card, nowMs, isNew, offer, onOffer, onChanged, onHover, onDrawer }: Props) {
+export function DecisionCard({
+  card, nowMs, isNew, offer, onOffer, onChanged, onHover, onDrawer, ringing, onRingingDone,
+}: Props) {
   const [sel, setSel] = useState(0)
   const [mode, setMode] = useState<'idle' | 'edit' | 'escalate'>('idle')
   const [text, setText] = useState('')
@@ -169,6 +174,26 @@ export function DecisionCard({ card, nowMs, isNew, offer, onOffer, onChanged, on
             <Button variant="ghost" disabled={busy} onClick={dismiss}>Dismiss</Button>
           </div>
         </>
+      )}
+
+      {card.ui?.reply && (
+        <div className="mt-4 rounded-xl border-2 border-ok/30 bg-ok/5 p-4">
+          <div className="text-xs font-bold uppercase tracking-wide text-ok">
+            Reply from {card.ui.reply_from || 'supplier'}
+            {card.ui.reply_at ? ` · ${fmtDay(card.ui.reply_at)} ${fmtTime(card.ui.reply_at)}` : ''}
+          </div>
+          <p className="mt-1 text-[15px] font-medium leading-snug">{card.ui.reply}</p>
+          {card.ui.reply_text && (
+            <details className="mt-2">
+              <summary className="cursor-pointer text-sm text-ink-3">Original email</summary>
+              <pre className="mt-1 whitespace-pre-wrap break-words font-sans text-sm text-ink-2">{card.ui.reply_text}</pre>
+            </details>
+          )}
+        </div>
+      )}
+
+      {!decided && (
+        <VoiceCall card={card} onChanged={onChanged} ringing={ringing} onRingingDone={onRingingDone} />
       )}
 
       {decided && offer && (

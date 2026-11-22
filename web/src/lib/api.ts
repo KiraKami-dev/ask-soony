@@ -50,7 +50,11 @@ export interface Card {
   supplier_name?: string
   shipment?: string
   routes: string[]
-  ui: { status?: string; at?: string; note?: string }
+  ui: {
+    status?: string; at?: string; note?: string
+    // Supplier reply tied back by the alert agent (replies.py)
+    reply?: string; reply_from?: string; reply_at?: string; reply_text?: string
+  }
   escalation_brief: string
 }
 
