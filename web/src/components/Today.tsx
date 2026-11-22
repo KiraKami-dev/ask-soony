@@ -171,7 +171,7 @@ export function Today(p: Props) {
           {ready}
           {p.order.length > 0 && <QuietList {...p} card={p.caseCard ? null : p.card} />}
           {groups}
-          {!phone && <p className="t-small text-ink-3"><kbd>J</kbd> <kbd>K</kbd> move · <kbd>1</kbd>–<kbd>9</kbd> choose · <kbd>A</kbd> go</p>}
+          {!phone && <p className="t-small text-ink-3"><kbd>⌘</kbd><kbd>↵</kbd> approve · <kbd>O</kbd> options · <kbd>J</kbd> <kbd>K</kbd> move</p>}
         </aside>
         <main className="relative min-w-0">{body}</main>
       </div>
@@ -606,16 +606,23 @@ function Focus(p: Props & {
   useEffect(() => {
     if (phone) return
     const onKey = (e: KeyboardEvent) => {
-      if (typing(e.target) || e.metaKey || e.ctrlKey || e.altKey || source != null || review) return
+      if (typing(e.target) || source != null || review) return
       const k = e.key
+      // ⌘↵ / Ctrl+↵: the main button, whatever it says now; a second press confirms money.
+      if ((e.metaKey || e.ctrlKey) && k === 'Enter' && !ref.current.busy) {
+        e.preventDefault()
+        if (ref.current.confirm) void ref.current.approve()
+        else ref.current.go()
+        return
+      }
+      if (e.metaKey || e.ctrlKey || e.altKey) return
       if (ref.current.confirm && k === 'Enter') { e.preventDefault(); void ref.current.approve() }
+      else if (k === 'o' || k === 'O') { e.preventDefault(); setOthers((o) => !o) }
       else if (k === 'Escape') { setConfirm(false); setOthers(false) }
       else if ((k === 'a' || k === 'A') && !ref.current.busy) {
         e.preventDefault()
-        if (ref.current.choice.kind !== 'option') ref.current.go()
-        else if (!opt) return
-        else if (ref.current.emails) ref.current.openReview()
-        else setConfirm(true)
+        if (ref.current.choice.kind === 'option' && !opt) return
+        ref.current.go()
       }
       else if (/^[1-9]$/.test(k)) {
         const c = ref.current.choices[Number(k) - 1]
@@ -669,6 +676,7 @@ function Focus(p: Props & {
             )}
           >
             {busy ? (choice.kind === 'dismiss' ? 'Dismissing…' : 'Sending…') : confirm ? 'Yes, approve' : primaryLabel}
+            {!phone && keys && !busy && <span className="ml-3 text-[13px] font-normal opacity-70">⌘↵</span>}
           </button>}
           <div className={cn('flex items-center', phone ? 't-small gap-7' : 't-body gap-6', p.ringing && 'order-first w-full flex-col gap-4 pb-2 lg:items-start')}>
             <VoiceCall
@@ -892,6 +900,10 @@ function EmailReview({
         <Dialog.Overlay className="fade fixed inset-0 z-40 bg-[rgba(24,24,26,.28)]" />
         <Dialog.Content
           aria-describedby={undefined}
+          onKeyDown={(e) => {
+            // ⌘↵ sends, as in any mail program (the same check as the button).
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && !busy && draft.trim()) { e.preventDefault(); onSend(!!last) }
+          }}
           className={cn(
             'sheet-up fixed z-50 overflow-y-auto bg-ground focus:outline-none',
             'inset-x-0 bottom-0 max-h-[92vh] rounded-t-[22px] px-6 pb-[max(28px,env(safe-area-inset-bottom))] pt-3 shadow-[0_-10px_40px_-16px_rgba(0,0,0,.25)]',
@@ -982,7 +994,7 @@ function EmailReview({
               disabled={busy || !draft.trim()}
               className="t-body inline-flex h-12 cursor-pointer items-center justify-center rounded-xl bg-accent px-7 font-medium text-white hover:bg-[#1d3db5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-60"
             >
-              {busy ? 'Sending…' : last ? 'Send anyway' : 'Send email'}
+              {busy ? 'Sending…' : last ? 'Send anyway' : 'Send email'}<span className="ml-3 hidden text-[13px] font-normal opacity-70 md:inline">⌘↵</span>
             </button>
             <Dialog.Close className="t-body cursor-pointer text-ink-2 hover:text-ink">Cancel</Dialog.Close>
           </div>
