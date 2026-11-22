@@ -108,6 +108,49 @@ def _send_mail(to: str, subject: str, body: str) -> str:
     return mid
 
 
+def _send_mail_in_thread(
+    to: str, subject: str, body: str, in_reply_to: str, references: str
+) -> str:
+    """Like _send_mail, with In-Reply-To and References so the mail lands in the same thread."""
+    load_dotenv()
+    user = os.environ.get("ASK_MAIL_ADDRESS", "")
+    password = os.environ.get("ASK_MAIL_PASSWORD", "").replace(" ", "")
+    host = os.environ.get("ASK_SMTP_HOST", "")
+    if not (user and password and host):
+        raise HTTPException(503, "mail account not configured")
+    msg = EmailMessage()
+    msg["From"], msg["To"], msg["Subject"] = user, to, subject
+    msg["Date"] = formatdate(localtime=True)
+    msg["Message-ID"] = mid = make_msgid(domain=user.split("@")[-1])
+    if in_reply_to:
+        msg["In-Reply-To"] = in_reply_to
+    if references:
+        msg["References"] = references
+    msg.set_content(body)
+    with smtplib.SMTP(host, 587, timeout=30) as s:
+        s.starttls(context=ssl.create_default_context())
+        s.login(user, password)
+        s.send_message(msg)
+    return mid
+
+
+def send_followup(
+    to: str, subject: str, body: str, in_reply_to: str, references: list[str] | None = None
+) -> dict:
+    """
+    Send a follow-up in the same email thread ("Re: <subject>", In-Reply-To/References) to a
+    supplier address from the portal's profiles. Returns {message_id, to, subject, sent_body}.
+    """
+    to = (to or "").strip().lower()
+    body = (body or "").strip()
+    if not body or to not in supplier_addresses():
+        raise HTTPException(400, "follow-ups go only to known supplier addresses")
+    subject = subject if re.match(r"^\s*re\s*:", subject or "", re.I) else f"Re: {subject}"
+    refs = " ".join(r for r in (references or [in_reply_to]) if r)
+    mid = _send_mail_in_thread(to, subject, body, in_reply_to, refs)
+    return {"message_id": mid, "to": to, "subject": subject, "sent_body": body}
+
+
 def deliver(card: dict, option: dict, text: str | None) -> dict | None:
     """Send the approved option if it is an email to a known supplier; None if nothing was sent."""
     to = (option.get("to") or "").strip().lower()

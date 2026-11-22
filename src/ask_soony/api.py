@@ -815,9 +815,11 @@ def build_activity(cards: list[dict], events: list[dict], root: Path | None) -> 
     by_id = {a.get("id"): a for a in actions if a.get("id")}
     latest = {str(a.get("decision_id")): a for a in actions}
 
+    def act_of(c: dict) -> dict:
+        return by_id.get((c.get("ui") or {}).get("action_id")) or latest.get(c["id"]) or {}
+
     def via(c: dict) -> str | None:
-        act = by_id.get((c.get("ui") or {}).get("action_id")) or latest.get(c["id"]) or {}
-        return act.get("via")
+        return act_of(c).get("via")
 
     for e in events:
         items.append({"at": e.get("at"), "text": f"Read {e.get('path') or e.get('file')}", "kind": "read"})
@@ -825,12 +827,13 @@ def build_activity(cards: list[dict], events: list[dict], root: Path | None) -> 
         if c["status"] in ("dismissed", "logged"):
             items.append({"at": c.get("created_at"), "kind": "dismissed", "card": c["id"],
                           "text": f"{'No launch risk' if c['status'] == 'logged' else 'Dismissed'}: {c['headline']}",
-                          "detail": c.get("reason") or c.get("summary"), "via": via(c)})
+                          "detail": c.get("reason") or c.get("summary"), "via": via(c),
+                          "action_id": act_of(c).get("id")})
         elif c["status"] != "open":
             ui = c.get("ui") or {}
             items.append({"at": ui.get("at") or c.get("created_at"), "kind": c["status"], "card": c["id"],
                           "text": f"{c['status'].title()}: {c['headline']}", "detail": ui.get("note"),
-                          "via": via(c)})
+                          "via": via(c), "action_id": act_of(c).get("id")})
     items.sort(key=lambda x: (parse_ts(x.get("at")) or datetime.min.replace(tzinfo=tz())), reverse=True)
     return items[:40]
 
