@@ -1,0 +1,13 @@
+in this project we first trained a claude model how to read scanned documents, then using claude, taught a gpt 5 mini how to do the same for cheaper, dig in (you're allowed to go in git history as well) and find out how we did it, give a detailed summary of the approach
+
+---
+
+explain the same to me in short and layman
+
+---
+
+push to main
+
+---
+
+yeah commit and push these deletions so i can share the repo
