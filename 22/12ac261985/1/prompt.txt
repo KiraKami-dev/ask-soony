@@ -1,0 +1,9 @@
+the current repo has some proprietary data, which needs to be removed and all the finished branches be merged to main, so that repo can be made public and shared. analyse thoroughly which branches are stale or hard to merge and which are finished to be merged without conflict . do not make any changes on your own
+
+---
+
+no need for any of these, i think lets just remove the data, everything else is fine.
+
+---
+
+how do we make sure nobody can retrieve data even from commit history ?

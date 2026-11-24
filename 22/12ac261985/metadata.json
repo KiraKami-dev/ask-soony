@@ -3,7 +3,7 @@
   "checkpoint_id": "2212ac261985",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 3,
+  "checkpoints_count": 6,
   "files_touched": [
     "data/portal/soony/context/approval_policy_PP-07.pdf",
     "data/portal/soony/context/launch_plan_GH6.xlsx",
@@ -348,34 +348,41 @@
       "compact_transcript": "/22/12ac261985/0/transcript.jsonl",
       "content_hash": "/22/12ac261985/0/content_hash.txt",
       "prompt": "/22/12ac261985/0/prompt.txt"
+    },
+    {
+      "metadata": "/22/12ac261985/1/metadata.json",
+      "transcript": "/22/12ac261985/1/full.jsonl",
+      "compact_transcript": "/22/12ac261985/1/transcript.jsonl",
+      "content_hash": "/22/12ac261985/1/content_hash.txt",
+      "prompt": "/22/12ac261985/1/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 34,
-    "cache_creation_tokens": 180902,
-    "cache_read_tokens": 895901,
-    "output_tokens": 6018,
-    "api_call_count": 14
+    "input_tokens": 74,
+    "cache_creation_tokens": 247734,
+    "cache_read_tokens": 2267170,
+    "output_tokens": 22506,
+    "api_call_count": 32
   },
   "redaction": {
-    "replacements": 21,
+    "replacements": 162,
     "layers": {
       "betterleaks": 0,
       "connection_string": 0,
       "credential_key": 0,
-      "credential_value": 0,
+      "credential_value": 12,
       "credentialed_uri": 0,
-      "entropy": 4,
+      "entropy": 10,
       "goredact": 0,
-      "key_context": 3,
-      "pii": 14,
+      "key_context": 6,
+      "pii": 134,
       "provider_token": 0,
       "shell_stdin": 0
     },
     "pii": {
-      "EMAIL": 14,
+      "EMAIL": 110,
       "IP": 0,
-      "PHONE": 0
+      "PHONE": 24
     }
   }
 }
